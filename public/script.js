@@ -75,32 +75,46 @@ function showResult(){
     `${name}님의 운세 결과<br>${birth}<br>MBTI: ${mbti}`;
 }
 
+/* ===============================
+TAROT 78 RANDOM
+================================ */
+
+const majors = [
+"00_the_fool.png","01_the_magician.png","02_the_high_priestess.png",
+"03_the_empress.png","04_the_emperor.png","05_the_hierophant.png",
+"06_the_lovers.png","07_the_chariot.png","08_strength.png",
+"09_the_hermit.png","10_wheel_of_fortune.png","11_justice.png",
+"12_the_hanged_man.png","13_death.png","14_temperance.png",
+"15_the_devil.png","16_the_tower.png","17_the_star.png",
+"18_the_moon.png","19_the_sun.png","20_judgement.png","21_the_world.png"
+];
+
+const suits = ["wands","cups","swords","pentacles"];
+
+const minorNames = [
+"01_ace.png","02_two.png","03_three.png","04_four.png","05_five.png",
+"06_six.png","07_seven.png","08_eight.png","09_nine.png","10_ten.png",
+"11_page.png","12_knight.png","13_queen.png","14_king.png"
+];
+
+let tarotCards = [];
+
+/* majors */
+majors.forEach(file=>{
+  tarotCards.push("/tarot/majors/" + file);
+});
+
+/* minors */
+suits.forEach(suit=>{
+  minorNames.forEach(file=>{
+    tarotCards.push("/tarot/minors/" + suit + "/" + file);
+  });
+});
+
+/* draw */
 function drawTarot(){
-  if(todayCard){
-    renderTarot(todayCard);
-    return;
-  }
-
-  const allCards = [
-    ...tarotDB.majors,
-    ...tarotDB.minors.cups,
-    ...tarotDB.minors.wands,
-    ...tarotDB.minors.swords,
-    ...tarotDB.minors.pentacles
-  ];
-
-  const idx=Math.floor(Math.random()*allCards.length);
-  todayCard=allCards[idx];
-
-  renderTarot(todayCard);
-}
-
-function renderTarot(c){
-  document.getElementById("tarotBox").innerHTML=`
-    <img src="${c.image}" style="width:100%">
-    <div>${c.name_ko}</div>
-    <div>${c.upright.summary}</div>
-  `;
+  const randomCard = tarotCards[Math.floor(Math.random()*tarotCards.length)];
+  document.getElementById("tarotImg").src = randomCard;
 }
 
 function goTarotApp(){
