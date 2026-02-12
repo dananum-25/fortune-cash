@@ -59,3 +59,17 @@ button{
   border-radius:10px;
   margin-bottom:10px;
 }
+
+.qrow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#1a1a1a;
+  padding:10px;
+  margin-bottom:6px;
+  border-radius:8px;
+}
+
+.qtext{
+  width:85%;
+}
