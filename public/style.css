@@ -47,3 +47,8 @@ button{
   margin:12px 0;
   text-align:center;
 }
+
+.label{
+  font-size:14px;
+  margin-top:10px;
+}
