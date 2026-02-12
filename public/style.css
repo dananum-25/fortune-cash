@@ -75,15 +75,17 @@ button{
 }
 
 .tarotWrap {
-  height: 100vh;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  margin: 0;
 }
 
 .tarotCard {
-  height: 100vh;
+  max-width: 92vw;
+  max-height: 70vh;
   width: auto;
-  object-fit: cover;
-  margin: 0;
+  height: auto;
+  object-fit: contain;
+  display: block;
 }
