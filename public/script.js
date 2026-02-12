@@ -119,3 +119,68 @@ function copyURL(){
   navigator.clipboard.writeText(location.href);
   alert("복사되었습니다!");
 }
+
+/* ===============================
+MBTI TEST
+================================ */
+const MBTI_Q16 = [
+["EI","사람들과 함께 있을 때 에너지가 올라간다","혼자 있는 시간이 에너지를 채운다"],
+["EI","처음 보는 사람과도 금방 친해지는 편이다","낯선 사람은 적응 시간이 필요하다"],
+["EI","생각을 말하면서 정리하는 편이다","생각을 정리한 뒤 말하는 편이다"],
+["EI","주말엔 약속이 있으면 좋다","주말엔 혼자 쉬고 싶다"],
+["SN","구체적인 사실/데이터가 편하다","가능성/아이디어가 편하다"],
+["SN","현재의 현실 문제 해결이 우선이다","미래의 큰 방향이 우선이다"],
+["SN","경험을 기반으로 판단한다","직감/영감을 믿는 편이다"],
+["SN","설명은 디테일이 중요하다","설명은 큰 그림이 중요하다"],
+["TF","결정은 논리/원칙이 우선이다","결정은 사람/상황 배려가 우선이다"],
+["TF","피드백은 직설이 좋다","피드백은 부드러운 방식이 좋다"],
+["TF","갈등은 원인-해결이 핵심이다","갈등은 감정-관계가 핵심이다"],
+["TF","공정함이 최우선이다","조화로움이 최우선이다"],
+["JP","계획대로 진행해야 마음이 편하다","유연하게 바뀌어도 괜찮다"],
+["JP","마감 전에 미리 끝내는 편이다","마감 직전에 몰아서 하는 편이다"],
+["JP","정리/정돈이 되어야 편하다","어수선해도 진행 가능하다"],
+["JP","일정이 확정되어야 안심된다","상황 따라 바뀌는 게 자연스럽다"],
+];
+
+function initMBTITest(){
+  const box=document.getElementById("mbtiQuestions");
+  if(!box) return;
+
+  box.innerHTML="";
+
+  MBTI_Q16.forEach((q,i)=>{
+    box.innerHTML+=`
+      <div class="qbox">
+        <label>
+          <input type="radio" name="q${i}" value="left">
+          ${q[1]}
+        </label>
+        <label>
+          <input type="radio" name="q${i}" value="right">
+          ${q[2]}
+        </label>
+      </div>
+    `;
+  });
+
+  box.innerHTML+=`<button onclick="submitMBTI()">제출하고 MBTI 확정</button>`;
+}
+
+function submitMBTI(){
+  let scores={EI:0,SN:0,TF:0,JP:0};
+
+  MBTI_Q16.forEach((q,i)=>{
+    const sel=document.querySelector(`input[name=q${i}]:checked`);
+    if(!sel) return;
+    if(sel.value==="left") scores[q[0]]++;
+  });
+
+  const mbti =
+    (scores.EI>=2?"E":"I")+
+    (scores.SN>=2?"S":"N")+
+    (scores.TF>=2?"T":"F")+
+    (scores.JP>=2?"J":"P");
+
+  document.getElementById("mbtiSelect").value=mbti;
+  alert("당신의 MBTI는 "+mbti);
+}
