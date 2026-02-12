@@ -1,0 +1,49 @@
+body{
+  background:#111;
+  color:white;
+  font-family:Arial;
+}
+
+.container{
+  max-width:420px;
+  margin:auto;
+}
+
+.hero{
+  padding:20px;
+  background:linear-gradient(135deg,#7f5af0,#2cb67d);
+  border-radius:20px;
+  text-align:center;
+  font-weight:bold;
+}
+
+input,select{
+  width:100%;
+  margin:10px 0;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  margin-top:10px;
+  font-weight:bold;
+}
+
+.mainBtn{
+  background:#7f5af0;
+  color:white;
+}
+
+.adbox{
+  background:white;
+  color:black;
+  padding:14px;
+  border-radius:12px;
+  margin:12px 0;
+  text-align:center;
+}
