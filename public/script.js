@@ -1,6 +1,4 @@
-let zodiacMap = {};
-let mbtiDB = {};
-let tarotDB = [];
+let tarotDB = {};
 let todayCard = null;
 
 const MBTI_TYPES = [
@@ -11,11 +9,9 @@ const MBTI_TYPES = [
 ];
 
 async function loadDB(){
-  zodiacMap = await fetch("data/lunar_new_year_1920_2026.json").then(r=>r.json());
-  mbtiDB = await fetch("data/mbti_traits_ko.json").then(r=>r.json());
   tarotDB = await fetch("data/tarot_db_ko.json").then(r=>r.json());
-
   initMBTI();
+  initMBTITest();
 }
 
 loadDB();
@@ -28,14 +24,21 @@ function initMBTI(){
     o.textContent=t;
     sel.appendChild(o);
   });
-
-  sel.onchange=showMBTITrait;
 }
 
-function showMBTITrait(){
-  const t=document.getElementById("mbtiSelect").value;
-  document.getElementById("mbtiTrait").innerText=
-    mbtiDB.traits[t].keywords.join(" · ");
+function initMBTITest(){
+  const box=document.getElementById("mbtiQuestions");
+  for(let i=1;i<=16;i++){
+    box.innerHTML += `
+      <div>
+        Q${i}. 질문 ${i}
+        <select>
+          <option>왼쪽</option>
+          <option>오른쪽</option>
+        </select>
+      </div>
+    `;
+  }
 }
 
 function setMBTIMode(m){
@@ -45,33 +48,58 @@ function setMBTIMode(m){
     m==="test"?"block":"none";
 }
 
-function zodiacFromBirth(b){
-  const d=new Date(b);
-  const y=d.getFullYear();
-  return (y-4)%12;
-}
-
 function showResult(){
+  const name=document.getElementById("name").value;
+  const birth=document.getElementById("birth").value;
+  const mbti=document.getElementById("mbtiSelect").value;
+
+  if(!name){
+    alert("성명을 입력해주세요");
+    return;
+  }
+
+  if(!birth){
+    alert("생년월일을 선택해주세요");
+    return;
+  }
+
+  if(!mbti){
+    alert("MBTI를 선택해주세요");
+    return;
+  }
+
   document.getElementById("inputSection").style.display="none";
   document.getElementById("resultSection").style.display="block";
 
-  const name=document.getElementById("name").value;
-  const mbti=document.getElementById("mbtiSelect").value;
-
   document.getElementById("resultBox").innerHTML=
-    `${name}님의 운세 결과<br>MBTI:${mbti}`;
-
-  drawTarot();
+    `${name}님의 운세 결과<br>${birth}<br>MBTI: ${mbti}`;
 }
 
 function drawTarot(){
-  const idx=Math.floor(Math.random()*tarotDB.majors.length);
-  const c=tarotDB.majors[idx];
+  if(todayCard){
+    renderTarot(todayCard);
+    return;
+  }
 
+  const allCards = [
+    ...tarotDB.majors,
+    ...tarotDB.minors.cups,
+    ...tarotDB.minors.wands,
+    ...tarotDB.minors.swords,
+    ...tarotDB.minors.pentacles
+  ];
+
+  const idx=Math.floor(Math.random()*allCards.length);
+  todayCard=allCards[idx];
+
+  renderTarot(todayCard);
+}
+
+function renderTarot(c){
   document.getElementById("tarotBox").innerHTML=`
-  <img src="${c.image}" style="width:100%">
-  <div>${c.name_ko}</div>
-  <div>${c.upright.summary}</div>
+    <img src="${c.image}" style="width:100%">
+    <div>${c.name_ko}</div>
+    <div>${c.upright.summary}</div>
   `;
 }
 
@@ -89,5 +117,5 @@ function back(){
 
 function copyURL(){
   navigator.clipboard.writeText(location.href);
-  alert("복사됨");
+  alert("복사되었습니다!");
 }
