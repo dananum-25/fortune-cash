@@ -50,7 +50,7 @@ function setMBTIMode(m){
 
 function showResult(){
   const name=document.getElementById("name").value;
-  const birth=document.getElementById("birth").value;
+  const birth=document.getElementById("birthInput").value;
   const mbti=document.getElementById("mbtiSelect").value;
 
   if(!name){
