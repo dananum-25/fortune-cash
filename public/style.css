@@ -89,3 +89,12 @@ button{
   object-fit: contain;
   display: block;
 }
+
+.tarotCard{
+  transition:transform 0.6s;
+  transform-style:preserve-3d;
+}
+
+.flip{
+  transform:rotateY(180deg);
+}
