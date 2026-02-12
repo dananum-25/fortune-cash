@@ -74,9 +74,15 @@ button{
   width:85%;
 }
 
-.tarotCard{
-  width:70%;
-  max-width:260px;
-  margin:auto;
-  display:block;
+.tarotWrap {
+  height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tarotCard {
+  max-height: 75vh;
+  max-width: 90vw;
+  object-fit: contain;
 }
