@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>2026 운세</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="hero">
+    🔮 2026 운세 | 띠 + MBTI + 사주 + 오늘/내일 + 타로
+  </div>
+
+  <!-- INPUT -->
+  <div id="inputSection">
+
+    <input id="name" placeholder="이름">
+
+    <input id="birth" type="date">
+
+    <div id="zodiacBox"></div>
+
+    <h3>MBTI</h3>
+
+    <div class="mbti-mode">
+      <button onclick="setMBTIMode('direct')">직접 선택</button>
+      <button onclick="setMBTIMode('test')">16문항 테스트</button>
+    </div>
+
+    <div id="mbtiDirect">
+      <select id="mbtiSelect"></select>
+      <div id="mbtiTrait"></div>
+    </div>
+
+    <div id="mbtiTest" style="display:none;"></div>
+
+    <button class="mainBtn" onclick="showResult()">운세 보기</button>
+
+  </div>
+
+  <!-- RESULT -->
+  <div id="resultSection" style="display:none;">
+
+    <div id="resultBox"></div>
+
+    <button onclick="copyURL()">URL 복사</button>
+
+    <div class="adbox">
+      <div>정수기 렌탈</div>
+      <a href="https://dananum-landing.vercel.app/">무료 상담하기</a>
+    </div>
+
+    <div id="tarotBox"></div>
+
+    <button onclick="goTarotApp()">타로 전문앱 방문하기</button>
+
+    <button onclick="goGame()">🎮 미니게임하고 커피쿠폰 받기</button>
+
+    <button onclick="back()">입력 화면으로</button>
+
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
