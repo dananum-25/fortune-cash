@@ -196,3 +196,41 @@ function submitMBTI(){
   document.getElementById("mbtiSelect").value=mbti;
   alert("당신의 MBTI는 "+mbti);
 }
+document.getElementById("submitBtn").onclick = async () => {
+/* =========================
+   띠 자동 계산
+========================= */
+
+let lunarMap = {};
+
+fetch("/data/lunar_new_year_1920_2026.json")
+  .then(r=>r.json())
+  .then(d=> lunarMap = d);
+
+const zodiacAnimals = [
+"원숭이","닭","개","돼지",
+"쥐","소","호랑이","토끼",
+"용","뱀","말","양"
+];
+
+document.getElementById("birthInput").addEventListener("change", function(){
+  const value = this.value;
+  if(!value) return;
+
+  const [y,m,d] = value.split("-").map(Number);
+  let zodiacYear = y;
+
+  const lunar = lunarMap[y];
+  if(lunar){
+    const [lm,ld] = lunar.split("-").map(Number);
+    if(m < lm || (m === lm && d < ld)){
+      zodiacYear = y - 1;
+    }
+  }
+
+  const zodiac = zodiacAnimals[zodiacYear % 12];
+
+  document.getElementById("zodiacResult").innerText =
+    `${y}년 ${m}월 ${d}일생은 ${zodiac}띠 입니다`;
+});
+  
