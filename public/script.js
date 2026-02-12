@@ -121,7 +121,7 @@ function copyURL(){
 }
 
 /* ===============================
-MBTI TEST
+MBTI TEST (UI 개선)
 ================================ */
 const MBTI_Q16 = [
 ["EI","사람들과 함께 있을 때 에너지가 올라간다","혼자 있는 시간이 에너지를 채운다"],
@@ -150,15 +150,13 @@ function initMBTITest(){
 
   MBTI_Q16.forEach((q,i)=>{
     box.innerHTML+=`
-      <div class="qbox">
-        <label>
-          <input type="radio" name="q${i}" value="left">
-          ${q[1]}
-        </label>
-        <label>
-          <input type="radio" name="q${i}" value="right">
-          ${q[2]}
-        </label>
+      <div class="qrow">
+        <div class="qtext">${i+1}. ${q[1]}</div>
+        <input type="radio" name="q${i}" value="left">
+      </div>
+      <div class="qrow">
+        <div class="qtext">${q[2]}</div>
+        <input type="radio" name="q${i}" value="right">
       </div>
     `;
   });
