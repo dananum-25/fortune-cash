@@ -71,9 +71,11 @@ function showResult(){
   document.getElementById("inputSection").style.display="none";
   document.getElementById("resultSection").style.display="block";
 
+  const zodiacText =
+  document.getElementById("zodiacResult").innerText;
+
   document.getElementById("resultBox").innerHTML=
-    `${name}님의 운세 결과<br>${birth}<br>MBTI: ${mbti}`;
-}
+  `${name}님의 운세 결과<br>${birth}<br>${zodiacText}<br>MBTI: ${mbti}`;
 
 /* ===============================
 TAROT 78 RANDOM
@@ -111,10 +113,28 @@ suits.forEach(suit=>{
   });
 });
 
-/* draw */
 function drawTarot(){
+  const today = new Date().toISOString().slice(0,10);
+
+  const saved = localStorage.getItem("todayTarot");
+  if(saved){
+    const obj = JSON.parse(saved);
+    if(obj.date === today){
+      document.getElementById("tarotImg").src = obj.card;
+      flipCard();
+      return;
+    }
+  }
+
   const randomCard = tarotCards[Math.floor(Math.random()*tarotCards.length)];
   document.getElementById("tarotImg").src = randomCard;
+
+  localStorage.setItem("todayTarot", JSON.stringify({
+    date: today,
+    card: randomCard
+  }));
+
+  flipCard();
 }
 
 function goTarotApp(){
@@ -132,6 +152,13 @@ function back(){
 function copyURL(){
   navigator.clipboard.writeText(location.href);
   alert("복사되었습니다!");
+}
+
+function flipCard(){
+  const img = document.getElementById("tarotImg");
+  img.classList.remove("flip");
+  void img.offsetWidth;
+  img.classList.add("flip");
 }
 
 /* ===============================
@@ -180,18 +207,25 @@ function initMBTITest(){
 
 function submitMBTI(){
   let scores={EI:0,SN:0,TF:0,JP:0};
+function submitMBTI(){
+  let scores={E:0,I:0,S:0,N:0,T:0,F:0,J:0,P:0};
 
   MBTI_Q16.forEach((q,i)=>{
     const sel=document.querySelector(`input[name=q${i}]:checked`);
     if(!sel) return;
-    if(sel.value==="left") scores[q[0]]++;
+
+    if(sel.value==="left"){
+      scores[q[0][0]]++;
+    }else{
+      scores[q[0][1]]++;
+    }
   });
 
   const mbti =
-    (scores.EI>=2?"E":"I")+
-    (scores.SN>=2?"S":"N")+
-    (scores.TF>=2?"T":"F")+
-    (scores.JP>=2?"J":"P");
+    (scores.E>=scores.I?"E":"I")+
+    (scores.S>=scores.N?"S":"N")+
+    (scores.T>=scores.F?"T":"F")+
+    (scores.J>=scores.P?"J":"P");
 
   document.getElementById("mbtiSelect").value=mbti;
   alert("당신의 MBTI는 "+mbti);
