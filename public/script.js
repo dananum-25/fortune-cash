@@ -196,9 +196,8 @@ function submitMBTI(){
   document.getElementById("mbtiSelect").value=mbti;
   alert("당신의 MBTI는 "+mbti);
 }
-document.getElementById("submitBtn").onclick = async () => {
 /* =========================
-   띠 자동 계산
+띠 자동 계산 (달력 선택 시)
 ========================= */
 
 let lunarMap = {};
@@ -231,6 +230,5 @@ document.getElementById("birthInput").addEventListener("change", function(){
   const zodiac = zodiacAnimals[zodiacYear % 12];
 
   document.getElementById("zodiacResult").innerText =
-    `${y}년 ${m}월 ${d}일생은 ${zodiac}띠 입니다`;
+    `${zodiac}띠 입니다`;
 });
-  
