@@ -73,3 +73,10 @@ button{
 .qtext{
   width:85%;
 }
+
+.tarotCard{
+  width:70%;
+  max-width:260px;
+  margin:auto;
+  display:block;
+}
