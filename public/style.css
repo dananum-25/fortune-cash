@@ -52,3 +52,10 @@ button{
   font-size:14px;
   margin-top:10px;
 }
+
+.qbox{
+  background:#1a1a1a;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:10px;
+}
