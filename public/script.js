@@ -298,6 +298,10 @@ function goTarotApp(){
 }
 
 function goGame(){
+  point += 30;
+  localStorage.setItem("point", point);
+  renderPoint();
+
   location.href="https://game-time-kappa.vercel.app/";
 }
 
@@ -305,6 +309,22 @@ function back(){
   location.reload();
 }
 function copyURL(){
-  navigator.clipboard.writeText(location.href);
-  alert("URL이 복사되었습니다!");
+  const url = location.origin + "?invite=" + inviteCode;
+  navigator.clipboard.writeText(url);
+
+  point += 50;
+  localStorage.setItem("point", point);
+
+  renderPoint();
+  alert("URL이 복사되었습니다! +50P");
+}
+const params = new URLSearchParams(location.search);
+const invite = params.get("invite");
+
+if(invite && invite !== inviteCode){
+  if(!localStorage.getItem("invited")){
+    point += 50;
+    localStorage.setItem("invited","1");
+    localStorage.setItem("point",point);
+  }
 }
