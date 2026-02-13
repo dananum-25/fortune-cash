@@ -131,16 +131,15 @@ function setMBTIMode(m){
 TAROT
 ================================ */
 function drawTarot(){
-  const tarotKeys = Object.keys(tarotDB);
-  const key = tarotKeys[Math.floor(Math.random()*tarotKeys.length)];
+  const cards = tarotDB.majors || [];
+  const card = cards[Math.floor(Math.random()*cards.length)];
 
-  const data = tarotDB[key];
-  document.getElementById("tarotImg").src="/tarot/"+data.image;
+  document.getElementById("tarotImg").src="/tarot/back.png";
 
   document.getElementById("resultBox").innerHTML += `
     <br><b>타로카드</b><br>
-    ${data.name}<br>
-    ${data.meaning}
+    ${card.name_ko}<br>
+    ${card.upright.summary}
   `;
 }
 
@@ -150,13 +149,7 @@ SHOW RESULT
 function showResult(){
 
   const name = document.getElementById("name").value;
-  const birth = document.getElementById("birthInput").value;
   const mbti = document.getElementById("mbtiSelect").value;
-
-  if(!name || !birth || !mbti){
-    alert("정보를 모두 입력해주세요");
-    return;
-  }
 
   const todayArr=todayDB?.pools?.today||[];
   const tomorrowArr=tomorrowDB?.pools?.tomorrow||[];
@@ -168,18 +161,18 @@ function showResult(){
 
   let zodiacFortune="";
   if(currentZodiac && zodiacDB[currentZodiac]){
-    zodiacFortune=zodiacDB[currentZodiac].year;
+    const arr=zodiacDB[currentZodiac].today||[];
+    zodiacFortune=arr[Math.floor(Math.random()*arr.length)]||"";
   }
 
-  const mbtiText = mbtiDB[mbti]?.description || "";
-  const sajuText = sajuDB?.one_line?.[
-    Math.floor(Math.random()*sajuDB.one_line.length)
-  ] || "";
+  const mbtiText = mbtiDB[mbti]?.summary || "";
+
+  const elements = sajuDB.elements || [];
+  const sajuText =
+    elements[Math.floor(Math.random()*elements.length)]?.pools?.overall?.[0] || "";
 
   document.getElementById("resultBox").innerHTML=`
     <b>${name}님의 운세 결과</b><br><br>
-    ${document.getElementById("zodiacResult").innerText}<br><br>
-
     <b>오늘의 운세</b><br>${todayFortune}<br><br>
     <b>내일의 운세</b><br>${tomorrowFortune}<br><br>
     <b>2026년 운세</b><br>${yearFortune}<br><br>
