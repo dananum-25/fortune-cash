@@ -16,12 +16,6 @@ async function loadDB(){
 
 loadDB();
 
-function initMBTITest(){
-  const box=document.getElementById("mbtiQuestions");
-  if(!box) return;
-
-  box.innerHTML="";
-
   MBTI_Q16.forEach((q,i)=>{
     box.innerHTML+=`
       <div class="qbox">
@@ -93,8 +87,6 @@ function initMBTITest(){
   box.innerHTML+=`<button onclick="submitMBTI()">제출하고 MBTI 확정</button>`;
 }
 
-function submitMBTI(){
-  let scores={EI:0,SN:0,TF:0,JP:0};
 function submitMBTI(){
   let scores={E:0,I:0,S:0,N:0,T:0,F:0,J:0,P:0};
 
