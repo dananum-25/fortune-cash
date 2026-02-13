@@ -132,7 +132,7 @@ TAROT
 ================================ */
 function drawTarot(){
 
-  if(!tarotDB.majors) return;
+  if(!tarotDB) return;
 
   const birth = document.getElementById("birthInput").value;
   if(!birth){
@@ -141,22 +141,25 @@ function drawTarot(){
   }
 
   const todayKey = new Date().toISOString().slice(0,10);
-  const storageKey = "tarot_" + birth + "_" + todayKey;
+  const seedString = birth + todayKey;
 
-  let saved = localStorage.getItem(storageKey);
-  let card;
-
-  if(saved){
-    card = JSON.parse(saved);
-  }else{
-    const allCards = [
-      ...(tarotDB.majors||[]),
-      ...(tarotDB.minors||[])
-    ];
-
-    card = allCards[Math.floor(Math.random()*allCards.length)];
-    localStorage.setItem(storageKey, JSON.stringify(card));
+  let seed = 0;
+  for(let i=0;i<seedString.length;i++){
+    seed += seedString.charCodeAt(i);
   }
+
+  const allCards = [
+    ...(tarotDB.majors || []),
+    ...(tarotDB.minors || [])
+  ];
+
+  if(allCards.length === 0){
+    alert("타로 DB 없음");
+    return;
+  }
+
+  const idx = seed % allCards.length;
+  const card = allCards[idx];
 
   document.getElementById("tarotImg").src = getTarotImage(card);
 
@@ -196,10 +199,27 @@ function showResult(){
   const yearFortune=yearArr[Math.floor(Math.random()*yearArr.length)]||"";
 
 
-    let zodiacFortune="";
+    let zodiacFortune = "";
+
 if(currentZodiac && zodiacDB[currentZodiac]){
-  const arr=zodiacDB[currentZodiac].year || [];
-  zodiacFortune = arr[Math.floor(Math.random()*arr.length)] || "";
+
+  const arr = zodiacDB[currentZodiac].year || [];
+
+  if(arr.length > 0){
+
+    const birth = document.getElementById("birthInput").value;
+    const todayKey = new Date().toISOString().slice(0,10);
+
+    const seedString = birth + currentZodiac + todayKey;
+
+    let seed = 0;
+    for(let i=0;i<seedString.length;i++){
+      seed += seedString.charCodeAt(i);
+    }
+
+    const idx = seed % arr.length;
+    zodiacFortune = arr[idx];
+  }
 }
   const mbtiData = mbtiDB.traits?.[mbti];
 const mbtiText = mbtiData
