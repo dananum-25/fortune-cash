@@ -122,32 +122,48 @@ document.getElementById("birthInput").addEventListener("change",function(){
 /* ===============================
 SHOW RESULT
 ================================ */
-function showResult(){
-  const name=document.getElementById("name").value;
-  const birth=document.getElementById("birthInput").value;
-  const mbti=document.getElementById("mbtiSelect").value;
-  const phone="01000000000";
+async function showResult(){
 
-  if(!name){ alert("성명을 입력해주세요"); return; }
-  if(!birth){ alert("생년월일을 선택해주세요"); return; }
-  if(!mbti){ alert("MBTI를 선택해주세요"); return; }
+  const name = document.getElementById("name").value;
+  const birth = document.getElementById("birthInput").value;
+  const mbti = document.getElementById("mbtiSelect").value;
 
-  document.getElementById("inputSection").style.display="none";
-  document.getElementById("resultSection").style.display="block";
-
-  let zodiacFortune="";
-  if(currentZodiac && zodiacDB[currentZodiac]){
-    zodiacFortune=zodiacDB[currentZodiac].year||"";
+  if(!name){
+    alert("성명을 입력해주세요");
+    return;
   }
 
-  function getRandomTodayFortune(){
-  if(!todayDB?.pools?.today?.length) return "운세 데이터 준비중";
-  const arr = todayDB.pools.today;
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-  const tomorrowFortune=tomorrowDB[mbti]||"";
+  if(!birth){
+    alert("생년월일을 선택해주세요");
+    return;
+  }
 
-  document.getElementById("resultBox").innerHTML=`
+  if(!mbti){
+    alert("MBTI를 선택해주세요");
+    return;
+  }
+
+  /* 오늘 운세 */
+  let todayFortune = "";
+  if(todayDB?.pools?.today){
+    const arr = todayDB.pools.today;
+    todayFortune = arr[Math.floor(Math.random()*arr.length)];
+  }
+
+  /* 내일 운세 */
+  let tomorrowFortune = "";
+  if(tomorrowDB?.pools?.tomorrow){
+    const arr = tomorrowDB.pools.tomorrow;
+    tomorrowFortune = arr[Math.floor(Math.random()*arr.length)];
+  }
+
+  /* 띠 운세 */
+  let zodiacFortune = "";
+  if(currentZodiac && zodiacDB[currentZodiac]){
+    zodiacFortune = zodiacDB[currentZodiac].year || "";
+  }
+
+  document.getElementById("resultBox").innerHTML = `
     <b>${name}님의 운세 결과</b><br><br>
     ${document.getElementById("zodiacResult").innerText}<br><br>
     <b>오늘의 운세</b><br>${todayFortune}<br><br>
@@ -155,6 +171,10 @@ function showResult(){
     <b>2026년 운세</b><br>${zodiacFortune}<br><br>
     MBTI: ${mbti}
   `;
+
+  document.getElementById("inputSection").style.display="none";
+  document.getElementById("resultSection").style.display="block";
+}
 
   // 🔹 백그라운드 저장
   registerUser(name,phone);
