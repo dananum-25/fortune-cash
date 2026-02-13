@@ -109,6 +109,7 @@ async function loadDB(){
 }
 
 /* ===============================
+/* ===============================
 ZODIAC
 ================================ */
 let lunarMap={};
@@ -125,7 +126,10 @@ const zodiacAnimals=[
 
 document.addEventListener("DOMContentLoaded", function(){
 
-  document.getElementById("birthInput").addEventListener("change",function(){
+  const birthInput = document.getElementById("birthInput");
+  if(!birthInput) return;
+
+  birthInput.addEventListener("change", function(){
 
     const [y,m,d]=this.value.split("-").map(Number);
     let zodiacYear=y;
@@ -140,10 +144,11 @@ document.addEventListener("DOMContentLoaded", function(){
     currentZodiac=zodiac;
 
     const name=document.getElementById("name").value||"선택한 생년월일";
-    document.getElementById("zodiacResult").innerText=
+    document.getElementById("zodiacResult").innerText =
       `음력을 적용한 ${name}님은 ${zodiac}띠 입니다`;
-
   });
+
+});
 
   let zodiacYear=y;
 
