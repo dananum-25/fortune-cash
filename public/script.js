@@ -110,9 +110,12 @@ async function showResult(){
 
   let zodiacFortune="";
   if(currentZodiac && zodiacDB[currentZodiac]){
-    const arr=zodiacDB[currentZodiac].year;
-zodiacFortune=arr[Math.floor(Math.random()*arr.length)];
-  }
+    const z = zodiacDB[currentZodiac].year;
+if(Array.isArray(z)){
+  zodiacFortune = z[Math.floor(Math.random()*z.length)];
+}else{
+  zodiacFortune = z;
+}
 
   document.getElementById("resultBox").innerHTML=`
     <b>${name}님의 운세 결과</b><br><br>
@@ -130,8 +133,8 @@ zodiacFortune=arr[Math.floor(Math.random()*arr.length)];
 /* ===============================
 INIT
 ================================ */
-document.addEventListener("DOMContentLoaded", function(){
-  loadDB();
+document.addEventListener("DOMContentLoaded", async function(){
+  await loadDB();
   initZodiac();
   renderPoint();
 });
