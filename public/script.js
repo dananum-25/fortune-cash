@@ -225,7 +225,17 @@ function showResult(){
     alert("MBTI를 선택해주세요");
     return;
   }
+function goTarotApp(){
+  location.href="https://my-fortune-lake.vercel.app/";
+}
 
+function goGame(){
+  location.href="https://game-time-kappa.vercel.app/";
+}
+
+function back(){
+  location.reload();
+}
   document.getElementById("inputSection").style.display="none";
   document.getElementById("resultSection").style.display="block";
 
