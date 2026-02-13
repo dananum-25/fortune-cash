@@ -1,3 +1,17 @@
+const API_URL = "https://script.google.com/macros/s/AKfycbwL01pmMt2DFpaGIZrQr3rVL8wAj2806Ys3ssKgLqH4cylrQf6wUc83YOo1lDuYTyhHlQ/exec";
+
+async function registerUser(name, phone){
+  const res = await fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"register",
+      name,
+      phone
+    })
+  });
+
+  return await res.json();
+}
 let point = parseInt(localStorage.getItem("point") || "0");
 let inviteCode = localStorage.getItem("inviteCode");
 
@@ -238,11 +252,17 @@ function flipCard(){
 }
 
 function showResult(){
-function showResult(){
   const name = document.getElementById("name").value;
   const birth = document.getElementById("birthInput").value;
   const mbti = document.getElementById("mbtiSelect").value;
+  const phone = "01000000000"; // 임시 테스트용
 
+await registerUser(name, phone);
+const check = await checkin(phone);
+const user = await getUser(phone);
+
+document.getElementById("resultBox").innerHTML +=
+  `<br>포인트: ${user.points} / streak: ${user.streak}`;
   if(!name){
     alert("성명을 입력해주세요");
     return;
