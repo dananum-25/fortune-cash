@@ -225,6 +225,10 @@ async function showResult(){
     return;
   }
 
+  const phone = "01000000000"; // 테스트용
+  await registerUser(name, phone);
+  await checkin(phone);
+  const user = await getUser(phone);
   // 오늘/내일 운세 (pool에서 랜덤)
   let todayFortune = "";
   if(todayDB?.pools?.today?.length){
@@ -247,13 +251,14 @@ async function showResult(){
   const zodiacText = document.getElementById("zodiacResult")?.innerText || "";
 
   document.getElementById("resultBox").innerHTML = `
-    <b>${name}님의 운세 결과</b><br><br>
-    ${zodiacText}<br><br>
-    <b>오늘의 운세</b><br>${todayFortune}<br><br>
-    <b>내일의 운세</b><br>${tomorrowFortune}<br><br>
-    <b>2026년 운세</b><br>${zodiacFortune}<br><br>
-    MBTI: ${mbti}
-  `;
+  <b>${name}님의 운세 결과</b><br><br>
+  ${document.getElementById("zodiacResult").innerText}<br><br>
+  <b>오늘의 운세</b><br>${todayFortune}<br><br>
+  <b>내일의 운세</b><br>${tomorrowFortune}<br><br>
+  <b>2026년 운세</b><br>${zodiacFortune}<br><br>
+  MBTI: ${mbti}
+  <br><br>포인트: ${user.points}P / 연속출석: ${user.streak}
+`;
 
   document.getElementById("inputSection").style.display="none";
   document.getElementById("resultSection").style.display="block";
