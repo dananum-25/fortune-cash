@@ -140,7 +140,11 @@ function showResult(){
     zodiacFortune=zodiacDB[currentZodiac].year||"";
   }
 
-  const todayFortune=todayDB[mbti]||"";
+  function getRandomTodayFortune(){
+  if(!todayDB?.pools?.today?.length) return "운세 데이터 준비중";
+  const arr = todayDB.pools.today;
+  return arr[Math.floor(Math.random() * arr.length)];
+}
   const tomorrowFortune=tomorrowDB[mbti]||"";
 
   document.getElementById("resultBox").innerHTML=`
