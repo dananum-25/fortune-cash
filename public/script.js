@@ -236,6 +236,7 @@ function goGame(){
 function back(){
   location.reload();
 }
+
   document.getElementById("inputSection").style.display="none";
   document.getElementById("resultSection").style.display="block";
 
@@ -244,4 +245,20 @@ function back(){
 
   document.getElementById("resultBox").innerHTML =
     `${name}님의 운세 결과<br>${birth}<br>${zodiacText}<br>MBTI: ${mbti}`;
+}
+
+function goTarotApp(){
+  location.href="https://my-fortune-lake.vercel.app/";
+}
+
+function goGame(){
+  location.href="https://game-time-kappa.vercel.app/";
+}
+
+function back(){
+  location.reload();
+}
+function copyURL(){
+  navigator.clipboard.writeText(location.href);
+  alert("URL이 복사되었습니다!");
 }
