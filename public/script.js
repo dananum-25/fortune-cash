@@ -205,3 +205,33 @@ function flipCard(){
   void img.offsetWidth;
   img.classList.add("flip");
 }
+
+function showResult(){
+  const name = document.getElementById("name").value;
+  const birth = document.getElementById("birthInput").value;
+  const mbti = document.getElementById("mbtiSelect").value;
+
+  if(!name){
+    alert("성명을 입력해주세요");
+    return;
+  }
+
+  if(!birth){
+    alert("생년월일을 선택해주세요");
+    return;
+  }
+
+  if(!mbti){
+    alert("MBTI를 선택해주세요");
+    return;
+  }
+
+  document.getElementById("inputSection").style.display="none";
+  document.getElementById("resultSection").style.display="block";
+
+  const zodiacText =
+    document.getElementById("zodiacResult").innerText;
+
+  document.getElementById("resultBox").innerHTML =
+    `${name}님의 운세 결과<br>${birth}<br>${zodiacText}<br>MBTI: ${mbti}`;
+}
