@@ -75,6 +75,24 @@ function initMBTI(){
   });
 }
 
+const MBTI_Q16 = [
+["EI","사람들과 함께 있을 때 에너지가 올라간다","혼자 있는 시간이 에너지를 채운다"],
+["EI","처음 보는 사람과도 금방 친해진다","낯선 사람은 적응 시간이 필요하다"],
+["EI","생각을 말하면서 정리한다","생각을 정리한 뒤 말한다"],
+["EI","주말엔 약속이 좋다","혼자 쉬는 게 좋다"],
+["SN","구체적인 사실이 중요하다","아이디어가 중요하다"],
+["SN","현실 문제 해결이 먼저","미래 가능성이 먼저"],
+["SN","경험을 믿는다","직감을 믿는다"],
+["SN","디테일 설명 선호","큰 그림 설명 선호"],
+["TF","논리 중심 결정","감정 중심 결정"],
+["TF","직설 피드백 선호","부드러운 피드백 선호"],
+["TF","원인 해결 중심","관계 회복 중심"],
+["TF","공정함 우선","조화 우선"],
+["JP","계획형","즉흥형"],
+["JP","미리 끝낸다","마감 직전"],
+["JP","정리된 환경","어수선해도 OK"],
+["JP","일정 확정 선호","유동적 일정 선호"]
+];
 /* ===============================
 DB LOAD
 ================================ */
@@ -89,7 +107,6 @@ async function loadDB(){
   initMBTI();
   initMBTITest();
 }
-loadDB();
 
 /* ===============================
 ZODIAC
@@ -106,7 +123,29 @@ const zodiacAnimals=[
 "용","뱀","말","양"
 ];
 
-document.getElementById("birthInput").addEventListener("change",function(){
+document.addEventListener("DOMContentLoaded", function(){
+
+  document.getElementById("birthInput").addEventListener("change",function(){
+
+    const [y,m,d]=this.value.split("-").map(Number);
+    let zodiacYear=y;
+
+    const lunar=lunarMap[y];
+    if(lunar){
+      const [lm,ld]=lunar.split("-").map(Number);
+      if(m<lm||(m===lm&&d<ld)) zodiacYear=y-1;
+    }
+
+    const zodiac=zodiacAnimals[zodiacYear%12];
+    currentZodiac=zodiac;
+
+    const name=document.getElementById("name").value||"선택한 생년월일";
+    document.getElementById("zodiacResult").innerText=
+      `음력을 적용한 ${name}님은 ${zodiac}띠 입니다`;
+
+  });
+
+});
   const [y,m,d]=this.value.split("-").map(Number);
   let zodiacYear=y;
 
@@ -213,3 +252,7 @@ function setMBTIMode(m){
   document.getElementById("mbtiTest").style.display =
     m==="test" ? "block" : "none";
 }
+document.addEventListener("DOMContentLoaded", function(){
+  loadDB();
+  renderPoint();
+});
