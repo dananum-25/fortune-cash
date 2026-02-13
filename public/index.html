@@ -13,7 +13,9 @@
   <div class="hero">
     🔮 2026 운세 | 띠 + MBTI + 사주 + 오늘/내일 + 타로
   </div>
-<div id="pointBox" style="margin:10px 0;color:#aaa;"></div>
+
+  <div id="pointBox" style="margin:10px 0;color:#aaa;"></div>
+
   <div id="inputSection">
 
     <input id="name" placeholder="성함을 입력해주세요">
@@ -22,28 +24,25 @@
     <input type="date" id="birthInput">
 
     <div id="zodiacResult" style="margin-top:8px;color:#bbb;font-size:14px;"></div>
+
     <h3>MBTI</h3>
 
-    <div class="mbti-mode">
-      <button onclick="setMBTIMode('direct')">직접 선택</button>
-    </div>
- 
-    <div id="mbtiDirect" style="display:block;">
+    <button onclick="setMBTIMode('direct')">직접 선택</button>
+    <button onclick="setMBTIMode('test')">16문항 테스트</button>
+
+    <div id="mbtiDirect">
       <select id="mbtiSelect"></select>
-      <div id="mbtiTrait"></div>
-    </div>
-  
-    <div class="mbti-mode">
-      <button onclick="setMBTIMode('test')">16문항 테스트</button>
     </div>
 
     <div id="mbtiTest" style="display:none;">
-      
-    <button class="mainBtn" onclick="showResult()">운세 보기</button>
-  </div>
-  
-  <div id="resultSection" style="display:none;">
+      <div id="mbtiQuestions"></div>
+    </div>
 
+    <button class="mainBtn" onclick="showResult()">운세 보기</button>
+
+  </div>
+
+  <div id="resultSection" style="display:none;">
     <div id="resultBox"></div>
 
     <button onclick="copyURL()">URL복사 친구공유 하고 포인트 받기</button>
@@ -54,9 +53,9 @@
     </div>
 
     <div class="tarotWrap">
-  <img id="tarotImg" class="tarotCard" src="/tarot/back.png">
+      <img id="tarotImg" class="tarotCard" src="/tarot/back.png">
     </div>
-    
+
     <div id="tarotBox">
       <button onclick="drawTarot()">타로카드 뽑기</button>
     </div>
@@ -64,7 +63,6 @@
     <button onclick="goTarotApp()">타로 전문앱 방문하기</button>
     <button onclick="goGame()">🎮 미니게임하고 커피쿠폰 받기</button>
     <button onclick="back()">입력 화면으로</button>
-
   </div>
 
 </div>
