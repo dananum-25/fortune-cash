@@ -251,7 +251,7 @@ function flipCard(){
   img.classList.add("flip");
 }
 
-function showResult(){
+async function showResult(){
   const name = document.getElementById("name").value;
   const birth = document.getElementById("birthInput").value;
   const mbti = document.getElementById("mbtiSelect").value;
@@ -278,9 +278,27 @@ document.getElementById("resultBox").innerHTML +=
     return;
   }
 
-  document.getElementById("inputSection").style.display="none";
-  document.getElementById("resultSection").style.display="block";
+  async function checkin(phone){
+  const res = await fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"checkin",
+      phone
+    })
+  });
+  return await res.json();
+}
 
+async function getUser(phone){
+  const res = await fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"getUser",
+      phone
+    })
+  });
+  return await res.json();
+}
   /* DB 운세 가져오기 */
   let zodiacFortune = "";
   let todayFortune = "";
