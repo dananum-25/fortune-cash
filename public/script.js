@@ -1,5 +1,6 @@
 let tarotDB = {};
 let todayCard = null;
+let currentZodiac = null;
 
 const MBTI_TYPES = [
 "INTJ","INTP","ENTJ","ENTP",
@@ -142,6 +143,7 @@ document.getElementById("birthInput").addEventListener("change", function(){
   }
 
   const zodiac = zodiacAnimals[zodiacYear % 12];
+currentZodiac = zodiac;
 
   const name = document.getElementById("name").value || "선택한 생년월일";
 
@@ -215,6 +217,7 @@ function flipCard(){
 }
 
 function showResult(){
+function showResult(){
   const name = document.getElementById("name").value;
   const birth = document.getElementById("birthInput").value;
   const mbti = document.getElementById("mbtiSelect").value;
@@ -233,16 +236,30 @@ function showResult(){
     alert("MBTI를 선택해주세요");
     return;
   }
-function goTarotApp(){
-  location.href="https://my-fortune-lake.vercel.app/";
-}
 
-function goGame(){
-  location.href="https://game-time-kappa.vercel.app/";
-}
+  document.getElementById("inputSection").style.display="none";
+  document.getElementById("resultSection").style.display="block";
 
-function back(){
-  location.reload();
+  /* DB 운세 가져오기 */
+  let zodiacFortune = "";
+  let todayFortune = "";
+  let tomorrowFortune = "";
+
+  if(currentZodiac && zodiacDB[currentZodiac]){
+    zodiacFortune = zodiacDB[currentZodiac].year || "";
+  }
+
+  todayFortune = todayDB[mbti] || "";
+  tomorrowFortune = tomorrowDB[mbti] || "";
+
+  document.getElementById("resultBox").innerHTML = `
+    <b>${name}님의 운세 결과</b><br><br>
+    ${document.getElementById("zodiacResult").innerText}<br><br>
+    <b>오늘의 운세</b><br>${todayFortune}<br><br>
+    <b>내일의 운세</b><br>${tomorrowFortune}<br><br>
+    <b>2026년 운세</b><br>${zodiacFortune}<br><br>
+    MBTI: ${mbti}
+  `;
 }
 
   document.getElementById("inputSection").style.display="none";
