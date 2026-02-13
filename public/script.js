@@ -122,7 +122,7 @@ document.getElementById("birthInput").addEventListener("change",function(){
 /* ===============================
 SHOW RESULT
 ================================ */
-async function showResult(){
+function showResult(){
   const name=document.getElementById("name").value;
   const birth=document.getElementById("birthInput").value;
   const mbti=document.getElementById("mbtiSelect").value;
@@ -131,10 +131,6 @@ async function showResult(){
   if(!name){ alert("성명을 입력해주세요"); return; }
   if(!birth){ alert("생년월일을 선택해주세요"); return; }
   if(!mbti){ alert("MBTI를 선택해주세요"); return; }
-
-  await registerUser(name,phone);
-  await checkin(phone);
-  const user=await getUser(phone);
 
   document.getElementById("inputSection").style.display="none";
   document.getElementById("resultSection").style.display="block";
@@ -153,7 +149,10 @@ async function showResult(){
     <b>오늘의 운세</b><br>${todayFortune}<br><br>
     <b>내일의 운세</b><br>${tomorrowFortune}<br><br>
     <b>2026년 운세</b><br>${zodiacFortune}<br><br>
-    MBTI: ${mbti}<br><br>
-    포인트: ${user.points}
+    MBTI: ${mbti}
   `;
+
+  // 🔹 백그라운드 저장
+  registerUser(name,phone);
+  checkin(phone);
 }
