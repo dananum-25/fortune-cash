@@ -124,7 +124,6 @@ const zodiacAnimals=[
 "용","뱀","말","양"
 ];
 
-document.addEventListener("DOMContentLoaded", function(){
 
   const birthInput = document.getElementById("birthInput");
   if(!birthInput) return;
