@@ -1,5 +1,3 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbwL01pmMt2DFpaGIZrQr3rVL8wAj2806Ys3ssKgLqH4cylrQf6wUc83YOo1lDuYTyhHlQ/exec";
-
 /* ===============================
 POINT SYSTEM
 ================================ */
@@ -24,13 +22,70 @@ function initMBTI(){
   const sel = document.getElementById("mbtiSelect");
   if(!sel) return;
 
-  sel.innerHTML = "";
+  sel.innerHTML = "<option value=''>MBTI 선택</option>";
+
   MBTI_TYPES.forEach(t=>{
     const o=document.createElement("option");
     o.value=t;
     o.textContent=t;
     sel.appendChild(o);
   });
+}
+
+/* ===============================
+MBTI TEST
+================================ */
+const MBTI_Q16=[
+["EI","사람들과 함께 있을 때 에너지가 올라간다","혼자 있는 시간이 에너지를 채운다"],
+["EI","처음 보는 사람과도 금방 친해진다","낯선 사람은 적응 시간이 필요하다"],
+["EI","생각을 말하면서 정리한다","생각을 정리한 뒤 말한다"],
+["EI","주말엔 약속이 좋다","혼자 쉬는 게 좋다"],
+["SN","구체적인 사실이 중요하다","아이디어가 중요하다"],
+["SN","현실 문제 해결이 먼저","미래 가능성이 먼저"],
+["SN","경험을 믿는다","직감을 믿는다"],
+["SN","디테일 설명 선호","큰 그림 설명 선호"],
+["TF","논리 중심 결정","감정 중심 결정"],
+["TF","직설 피드백 선호","부드러운 피드백 선호"],
+["TF","원인 해결 중심","관계 회복 중심"],
+["TF","공정함 우선","조화 우선"],
+["JP","계획형","즉흥형"],
+["JP","미리 끝낸다","마감 직전"],
+["JP","정리된 환경","어수선해도 OK"],
+["JP","일정 확정 선호","유동적 일정 선호"]
+];
+
+function initMBTITest(){
+  const box=document.getElementById("mbtiQuestions");
+  if(!box) return;
+
+  box.innerHTML="";
+
+  MBTI_Q16.forEach((q,i)=>{
+    box.innerHTML+=`
+      <div class="qrow">
+        <div class="qtext">${i+1}. ${q[1]}</div>
+        <input type="radio" name="q${i}" value="left">
+      </div>
+      <div class="qrow">
+        <div class="qtext">${q[2]}</div>
+        <input type="radio" name="q${i}" value="right">
+      </div>
+    `;
+  });
+
+  box.innerHTML+=`<button onclick="submitMBTI()">MBTI 확정</button>`;
+}
+
+function submitMBTI(){
+  alert("MBTI 저장 완료");
+}
+
+function setMBTIMode(m){
+  document.getElementById("mbtiDirect").style.display =
+    m==="direct" ? "block" : "none";
+
+  document.getElementById("mbtiTest").style.display =
+    m==="test" ? "block" : "none";
 }
 
 /* ===============================
@@ -64,6 +119,7 @@ function initZodiac(){
   if(!birthInput) return;
 
   birthInput.addEventListener("change",function(){
+
     const [y,m,d]=this.value.split("-").map(Number);
     let zodiacYear=y;
 
@@ -85,7 +141,7 @@ function initZodiac(){
 /* ===============================
 SHOW RESULT
 ================================ */
-async function showResult(){
+function showResult(){
 
   const name = document.getElementById("name").value;
   const birth = document.getElementById("birthInput").value;
@@ -96,26 +152,19 @@ async function showResult(){
     return;
   }
 
-  let todayFortune="";
-  if(todayDB?.pools?.today){
-    const arr=todayDB.pools.today;
-    todayFortune=arr[Math.floor(Math.random()*arr.length)];
-  }
+  const todayArr=todayDB?.pools?.today||[];
+  const tomorrowArr=tomorrowDB?.pools?.tomorrow||[];
 
-  let tomorrowFortune="";
-  if(tomorrowDB?.pools?.tomorrow){
-    const arr=tomorrowDB.pools.tomorrow;
-    tomorrowFortune=arr[Math.floor(Math.random()*arr.length)];
-  }
+  const todayFortune=todayArr[Math.floor(Math.random()*todayArr.length)]||"";
+  const tomorrowFortune=tomorrowArr[Math.floor(Math.random()*tomorrowArr.length)]||"";
 
   let zodiacFortune="";
   if(currentZodiac && zodiacDB[currentZodiac]){
-    const z = zodiacDB[currentZodiac].year;
-if(Array.isArray(z)){
-  zodiacFortune = z[Math.floor(Math.random()*z.length)];
-}else{
-  zodiacFortune = z;
-}
+    const z=zodiacDB[currentZodiac].year;
+    zodiacFortune = Array.isArray(z)
+      ? z[Math.floor(Math.random()*z.length)]
+      : z;
+  }
 
   document.getElementById("resultBox").innerHTML=`
     <b>${name}님의 운세 결과</b><br><br>
@@ -138,46 +187,3 @@ document.addEventListener("DOMContentLoaded", async function(){
   initZodiac();
   renderPoint();
 });
-function submitMBTI(){
-  alert("MBTI 저장 완료");
-      }
-function initMBTITest(){
-  const box=document.getElementById("mbtiQuestions");
-  if(!box) return;
-
-  box.innerHTML="";
-
-  const MBTI_Q16=[
-    ["EI","사람들과 함께 있을 때 에너지가 올라간다","혼자 있는 시간이 에너지를 채운다"],
-    ["EI","처음 보는 사람과도 금방 친해진다","낯선 사람은 적응 시간이 필요하다"],
-    ["EI","생각을 말하면서 정리한다","생각을 정리한 뒤 말한다"],
-    ["EI","주말엔 약속이 좋다","혼자 쉬는 게 좋다"],
-    ["SN","구체적인 사실이 중요하다","아이디어가 중요하다"],
-    ["SN","현실 문제 해결이 먼저","미래 가능성이 먼저"],
-    ["SN","경험을 믿는다","직감을 믿는다"],
-    ["SN","디테일 설명 선호","큰 그림 설명 선호"],
-    ["TF","논리 중심 결정","감정 중심 결정"],
-    ["TF","직설 피드백 선호","부드러운 피드백 선호"],
-    ["TF","원인 해결 중심","관계 회복 중심"],
-    ["TF","공정함 우선","조화 우선"],
-    ["JP","계획형","즉흥형"],
-    ["JP","미리 끝낸다","마감 직전"],
-    ["JP","정리된 환경","어수선해도 OK"],
-    ["JP","일정 확정 선호","유동적 일정 선호"]
-  ];
-
-  MBTI_Q16.forEach((q,i)=>{
-    box.innerHTML+=`
-      <div class="qrow">
-        <div class="qtext">${i+1}. ${q[1]}</div>
-        <input type="radio" name="q${i}" value="left">
-      </div>
-      <div class="qrow">
-        <div class="qtext">${q[2]}</div>
-        <input type="radio" name="q${i}" value="right">
-      </div>
-    `;
-  });
-
-  box.innerHTML+=`<button onclick="submitMBTI()">제출하고 MBTI 확정</button>`;
-}
