@@ -201,7 +201,10 @@ if(currentZodiac && zodiacDB[currentZodiac]){
   const arr=zodiacDB[currentZodiac].year || [];
   zodiacFortune = arr[Math.floor(Math.random()*arr.length)] || "";
 }
-  const mbtiText = mbtiDB?.[mbti]?.summary || "";
+  const mbtiData = mbtiDB.traits?.[mbti];
+const mbtiText = mbtiData
+  ? `${mbtiData.label} — ${mbtiData.one_liner}`
+  : "";
   const elements = sajuDB.elements || [];
   const sajuText =
     elements[Math.floor(Math.random()*elements.length)]?.pools?.overall?.[0] || "";
