@@ -125,3 +125,8 @@ button{
   width:85%;
   font-size:14px;
 }
+
+input, select, button{
+  width:100%;
+  box-sizing:border-box;
+}
