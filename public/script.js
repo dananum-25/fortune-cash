@@ -28,17 +28,28 @@ function initMBTI(){
 
 function initMBTITest(){
   const box=document.getElementById("mbtiQuestions");
-  for(let i=1;i<=16;i++){
-    box.innerHTML += `
-      <div>
-        Q${i}. 질문 ${i}
-        <select>
-          <option>왼쪽</option>
-          <option>오른쪽</option>
-        </select>
+  if(!box) return;
+
+  box.innerHTML="";
+
+  MBTI_Q16.forEach((q,i)=>{
+    box.innerHTML+=`
+      <div class="qbox">
+        <div class="qtitle">${i+1}. ${q[1]}</div>
+        <label class="qoption">
+          <span>${q[1]}</span>
+          <input type="radio" name="q${i}" value="left">
+        </label>
+
+        <label class="qoption">
+          <span>${q[2]}</span>
+          <input type="radio" name="q${i}" value="right">
+        </label>
       </div>
     `;
-  }
+  });
+
+  box.innerHTML+=`<button onclick="submitMBTI()">제출하고 MBTI 확정</button>`;
 }
 
 function setMBTIMode(m){
