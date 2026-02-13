@@ -16,16 +16,6 @@ async function loadDB(){
 
 loadDB();
 
-function initMBTI(){
-  const sel=document.getElementById("mbtiSelect");
-  MBTI_TYPES.forEach(t=>{
-    const o=document.createElement("option");
-    o.value=t;
-    o.textContent=t;
-    sel.appendChild(o);
-  });
-}
-
 function initMBTITest(){
   const box=document.getElementById("mbtiQuestions");
   if(!box) return;
@@ -57,119 +47,6 @@ function setMBTIMode(m){
     m==="direct"?"block":"none";
   document.getElementById("mbtiTest").style.display=
     m==="test"?"block":"none";
-}
-
-function showResult(){
-  const name=document.getElementById("name").value;
-  const birth=document.getElementById("birthInput").value;
-  const mbti=document.getElementById("mbtiSelect").value;
-
-  if(!name){
-    alert("성명을 입력해주세요");
-    return;
-  }
-
-  if(!birth){
-    alert("생년월일을 선택해주세요");
-    return;
-  }
-
-  if(!mbti){
-    alert("MBTI를 선택해주세요");
-    return;
-  }
-
-  document.getElementById("inputSection").style.display="none";
-  document.getElementById("resultSection").style.display="block";
-
-  const zodiacText =
-  document.getElementById("zodiacResult").innerText;
-
-  document.getElementById("resultBox").innerHTML=
-  `${name}님의 운세 결과<br>${birth}<br>${zodiacText}<br>MBTI: ${mbti}`;
-
-/* ===============================
-TAROT 78 RANDOM
-================================ */
-
-const majors = [
-"00_the_fool.png","01_the_magician.png","02_the_high_priestess.png",
-"03_the_empress.png","04_the_emperor.png","05_the_hierophant.png",
-"06_the_lovers.png","07_the_chariot.png","08_strength.png",
-"09_the_hermit.png","10_wheel_of_fortune.png","11_justice.png",
-"12_the_hanged_man.png","13_death.png","14_temperance.png",
-"15_the_devil.png","16_the_tower.png","17_the_star.png",
-"18_the_moon.png","19_the_sun.png","20_judgement.png","21_the_world.png"
-];
-
-const suits = ["wands","cups","swords","pentacles"];
-
-const minorNames = [
-"01_ace.png","02_two.png","03_three.png","04_four.png","05_five.png",
-"06_six.png","07_seven.png","08_eight.png","09_nine.png","10_ten.png",
-"11_page.png","12_knight.png","13_queen.png","14_king.png"
-];
-
-let tarotCards = [];
-
-/* majors */
-majors.forEach(file=>{
-  tarotCards.push("/tarot/majors/" + file);
-});
-
-/* minors */
-suits.forEach(suit=>{
-  minorNames.forEach(file=>{
-    tarotCards.push("/tarot/minors/" + suit + "/" + file);
-  });
-});
-
-function drawTarot(){
-  const today = new Date().toISOString().slice(0,10);
-
-  const saved = localStorage.getItem("todayTarot");
-  if(saved){
-    const obj = JSON.parse(saved);
-    if(obj.date === today){
-      document.getElementById("tarotImg").src = obj.card;
-      flipCard();
-      return;
-    }
-  }
-
-  const randomCard = tarotCards[Math.floor(Math.random()*tarotCards.length)];
-  document.getElementById("tarotImg").src = randomCard;
-
-  localStorage.setItem("todayTarot", JSON.stringify({
-    date: today,
-    card: randomCard
-  }));
-
-  flipCard();
-}
-
-function goTarotApp(){
-  location.href="https://my-fortune-lake.vercel.app/";
-}
-
-function goGame(){
-  location.href="https://game-time-kappa.vercel.app/";
-}
-
-function back(){
-  location.reload();
-}
-
-function copyURL(){
-  navigator.clipboard.writeText(location.href);
-  alert("복사되었습니다!");
-}
-
-function flipCard(){
-  const img = document.getElementById("tarotImg");
-  img.classList.remove("flip");
-  void img.offsetWidth;
-  img.classList.add("flip");
 }
 
 /* ===============================
@@ -274,6 +151,73 @@ document.getElementById("birthInput").addEventListener("change", function(){
 
   const zodiac = zodiacAnimals[zodiacYear % 12];
 
-  document.getElementById("zodiacResult").innerText =
-    `${zodiac}띠 입니다`;
+  const name = document.getElementById("name").value || "선택한 생년월일";
+
+document.getElementById("zodiacResult").innerText =
+`음력을 적용한 ${name}님은 ${zodiac}띠 입니다`;
 });
+
+/* ===============================
+TAROT 78 RANDOM
+================================ */
+
+const majors = [
+"00_the_fool.png","01_the_magician.png","02_the_high_priestess.png",
+"03_the_empress.png","04_the_emperor.png","05_the_hierophant.png",
+"06_the_lovers.png","07_the_chariot.png","08_strength.png",
+"09_the_hermit.png","10_wheel_of_fortune.png","11_justice.png",
+"12_the_hanged_man.png","13_death.png","14_temperance.png",
+"15_the_devil.png","16_the_tower.png","17_the_star.png",
+"18_the_moon.png","19_the_sun.png","20_judgement.png","21_the_world.png"
+];
+
+const suits = ["wands","cups","swords","pentacles"];
+
+const minorNames = [
+"01_ace.png","02_two.png","03_three.png","04_four.png","05_five.png",
+"06_six.png","07_seven.png","08_eight.png","09_nine.png","10_ten.png",
+"11_page.png","12_knight.png","13_queen.png","14_king.png"
+];
+
+let tarotCards = [];
+
+majors.forEach(file=>{
+  tarotCards.push("/tarot/majors/" + file);
+});
+
+suits.forEach(suit=>{
+  minorNames.forEach(file=>{
+    tarotCards.push("/tarot/minors/" + suit + "/" + file);
+  });
+});
+
+function drawTarot(){
+  const today = new Date().toISOString().slice(0,10);
+
+  const saved = localStorage.getItem("todayTarot");
+  if(saved){
+    const obj = JSON.parse(saved);
+    if(obj.date === today){
+      document.getElementById("tarotImg").src = obj.card;
+      flipCard();
+      return;
+    }
+  }
+
+  const randomCard = tarotCards[Math.floor(Math.random()*tarotCards.length)];
+  document.getElementById("tarotImg").src = randomCard;
+
+  localStorage.setItem("todayTarot", JSON.stringify({
+    date: today,
+    card: randomCard
+  }));
+
+  flipCard();
+}
+
+function flipCard(){
+  const img = document.getElementById("tarotImg");
+  img.classList.remove("flip");
+  void img.offsetWidth;
+  img.classList.add("flip");
+}
