@@ -62,7 +62,11 @@ const MBTI_TYPES = [
 ];
 
 function initMBTI(){
-  const sel=document.getElementById("mbtiSelect");
+  const sel = document.getElementById("mbtiSelect");
+  if(!sel) return;
+
+  sel.innerHTML = "";
+
   MBTI_TYPES.forEach(t=>{
     const o=document.createElement("option");
     o.value=t;
@@ -180,18 +184,3 @@ async function showResult(){
   registerUser(name,phone);
   checkin(phone);
 }
-document.getElementById("fortuneBtn").onclick = () => {
-
-  const name = document.getElementById("name").value;
-
-  if(!name){
-    alert("이름 입력");
-    return;
-  }
-
-  const arr = todayDB.pools.today;
-  const fortune = arr[Math.floor(Math.random()*arr.length)];
-
-  document.getElementById("fortuneResult").innerHTML =
-    `<b>${name}님의 오늘 운세</b><br><br>${fortune}`;
-};
