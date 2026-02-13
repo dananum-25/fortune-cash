@@ -87,6 +87,7 @@ async function loadDB(){
   tomorrowDB = await fetch("/data/fortunes_ko_tomorrow.json").then(r=>r.json());
 
   initMBTI();
+  initMBTITest();
 }
 loadDB();
 
@@ -183,4 +184,25 @@ async function showResult(){
   // 🔹 백그라운드 저장
   registerUser(name,phone);
   checkin(phone);
+}
+function initMBTITest(){
+  const box=document.getElementById("mbtiQuestions");
+  if(!box) return;
+
+  box.innerHTML="";
+
+  MBTI_Q16.forEach((q,i)=>{
+    box.innerHTML+=`
+      <div class="qrow">
+        <div class="qtext">${i+1}. ${q[1]}</div>
+        <input type="radio" name="q${i}" value="left">
+      </div>
+      <div class="qrow">
+        <div class="qtext">${q[2]}</div>
+        <input type="radio" name="q${i}" value="right">
+      </div>
+    `;
+  });
+
+  box.innerHTML+=`<button onclick="submitMBTI()">제출하고 MBTI 확정</button>`;
 }
