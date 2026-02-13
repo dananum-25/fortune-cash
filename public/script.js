@@ -1,3 +1,23 @@
+let point = parseInt(localStorage.getItem("point") || "0");
+let inviteCode = localStorage.getItem("inviteCode");
+
+if(!inviteCode){
+  inviteCode = Math.random().toString(36).substring(2,8);
+  localStorage.setItem("inviteCode", inviteCode);
+}
+
+/* 최초 방문 보너스 */
+if(!localStorage.getItem("welcomePoint")){
+  point += 100;
+  localStorage.setItem("welcomePoint","1");
+  localStorage.setItem("point",point);
+}
+function renderPoint(){
+  const el = document.getElementById("pointBox");
+  if(el){
+    el.innerText = "보유 포인트 : " + point + "P";
+  }
+}
 let tarotDB = {};
 let todayCard = null;
 let currentZodiac = null;
@@ -36,6 +56,7 @@ async function loadDB(){
 }
 
 loadDB();
+renderPoint();
 
 function setMBTIMode(m){
   document.getElementById("mbtiDirect").style.display=
