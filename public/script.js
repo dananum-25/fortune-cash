@@ -145,8 +145,6 @@ document.addEventListener("DOMContentLoaded", function(){
 
   });
 
-});
-  const [y,m,d]=this.value.split("-").map(Number);
   let zodiacYear=y;
 
   const lunar=lunarMap[y];
