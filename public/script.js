@@ -9,14 +9,7 @@ function renderPoint(){
 }
 
 /* ===============================
-GLOBAL DB
-================================ */
-let zodiacDB={}, todayDB={}, tomorrowDB={};
-let lunarMap={}, mbtiDB={}, sajuDB={}, tarotDB={};
-let currentZodiac=null;
-
-/* ===============================
-MBTI
+MBTI TYPES
 ================================ */
 const MBTI_TYPES = [
 "INTJ","INTP","ENTJ","ENTP",
@@ -30,12 +23,65 @@ function initMBTI(){
   if(!sel) return;
 
   sel.innerHTML = "<option value=''>MBTI 선택</option>";
-
   MBTI_TYPES.forEach(t=>{
     const o=document.createElement("option");
     o.value=t;
     o.textContent=t;
     sel.appendChild(o);
+  });
+}
+
+/* ===============================
+DB LOAD
+================================ */
+let zodiacDB={}, todayDB={}, tomorrowDB={}, yearDB={};
+let mbtiDB={}, sajuDB={}, tarotDB={};
+let lunarMap={};
+let currentZodiac=null;
+
+async function loadDB(){
+  zodiacDB = await fetch("/data/zodiac_fortunes_ko_2026.json").then(r=>r.json());
+  todayDB = await fetch("/data/fortunes_ko_today.json").then(r=>r.json());
+  tomorrowDB = await fetch("/data/fortunes_ko_tomorrow.json").then(r=>r.json());
+  yearDB = await fetch("/data/fortunes_ko_2026.json").then(r=>r.json());
+  mbtiDB = await fetch("/data/mbti_traits_ko.json").then(r=>r.json());
+  sajuDB = await fetch("/data/saju_ko.json").then(r=>r.json());
+  tarotDB = await fetch("/data/tarot_db_ko.json").then(r=>r.json());
+  lunarMap = await fetch("/data/lunar_new_year_1920_2026.json").then(r=>r.json());
+
+  initMBTI();
+  initMBTITest();
+}
+
+/* ===============================
+ZODIAC
+================================ */
+const zodiacAnimals=[
+"원숭이","닭","개","돼지",
+"쥐","소","호랑이","토끼",
+"용","뱀","말","양"
+];
+
+function initZodiac(){
+  const birthInput = document.getElementById("birthInput");
+  if(!birthInput) return;
+
+  birthInput.addEventListener("change",function(){
+    const [y,m,d]=this.value.split("-").map(Number);
+    let zodiacYear=y;
+
+    const lunar=lunarMap[y];
+    if(lunar){
+      const [lm,ld]=lunar.split("-").map(Number);
+      if(m<lm||(m===lm&&d<ld)) zodiacYear=y-1;
+    }
+
+    const zodiac=zodiacAnimals[zodiacYear%12];
+    currentZodiac=zodiac;
+
+    const name=document.getElementById("name").value||"선택한 생년월일";
+    document.getElementById("zodiacResult").innerText=
+      `음력을 적용한 ${name}님은 ${zodiac}띠 입니다`;
   });
 }
 
@@ -54,11 +100,10 @@ function initMBTITest(){
   if(!box) return;
 
   box.innerHTML="";
-
   MBTI_Q16.forEach((q,i)=>{
     box.innerHTML+=`
       <div class="qrow">
-        <div class="qtext">${q[1]}</div>
+        <div class="qtext">${i+1}. ${q[1]}</div>
         <input type="radio" name="q${i}" value="left">
       </div>
       <div class="qrow">
@@ -78,74 +123,25 @@ function submitMBTI(){
 function setMBTIMode(m){
   document.getElementById("mbtiDirect").style.display =
     m==="direct" ? "block" : "none";
-
   document.getElementById("mbtiTest").style.display =
     m==="test" ? "block" : "none";
-}
-
-/* ===============================
-DB LOAD
-================================ */
-async function loadDB(){
-  zodiacDB = await fetch("/data/zodiac_fortunes_ko_2026.json").then(r=>r.json());
-  todayDB = await fetch("/data/fortunes_ko_today.json").then(r=>r.json());
-  tomorrowDB = await fetch("/data/fortunes_ko_tomorrow.json").then(r=>r.json());
-  lunarMap = await fetch("/data/lunar_new_year_1920_2026.json").then(r=>r.json());
-  mbtiDB = await fetch("/data/mbti_traits_ko.json").then(r=>r.json());
-  sajuDB = await fetch("/data/saju_ko.json").then(r=>r.json());
-  tarotDB = await fetch("/data/tarot_db_ko.json").then(r=>r.json());
-
-  initMBTI();
-  initMBTITest();
-}
-
-/* ===============================
-ZODIAC
-================================ */
-const zodiacAnimals=[
-"원숭이","닭","개","돼지",
-"쥐","소","호랑이","토끼",
-"용","뱀","말","양"
-];
-
-const zodiacMap={
-"쥐":"rat","소":"ox","호랑이":"tiger","토끼":"rabbit",
-"용":"dragon","뱀":"snake","말":"horse","양":"sheep",
-"원숭이":"monkey","닭":"rooster","개":"dog","돼지":"pig"
-};
-
-function initZodiac(){
-  const birthInput = document.getElementById("birthInput");
-  if(!birthInput) return;
-
-  birthInput.addEventListener("change",function(){
-    const [y,m,d]=this.value.split("-").map(Number);
-    let zodiacYear=y;
-
-    const lunar=lunarMap[y];
-    if(lunar){
-      const [lm,ld]=lunar.split("-").map(Number);
-      if(m<lm||(m===lm&&d<ld)) zodiacYear=y-1;
-    }
-
-    const zodiac=zodiacAnimals[zodiacYear%12];
-    currentZodiac=zodiac;
-
-    document.getElementById("zodiacResult").innerText=
-      `음력 기준 ${zodiac}띠`;
-  });
 }
 
 /* ===============================
 TAROT
 ================================ */
 function drawTarot(){
-  if(!tarotDB.majors) return;
+  const tarotKeys = Object.keys(tarotDB);
+  const key = tarotKeys[Math.floor(Math.random()*tarotKeys.length)];
 
-  const cards=tarotDB.majors;
-  const card=cards[Math.floor(Math.random()*cards.length)];
+  const data = tarotDB[key];
+  document.getElementById("tarotImg").src="/tarot/"+data.image;
 
-  document.getElementById("tarotImg").src="/"+card.image;
+  document.getElementById("resultBox").innerHTML += `
+    <br><b>타로카드</b><br>
+    ${data.name}<br>
+    ${data.meaning}
+  `;
 }
 
 /* ===============================
@@ -164,30 +160,32 @@ function showResult(){
 
   const todayArr=todayDB?.pools?.today||[];
   const tomorrowArr=tomorrowDB?.pools?.tomorrow||[];
+  const yearArr=yearDB?.pools?.year_all||[];
 
   const todayFortune=todayArr[Math.floor(Math.random()*todayArr.length)]||"";
   const tomorrowFortune=tomorrowArr[Math.floor(Math.random()*tomorrowArr.length)]||"";
+  const yearFortune=yearArr[Math.floor(Math.random()*yearArr.length)]||"";
 
-  const key=zodiacMap[currentZodiac];
-  const yearArr=zodiacDB[key]?.year||[];
-  const zodiacFortune=yearArr[Math.floor(Math.random()*yearArr.length)]||"";
+  let zodiacFortune="";
+  if(currentZodiac && zodiacDB[currentZodiac]){
+    zodiacFortune=zodiacDB[currentZodiac].year;
+  }
 
-  const mbtiTrait = mbtiDB?.[mbti]?.summary || "";
-
-  const elements=["wood","fire","earth","metal","water"];
-  const sajuKey=elements[new Date(birth).getFullYear()%5];
-  const sajuMsg=sajuDB?.elements?.[sajuKey]?.pools?.overall?.[0]||"";
+  const mbtiText = mbtiDB[mbti]?.description || "";
+  const sajuText = sajuDB?.one_line?.[
+    Math.floor(Math.random()*sajuDB.one_line.length)
+  ] || "";
 
   document.getElementById("resultBox").innerHTML=`
     <b>${name}님의 운세 결과</b><br><br>
     ${document.getElementById("zodiacResult").innerText}<br><br>
 
-    <b>띠 운세</b><br>${zodiacFortune}<br><br>
-    <b>MBTI 특징</b><br>${mbtiTrait}<br><br>
-    <b>사주 한마디</b><br>${sajuMsg}<br><br>
-
     <b>오늘의 운세</b><br>${todayFortune}<br><br>
     <b>내일의 운세</b><br>${tomorrowFortune}<br><br>
+    <b>2026년 운세</b><br>${yearFortune}<br><br>
+    <b>띠 운세</b><br>${zodiacFortune}<br><br>
+    <b>MBTI 특징</b><br>${mbtiText}<br><br>
+    <b>사주 한마디</b><br>${sajuText}
   `;
 
   document.getElementById("inputSection").style.display="none";
