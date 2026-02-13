@@ -206,3 +206,10 @@ function initMBTITest(){
 
   box.innerHTML+=`<button onclick="submitMBTI()">제출하고 MBTI 확정</button>`;
 }
+function setMBTIMode(m){
+  document.getElementById("mbtiDirect").style.display =
+    m==="direct" ? "block" : "none";
+
+  document.getElementById("mbtiTest").style.display =
+    m==="test" ? "block" : "none";
+}
