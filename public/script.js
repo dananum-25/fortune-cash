@@ -146,7 +146,14 @@ function drawTarot(){
     ${card.upright.summary}
   `;
 }
+function getTarotImage(card){
 
+  if(card.arcana === "major"){
+    return "/tarot/majors/" + String(card.id).padStart(2,"0") + "_" + card.key + ".png";
+  }
+
+  return `/tarot/minors/${card.suit}/${String(card.id).padStart(2,"0")}_${card.rank}.png`;
+}
 /* ===============================
 SHOW RESULT
 ================================ */
