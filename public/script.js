@@ -28,26 +28,6 @@ async function loadDB(){
 
 loadDB();
 
-  MBTI_Q16.forEach((q,i)=>{
-    box.innerHTML+=`
-      <div class="qbox">
-        <div class="qtitle">${i+1}. ${q[1]}</div>
-        <label class="qoption">
-          <span>${q[1]}</span>
-          <input type="radio" name="q${i}" value="left">
-        </label>
-
-        <label class="qoption">
-          <span>${q[2]}</span>
-          <input type="radio" name="q${i}" value="right">
-        </label>
-      </div>
-    `;
-  });
-
-  box.innerHTML+=`<button onclick="submitMBTI()">제출하고 MBTI 확정</button>`;
-}
-
 function setMBTIMode(m){
   document.getElementById("mbtiDirect").style.display=
     m==="direct"?"block":"none";
