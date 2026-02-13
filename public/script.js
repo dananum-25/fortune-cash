@@ -78,9 +78,9 @@ let zodiacDB={}, todayDB={}, tomorrowDB={};
 let currentZodiac=null;
 
 async function loadDB(){
-  zodiacDB = await fetch("data/zodiac_fortunes_ko_2026.json").then(r=>r.json());
-  todayDB = await fetch("data/fortunes_ko_today.json").then(r=>r.json());
-  tomorrowDB = await fetch("data/fortunes_ko_tomorrow.json").then(r=>r.json());
+  zodiacDB = await fetch("/data/zodiac_fortunes_ko_2026.json").then(r=>r.json());
+  todayDB = await fetch("/data/fortunes_ko_today.json").then(r=>r.json());
+  tomorrowDB = await fetch("/data/fortunes_ko_tomorrow.json").then(r=>r.json());
 
   initMBTI();
 }
