@@ -131,10 +131,14 @@ function setMBTIMode(m){
 TAROT
 ================================ */
 function drawTarot(){
-  const cards = tarotDB.majors || [];
+
+  if(!tarotDB.majors) return;
+
+  const cards = tarotDB.majors;
   const card = cards[Math.floor(Math.random()*cards.length)];
 
-  document.getElementById("tarotImg").src="/tarot/back.png";
+  document.getElementById("tarotImg").src =
+    "/tarot/majors/" + String(card.id).padStart(2,"0") + "_" + card.key + ".png";
 
   document.getElementById("resultBox").innerHTML += `
     <br><b>타로카드</b><br>
