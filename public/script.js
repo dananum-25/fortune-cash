@@ -134,11 +134,31 @@ function drawTarot(){
 
   if(!tarotDB.majors) return;
 
-  const cards = tarotDB.majors;
-  const card = cards[Math.floor(Math.random()*cards.length)];
+  const birth = document.getElementById("birthInput").value;
+  if(!birth){
+    alert("생년월일을 먼저 입력해주세요");
+    return;
+  }
 
-  document.getElementById("tarotImg").src =
-    "/tarot/majors/" + String(card.id).padStart(2,"0") + "_" + card.key + ".png";
+  const todayKey = new Date().toISOString().slice(0,10);
+  const storageKey = "tarot_" + birth + "_" + todayKey;
+
+  let saved = localStorage.getItem(storageKey);
+  let card;
+
+  if(saved){
+    card = JSON.parse(saved);
+  }else{
+    const allCards = [
+      ...(tarotDB.majors||[]),
+      ...(tarotDB.minors||[])
+    ];
+
+    card = allCards[Math.floor(Math.random()*allCards.length)];
+    localStorage.setItem(storageKey, JSON.stringify(card));
+  }
+
+  document.getElementById("tarotImg").src = getTarotImage(card);
 
   document.getElementById("resultBox").innerHTML += `
     <br><b>타로카드</b><br>
@@ -149,10 +169,15 @@ function drawTarot(){
 function getTarotImage(card){
 
   if(card.arcana === "major"){
-    return "/tarot/majors/" + String(card.id).padStart(2,"0") + "_" + card.key + ".png";
+    return "/tarot/majors/" +
+      String(card.id).padStart(2,"0") +
+      "_" + card.key + ".png";
   }
 
-  return `/tarot/minors/${card.suit}/${String(card.id).padStart(2,"0")}_${card.rank}.png`;
+  return "/tarot/minors/" +
+    card.suit + "/" +
+    String(card.id).padStart(2,"0") +
+    "_" + card.rank + ".png";
 }
 /* ===============================
 SHOW RESULT
@@ -170,14 +195,13 @@ function showResult(){
   const tomorrowFortune=tomorrowArr[Math.floor(Math.random()*tomorrowArr.length)]||"";
   const yearFortune=yearArr[Math.floor(Math.random()*yearArr.length)]||"";
 
-  let zodiacFortune="";
-  if(currentZodiac && zodiacDB[currentZodiac]){
-    const arr=zodiacDB[currentZodiac].today||[];
-    zodiacFortune=arr[Math.floor(Math.random()*arr.length)]||"";
-  }
 
-  const mbtiText = mbtiDB.types?.[mbti]?.summary || "";
-
+    let zodiacFortune="";
+if(currentZodiac && zodiacDB[currentZodiac]){
+  const arr=zodiacDB[currentZodiac].year || [];
+  zodiacFortune = arr[Math.floor(Math.random()*arr.length)] || "";
+}
+  const mbtiText = mbtiDB?.[mbti]?.summary || "";
   const elements = sajuDB.elements || [];
   const sajuText =
     elements[Math.floor(Math.random()*elements.length)]?.pools?.overall?.[0] || "";
