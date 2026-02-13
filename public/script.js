@@ -169,7 +169,7 @@ function showResult(){
     zodiacFortune=arr[Math.floor(Math.random()*arr.length)]||"";
   }
 
-  const mbtiText = mbtiDB[mbti]?.summary || "";
+  const mbtiText = mbtiDB.types?.[mbti]?.summary || "";
 
   const elements = sajuDB.elements || [];
   const sajuText =
