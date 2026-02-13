@@ -14,15 +14,13 @@ if(!inviteCode){
 if(!localStorage.getItem("welcomePoint")){
   point += 100;
   localStorage.setItem("welcomePoint","1");
-  localStorage.setItem("point",point);
+  localStorage.setItem("point",String(point));
 }
 
 function renderPoint(){
   const el = document.getElementById("pointBox");
   if(el) el.innerText = "보유 포인트 : " + point + "P";
 }
-
-renderPoint();
 
 /* ===============================
 USER API
@@ -55,10 +53,10 @@ async function getUser(phone){
 MBTI
 ================================ */
 const MBTI_TYPES = [
-"INTJ","INTP","ENTJ","ENTP",
-"INFJ","INFP","ENFJ","ENFP",
-"ISTJ","ISFJ","ESTJ","ESFJ",
-"ISTP","ISFP","ESTP","ESFP"
+  "INTJ","INTP","ENTJ","ENTP",
+  "INFJ","INFP","ENFJ","ENFP",
+  "ISTJ","ISFJ","ESTJ","ESFJ",
+  "ISTP","ISFP","ESTP","ESFP"
 ];
 
 function initMBTI(){
@@ -66,33 +64,87 @@ function initMBTI(){
   if(!sel) return;
 
   sel.innerHTML = "";
+  sel.appendChild(new Option("MBTI를 선택하세요", ""));
 
   MBTI_TYPES.forEach(t=>{
-    const o=document.createElement("option");
-    o.value=t;
-    o.textContent=t;
-    sel.appendChild(o);
+    sel.appendChild(new Option(t, t));
   });
 }
 
 const MBTI_Q16 = [
-["EI","사람들과 함께 있을 때 에너지가 올라간다","혼자 있는 시간이 에너지를 채운다"],
-["EI","처음 보는 사람과도 금방 친해진다","낯선 사람은 적응 시간이 필요하다"],
-["EI","생각을 말하면서 정리한다","생각을 정리한 뒤 말한다"],
-["EI","주말엔 약속이 좋다","혼자 쉬는 게 좋다"],
-["SN","구체적인 사실이 중요하다","아이디어가 중요하다"],
-["SN","현실 문제 해결이 먼저","미래 가능성이 먼저"],
-["SN","경험을 믿는다","직감을 믿는다"],
-["SN","디테일 설명 선호","큰 그림 설명 선호"],
-["TF","논리 중심 결정","감정 중심 결정"],
-["TF","직설 피드백 선호","부드러운 피드백 선호"],
-["TF","원인 해결 중심","관계 회복 중심"],
-["TF","공정함 우선","조화 우선"],
-["JP","계획형","즉흥형"],
-["JP","미리 끝낸다","마감 직전"],
-["JP","정리된 환경","어수선해도 OK"],
-["JP","일정 확정 선호","유동적 일정 선호"]
+  ["EI","사람들과 함께 있을 때 에너지가 올라간다","혼자 있는 시간이 에너지를 채운다"],
+  ["EI","처음 보는 사람과도 금방 친해진다","낯선 사람은 적응 시간이 필요하다"],
+  ["EI","생각을 말하면서 정리한다","생각을 정리한 뒤 말한다"],
+  ["EI","주말엔 약속이 좋다","혼자 쉬는 게 좋다"],
+  ["SN","구체적인 사실이 중요하다","아이디어가 중요하다"],
+  ["SN","현실 문제 해결이 먼저","미래 가능성이 먼저"],
+  ["SN","경험을 믿는다","직감을 믿는다"],
+  ["SN","디테일 설명 선호","큰 그림 설명 선호"],
+  ["TF","논리 중심 결정","감정 중심 결정"],
+  ["TF","직설 피드백 선호","부드러운 피드백 선호"],
+  ["TF","원인 해결 중심","관계 회복 중심"],
+  ["TF","공정함 우선","조화 우선"],
+  ["JP","계획형","즉흥형"],
+  ["JP","미리 끝낸다","마감 직전"],
+  ["JP","정리된 환경","어수선해도 OK"],
+  ["JP","일정 확정 선호","유동적 일정 선호"]
 ];
+
+function initMBTITest(){
+  const box = document.getElementById("mbtiQuestions");
+  if(!box) return;
+
+  box.innerHTML = "";
+
+  MBTI_Q16.forEach((q,i)=>{
+    box.innerHTML += `
+      <div class="qrow">
+        <div class="qtext">${i+1}. ${q[1]}</div>
+        <input type="radio" name="q${i}" value="left">
+      </div>
+      <div class="qrow">
+        <div class="qtext">${q[2]}</div>
+        <input type="radio" name="q${i}" value="right">
+      </div>
+    `;
+  });
+
+  box.innerHTML += `<button type="button" onclick="submitMBTI()">제출하고 MBTI 확정</button>`;
+}
+
+function submitMBTI(){
+  const scores = {E:0,I:0,S:0,N:0,T:0,F:0,J:0,P:0};
+
+  MBTI_Q16.forEach((q,i)=>{
+    const sel = document.querySelector(`input[name="q${i}"]:checked`);
+    if(!sel) return;
+
+    if(sel.value==="left"){
+      scores[q[0][0]]++;
+    }else{
+      scores[q[0][1]]++;
+    }
+  });
+
+  const mbti =
+    (scores.E>=scores.I?"E":"I")+
+    (scores.S>=scores.N?"S":"N")+
+    (scores.T>=scores.F?"T":"F")+
+    (scores.J>=scores.P?"J":"P");
+
+  const mbtiSelect = document.getElementById("mbtiSelect");
+  if(mbtiSelect) mbtiSelect.value = mbti;
+
+  alert("당신의 MBTI는 " + mbti + " 입니다!");
+}
+
+function setMBTIMode(m){
+  const direct = document.getElementById("mbtiDirect");
+  const test = document.getElementById("mbtiTest");
+  if(direct) direct.style.display = (m==="direct" ? "block" : "none");
+  if(test) test.style.display = (m==="test" ? "block" : "none");
+}
+
 /* ===============================
 DB LOAD
 ================================ */
@@ -109,68 +161,54 @@ async function loadDB(){
 }
 
 /* ===============================
-/* ===============================
 ZODIAC
 ================================ */
-let lunarMap={};
+let lunarMap = {};
 
 fetch("/data/lunar_new_year_1920_2026.json")
-.then(r=>r.json())
-.then(d=>lunarMap=d);
+  .then(r=>r.json())
+  .then(d=>{ lunarMap = d; });
 
-const zodiacAnimals=[
-"원숭이","닭","개","돼지",
-"쥐","소","호랑이","토끼",
-"용","뱀","말","양"
+const zodiacAnimals = [
+  "원숭이","닭","개","돼지",
+  "쥐","소","호랑이","토끼",
+  "용","뱀","말","양"
 ];
 
-
+function bindBirthInput(){
   const birthInput = document.getElementById("birthInput");
   if(!birthInput) return;
 
   birthInput.addEventListener("change", function(){
+    if(!this.value) return;
 
-    const [y,m,d]=this.value.split("-").map(Number);
-    let zodiacYear=y;
+    const [y,m,d] = this.value.split("-").map(Number);
+    let zodiacYear = y;
 
-    const lunar=lunarMap[y];
+    const lunar = lunarMap[y];
     if(lunar){
-      const [lm,ld]=lunar.split("-").map(Number);
-      if(m<lm||(m===lm&&d<ld)) zodiacYear=y-1;
+      const [lm,ld] = lunar.split("-").map(Number);
+      if(m < lm || (m === lm && d < ld)){
+        zodiacYear = y - 1;
+      }
     }
 
-    const zodiac=zodiacAnimals[zodiacYear%12];
-    currentZodiac=zodiac;
+    const zodiac = zodiacAnimals[zodiacYear % 12];
+    currentZodiac = zodiac;
 
-    const name=document.getElementById("name").value||"선택한 생년월일";
-    document.getElementById("zodiacResult").innerText =
-      `음력을 적용한 ${name}님은 ${zodiac}띠 입니다`;
+    const name = document.getElementById("name").value || "선택한 생년월일";
+    const out = document.getElementById("zodiacResult");
+    if(out){
+      out.innerText = `음력을 적용한 ${name}님은 ${zodiac}띠 입니다`;
+    }
   });
-
-});
-
-  let zodiacYear=y;
-
-  const lunar=lunarMap[y];
-  if(lunar){
-    const [lm,ld]=lunar.split("-").map(Number);
-    if(m<lm||(m===lm&&d<ld)) zodiacYear=y-1;
-  }
-
-  const zodiac=zodiacAnimals[zodiacYear%12];
-  currentZodiac=zodiac;
-
-  const name=document.getElementById("name").value||"선택한 생년월일";
-  document.getElementById("zodiacResult").innerText=
-  `음력을 적용한 ${name}님은 ${zodiac}띠 입니다`;
-});
+}
 
 /* ===============================
 SHOW RESULT
 ================================ */
 async function showResult(){
-
-  const name = document.getElementById("name").value;
+  const name = document.getElementById("name").value.trim();
   const birth = document.getElementById("birthInput").value;
   const mbti = document.getElementById("mbtiSelect").value;
 
@@ -178,40 +216,39 @@ async function showResult(){
     alert("성명을 입력해주세요");
     return;
   }
-
   if(!birth){
     alert("생년월일을 선택해주세요");
     return;
   }
-
   if(!mbti){
     alert("MBTI를 선택해주세요");
     return;
   }
 
-  /* 오늘 운세 */
+  // 오늘/내일 운세 (pool에서 랜덤)
   let todayFortune = "";
-  if(todayDB?.pools?.today){
+  if(todayDB?.pools?.today?.length){
     const arr = todayDB.pools.today;
     todayFortune = arr[Math.floor(Math.random()*arr.length)];
   }
 
-  /* 내일 운세 */
   let tomorrowFortune = "";
-  if(tomorrowDB?.pools?.tomorrow){
+  if(tomorrowDB?.pools?.tomorrow?.length){
     const arr = tomorrowDB.pools.tomorrow;
     tomorrowFortune = arr[Math.floor(Math.random()*arr.length)];
   }
 
-  /* 띠 운세 */
+  // 띠 운세
   let zodiacFortune = "";
   if(currentZodiac && zodiacDB[currentZodiac]){
     zodiacFortune = zodiacDB[currentZodiac].year || "";
   }
 
+  const zodiacText = document.getElementById("zodiacResult")?.innerText || "";
+
   document.getElementById("resultBox").innerHTML = `
     <b>${name}님의 운세 결과</b><br><br>
-    ${document.getElementById("zodiacResult").innerText}<br><br>
+    ${zodiacText}<br><br>
     <b>오늘의 운세</b><br>${todayFortune}<br><br>
     <b>내일의 운세</b><br>${tomorrowFortune}<br><br>
     <b>2026년 운세</b><br>${zodiacFortune}<br><br>
@@ -220,41 +257,18 @@ async function showResult(){
 
   document.getElementById("inputSection").style.display="none";
   document.getElementById("resultSection").style.display="block";
+
+  // 🔹 백그라운드 저장 (전화번호가 없어서 일단 저장은 막음)
+  // phone 입력칸 만들면 아래 주석 풀면 됨
+  // const phone = document.getElementById("phone")?.value?.trim() || "";
+  // if(phone) { registerUser(name, phone); checkin(phone); }
 }
 
-  // 🔹 백그라운드 저장
-  registerUser(name,phone);
-  checkin(phone);
-}
-function initMBTITest(){
-  const box=document.getElementById("mbtiQuestions");
-  if(!box) return;
-
-  box.innerHTML="";
-
-  MBTI_Q16.forEach((q,i)=>{
-    box.innerHTML+=`
-      <div class="qrow">
-        <div class="qtext">${i+1}. ${q[1]}</div>
-        <input type="radio" name="q${i}" value="left">
-      </div>
-      <div class="qrow">
-        <div class="qtext">${q[2]}</div>
-        <input type="radio" name="q${i}" value="right">
-      </div>
-    `;
-  });
-
-  box.innerHTML+=`<button onclick="submitMBTI()">제출하고 MBTI 확정</button>`;
-}
-function setMBTIMode(m){
-  document.getElementById("mbtiDirect").style.display =
-    m==="direct" ? "block" : "none";
-
-  document.getElementById("mbtiTest").style.display =
-    m==="test" ? "block" : "none";
-}
-document.addEventListener("DOMContentLoaded", function(){
-  loadDB();
+/* ===============================
+INIT
+================================ */
+document.addEventListener("DOMContentLoaded", async function(){
   renderPoint();
+  bindBirthInput();
+  await loadDB();
 });
