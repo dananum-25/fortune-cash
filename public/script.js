@@ -8,6 +8,18 @@ const MBTI_TYPES = [
 "ISTP","ISFP","ESTP","ESFP"
 ];
 
+function initMBTI(){
+  const sel=document.getElementById("mbtiSelect");
+  if(!sel) return;
+
+  MBTI_TYPES.forEach(t=>{
+    const o=document.createElement("option");
+    o.value=t;
+    o.textContent=t;
+    sel.appendChild(o);
+  });
+}
+
 async function loadDB(){
   tarotDB = await fetch("data/tarot_db_ko.json").then(r=>r.json());
   initMBTI();
