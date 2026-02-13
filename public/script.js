@@ -47,6 +47,7 @@ async function loadDB(){
   lunarMap = await fetch("/data/lunar_new_year_1920_2026.json").then(r=>r.json());
 
   initMBTI();
+  initMBTITest();
 }
 
 /* ===============================
@@ -109,7 +110,8 @@ async function showResult(){
 
   let zodiacFortune="";
   if(currentZodiac && zodiacDB[currentZodiac]){
-    zodiacFortune=zodiacDB[currentZodiac].year || "";
+    const arr=zodiacDB[currentZodiac].year;
+zodiacFortune=arr[Math.floor(Math.random()*arr.length)];
   }
 
   document.getElementById("resultBox").innerHTML=`
@@ -133,3 +135,6 @@ document.addEventListener("DOMContentLoaded", function(){
   initZodiac();
   renderPoint();
 });
+function submitMBTI(){
+  alert("MBTI 저장 완료");
+      }
