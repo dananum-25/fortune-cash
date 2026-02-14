@@ -213,22 +213,25 @@ function showResult(){
   const yearFortune=yearArr[Math.floor(Math.random()*yearArr.length)]||"";
 
 
-    let zodiacFortune = "";
+  
+let zodiacFortune = "";
+
+const zodiacKey = zodiacKeyMap[currentZodiac];
 
 if(zodiacKey && zodiacDB[zodiacKey]){
   const arr = zodiacDB[zodiacKey].today || [];
-  zodiacFortune = arr[Math.floor(Math.random()*arr.length)] || "";
-}
+
   const todayKey = new Date().toISOString().slice(0,10);
-const storageKey = "zodiac_" + currentZodiac + "_" + todayKey;
+  const storageKey = "zodiac_" + currentZodiac + "_" + todayKey;
 
-let saved = localStorage.getItem(storageKey);
+  let saved = localStorage.getItem(storageKey);
 
-if(saved){
-  zodiacFortune = saved;
-}else{
-  zodiacFortune = arr[Math.floor(Math.random()*arr.length)] || "";
-  localStorage.setItem(storageKey, zodiacFortune);
+  if(saved){
+    zodiacFortune = saved;
+  }else{
+    zodiacFortune = arr[Math.floor(Math.random()*arr.length)] || "";
+    localStorage.setItem(storageKey, zodiacFortune);
+  }
 }
   const mbtiData = mbtiDB.traits?.[mbti];
 const mbtiText = mbtiData
