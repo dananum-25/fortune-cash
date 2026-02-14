@@ -63,6 +63,20 @@ const zodiacAnimals=[
 ];
 
 function initZodiac(){
+  const zodiacKeyMap = {
+  "쥐":"rat",
+  "소":"ox",
+  "호랑이":"tiger",
+  "토끼":"rabbit",
+  "용":"dragon",
+  "뱀":"snake",
+  "말":"horse",
+  "양":"sheep",
+  "원숭이":"monkey",
+  "닭":"rooster",
+  "개":"dog",
+  "돼지":"pig"
+};
   const birthInput = document.getElementById("birthInput");
   if(!birthInput) return;
 
@@ -200,26 +214,24 @@ function showResult(){
 
 
     let zodiacFortune = "";
+let zodiacFortune="";
 
-if(currentZodiac && zodiacDB[currentZodiac]){
+const zodiacKey = zodiacKeyMap[currentZodiac];
 
-  const arr = zodiacDB[currentZodiac].year || [];
+if(zodiacKey && zodiacDB[zodiacKey]){
+  const arr = zodiacDB[zodiacKey].today || [];
+  zodiacFortune = arr[Math.floor(Math.random()*arr.length)] || "";
+}
+  const todayKey = new Date().toISOString().slice(0,10);
+const storageKey = "zodiac_" + currentZodiac + "_" + todayKey;
 
-  if(arr.length > 0){
+let saved = localStorage.getItem(storageKey);
 
-    const birth = document.getElementById("birthInput").value;
-    const todayKey = new Date().toISOString().slice(0,10);
-
-    const seedString = birth + currentZodiac + todayKey;
-
-    let seed = 0;
-    for(let i=0;i<seedString.length;i++){
-      seed += seedString.charCodeAt(i);
-    }
-
-    const idx = seed % arr.length;
-    zodiacFortune = arr[idx];
-  }
+if(saved){
+  zodiacFortune = saved;
+}else{
+  zodiacFortune = arr[Math.floor(Math.random()*arr.length)] || "";
+  localStorage.setItem(storageKey, zodiacFortune);
 }
   const mbtiData = mbtiDB.traits?.[mbti];
 const mbtiText = mbtiData
