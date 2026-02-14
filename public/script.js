@@ -76,25 +76,31 @@ const zodiacKeyMap = {
   "돼지":"pig"
 };
 function initZodiac(){
+function initZodiac(){
 
   const birthInput = document.getElementById("birthInput");
   if(!birthInput) return;
 
   birthInput.addEventListener("change",function(){
+
+    if(!lunarMap) return;
+
     const [y,m,d]=this.value.split("-").map(Number);
     let zodiacYear=y;
 
     const lunar=lunarMap[y];
+
     if(lunar){
       const [lm,ld]=lunar.split("-").map(Number);
       if(m<lm||(m===lm&&d<ld)) zodiacYear=y-1;
     }
 
-    const zodiac = zodiacAnimals[(zodiacYear - 4) % 12];
+    const zodiac=zodiacAnimals[zodiacYear%12];
     currentZodiac=zodiac;
 
     const name=document.getElementById("name").value||"선택한 생년월일";
-    document.getElementById("zodiacResult").innerText=
+
+    document.getElementById("zodiacResult").innerText =
       `음력을 적용한 ${name}님은 ${zodiac}띠 입니다`;
   });
 }
