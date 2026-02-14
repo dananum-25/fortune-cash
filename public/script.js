@@ -120,19 +120,25 @@ const MBTI_Q16=[
 ];
 
 function initMBTITest(){
-  const box=document.getElementById("mbtiQuestions");
+  const box = document.getElementById("mbtiQuestions");
   if(!box) return;
 
-  box.innerHTML="";
+  box.innerHTML = "";
+
   MBTI_Q16.forEach((q,i)=>{
-    box.innerHTML+=`
-      <div class="qrow">
-        <div class="qtext">${i+1}. ${q[1]}</div>
-        <input type="radio" name="q${i}" value="left">
-      </div>
-      <div class="qrow">
-        <div class="qtext">${q[2]}</div>
-        <input type="radio" name="q${i}" value="right">
+    box.innerHTML += `
+      <div class="qbox">
+        <div class="qtitle">${i+1}번 질문</div>
+
+        <label class="qoption">
+          <span>A. ${q[1]}</span>
+          <input type="radio" name="q${i}" value="A">
+        </label>
+
+        <label class="qoption">
+          <span>B. ${q[2]}</span>
+          <input type="radio" name="q${i}" value="B">
+        </label>
       </div>
     `;
   });
