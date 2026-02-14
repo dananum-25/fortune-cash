@@ -214,9 +214,6 @@ function showResult(){
 
 
     let zodiacFortune = "";
-let zodiacFortune="";
-
-const zodiacKey = zodiacKeyMap[currentZodiac];
 
 if(zodiacKey && zodiacDB[zodiacKey]){
   const arr = zodiacDB[zodiacKey].today || [];
