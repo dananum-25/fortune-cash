@@ -25,18 +25,11 @@
 
     <div id="zodiacResult" style="margin-top:8px;color:#bbb;font-size:14px;"></div>
 
-    <h3>MBTI</h3>
+<h3>MBTI 직접 선택</h3>
+<select id="mbtiSelect"></select>
 
-    <button onclick="setMBTIMode('direct')">직접 선택</button>
-    <button onclick="setMBTIMode('test')">16문항 테스트</button>
-
-    <div id="mbtiDirect">
-      <select id="mbtiSelect"></select>
-    </div>
-
-    <div id="mbtiTest" style="display:none;">
-      <div id="mbtiQuestions"></div>
-    </div>
+<h3 style="margin-top:20px;">MBTI 16문항 테스트</h3>
+<div id="mbtiQuestions"></div>
 
     <button class="mainBtn" onclick="showResult()">운세 보기</button>
 
