@@ -83,21 +83,26 @@ function initZodiac(){
 
   birthInput.addEventListener("change", function(){
 
-    if(!lunarMap) return;
-
     const [y,m,d] = this.value.split("-").map(Number);
     let zodiacYear = y;
 
-    const lunar = lunarMap[y];
+    const lunar = lunarMap?.[y];
+
     if(lunar){
-      const [lm,ld] = lunar.split("-").map(Number);
-      if(m<lm || (m===lm && d<ld)) zodiacYear = y-1;
+      const [ly,lm,ld] = lunar.split("-").map(Number);
+
+      if(m < lm || (m === lm && d < ld)){
+        zodiacYear = y - 1;
+      }
     }
 
-    const zodiac = zodiacAnimals[zodiacYear % 12];
+    // ⭐ 기준연도 보정 (2020 = 쥐)
+    const zodiacIndex = (zodiacYear - 2020 + 120) % 12;
+    const zodiac = zodiacAnimals[zodiacIndex];
+
     currentZodiac = zodiac;
 
-    const name=document.getElementById("name").value || "선택한 생년월일";
+    const name = document.getElementById("name").value || "선택한 생년월일";
 
     document.getElementById("zodiacResult").innerText =
       `음력을 적용한 ${name}님은 ${zodiac}띠 입니다`;
