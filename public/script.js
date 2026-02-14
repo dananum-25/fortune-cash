@@ -61,6 +61,7 @@ const zodiacAnimals = [
 "용","뱀","말","양",
 "원숭이","닭","개","돼지"
 ];
+
 const zodiacKeyMap = {
   "쥐":"rat",
   "소":"ox",
@@ -75,36 +76,33 @@ const zodiacKeyMap = {
   "개":"dog",
   "돼지":"pig"
 };
-function initZodiac(){
-function initZodiac(){
 
+function initZodiac(){
   const birthInput = document.getElementById("birthInput");
   if(!birthInput) return;
 
-  birthInput.addEventListener("change",function(){
+  birthInput.addEventListener("change", function(){
 
     if(!lunarMap) return;
 
-    const [y,m,d]=this.value.split("-").map(Number);
-    let zodiacYear=y;
+    const [y,m,d] = this.value.split("-").map(Number);
+    let zodiacYear = y;
 
-    const lunar=lunarMap[y];
-
+    const lunar = lunarMap[y];
     if(lunar){
-      const [lm,ld]=lunar.split("-").map(Number);
-      if(m<lm||(m===lm&&d<ld)) zodiacYear=y-1;
+      const [lm,ld] = lunar.split("-").map(Number);
+      if(m<lm || (m===lm && d<ld)) zodiacYear = y-1;
     }
 
-    const zodiac=zodiacAnimals[zodiacYear%12];
-    currentZodiac=zodiac;
+    const zodiac = zodiacAnimals[zodiacYear % 12];
+    currentZodiac = zodiac;
 
-    const name=document.getElementById("name").value||"선택한 생년월일";
+    const name=document.getElementById("name").value || "선택한 생년월일";
 
     document.getElementById("zodiacResult").innerText =
       `음력을 적용한 ${name}님은 ${zodiac}띠 입니다`;
   });
 }
-
     const lunar=lunarMap[y];
     if(lunar){
       const [lm,ld]=lunar.split("-").map(Number);
