@@ -61,9 +61,7 @@ const zodiacAnimals=[
 "쥐","소","호랑이","토끼",
 "용","뱀","말","양"
 ];
-
-function initZodiac(){
-  const zodiacKeyMap = {
+const zodiacKeyMap = {
   "쥐":"rat",
   "소":"ox",
   "호랑이":"tiger",
@@ -77,6 +75,8 @@ function initZodiac(){
   "개":"dog",
   "돼지":"pig"
 };
+function initZodiac(){
+  
   const birthInput = document.getElementById("birthInput");
   if(!birthInput) return;
 
