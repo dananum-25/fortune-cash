@@ -165,11 +165,27 @@ function submitMBTI(){
   alert("MBTI 저장 완료");
 }
 
-function setMBTIMode(m){
-  document.getElementById("mbtiDirect").style.display =
-    m==="direct" ? "block" : "none";
-  document.getElementById("mbtiTest").style.display =
-    m==="test" ? "block" : "none";
+function setMBTIMode(mode){
+
+  const direct = document.getElementById("mbtiDirect");
+  const test = document.getElementById("mbtiTest");
+
+  if(!direct || !test) return;
+
+  if(mode === "direct"){
+    direct.style.display = "block";
+    test.style.display = "none";
+  }
+
+  if(mode === "test"){
+    direct.style.display = "none";
+    test.style.display = "block";
+
+    // 질문이 아직 없으면 생성
+    if(document.getElementById("mbtiQuestions").innerHTML === ""){
+      initMBTITest();
+    }
+  }
 }
 
 /* ===============================
