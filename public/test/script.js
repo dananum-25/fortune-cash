@@ -180,8 +180,9 @@ function setMBTIMode(mode){
 }
 
 function drawTarot(){
+
   alert("타로 실행됨");
-console.log(card);
+
   const birth = document.getElementById("birthInput").value;
   if(!birth){
     alert("생년월일을 먼저 입력해주세요");
@@ -207,12 +208,13 @@ console.log(card);
   const card = tarotDB[cardKey];
 
   const imgPath = getTarotImage(card);
-console.log(imgPath);
-document.getElementById("tarotImg").src = imgPath;
+  console.log(imgPath);
+
+  document.getElementById("tarotImg").src = imgPath;
 
   document.getElementById("resultBox").innerHTML += `
     <br><b>타로카드</b><br>
-    ${getCardDisplayName(cardKey)}<br>
+    ${cardKey}<br>
     ${card.summary}
   `;
 }
