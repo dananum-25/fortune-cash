@@ -179,7 +179,17 @@ function setMBTIMode(mode){
   }
 }
 
+const tarotSound = new Audio("/tarot_reveal.mp3");
+tarotSound.volume = 0.7;
 function drawTarot(){
+
+  const todayKey = new Date().toISOString().slice(0,10);
+  const lockKey = "tarot_draw_" + todayKey;
+
+  if(localStorage.getItem(lockKey)){
+    alert("타로뽑기는 1일 1회 고정값 입니다.\n\n아래 버튼에서 타로 전용앱을 이용해보세요.");
+    return;
+  }
 
   const birth = document.getElementById("birthInput").value;
   if(!birth){
@@ -187,14 +197,8 @@ function drawTarot(){
     return;
   }
 
-  const todayKey = new Date().toISOString().slice(0,10);
-  const tarotLockKey = "tarot_draw_" + todayKey;
-
-  // 이미 뽑은 경우
-  if(localStorage.getItem(tarotLockKey)){
-    alert("타로뽑기는 1일 1회 고정값 입니다.\n\n아래 버튼 타로 전용앱 방문해보시겠어요?");
-    return;
-  }
+  tarotSound.currentTime = 0;
+  tarotSound.play();
 
   const seedString = birth + todayKey;
 
@@ -216,8 +220,7 @@ function drawTarot(){
     ${card.core}
   `;
 
-  // 실행 기록 저장
-  localStorage.setItem(tarotLockKey, cardKey);
+  localStorage.setItem(lockKey, cardKey);
 }
 
 function getCardImagePath(cardKey){
