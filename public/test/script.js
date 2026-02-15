@@ -181,8 +181,6 @@ function setMBTIMode(mode){
 
 function drawTarot(){
 
-  alert("타로 실행됨");
-
   const birth = document.getElementById("birthInput").value;
   if(!birth){
     alert("생년월일을 먼저 입력해주세요");
@@ -198,24 +196,16 @@ function drawTarot(){
   }
 
   const keys = Object.keys(tarotDB);
-
-  if(keys.length === 0){
-    alert("타로 DB 없음");
-    return;
-  }
-
   const cardKey = keys[seed % keys.length];
   const card = tarotDB[cardKey];
 
-  const imgPath = getTarotImage(card);
-  console.log(imgPath);
-
-  document.getElementById("tarotImg").src = imgPath;
+  document.getElementById("tarotImg").src =
+    getCardImagePath(cardKey);
 
   document.getElementById("resultBox").innerHTML += `
     <br><b>타로카드</b><br>
     ${cardKey}<br>
-    ${card.summary}
+    ${card.core}
   `;
 }
 function getTarotImage(card){
@@ -230,6 +220,9 @@ function getTarotImage(card){
     card.suit + "/" +
     String(card.id).padStart(2,"0") +
     "_" + card.rank + ".png";
+}
+function getCardImagePath(cardKey){
+  return "/tarot/" + cardKey.replace("_","/") + ".png";
 }
 /* ===============================
 SHOW RESULT
