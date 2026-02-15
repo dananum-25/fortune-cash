@@ -183,6 +183,7 @@ function setMBTIMode(mode){
 TAROT
 ================================ */
 function drawTarot(){
+  alert("타로 버튼 클릭됨");
 
   if(!tarotDB) return;
 
