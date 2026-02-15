@@ -272,9 +272,14 @@ z-index:10000;
     <a href="/terms.html">이용약관</a>
   </div>
 </footer>
+
 <script>
 const entryModal = document.getElementById("entryModal");
+const loginModal = document.getElementById("loginModal");
 
+/* =========================
+ENTRY MODAL
+========================= */
 document.getElementById("startGuest").onclick = ()=>{
   localStorage.setItem("guestMode","true");
   entryModal.style.display="none";
@@ -285,14 +290,43 @@ document.getElementById("startApptech").onclick = ()=>{
   openLoginModal();
 };
 
-window.addEventListener("load",()=>{
-  const phone = localStorage.getItem("phone");
-  const guest = localStorage.getItem("guestMode");
+/* =========================
+LOGIN MODAL
+========================= */
+function openLoginModal(){
+  loginModal.style.display="flex";
+}
 
-  if(phone || guest){
-    entryModal.style.display="none";
+document.getElementById("loginClose").onclick = ()=>{
+  loginModal.style.display="none";
+};
+
+document.getElementById("loginSubmit").onclick = ()=>{
+  const name = document.getElementById("loginName").value.trim();
+  let phone = document.getElementById("loginPhone").value.trim();
+
+  if(!name || !phone){
+    alert("이름과 전화번호를 입력해주세요");
+    return;
   }
 
+  phone = phone.replace(/[^0-9]/g,"");
+
+  if(phone.length !== 11){
+    alert("전화번호는 11자리 숫자로 입력해주세요.");
+    return;
+  }
+
+  localStorage.setItem("phone", phone);
+  localStorage.setItem("name", name);
+
+  loginModal.style.display="none";
+  renderUserBar();
+};
+
+/* =========================
+USER BAR
+========================= */
 function renderUserBar(){
   const phone = localStorage.getItem("phone");
   const name = localStorage.getItem("name");
@@ -315,8 +349,21 @@ function renderUserBar(){
     btn.textContent = "로그인";
     btn.onclick = openLoginModal;
   }
-  renderUserBar();
 }
-  
+
+/* =========================
+INIT
+========================= */
+window.addEventListener("load",()=>{
+  const phone = localStorage.getItem("phone");
+  const guest = localStorage.getItem("guestMode");
+
+  if(phone || guest){
+    entryModal.style.display="none";
+  }else{
+    entryModal.style.display="flex";
+  }
+
+  renderUserBar();
 });
 </script>
