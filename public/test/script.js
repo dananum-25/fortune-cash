@@ -183,7 +183,6 @@ function setMBTIMode(mode){
 TAROT
 ================================ */
 function drawTarot(){
-  alert("타로 버튼 클릭됨");
 
   if(!tarotDB) return;
 
@@ -222,19 +221,15 @@ function drawTarot(){
     ${card.upright.summary}
   `;
 }
+
+
+/* ===============================
+TAROT IMAGE (FIXED)
+================================ */
 function getTarotImage(card){
-
-  if(card.arcana === "major"){
-    return "/tarot/majors/" +
-      String(card.id).padStart(2,"0") +
-      "_" + card.key + ".png";
-  }
-
-  return "/tarot/minors/" +
-    card.suit + "/" +
-    String(card.id).padStart(2,"0") +
-    "_" + card.rank + ".png";
+  return "/" + card.image.replace("assets/","");
 }
+
 /* ===============================
 SHOW RESULT
 ================================ */
