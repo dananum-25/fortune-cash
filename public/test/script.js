@@ -313,3 +313,25 @@ document.addEventListener("DOMContentLoaded", async function(){
     }
   };
 });
+
+/* ===============================
+RESULT BUTTON ACTIONS
+================================ */
+
+function copyURL(){
+  navigator.clipboard.writeText(location.href);
+  alert("URL이 복사되었습니다!");
+}
+
+function goTarotApp(){
+  window.open("https://my-fortune-lake.vercel.app/", "_blank");
+}
+
+function goGame(){
+  window.open("https://game-time-kappa.vercel.app/", "_blank");
+}
+
+function back(){
+  document.getElementById("resultSection").style.display="none";
+  document.getElementById("inputSection").style.display="block";
+}
