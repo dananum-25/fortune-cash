@@ -186,7 +186,7 @@ function applySlotVisibility(){
 if(revealedCards[String(s)]){
   c.style.backgroundImage = `url('${revealedCards[String(s)]}')`;
 }else{
-  c.style.backgroundImage = "url('/assets/tarot/back.png')";
+  c.style.backgroundImage = "url('/tarot/back.png')";
 }
 
     c.classList.remove("burning","smoking");
@@ -280,7 +280,7 @@ async function handleAfterConfirm(pickedCards, selectedCopy){
 
     if(active.includes(s)){
       c.style.opacity = "1";
-      c.style.backgroundImage = "url('/assets/tarot/back.png')";
+      c.style.backgroundImage = "url('/tarot/back.png')";
     }else{
       c.style.opacity = "0";
     }
