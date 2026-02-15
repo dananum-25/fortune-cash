@@ -137,11 +137,13 @@ input, select, button{
   gap:10px;
 }
 
+.qrow input{
+  flex-shrink:0;
+}
 .qtext{
   flex:1;
   font-size:14px;
-}
-
-.qrow input{
-  flex-shrink:0;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
