@@ -1,0 +1,146 @@
+body{
+  background:#111;
+  color:white;
+  font-family:Arial;
+}
+
+.container{
+  max-width:420px;
+  margin:auto;
+}
+
+.hero{
+  padding:20px;
+  background:linear-gradient(135deg,#7f5af0,#2cb67d);
+  border-radius:20px;
+  text-align:center;
+  font-weight:bold;
+}
+
+input,select{
+  width:100%;
+  margin:10px 0;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  margin-top:10px;
+  font-weight:bold;
+}
+
+.mainBtn{
+  background:#7f5af0;
+  color:white;
+}
+
+.adbox{
+  background:white;
+  color:black;
+  padding:14px;
+  border-radius:12px;
+  margin:12px 0;
+  text-align:center;
+}
+
+.label{
+  font-size:14px;
+  margin-top:10px;
+}
+
+.qbox{
+  background:#1a1a1a;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:10px;
+}
+
+.qrow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#1a1a1a;
+  padding:10px;
+  margin-bottom:6px;
+  border-radius:8px;
+}
+
+.qtext{
+  width:85%;
+}
+
+.tarotWrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+}
+
+.tarotCard {
+  max-width: 92vw;
+  max-height: 70vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.tarotCard{
+  transition:transform 0.6s;
+  transform-style:preserve-3d;
+}
+
+.flip{
+  transform:rotateY(180deg);
+}
+
+.qbox{
+  background:#1a1a1a;
+  padding:14px;
+  border-radius:12px;
+  margin-bottom:12px;
+}
+
+.qtitle{
+  font-weight:bold;
+  margin-bottom:8px;
+}
+
+.qoption{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px;
+  background:#222;
+  border-radius:8px;
+  margin-top:6px;
+}
+
+.qoption span{
+  width:85%;
+  font-size:14px;
+}
+
+input, select, button{
+  width:100%;
+  box-sizing:border-box;
+}
+.qrow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#1a1a1a;
+  padding:10px;
+  margin-bottom:6px;
+  border-radius:8px;
+}
+
+.qtext{
+  width:85%;
+  font-size:14px;
+}
