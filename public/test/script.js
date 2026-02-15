@@ -344,9 +344,24 @@ document.addEventListener("DOMContentLoaded", async function(){
 RESULT BUTTON ACTIONS
 ================================ */
 
-function copyURL(){
-  navigator.clipboard.writeText(location.href);
-  alert("URL이 복사되었습니다!");
+async function copyURL(){
+
+  const shareData = {
+    title: "운세앱 앱테크",
+    text: "무료 운세앱 앱테크 해보기",
+    url: location.href
+  };
+
+  if(navigator.share){
+    try{
+      await navigator.share(shareData);
+    }catch(e){
+      console.log("공유 취소");
+    }
+  }else{
+    navigator.clipboard.writeText(location.href);
+    alert("URL이 복사되었습니다!");
+  }
 }
 
 function goTarotApp(){
