@@ -149,3 +149,21 @@ input, select, button{
   height:22px;
   flex-shrink:0;
 }
+.tarotWrap{
+  perspective:1000px;
+  display:flex;
+  justify-content:center;
+  margin:20px 0;
+}
+
+.tarotCard{
+  width:220px;
+  border-radius:12px;
+  transform-style:preserve-3d;
+  transition:transform 0.8s ease;
+  box-shadow:0 10px 30px rgba(0,0,0,0.5);
+}
+
+.tarotCard.flip{
+  transform:rotateY(180deg);
+}
