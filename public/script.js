@@ -347,7 +347,7 @@ RESULT BUTTON ACTIONS
 async function copyURL(){
 
   const shareData = {
-    title: "운세앱 앱테크",
+    title: "무료 운세앱",
     text: "무료 운세앱 앱테크 해보기",
     url: location.href
   };
@@ -355,6 +355,14 @@ async function copyURL(){
   if(navigator.share){
     try{
       await navigator.share(shareData);
+
+      // 공유 성공 → 포인트 지급
+      point += 50;
+      localStorage.setItem("point", point);
+      renderPoint();
+
+      alert("공유 완료! +50P 지급 🎉");
+
     }catch(e){
       console.log("공유 취소");
     }
