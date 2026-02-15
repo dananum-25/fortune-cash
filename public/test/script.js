@@ -208,21 +208,35 @@ function drawTarot(){
     ${card.core}
   `;
 }
-function getTarotImage(card){
 
-  if(card.arcana === "major"){
-    return "/tarot/majors/" +
-      String(card.id).padStart(2,"0") +
-      "_" + card.key + ".png";
+function getCardImagePath(cardKey){
+
+  // 메이저 카드
+  if(cardKey.includes("the_")){
+    return "/tarot/majors/" + cardKey + ".png";
   }
 
-  return "/tarot/minors/" +
-    card.suit + "/" +
-    String(card.id).padStart(2,"0") +
-    "_" + card.rank + ".png";
-}
-function getCardImagePath(cardKey){
-  return "/tarot/" + cardKey.replace("_","/") + ".png";
+  // 마이너 카드
+  const [suit, name] = cardKey.split("_");
+
+  const order = {
+    ace:"01",
+    two:"02",
+    three:"03",
+    four:"04",
+    five:"05",
+    six:"06",
+    seven:"07",
+    eight:"08",
+    nine:"09",
+    ten:"10",
+    page:"11",
+    knight:"12",
+    queen:"13",
+    king:"14"
+  };
+
+  return `/tarot/minors/${suit}/${order[name]}_${name}.png`;
 }
 /* ===============================
 SHOW RESULT
