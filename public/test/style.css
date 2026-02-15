@@ -135,21 +135,13 @@ input, select, button{
   align-items:center;
   justify-content:space-between;
   gap:10px;
-  background:#1a1a1a;
-  padding:12px;
-  margin-bottom:6px;
-  border-radius:10px;
 }
 
 .qtext{
   flex:1;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
   font-size:14px;
 }
 
 .qrow input{
   flex-shrink:0;
-  margin-left:auto;
 }
