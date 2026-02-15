@@ -290,59 +290,34 @@ z-index:10000;
 document.addEventListener("DOMContentLoaded", ()=>{
 
 const entryModal = document.getElementById("entryModal");
-const loginModal = document.getElementById("loginModal");
-
 const startGuestBtn = document.getElementById("startGuest");
 const startApptechBtn = document.getElementById("startApptech");
-const loginBtn = document.getElementById("loginBtn");
 
-const loginClose = document.getElementById("loginClose");
-const loginSubmit = document.getElementById("loginSubmit");
-
-/* ENTRY */
 startGuestBtn.onclick = ()=>{
   localStorage.setItem("guestMode","true");
-  entryModal.style.display="none";
+  entryModal.classList.add("hidden");
 };
 
 startApptechBtn.onclick = ()=>{
-  entryModal.style.display="none";
+  entryModal.classList.add("hidden");
   openLoginModal();
 };
 
-/* LOGIN */
-function openLoginModal(){
-  loginModal.style.display="flex";
-}
+window.addEventListener("load",()=>{
+  const phone = localStorage.getItem("phone");
+  const guest = localStorage.getItem("guestMode");
 
-loginClose.onclick = ()=>{
-  loginModal.style.display="none";
-};
-
-loginSubmit.onclick = ()=>{
-  const name = document.getElementById("loginName").value.trim();
-  let phone = document.getElementById("loginPhone").value.trim();
-
-  if(!name || !phone){
-    alert("이름과 전화번호를 입력해주세요");
-    return;
+  if(phone || guest){
+    entryModal.classList.add("hidden");
+  }else{
+    entryModal.classList.remove("hidden");
   }
 
-  phone = phone.replace(/[^0-9]/g,"");
-
-  if(phone.length !== 11){
-    alert("전화번호는 11자리 숫자로 입력해주세요.");
-    return;
-  }
-
-  localStorage.setItem("phone", phone);
-  localStorage.setItem("name", name);
-
-  loginModal.style.display="none";
   renderUserBar();
-};
+});
 
-/* USER BAR */
+/* ================= USER BAR ================= */
+
 function renderUserBar(){
   const phone = localStorage.getItem("phone");
   const name = localStorage.getItem("name");
