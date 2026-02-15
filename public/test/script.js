@@ -46,7 +46,7 @@ async function loadDB(){
   yearDB = await fetch("/data/fortunes_ko_2026.json").then(r=>r.json());
   mbtiDB = await fetch("/data/mbti_traits_ko.json").then(r=>r.json());
   sajuDB = await fetch("/data/saju_ko.json").then(r=>r.json());
-  tarotDB = await fetch("/data/tarot_db_ko.json").then(r=>r.json());
+  tarotDB = await fetch("/data/tarot_reading_db_ko.json").then(r=>r.json());
   lunarMap = await fetch("/data/lunar_new_year_1920_2026.json").then(r=>r.json());
 
   initMBTI();
@@ -181,11 +181,6 @@ function setMBTIMode(mode){
 
 function drawTarot(){
 
-  if(!tarotDB?.majors){
-    alert("타로 DB 로딩 안됨");
-    return;
-  }
-
   const birth = document.getElementById("birthInput").value;
   if(!birth){
     alert("생년월일을 먼저 입력해주세요");
@@ -200,35 +195,24 @@ function drawTarot(){
     seed += seedString.charCodeAt(i);
   }
 
-  const allCards = [
-    ...(tarotDB.majors || []),
-    ...(tarotDB.minors || [])
-  ];
+  const keys = Object.keys(tarotDB);
 
-  if(allCards.length === 0){
-    alert("타로카드 없음");
+  if(keys.length === 0){
+    alert("타로 DB 없음");
     return;
   }
 
-  const idx = seed % allCards.length;
-  const card = allCards[idx];
+  const cardKey = keys[seed % keys.length];
+  const card = tarotDB[cardKey];
 
   document.getElementById("tarotImg").src =
-    "/" + card.image.replace("assets/","");
+    "/tarot/" + card.image;
 
   document.getElementById("resultBox").innerHTML += `
     <br><b>타로카드</b><br>
-    ${card.name_ko}<br>
-    ${card.upright.summary}
+    ${getCardDisplayName(cardKey)}<br>
+    ${card.summary}
   `;
-}
-
-
-/* ===============================
-TAROT IMAGE (FIXED)
-================================ */
-function getTarotImage(card){
-  return "/" + card.image.replace("assets/","");
 }
 
 /* ===============================
