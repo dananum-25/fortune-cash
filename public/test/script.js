@@ -135,6 +135,7 @@ const MBTI_Q16=[
 ];
 
 function initMBTITest(){
+function initMBTITest(){
   const box=document.getElementById("mbtiQuestions");
   if(!box) return;
 
@@ -145,12 +146,12 @@ function initMBTITest(){
       <div class="qbox">
 
         <div class="qrow">
-          <span class="qtext">${i+1}. A. ${q[1]}</span>
+          <div class="qtext">${i+1}. A ${q[1]}</div>
           <input type="radio" name="q${i}" value="left">
         </div>
 
         <div class="qrow">
-          <span class="qtext">B. ${q[2]}</span>
+          <div class="qtext">B ${q[2]}</div>
           <input type="radio" name="q${i}" value="right">
         </div>
 
