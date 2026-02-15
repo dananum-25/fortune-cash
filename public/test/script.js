@@ -181,7 +181,6 @@ function setMBTIMode(mode){
     direct.style.display = "none";
     test.style.display = "block";
 
-    // 질문이 아직 없으면 생성
     if(document.getElementById("mbtiQuestions").innerHTML === ""){
       initMBTITest();
     }
@@ -309,4 +308,7 @@ document.addEventListener("DOMContentLoaded", async function(){
   await loadDB();
   initZodiac();
   renderPoint();
+
+  // ⭐ 기본 상태 = 직접선택
+  setMBTIMode("direct");
 });
