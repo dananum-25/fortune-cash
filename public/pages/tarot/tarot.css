@@ -127,7 +127,7 @@ body.lock-scroll{ overflow:hidden; }
   width:120px;      /* ← 카드 크기 고정 */
   height:180px;
   border-radius:14px;
-  background:url("/assets/tarot/back.png") center / cover no-repeat;
+  background:url("/tarot/back.png") center / cover no-repeat;
   filter:drop-shadow(0 10px 22px rgba(0,0,0,.55));
   backface-visibility:hidden;
 }
@@ -170,7 +170,7 @@ body.lock-scroll{ overflow:hidden; }
   position: absolute;
   width: 42px;
   height: 64px;
-  background: url("/assets/tarot/back.png") center / contain no-repeat;
+  background: url("/tarot/back.png") center / contain no-repeat;
   filter: drop-shadow(0 4px 8px rgba(0,0,0,.45));
   opacity: 0;
 }
