@@ -137,11 +137,15 @@ input, select, button{
   gap:10px;
 }
 
-.qrow input{
-  flex-shrink:0;
-}
 .qtext{
   flex:1;
   font-size:14px;
-  white-space:normal;
+  line-height:1.4;
+  word-break:keep-all;
+}
+
+.qrow input{
+  width:22px;
+  height:22px;
+  flex-shrink:0;
 }
