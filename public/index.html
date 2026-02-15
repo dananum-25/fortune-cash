@@ -85,7 +85,8 @@ body{
 <div class="cardTitle">띠별운세</div>
 </div>
 
-<div class="card">
+<!-- 타로만 실제 연결 -->
+<div class="card" onclick="goTarot()">
 <img src="/assets/tarot.png">
 <div class="cardTitle">타로</div>
 </div>
@@ -113,33 +114,11 @@ body{
 </div>
 </div>
 
-</body>
-</html>
-  <div id="resultSection" style="display:none;">
-    <div id="resultBox"></div>
+<script>
+function goTarot(){
+  location.href = "/pages/tarot/tarot.html";
+}
+</script>
 
-    <button onclick="copyURL()">URL복사 친구공유 하고 포인트 받기</button>
-
-    <div class="adbox">
-      <div>정수기 렌탈하고 최대 50만원 받기</div>
-      <a href="https://dananum-landing.vercel.app/">무료 상담하기</a>
-    </div>
-
-    <div class="tarotWrap">
-      <img id="tarotImg" class="tarotCard" src="/tarot/back.png">
-    </div>
-
-    <div id="tarotBox">
-      <button onclick="drawTarot()">타로카드 뽑기</button>
-    </div>
-
-    <button onclick="goTarotApp()">타로 전문앱 방문하기</button>
-    <button onclick="goGame()">🎮 미니게임하고 커피쿠폰 받기</button>
-    <button onclick="back()">입력 화면으로</button>
-  </div>
-
-</div>
-
-<script src="script.js"></script>
 </body>
 </html>
