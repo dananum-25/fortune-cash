@@ -114,11 +114,27 @@ MBTI TEST
 ================================ */
 const MBTI_Q16=[
 ["EI","사람들과 함께 있을 때 에너지가 올라간다","혼자 있는 시간이 에너지를 채운다"],
+["EI","처음 보는 사람과도 금방 친해진다","낯선 사람은 적응 시간이 필요하다"],
+["EI","생각을 말하면서 정리한다","생각을 정리한 뒤 말한다"],
+["EI","주말엔 약속이 좋다","혼자 쉬는 게 좋다"],
+
 ["SN","구체적인 사실이 중요하다","아이디어가 중요하다"],
+["SN","현실 문제 해결이 먼저","미래 가능성이 먼저"],
+["SN","경험을 믿는다","직감을 믿는다"],
+["SN","디테일 설명 선호","큰 그림 설명 선호"],
+
 ["TF","논리 중심 결정","감정 중심 결정"],
-["JP","계획형","즉흥형"]
+["TF","직설 피드백 선호","부드러운 피드백 선호"],
+["TF","원인 해결 중심","관계 회복 중심"],
+["TF","공정함 우선","조화 우선"],
+
+["JP","계획형","즉흥형"],
+["JP","미리 끝낸다","마감 직전"],
+["JP","정리된 환경 선호","어수선해도 OK"],
+["JP","일정 확정 선호","유동적 일정 선호"]
 ];
 
+function initMBTITest(){
 function initMBTITest(){
   const box=document.getElementById("mbtiQuestions");
   if(!box) return;
@@ -130,12 +146,12 @@ function initMBTITest(){
       <div class="qbox">
 
         <div class="qrow">
-          <span class="qtext">${i+1}. ${q[1]}</span>
+          <span class="qtext">${i+1}. A. ${q[1]}</span>
           <input type="radio" name="q${i}" value="left">
         </div>
 
         <div class="qrow">
-          <span class="qtext">${q[2]}</span>
+          <span class="qtext">B. ${q[2]}</span>
           <input type="radio" name="q${i}" value="right">
         </div>
 
