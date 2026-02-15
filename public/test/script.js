@@ -301,6 +301,15 @@ document.addEventListener("DOMContentLoaded", async function(){
   initZodiac();
   renderPoint();
 
-  // ⭐ 기본 상태 = 직접선택
-  setMBTIMode("direct");
+  const btn = document.getElementById("mbtiTestBtn");
+  const box = document.getElementById("mbtiQuestions");
+
+  btn.onclick = () => {
+    if(box.style.display === "block"){
+      box.style.display = "none";
+    }else{
+      box.style.display = "block";
+      initMBTITest();
+    }
+  };
 });
