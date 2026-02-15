@@ -135,7 +135,6 @@ const MBTI_Q16=[
 ];
 
 function initMBTITest(){
-function initMBTITest(){
   const box=document.getElementById("mbtiQuestions");
   if(!box) return;
 
