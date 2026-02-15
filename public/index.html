@@ -1,40 +1,120 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>2026 운세</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>무료 운세 플랫폼</title>
+
+<style>
+body{
+  margin:0;
+  background:#111;
+  color:white;
+  font-family:Arial;
+}
+
+.wrap{
+  max-width:420px;
+  margin:auto;
+  padding:20px;
+}
+
+.title{
+  text-align:center;
+  font-size:24px;
+  font-weight:bold;
+  margin-bottom:20px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.card{
+  background:#1a1a1a;
+  border-radius:16px;
+  padding:12px;
+  cursor:pointer;
+}
+
+.card img{
+  width:100%;
+  border-radius:10px;
+}
+
+.cardTitle{
+  text-align:center;
+  margin-top:8px;
+  font-weight:bold;
+}
+</style>
 </head>
 
 <body>
-<div class="container">
 
-  <div class="hero">
-    🔮 2026 운세 | 띠 + MBTI + 사주 + 오늘/내일 + 타로
-  </div>
+<div class="wrap">
 
-  <div id="pointBox" style="margin:10px 0;color:#aaa;"></div>
+<div class="title">🔮 무료 운세 플랫폼</div>
 
-  <div id="inputSection">
+<div class="grid">
 
-    <input id="name" placeholder="성함을 입력해주세요">
+<div class="card">
+<img src="/assets/today_fortune.png">
+<div class="cardTitle">기간운세</div>
+</div>
 
-    <div class="label">생년월일을 입력해주세요</div>
-    <input type="date" id="birthInput">
+<div class="card">
+<img src="/assets/saju.png">
+<div class="cardTitle">사주</div>
+</div>
 
-    <div id="zodiacResult" style="margin-top:8px;color:#bbb;font-size:14px;"></div>
+<div class="card">
+<img src="/assets/tojung.png">
+<div class="cardTitle">토정비결</div>
+</div>
 
-<h3>MBTI 직접 선택</h3>
-<select id="mbtiSelect"></select>
+<div class="card">
+<img src="/assets/star_fortune.png">
+<div class="cardTitle">별자리운세</div>
+</div>
 
-<button id="mbtiTestBtn">16문항 테스트</button>
-<div id="mbtiQuestions" style="display:none;"></div>
+<div class="card">
+<img src="/assets/zodiac_fortune.png">
+<div class="cardTitle">띠별운세</div>
+</div>
 
-    <button class="mainBtn" onclick="showResult()">운세 보기</button>
+<div class="card">
+<img src="/assets/tarot.png">
+<div class="cardTitle">타로</div>
+</div>
 
-  </div>
+<div class="card">
+<img src="/assets/fortune_cookie.png">
+<div class="cardTitle">포춘쿠키</div>
+</div>
 
+<div class="card">
+<img src="/assets/mbti.png">
+<div class="cardTitle">MBTI</div>
+</div>
+
+<div class="card">
+<img src="/assets/mini_game.png">
+<div class="cardTitle">미니게임</div>
+</div>
+
+<div class="card">
+<img src="/assets/board.png">
+<div class="cardTitle">게시판</div>
+</div>
+
+</div>
+</div>
+
+</body>
+</html>
   <div id="resultSection" style="display:none;">
     <div id="resultBox"></div>
 
