@@ -166,11 +166,8 @@ function submitMBTI(){
 }
 
 function setMBTIMode(mode){
-
   const direct = document.getElementById("mbtiDirect");
   const test = document.getElementById("mbtiTest");
-
-  if(!direct || !test) return;
 
   if(mode === "direct"){
     direct.style.display = "block";
@@ -180,10 +177,6 @@ function setMBTIMode(mode){
   if(mode === "test"){
     direct.style.display = "none";
     test.style.display = "block";
-
-    if(document.getElementById("mbtiQuestions").innerHTML === ""){
-      initMBTITest();
-    }
   }
 }
 
