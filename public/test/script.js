@@ -188,6 +188,14 @@ function drawTarot(){
   }
 
   const todayKey = new Date().toISOString().slice(0,10);
+  const tarotLockKey = "tarot_draw_" + todayKey;
+
+  // 이미 뽑은 경우
+  if(localStorage.getItem(tarotLockKey)){
+    alert("타로뽑기는 1일 1회 고정값 입니다.\n\n아래 버튼 타로 전용앱 방문해보시겠어요?");
+    return;
+  }
+
   const seedString = birth + todayKey;
 
   let seed = 0;
@@ -207,6 +215,9 @@ function drawTarot(){
     ${cardKey}<br>
     ${card.core}
   `;
+
+  // 실행 기록 저장
+  localStorage.setItem(tarotLockKey, cardKey);
 }
 
 function getCardImagePath(cardKey){
