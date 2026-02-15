@@ -1,0 +1,478 @@
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  background:#0b0b0f;
+  color:#fff;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+body.lock-scroll{ overflow:hidden; }
+.hidden{ display:none !important; }
+
+/* TOP BAR */
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 14px;
+}
+.brand{ font-weight:800; letter-spacing:.2px; }
+
+#soundToggle{
+  font-size:14px;
+  padding:8px 12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.06);
+  color:#fff;
+}
+
+/* QUESTION */
+.cat-area{ text-align:center; padding:14px 16px 6px; }
+.cat-image{
+  display:block;
+  width:100%;
+  max-width:420px;
+  margin:0 auto 14px;
+  border-radius:18px;
+}
+#catText{
+  margin:10px 0 14px;
+  font-size:26px;
+  line-height:1.25;
+  font-weight:900;
+  letter-spacing:-0.4px;
+}
+#questionArea{ margin-top:10px; }
+#questionArea button{
+  display:block;
+  width:100%;
+  margin:12px 0;
+  padding:20px 16px;
+  border-radius:18px;
+  border:none;
+  background:#1e1e2a;
+  color:#fff;
+  font-size:20px;
+  font-weight:800;
+  letter-spacing:-0.3px;
+  transition:transform .15s ease, background .15s ease;
+}
+#questionArea button:active{ transform:scale(0.97); background:#2a2a3a; }
+
+/* TRANSITION */
+.transition{ padding:14px; text-align:center; }
+.transition p{
+  font-size:20px;
+  font-weight:800;
+  margin:10px 0 14px;
+}
+.transition button{
+  width:100%;
+  padding:18px;
+  border-radius:16px;
+  border:none;
+  background:#f5f5f7;
+  color:#111;
+  font-size:18px;
+  font-weight:900;
+}
+
+/* BIG CARD STAGE */
+
+#stageWrapper{
+  position: relative;
+  max-width: 420px;
+  margin: 0 auto;
+  min-height: 480px;   /* ← 이거 추가 (핵심) */
+}
+
+/* big cards */
+#bigCardStage{
+  position: relative;   /* ❗ sticky 완전 제거 */
+  z-index: 20;
+  padding-top: 8px;
+}
+
+/* reorder는 그냥 아래에 “고정된 박스” */
+#reorderStage{
+  position: relative;
+  margin-top: 18px;   /* ← 이게 “빅카드 아래” 기준 */
+  z-index: 10;
+}
+
+/* 가운데 정렬은 transform 쓰지 말고 */
+.reorder-cards{
+  margin: 0 auto;
+}
+.tarot-stage{
+  padding:8px 10px 0;
+  overflow: visible;
+  background: radial-gradient(circle at top,
+    rgba(0,0,0,.6),
+    rgba(0,0,0,0));
+}
+
+.big-cards{
+  position:relative;
+  width:100%;
+  max-width:420px;
+  height:480px;   /* ← 고정 높이로 변경 */
+  margin:8px auto 0;
+}
+
+.big-card{
+  position:absolute;
+  width:120px;      /* ← 카드 크기 고정 */
+  height:180px;
+  border-radius:14px;
+  background:url("/tarot/back.png") center / cover no-repeat;
+  filter:drop-shadow(0 10px 22px rgba(0,0,0,.55));
+  backface-visibility:hidden;
+}
+
+/* 슬롯 위치 */
+.slot-2{ left:0%;   top:0%; }
+.slot-1{ left:36%;  top:0%; }
+.slot-3{ left:72%;  top:0%; }
+.slot-6{ left:36%;  top:35%; }
+.slot-4{ left:0%;   top:70%; }
+.slot-7{ left:36%;  top:70%; }
+.slot-5{ left:72%;  top:70%; }
+
+#chatContainer{
+  margin-top: 12px;
+}
+
+#pickerTitle{
+  margin: 40px 0 8px;
+  text-align: center;
+}
+
+/* REORDER STAGE (✅ bigCardStage 내부 absolute, 무조건 아래 고정) */
+#reorderStage{
+  width: 100%;
+  max-width: 900px;
+  z-index: 45;
+  pointer-events: none;
+}
+
+#reorderStage .reorder-cards{
+  position: relative;
+  width: 100%;
+  max-width: 220px;
+  height: 26px;      /* 더 압축 */
+  margin: 2px auto 0;
+}
+
+.reorder-card{
+  position: absolute;
+  width: 42px;
+  height: 64px;
+  background: url("/tarot/back.png") center / contain no-repeat;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,.45));
+  opacity: 0;
+}
+
+/* 슬롯 */
+.reorder-card.slot-2{ left: 0%;   top: 0px; }
+.reorder-card.slot-1{ left: 45%;  top: 0px; }
+.reorder-card.slot-3{ left: 90%;  top: 0px; }
+
+.reorder-card.slot-6{ left: 45%;  top: 45px; }
+
+.reorder-card.slot-4{ left: 0%;   top: 90px; }
+.reorder-card.slot-7{ left: 45%;  top: 90px; }
+.reorder-card.slot-5{ left: 90%;  top: 90px; }
+
+/* PICKER */
+.picker{ padding:8px 12px 0; }
+.picker-title{
+  margin:10px 0 8px;
+  font-size:26px;
+  font-weight:900;
+  letter-spacing:-.4px;
+}
+.grid78{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:8px;
+}
+.pick{
+  width:100%;
+  aspect-ratio:2 / 3;
+  background:url("/tarot/back.png") center / contain no-repeat;
+  border-radius:10px;
+  transition:transform .25s ease, opacity .35s ease;
+}
+.pick.sel{
+  outline:2px solid gold;
+  outline-offset:2px;
+  transform:translateY(-2px);
+}
+.pick.fade{ opacity:0; transform:scale(.85); }
+
+#spreadSection{
+  position: relative;
+  z-index: 1;
+  margin-top: 16px;
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+}
+.modal-card{
+  width:min(86vw,360px);
+  background:#1a1a1f;
+  padding:18px;
+  border-radius:16px;
+  text-align:center;
+  border:1px solid rgba(255,255,255,.1);
+}
+.modal-card button{
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:none;
+  background:#f5f5f7;
+  color:#111;
+  font-weight:900;
+}
+
+/* REORDER FLY + FIREBALL : 좌표계 통일 */
+.reorder-fly,
+.fireball{
+  position: absolute;      /* ✅ fixed 절대 금지 */
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* FIREBALL 스타일만 분리 */
+.fireball{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  background:radial-gradient(
+    circle,
+    #fff1c1,
+    #ffb703,
+    #ff5400,
+    #b5179e
+  );
+  box-shadow:
+    0 0 25px rgba(255,180,0,.9),
+    0 0 45px rgba(255,80,0,.8);
+}
+
+.big-card.burning::before{
+  content:"";
+  position:absolute;
+  inset:-20%;
+  background:radial-gradient(circle,
+    rgba(255,200,80,.9),
+    rgba(255,120,0,.7),
+    transparent 70%);
+  animation:burnPulse 2s ease-in-out forwards;
+  border-radius:18px;
+}
+@keyframes burnPulse{
+  0%{ opacity:.3; }
+  100%{ opacity:.8; }
+}
+
+/* CHAT */
+.chat{
+  padding:14px;
+  margin-top: 120px;   /* ← 이게 핵심 */
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.reading-result{
+  margin-top:120px;
+  padding:14px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:16px;
+}
+
+#adOverlay{
+  position:fixed;
+  inset:0;
+  background:#000;
+  z-index:9999;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+#adOverlay.hidden{
+  display:none;
+}
+
+#adOverlay iframe{
+  width:100%;
+  height:100%;
+  border:0;
+}
+
+#skipAd{
+  position:absolute;
+  top:16px;
+  right:16px;
+  background:white;
+  border:none;
+  border-radius:10px;
+  padding:10px 14px;
+  font-weight:bold;
+}
+
+.reading{
+  max-width: 720px;
+  margin: 40px auto;
+  padding: 22px;
+  border-radius: 18px;
+  background: linear-gradient(180deg,#0c0f1c,#12152a);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+  color:#f3f3f3;
+  line-height:1.6;
+}
+
+.reading h3{
+  text-align:center;
+  margin-bottom:18px;
+  font-size:20px;
+  letter-spacing:1px;
+}
+
+.reading-core{
+  background:#171a33;
+  padding:14px;
+  border-radius:12px;
+  margin-bottom:18px;
+}
+
+.reading h4{
+  margin-top:18px;
+  margin-bottom:8px;
+  color:#ffd56b;
+}
+
+/* 카드 흐름 영역 */
+.reading-flow p{
+  background:#14172b;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:10px;
+}
+
+/* 강조 메시지 */
+.reading-focus{
+  margin-top:20px;
+  padding:16px;
+  border-radius:14px;
+  background:linear-gradient(135deg,#1d2145,#2b2f63);
+  border:1px solid rgba(255,213,107,0.3);
+}
+
+/* 상담 메시지 */
+.reading-category{
+  margin-top:16px;
+  padding:16px;
+  border-radius:14px;
+  background:#191c3a;
+}
+
+/* 조언 카드 */
+.reading-advice{
+  margin-top:20px;
+  padding:18px;
+  border-radius:16px;
+  background:linear-gradient(135deg,#3b2b00,#5a4300);
+  color:#ffe08a;
+  font-weight:500;
+}
+
+/* 마무리 */
+.reading-end{
+  text-align:center;
+  margin-top:18px;
+  opacity:0.85;
+}
+
+#confirmModal button{
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  font-size:16px;
+  margin-top:12px;
+}
+
+#confirmPick{
+  background:#fff;
+  color:#111;
+  font-weight:600;
+}
+
+#retryPick{
+  background:#2a2a2f;
+  color:#fff;
+}
+
+.card-name{
+  color:#ffd56b;
+  font-weight:800;
+  letter-spacing:0.5px;
+  text-shadow:0 0 8px rgba(255,213,107,0.4);
+}
+/* 상단 UI 리디자인 */
+.topbar{
+  padding:14px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+
+.top-title{
+  font-size:20px;
+  font-weight:900;
+  margin-bottom:6px;
+}
+
+.user-bar{
+  display:flex;
+  gap:6px;
+  align-items:center;
+  margin-bottom:6px;
+  flex-wrap:wrap;
+}
+
+.user-bar button{
+  padding:6px 10px;
+  border-radius:8px;
+  border:none;
+  background:#2a2a3a;
+  color:white;
+  font-size:12px;
+}
+
+.apptool-guide{
+  font-size:12px;
+  opacity:0.75;
+  line-height:1.4;
+}
+
+.modal input{
+  width:100%;
+  padding:10px;
+  margin:6px 0;
+  border-radius:8px;
+  border:none;
+}
