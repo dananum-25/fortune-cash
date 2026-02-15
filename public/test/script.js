@@ -181,6 +181,7 @@ function setMBTIMode(mode){
 
 const tarotSound = new Audio("/tarot_reveal.mp3");
 tarotSound.volume = 0.7;
+
 function drawTarot(){
 
   const todayKey = new Date().toISOString().slice(0,10);
@@ -211,8 +212,15 @@ function drawTarot(){
   const cardKey = keys[seed % keys.length];
   const card = tarotDB[cardKey];
 
-  document.getElementById("tarotImg").src =
-    getCardImagePath(cardKey);
+  const tarotImg = document.getElementById("tarotImg");
+
+tarotImg.classList.remove("flip");
+tarotImg.src = "/tarot/back.png";
+
+setTimeout(()=>{
+  tarotImg.src = getCardImagePath(cardKey);
+  tarotImg.classList.add("flip");
+},400);
 
   document.getElementById("resultBox").innerHTML += `
     <br><b>타로카드</b><br>
