@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>AI 고양이 타로 상담</title>
+
+  <meta name="naver-site-verification" content="20b0cc209520048d7c651297a28b316fe1de7cd8" />
+
+  <script async
+    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7356591276029815"
+    crossorigin="anonymous">
+  </script>
+
+  <!-- CSS 경로 수정 -->
+  <link rel="stylesheet" href="./tarot.css" />
+</head>
+
+<body>
+
+<header class="topbar">
+
+  <div class="top-title">
+    🐾 AI 고양이 타로 상담
+  </div>
+
+  <div id="userBar" class="user-bar hidden">
+    <span id="userInfo"></span>
+    <button id="logoutBtn">로그아웃</button>
+    <button id="inviteBtn">친구초대</button>
+  </div>
+
+  <div class="apptool-guide">
+    🎁 출석체크 · 친구초대로 포인트 적립<br>
+    1점 = 1원 / 5000점부터 출금 가능
+  </div>
+
+  <button id="soundToggle">사운드 🔇</button>
+
+</header>
+
+<section id="catArea" class="cat-area">
+  <img src="/assets/cat_ai.webp" class="cat-image" />
+  <div id="catText"></div>
+  <div id="questionArea"></div>
+</section>
+
+<section id="transitionArea" class="transition hidden">
+  <p>카드를 골라주세요</p>
+  <button id="goCard">카드 고르기</button>
+</section>
+
+<section id="stageWrapper">
+
+  <section id="bigCardStage" class="tarot-stage hidden">
+    <div class="big-cards v7-layout">
+      <div class="big-card slot-2"></div>
+      <div class="big-card slot-1"></div>
+      <div class="big-card slot-3"></div>
+      <div class="big-card slot-6"></div>
+      <div class="big-card slot-4"></div>
+      <div class="big-card slot-7"></div>
+      <div class="big-card slot-5"></div>
+    </div>
+  </section>
+
+  <section id="reorderStage" class="reorder-stage hidden">
+    <div class="reorder-cards">
+      <div class="reorder-card slot-2"></div>
+      <div class="reorder-card slot-1"></div>
+      <div class="reorder-card slot-3"></div>
+      <div class="reorder-card slot-6"></div>
+      <div class="reorder-card slot-4"></div>
+      <div class="reorder-card slot-7"></div>
+      <div class="reorder-card slot-5"></div>
+    </div>
+  </section>
+
+</section>
+
+<section id="chatContainer" class="chat hidden"></section>
+
+<div class="picker-title hidden" id="pickerTitle">
+  마음이 가는 카드를 골라주세요
+</div>
+
+<section id="spreadSection" class="picker hidden">
+  <div id="grid78" class="grid78"></div>
+</section>
+
+<div id="confirmModal" class="modal hidden">
+  <div class="modal-card">
+    <p>선택한 카드로 진행할까요?</p>
+    <button id="confirmPick">이대로 진행 (광고 5초)</button>
+    <button id="retryPick">다시 선택하기</button>
+  </div>
+</div>
+
+<div id="adOverlay" class="hidden">
+  <iframe src="https://capable-kataifi-46f1ad.netlify.app/"></iframe>
+  <button id="skipAd" disabled>광고 시청 중...</button>
+</div>
+
+<div id="loginModal" class="modal hidden">
+  <div class="modal-card">
+    <h3>로그인 / 회원가입</h3>
+
+    <input id="loginName" placeholder="이름" />
+    <input id="loginPhone" placeholder="전화번호 (010xxxxxxxx)" />
+
+    <button id="loginSubmit">로그인 / 회원가입</button>
+    <button id="loginClose">닫기</button>
+  </div>
+</div>
+
+<!-- JS 경로 수정 -->
+<script src="./tarot.js"></script>
+
+</body>
+</html>
