@@ -362,7 +362,7 @@ card.style.backgroundImage = `url('${path}')`;
   });
 }
 function getCardImagePath(card){
-  return `/assets/tarot/${card}.png`;
+  return `/tarot/${card}.png`;
 }
 /* =====================================================
 UTIL
