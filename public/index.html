@@ -289,21 +289,28 @@ z-index:10000;
 <script>
 document.addEventListener("DOMContentLoaded", ()=>{
 
-const entryModal = document.getElementById("entryModal");
-const startGuestBtn = document.getElementById("startGuest");
-const startApptechBtn = document.getElementById("startApptech");
+  const entryModal = document.getElementById("entryModal");
+  const startGuestBtn = document.getElementById("startGuest");
+  const startApptechBtn = document.getElementById("startApptech");
 
-startGuestBtn.onclick = ()=>{
-  localStorage.setItem("guestMode","true");
-  entryModal.classList.add("hidden");
-};
+  startGuestBtn.onclick = ()=>{
+    localStorage.setItem("guestMode","true");
+    entryModal.classList.add("hidden");
+  };
 
-startApptechBtn.onclick = ()=>{
-  entryModal.classList.add("hidden");
-  openLoginModal();
-};
+  startApptechBtn.onclick = ()=>{
+    entryModal.classList.add("hidden");
+    openLoginModal();
+  };
 
-window.addEventListener("load",()=>{
+  init();
+});
+
+/* ================= INIT ================= */
+
+function init(){
+  const entryModal = document.getElementById("entryModal");
+
   const phone = localStorage.getItem("phone");
   const guest = localStorage.getItem("guestMode");
 
@@ -314,7 +321,7 @@ window.addEventListener("load",()=>{
   }
 
   renderUserBar();
-});
+}
 
 /* ================= USER BAR ================= */
 
