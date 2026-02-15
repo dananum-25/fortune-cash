@@ -122,6 +122,29 @@ z-index:9999;
 
   </div>
 </div>
+
+<div id="userBar" style="
+background:#1a1a1a;
+padding:10px 14px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+font-size:14px;
+">
+
+<div id="userInfo">로그인 필요</div>
+
+<button id="loginBtn" style="
+border:none;
+background:#ffd56b;
+padding:6px 10px;
+border-radius:8px;
+font-weight:bold;
+">
+로그인
+</button>
+
+</div>
   
 <div class="wrap">
 
@@ -269,5 +292,31 @@ window.addEventListener("load",()=>{
   if(phone || guest){
     entryModal.style.display="none";
   }
+
+function renderUserBar(){
+  const phone = localStorage.getItem("phone");
+  const name = localStorage.getItem("name");
+
+  const info = document.getElementById("userInfo");
+  const btn = document.getElementById("loginBtn");
+
+  if(phone){
+    info.textContent = `${name}님 로그인됨`;
+
+    btn.textContent = "로그아웃";
+    btn.onclick = ()=>{
+      localStorage.removeItem("phone");
+      localStorage.removeItem("name");
+      location.reload();
+    };
+
+  }else{
+    info.textContent = "로그인 필요";
+    btn.textContent = "로그인";
+    btn.onclick = openLoginModal;
+  }
+  renderUserBar();
+}
+  
 });
 </script>
