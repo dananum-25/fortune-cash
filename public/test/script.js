@@ -179,12 +179,12 @@ function setMBTIMode(mode){
   }
 }
 
-/* ===============================
-TAROT
-================================ */
 function drawTarot(){
 
-  if(!tarotDB) return;
+  if(!tarotDB?.majors){
+    alert("타로 DB 로딩 안됨");
+    return;
+  }
 
   const birth = document.getElementById("birthInput").value;
   if(!birth){
@@ -206,14 +206,15 @@ function drawTarot(){
   ];
 
   if(allCards.length === 0){
-    alert("타로 DB 없음");
+    alert("타로카드 없음");
     return;
   }
 
   const idx = seed % allCards.length;
   const card = allCards[idx];
 
-  document.getElementById("tarotImg").src = getTarotImage(card);
+  document.getElementById("tarotImg").src =
+    "/" + card.image.replace("assets/","");
 
   document.getElementById("resultBox").innerHTML += `
     <br><b>타로카드</b><br>
