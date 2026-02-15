@@ -71,7 +71,58 @@ body{
 </head>
 
 <body>
+<!-- ENTRY MODAL -->
+<div id="entryModal" style="
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.8);
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:9999;
+">
 
+  <div style="
+  background:#1a1a1a;
+  padding:20px;
+  border-radius:16px;
+  width:90%;
+  max-width:320px;
+  text-align:center;
+  ">
+
+    <h3>이용 방법 선택</h3>
+    <p style="opacity:.7;font-size:14px;">
+      앱테크 참여 또는 비회원 이용이 가능합니다
+    </p>
+
+    <button id="startApptech" style="
+      width:100%;
+      padding:14px;
+      margin-top:12px;
+      border-radius:12px;
+      border:none;
+      background:#ffd56b;
+      font-weight:bold;
+    ">
+      앱테크 시작하기
+    </button>
+
+    <button id="startGuest" style="
+      width:100%;
+      padding:14px;
+      margin-top:10px;
+      border-radius:12px;
+      border:none;
+      background:#2a2a2a;
+      color:white;
+    ">
+      그냥 운세 보기
+    </button>
+
+  </div>
+</div>
+  
 <div class="wrap">
 
 <div class="title">🔮 무료 운세 플랫폼</div>
@@ -146,54 +197,25 @@ body{
     <a href="/terms.html">이용약관</a>
   </div>
 </footer>
-<!-- ENTRY MODAL -->
-<div id="entryModal" style="
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.8);
-display:flex;
-justify-content:center;
-align-items:center;
-z-index:9999;
-">
+<script>
+const entryModal = document.getElementById("entryModal");
 
-  <div style="
-  background:#1a1a1a;
-  padding:20px;
-  border-radius:16px;
-  width:90%;
-  max-width:320px;
-  text-align:center;
-  ">
+document.getElementById("startGuest").onclick = ()=>{
+  localStorage.setItem("guestMode","true");
+  entryModal.style.display="none";
+};
 
-    <h3>이용 방법 선택</h3>
-    <p style="opacity:.7;font-size:14px;">
-      앱테크 참여 또는 비회원 이용이 가능합니다
-    </p>
+document.getElementById("startApptech").onclick = ()=>{
+  entryModal.style.display="none";
+  openLoginModal();
+};
 
-    <button id="startApptech" style="
-      width:100%;
-      padding:14px;
-      margin-top:12px;
-      border-radius:12px;
-      border:none;
-      background:#ffd56b;
-      font-weight:bold;
-    ">
-      앱테크 시작하기
-    </button>
+window.addEventListener("load",()=>{
+  const phone = localStorage.getItem("phone");
+  const guest = localStorage.getItem("guestMode");
 
-    <button id="startGuest" style="
-      width:100%;
-      padding:14px;
-      margin-top:10px;
-      border-radius:12px;
-      border:none;
-      background:#2a2a2a;
-      color:white;
-    ">
-      그냥 운세 보기
-    </button>
-
-  </div>
-</div>
+  if(phone || guest){
+    entryModal.style.display="none";
+  }
+});
+</script>
