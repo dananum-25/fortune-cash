@@ -166,13 +166,16 @@ function submitMBTI(){
 }
 
 function setMBTIMode(mode){
-  const test = document.getElementById("mbtiTest");
-
+  const test = document.getElementById("mbtiQuestions");
   if(!test) return;
 
   if(mode === "test"){
-    test.style.display = "block";
-    initMBTITest();
+    if(test.style.display === "block"){
+      test.style.display = "none";
+    }else{
+      test.style.display = "block";
+      initMBTITest();
+    }
   }
 }
 
