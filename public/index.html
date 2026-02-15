@@ -274,34 +274,38 @@ z-index:10000;
 
 <script>
 document.addEventListener("DOMContentLoaded", ()=>{
+
 const entryModal = document.getElementById("entryModal");
 const loginModal = document.getElementById("loginModal");
 
-/* =========================
-ENTRY MODAL
-========================= */
-document.getElementById("startGuest").onclick = ()=>{
+const startGuestBtn = document.getElementById("startGuest");
+const startApptechBtn = document.getElementById("startApptech");
+const loginBtn = document.getElementById("loginBtn");
+
+const loginClose = document.getElementById("loginClose");
+const loginSubmit = document.getElementById("loginSubmit");
+
+/* ENTRY */
+startGuestBtn.onclick = ()=>{
   localStorage.setItem("guestMode","true");
   entryModal.style.display="none";
 };
 
-document.getElementById("startApptech").onclick = ()=>{
+startApptechBtn.onclick = ()=>{
   entryModal.style.display="none";
   openLoginModal();
 };
 
-/* =========================
-LOGIN MODAL
-========================= */
+/* LOGIN */
 function openLoginModal(){
   loginModal.style.display="flex";
 }
 
-document.getElementById("loginClose").onclick = ()=>{
+loginClose.onclick = ()=>{
   loginModal.style.display="none";
 };
 
-document.getElementById("loginSubmit").onclick = ()=>{
+loginSubmit.onclick = ()=>{
   const name = document.getElementById("loginName").value.trim();
   let phone = document.getElementById("loginPhone").value.trim();
 
@@ -324,9 +328,7 @@ document.getElementById("loginSubmit").onclick = ()=>{
   renderUserBar();
 };
 
-/* =========================
-USER BAR
-========================= */
+/* USER BAR */
 function renderUserBar(){
   const phone = localStorage.getItem("phone");
   const name = localStorage.getItem("name");
@@ -351,20 +353,18 @@ function renderUserBar(){
   }
 }
 
-/* =========================
-INIT
-========================= */
-window.addEventListener("load",()=>{
-  const phone = localStorage.getItem("phone");
-  const guest = localStorage.getItem("guestMode");
+/* INIT */
+const phone = localStorage.getItem("phone");
+const guest = localStorage.getItem("guestMode");
 
-  if(phone || guest){
-    entryModal.style.display="none";
-  }else{
-    entryModal.style.display="flex";
-  }
+if(phone || guest){
+  entryModal.style.display="none";
+}else{
+  entryModal.style.display="flex";
+}
 
-  renderUserBar();
+renderUserBar();
+
 });
 </script>
 
