@@ -46,7 +46,7 @@ async function loadDB(){
   yearDB = await fetch("/data/fortunes_ko_2026.json").then(r=>r.json());
   mbtiDB = await fetch("/data/mbti_traits_ko.json").then(r=>r.json());
   sajuDB = await fetch("/data/saju_ko.json").then(r=>r.json());
-  tarotDB = await fetch("/data/tarot_db_ko.json").then(r=>r.json());
+  tarotDB = await fetch("/data/tarot_reading_db_ko.json").then(r=>r.json());
   lunarMap = await fetch("/data/lunar_new_year_1920_2026.json").then(r=>r.json());
 
   initMBTI();
@@ -114,9 +114,24 @@ MBTI TEST
 ================================ */
 const MBTI_Q16=[
 ["EI","사람들과 함께 있을 때 에너지가 올라간다","혼자 있는 시간이 에너지를 채운다"],
+["EI","처음 보는 사람과도 금방 친해진다","낯선 사람은 적응 시간이 필요하다"],
+["EI","생각을 말하면서 정리한다","생각을 정리한 뒤 말한다"],
+["EI","주말엔 약속이 좋다","혼자 쉬는 게 좋다"],
+
 ["SN","구체적인 사실이 중요하다","아이디어가 중요하다"],
+["SN","현실 문제 해결이 먼저","미래 가능성이 먼저"],
+["SN","경험을 믿는다","직감을 믿는다"],
+["SN","디테일 설명 선호","큰 그림 설명 선호"],
+
 ["TF","논리 중심 결정","감정 중심 결정"],
-["JP","계획형","즉흥형"]
+["TF","직설 피드백 선호","부드러운 피드백 선호"],
+["TF","원인 해결 중심","관계 회복 중심"],
+["TF","공정함 우선","조화 우선"],
+
+["JP","계획형","즉흥형"],
+["JP","미리 끝낸다","마감 직전"],
+["JP","정리된 환경 선호","어수선해도 OK"],
+["JP","일정 확정 선호","유동적 일정 선호"]
 ];
 
 function initMBTITest(){
@@ -130,12 +145,12 @@ function initMBTITest(){
       <div class="qbox">
 
         <div class="qrow">
-          <span class="qtext">${i+1}. ${q[1]}</span>
+          <div class="qtext">${i+1}. A ${q[1]}</div>
           <input type="radio" name="q${i}" value="left">
         </div>
 
         <div class="qrow">
-          <span class="qtext">${q[2]}</span>
+          <div class="qtext">B ${q[2]}</div>
           <input type="radio" name="q${i}" value="right">
         </div>
 
@@ -150,19 +165,32 @@ function submitMBTI(){
   alert("MBTI 저장 완료");
 }
 
-function setMBTIMode(m){
-  document.getElementById("mbtiDirect").style.display =
-    m==="direct" ? "block" : "none";
-  document.getElementById("mbtiTest").style.display =
-    m==="test" ? "block" : "none";
+function setMBTIMode(mode){
+  const test = document.getElementById("mbtiQuestions");
+  if(!test) return;
+
+  if(mode === "test"){
+    if(test.style.display === "block"){
+      test.style.display = "none";
+    }else{
+      test.style.display = "block";
+      initMBTITest();
+    }
+  }
 }
 
-/* ===============================
-TAROT
-================================ */
+const tarotSound = new Audio("/tarot_reveal.mp3");
+tarotSound.volume = 0.7;
+
 function drawTarot(){
 
-  if(!tarotDB) return;
+  const todayKey = new Date().toISOString().slice(0,10);
+  const lockKey = "tarot_draw_" + todayKey;
+
+  if(localStorage.getItem(lockKey)){
+    alert("타로뽑기는 1일 1회 고정값 입니다.\n\n아래 버튼에서 타로 전용앱을 이용해보세요.");
+    return;
+  }
 
   const birth = document.getElementById("birthInput").value;
   if(!birth){
@@ -170,7 +198,9 @@ function drawTarot(){
     return;
   }
 
-  const todayKey = new Date().toISOString().slice(0,10);
+  tarotSound.currentTime = 0;
+  tarotSound.play();
+
   const seedString = birth + todayKey;
 
   let seed = 0;
@@ -178,39 +208,57 @@ function drawTarot(){
     seed += seedString.charCodeAt(i);
   }
 
-  const allCards = [
-    ...(tarotDB.majors || []),
-    ...(tarotDB.minors || [])
-  ];
+  const keys = Object.keys(tarotDB);
+  const cardKey = keys[seed % keys.length];
+  const card = tarotDB[cardKey];
 
-  if(allCards.length === 0){
-    alert("타로 DB 없음");
-    return;
-  }
+  const tarotImg = document.getElementById("tarotImg");
 
-  const idx = seed % allCards.length;
-  const card = allCards[idx];
+tarotImg.classList.remove("flip");
+tarotImg.src = "/tarot/back.png";
 
-  document.getElementById("tarotImg").src = getTarotImage(card);
+setTimeout(()=>{
+  tarotImg.src = getCardImagePath(cardKey);
+  tarotImg.classList.add("flip");
+},400);
 
   document.getElementById("resultBox").innerHTML += `
     <br><b>타로카드</b><br>
-    ${card.name_ko}<br>
-    ${card.upright.summary}
+    ${cardKey}<br>
+    ${card.core}
   `;
-}
-function getTarotImage(card){
 
-  if(card.arcana === "major"){
-    return "/tarot/majors/" +
-      String(card.id).padStart(2,"0") +
-      "_" + card.key + ".png";
+  localStorage.setItem(lockKey, cardKey);
+}
+
+function getCardImagePath(cardKey){
+
+  // 메이저 카드
+  if(cardKey.includes("the_")){
+    return "/tarot/majors/" + cardKey + ".png";
   }
 
-  return "/tarot/minors/" +
-    card.suit + "/" +
-    String(card.id).padStart(2,"0") +
-    "_" + card.rank + ".png";
+  // 마이너 카드
+  const [suit, name] = cardKey.split("_");
+
+  const order = {
+    ace:"01",
+    two:"02",
+    three:"03",
+    four:"04",
+    five:"05",
+    six:"06",
+    seven:"07",
+    eight:"08",
+    nine:"09",
+    ten:"10",
+    page:"11",
+    knight:"12",
+    queen:"13",
+    king:"14"
+  };
+
+  return `/tarot/minors/${suit}/${order[name]}_${name}.png`;
 }
 /* ===============================
 SHOW RESULT
@@ -278,4 +326,53 @@ document.addEventListener("DOMContentLoaded", async function(){
   await loadDB();
   initZodiac();
   renderPoint();
+
+  const btn = document.getElementById("mbtiTestBtn");
+  const box = document.getElementById("mbtiQuestions");
+
+  btn.onclick = () => {
+    if(box.style.display === "block"){
+      box.style.display = "none";
+    }else{
+      box.style.display = "block";
+      initMBTITest();
+    }
+  };
 });
+
+/* ===============================
+RESULT BUTTON ACTIONS
+================================ */
+
+async function copyURL(){
+
+  const shareData = {
+    title: "운세앱 앱테크",
+    text: "무료 운세앱 앱테크 해보기",
+    url: location.href
+  };
+
+  if(navigator.share){
+    try{
+      await navigator.share(shareData);
+    }catch(e){
+      console.log("공유 취소");
+    }
+  }else{
+    navigator.clipboard.writeText(location.href);
+    alert("URL이 복사되었습니다!");
+  }
+}
+
+function goTarotApp(){
+  window.open("https://my-fortune-lake.vercel.app/", "_blank");
+}
+
+function goGame(){
+  window.open("https://game-time-kappa.vercel.app/", "_blank");
+}
+
+function back(){
+  document.getElementById("resultSection").style.display="none";
+  document.getElementById("inputSection").style.display="block";
+}
