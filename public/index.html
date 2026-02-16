@@ -342,7 +342,7 @@ function activatePointCard(){
 }
       
 info.textContent =
-`${name}님 로그아웃 | 현재 포인트 ${Number(points).toLocaleString()}점`;
+`${name}님 | 현재 포인트 ${Number(points).toLocaleString()}점`;
       loginBtn.textContent = "로그아웃";
       loginBtn.onclick = ()=>{
         localStorage.removeItem("phone");
