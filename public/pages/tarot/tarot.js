@@ -1,11 +1,3 @@
-requireEntry();
-const isGuest = localStorage.getItem("guestMode");
-const phone = localStorage.getItem("phone");
-
-if(!isGuest && !phone){
-  alert("먼저 메인에서 이용 방법을 선택해주세요.");
-  location.href="/";
-}
 /* =====================================================
 0. GLOBAL INIT
 ===================================================== */
