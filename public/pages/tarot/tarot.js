@@ -778,7 +778,7 @@ async function doCheckin(){
   const phone = localStorage.getItem("phone");
 
   if(!phone){
-    alert("회원가입이 필요합니다.");
+    alert("회원가입 후 이용해주세요.");
     return;
   }
 
@@ -791,12 +791,17 @@ async function doCheckin(){
   }).then(r=>r.json());
 
   if(res.status === "already"){
-    alert("오늘 출석 완료!");
-  }else if(res.status === "ok"){
-    alert(`출석 완료! 포인트:${res.points}`);
-  }else{
-    alert("사용자 없음");
+    alert("오늘은 이미 출석 완료했습니다!");
+    return;
   }
+
+  if(res.status === "ok"){
+    alert(`출석 완료! +${res.points}점 지급`);
+    location.reload();
+    return;
+  }
+
+  alert("출석 처리 실패");
 }
 
 function renderCheckinUI(){
