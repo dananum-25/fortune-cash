@@ -1,5 +1,5 @@
 const API_URL =
-"https://script.google.com/macros/s/AKfycbwL01pmMt2DFpaGIZrQr3rVL8wAj2806Ys3ssKgLqH4cylrQf6wUc83YOo1lDuYTyhHlQ/exec";
+"https://script.google.com/macros/s/AKfycbz1QnNlStdQYSaLu6x-LjcfbhW_mr-G9imRieFc56tqJ15UZchDDOdUrqpjNCO1ImOQ/exec";
 /* =========================================
    AUTH GUARD + LOGIN (auth.js)
 ========================================= */
@@ -160,13 +160,14 @@ async function handleSubmitLogin(){
     // 초대코드 역인덱스(중복방지/조회용)
     // 🔥 서버 등록 추가
   await fetch(API_URL,{
-    method:"POST",
-    body:JSON.stringify({
-      action:"register",
-      phone,
-      name
-    })
-  }); 
+  method:"POST",
+  body:JSON.stringify({
+    action:"register",
+    phone,
+    name,
+    inviteBy: localStorage.getItem("inviteCode") || ""
+  })
+});
     localStorage.setItem("invite_" + inviteCode, phone);
 
     // 현재 로그인 상태 저장
