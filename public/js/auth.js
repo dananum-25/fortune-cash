@@ -1,3 +1,5 @@
+const API_URL =
+"https://script.google.com/macros/s/AKfycbwL01pmMt2DFpaGIZrQr3rVL8wAj2806Ys3ssKgLqH4cylrQf6wUc83YOo1lDuYTyhHlQ/exec";
 /* =========================================
    AUTH GUARD + LOGIN (auth.js)
 ========================================= */
@@ -184,8 +186,9 @@ function handleSubmitLogin(){
     alert("로그인 되셨습니다.");
   }
 
-  closeLoginModal();
-  location.reload();
+  await syncUserFromServer();
+closeLoginModal();
+location.reload();
 }
 
 /* ---------- bind events ---------- */
@@ -203,3 +206,20 @@ window.addEventListener("DOMContentLoaded", ()=>{
   if(submitBtn) submitBtn.onclick = handleSubmitLogin;
   if(closeBtn) closeBtn.onclick = closeLoginModal;
 });
+async function syncUserFromServer(){
+  const phone = localStorage.getItem("phone");
+  if(!phone) return;
+
+  const res = await fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"getUser",
+      phone
+    })
+  }).then(r=>r.json());
+
+  if(res.status === "ok"){
+    localStorage.setItem("points", res.points || 0);
+    localStorage.setItem("name", res.name || "");
+  }
+}
