@@ -138,3 +138,9 @@ window.addEventListener("DOMContentLoaded", ()=>{
   closeLoginModal();
   location.reload();
 };
+     
+function addPoint(amount){
+  let p = Number(localStorage.getItem("points") || "0");
+  p += amount;
+  localStorage.setItem("points", p);
+}
