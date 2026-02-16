@@ -54,7 +54,13 @@ function createEntryModal(){
 
 function startGuest(){
   localStorage.setItem("guestMode","true");
-  document.getElementById("entryModal").remove();
+  document.getElementById("entryModal")?.remove();
+}
+
+/* 🔥 이건 반드시 전역에 있어야 함 */
+function openLoginModal(){
+  const modal = document.getElementById("loginModal");
+  if(modal) modal.style.display="flex";
 }
 
 function authGuard(){
@@ -64,9 +70,6 @@ function authGuard(){
   if(!phone && !guest){
     createEntryModal();
   }
-function openLoginModal(){
-  document.getElementById("loginModal").style.display="flex";
-}
 }
 
 window.addEventListener("DOMContentLoaded", authGuard);
