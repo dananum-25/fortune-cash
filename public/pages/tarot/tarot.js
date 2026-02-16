@@ -321,7 +321,10 @@ activeSlots.forEach((slot,i)=>{
   }
 });
   
-  chat.innerHTML = readingHTML;
+chat.innerHTML = readingHTML;
+
+/* 포인트 지급 */
+rewardContent("tarot");
 
 setTimeout(()=>{
   renderCheckinUI();
