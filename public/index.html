@@ -88,13 +88,6 @@ body{
 <body>
 <!-- ENTRY MODAL -->
 <div id="entryModal" class="modal hidden">
-inset:0;
-background:rgba(0,0,0,.8);
-display:flex;
-justify-content:center;
-align-items:center;
-z-index:9999;
-">
 
   <div style="
   background:#1a1a1a;
@@ -292,7 +285,9 @@ document.addEventListener("DOMContentLoaded", ()=>{
   const entryModal = document.getElementById("entryModal");
   const startGuestBtn = document.getElementById("startGuest");
   const startApptechBtn = document.getElementById("startApptech");
+  const loginBtn = document.getElementById("loginBtn");
 
+  /* ENTRY MODAL */
   startGuestBtn.onclick = ()=>{
     localStorage.setItem("guestMode","true");
     entryModal.classList.add("hidden");
@@ -303,14 +298,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
     openLoginModal();
   };
 
-  init();
-});
-
-/* ================= INIT ================= */
-
-function init(){
-  const entryModal = document.getElementById("entryModal");
-
+  /* INIT */
   const phone = localStorage.getItem("phone");
   const guest = localStorage.getItem("guestMode");
 
@@ -321,45 +309,30 @@ function init(){
   }
 
   renderUserBar();
-}
 
-/* ================= USER BAR ================= */
+  /* USER BAR */
+  function renderUserBar(){
+    const phone = localStorage.getItem("phone");
+    const name = localStorage.getItem("name");
 
-function renderUserBar(){
-  const phone = localStorage.getItem("phone");
-  const name = localStorage.getItem("name");
+    const info = document.getElementById("userInfo");
 
-  const info = document.getElementById("userInfo");
-  const btn = document.getElementById("loginBtn");
+    if(phone){
+      info.textContent = `${name}님 로그인됨`;
 
-  if(phone){
-    info.textContent = `${name}님 로그인됨`;
+      loginBtn.textContent = "로그아웃";
+      loginBtn.onclick = ()=>{
+        localStorage.removeItem("phone");
+        localStorage.removeItem("name");
+        location.reload();
+      };
 
-    btn.textContent = "로그아웃";
-    btn.onclick = ()=>{
-      localStorage.removeItem("phone");
-      localStorage.removeItem("name");
-      location.reload();
-    };
-
-  }else{
-    info.textContent = "로그인 필요";
-    btn.textContent = "로그인";
-    btn.onclick = openLoginModal;
+    }else{
+      info.textContent = "로그인 필요";
+      loginBtn.textContent = "로그인";
+      loginBtn.onclick = openLoginModal;
+    }
   }
-}
-
-/* INIT */
-const phone = localStorage.getItem("phone");
-const guest = localStorage.getItem("guestMode");
-
-if(phone || guest){
-  entryModal.style.display="none";
-}else{
-  entryModal.style.display="flex";
-}
-
-renderUserBar();
 
 });
 </script>
