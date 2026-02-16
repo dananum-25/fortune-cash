@@ -61,15 +61,31 @@ function startGuest(){
 }
 
 function openLoginModal(){
-  document.getElementById("loginModal").classList.remove("hidden");
+  const modal = document.getElementById("loginModal");
+  if(modal) modal.classList.remove("hidden");
 }
 
 function closeLoginModal(){
-  document.getElementById("loginModal").classList.add("hidden");
+  const modal = document.getElementById("loginModal");
+  if(modal) modal.classList.add("hidden");
 }
 
-/* 로그인 처리 */
-document.addEventListener("DOMContentLoaded", ()=>{
+function authGuard(){
+  const phone = localStorage.getItem("phone");
+  const guest = localStorage.getItem("guestMode");
+
+  if(!phone && !guest){
+    createEntryModal();
+  }
+}
+
+/* =========================================
+   INIT
+========================================= */
+
+window.addEventListener("DOMContentLoaded", ()=>{
+
+  authGuard();
 
   const submitBtn = document.getElementById("loginSubmit");
   const closeBtn = document.getElementById("loginClose");
@@ -98,19 +114,3 @@ document.addEventListener("DOMContentLoaded", ()=>{
   }
 
 });
-
-function closeLoginModal(){
-  const modal = document.getElementById("loginModal");
-  if(modal) modal.classList.add("hidden");
-}
-
-function authGuard(){
-  const phone = localStorage.getItem("phone");
-  const guest = localStorage.getItem("guestMode");
-
-  if(!phone && !guest){
-    createEntryModal();
-  }
-}
-
-window.addEventListener("DOMContentLoaded", authGuard);
