@@ -2,23 +2,113 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>앱테크 이용 규칙</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>포인트 안내</title>
+
+<style>
+body{
+  margin:0;
+  background:#111;
+  color:white;
+  font-family:Arial;
+}
+
+.wrap{
+  max-width:420px;
+  margin:auto;
+  padding:20px;
+}
+
+.card{
+  background:#1a1a1a;
+  padding:18px;
+  border-radius:14px;
+  margin-bottom:14px;
+}
+
+h2{
+  margin-top:0;
+}
+
+.point{
+  font-size:22px;
+  font-weight:bold;
+  color:#ffd56b;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:#ffd56b;
+  font-weight:bold;
+  cursor:pointer;
+}
+</style>
 </head>
-<body style="background:#111;color:white;font-family:Arial;padding:20px">
 
-<h2>앱테크 포인트 규칙</h2>
+<body>
 
-<p>출석체크: 10점</p>
-<p>컨텐츠 이용: 1점</p>
+<div class="wrap">
 
-<hr>
+<div class="card">
+<h2>🎁 내 포인트</h2>
+<div id="userInfo">로그인 필요</div>
+<div id="pointBox" class="point">0점</div>
+</div>
 
-<p>월~일 연속 출석 + 모든 컨텐츠 이용: +50점</p>
-<p>1일~말일까지 달성: +100점</p>
+<div class="card">
+<h2>📜 앱테크 규칙</h2>
 
-<hr>
+<p>• 출석 체크: +10점</p>
+<p>• 컨텐츠 이용: +1점</p>
+<p>• 주간 미션 달성: +50점</p>
+<p>• 월간 미션 달성: +100점</p>
+<p>• 친구 초대: 양쪽 +100점</p>
 
-<p>5000점 이상 출금 가능</p>
+<br>
+
+<p>💰 1점 = 1원</p>
+<p>💳 5,000점부터 출금 가능</p>
+</div>
+
+<button onclick="location.href='/'">
+메인으로 돌아가기
+</button>
+
+</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbwL01pmMt2DFpaGIZrQr3rVL8wAj2806Ys3ssKgLqH4cylrQf6wUc83YOo1lDuYTyhHlQ/exec";
+
+async function loadPoint(){
+  const phone = localStorage.getItem("phone");
+  const name = localStorage.getItem("name");
+
+  if(!phone){
+    document.getElementById("userInfo").textContent = "로그인 필요";
+    return;
+  }
+
+  const res = await fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"getUser",
+      phone
+    })
+  }).then(r=>r.json());
+
+  if(res.status === "ok"){
+    document.getElementById("userInfo").textContent =
+      `${res.name}님`;
+    document.getElementById("pointBox").textContent =
+      res.points.toLocaleString() + "점";
+  }
+}
+
+loadPoint();
+</script>
 
 </body>
 </html>
