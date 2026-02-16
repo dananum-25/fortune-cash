@@ -320,7 +320,7 @@ function renderUserBar(){
     const points = localStorage.getItem("points") || "0";
 
     info.textContent =
-    `${name}님 | 현재 포인트 ${Number(points).toLocaleString()}점`;
+`${name} (${phone}) | 현재 포인트 ${Number(points).toLocaleString()}점`;
 
     loginBtn.textContent = "로그아웃";
 loginBtn.onclick = ()=>{
