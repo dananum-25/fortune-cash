@@ -83,9 +83,15 @@ function authGuard(){
    INIT
 ========================================= */
 
-window.addEventListener("DOMContentLoaded", ()=>{
+window.addEventListener("DOMContentLoaded", authGuard);
 
-  authGuard();
+window.addEventListener("DOMContentLoaded", ()=>{
+  const loginBtn = document.getElementById("loginBtn");
+
+  if(loginBtn){
+    loginBtn.onclick = openLoginModal;
+  }
+});
 
   const submitBtn = document.getElementById("loginSubmit");
   const closeBtn = document.getElementById("loginClose");
