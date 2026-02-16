@@ -1,3 +1,4 @@
+requireEntry();
 const isGuest = localStorage.getItem("guestMode");
 const phone = localStorage.getItem("phone");
 
