@@ -91,49 +91,44 @@ window.addEventListener("DOMContentLoaded", ()=>{
   const closeBtn = document.getElementById("loginClose");
 
   if(submitBtn){
-    submitBtn.onclick = ()=>{
-
+submitBtn.onclick = async ()=>{
   const name = document.getElementById("loginName").value.trim();
-  const phone = document.getElementById("loginPhone").value.trim();
+  let phone = document.getElementById("loginPhone").value.trim();
 
   if(!name || !phone){
     alert("이름과 전화번호를 입력해주세요.");
     return;
   }
 
-  const savedPhone = localStorage.getItem("phone");
+  phone = phone.replace(/[^0-9]/g,"");
 
-  /* 신규 가입 */
-  if(!savedPhone){
+  const res = await fetch(
+    "https://script.google.com/macros/s/AKfycbwL01pmMt2DFpaGIZrQr3rVL8wAj2806Ys3ssKgLqH4cylrQf6wUc83YOo1lDuYTyhHlQ/exec",
+    {
+      method:"POST",
+      body:JSON.stringify({
+        action:"register",
+        name,
+        phone
+      })
+    }
+  ).then(r=>r.json());
 
-    const inviteCode = "U" + Math.random().toString(36).substring(2,8).toUpperCase();
-
-    localStorage.setItem("name", name);
-    localStorage.setItem("phone", phone);
-    localStorage.setItem("inviteCode", inviteCode);
-    localStorage.setItem("points", "0");
-    localStorage.removeItem("guestMode");
-
+  if(res.status==="exists"){
+    alert("로그인 되셨습니다.");
+  }else if(res.status==="ok"){
     alert(
-`가입이 완료되었습니다!
+`가입 완료!
+친구초대 코드: ${res.inviteCode}
 
-친구초대 코드: ${inviteCode}
-
-친구초대 시
-둘 다 100포인트 지급됩니다.`
+친구 초대 시
+양쪽 모두 100점 지급`
     );
-
-    closeLoginModal();
-    location.reload();
-    return;
   }
 
-  /* 기존 회원 */
   localStorage.setItem("name", name);
   localStorage.setItem("phone", phone);
   localStorage.removeItem("guestMode");
-
-  alert("로그인 되셨습니다.");
 
   closeLoginModal();
   location.reload();
