@@ -158,6 +158,15 @@ async function handleSubmitLogin(){
     // 저장 (유저)
     localStorage.setItem(userKey, JSON.stringify(userData));
     // 초대코드 역인덱스(중복방지/조회용)
+    // 🔥 서버 등록 추가
+  await fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"register",
+      phone,
+      name
+    })
+  }); 
     localStorage.setItem("invite_" + inviteCode, phone);
 
     // 현재 로그인 상태 저장
