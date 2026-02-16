@@ -302,7 +302,10 @@ document.addEventListener("DOMContentLoaded", ()=>{
     const info = document.getElementById("userInfo");
 
     if(phone){
-      info.textContent = `${name}님 로그인됨`;
+      const points = localStorage.getItem("points") || "0";
+
+info.textContent =
+`${name}님 로그아웃 | 현재 포인트 ${Number(points).toLocaleString()}점`;
       loginBtn.textContent = "로그아웃";
       loginBtn.onclick = ()=>{
         localStorage.removeItem("phone");
