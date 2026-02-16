@@ -278,6 +278,10 @@ z-index:10000;
     <a href="/terms.html">이용약관</a>
   </div>
 </footer>
+  
+<script src="/js/auth.js"></script>
+
+<script src="/js/auth.js"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", ()=>{
@@ -287,7 +291,6 @@ document.addEventListener("DOMContentLoaded", ()=>{
   const startApptechBtn = document.getElementById("startApptech");
   const loginBtn = document.getElementById("loginBtn");
 
-  /* ENTRY MODAL */
   startGuestBtn.onclick = ()=>{
     localStorage.setItem("guestMode","true");
     entryModal.classList.add("hidden");
@@ -298,7 +301,6 @@ document.addEventListener("DOMContentLoaded", ()=>{
     openLoginModal();
   };
 
-  /* INIT */
   const phone = localStorage.getItem("phone");
   const guest = localStorage.getItem("guestMode");
 
@@ -310,23 +312,19 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
   renderUserBar();
 
-  /* USER BAR */
   function renderUserBar(){
     const phone = localStorage.getItem("phone");
     const name = localStorage.getItem("name");
-
     const info = document.getElementById("userInfo");
 
     if(phone){
       info.textContent = `${name}님 로그인됨`;
-
       loginBtn.textContent = "로그아웃";
       loginBtn.onclick = ()=>{
         localStorage.removeItem("phone");
         localStorage.removeItem("name");
         location.reload();
       };
-
     }else{
       info.textContent = "로그인 필요";
       loginBtn.textContent = "로그인";
@@ -336,6 +334,6 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
 });
 </script>
-<script src="/js/auth.js"></script>
+  
 </body>
 </html>
