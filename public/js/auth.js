@@ -1,5 +1,5 @@
 /* =========================================
-   AUTH GUARD (공통 로그인/게스트 접근 제어)
+   AUTH GUARD
 ========================================= */
 
 function createEntryModal(){
@@ -23,7 +23,7 @@ function createEntryModal(){
         앱테크 참여 또는 비회원 이용이 가능합니다
       </p>
 
-      <button onclick="startGuest()" style="
+      <button id="guestBtn" style="
         width:100%;
         padding:14px;
         margin-top:12px;
@@ -35,7 +35,7 @@ function createEntryModal(){
         그냥 운세 보기
       </button>
 
-      <button onclick="openLoginModal()" style="
+      <button id="apptechBtn" style="
         width:100%;
         padding:14px;
         margin-top:10px;
@@ -50,6 +50,9 @@ function createEntryModal(){
   `;
 
   document.body.appendChild(modal);
+
+  document.getElementById("guestBtn").onclick = startGuest;
+  document.getElementById("apptechBtn").onclick = openLoginModal;
 }
 
 function startGuest(){
@@ -57,10 +60,14 @@ function startGuest(){
   document.getElementById("entryModal")?.remove();
 }
 
-/* 🔥 이건 반드시 전역에 있어야 함 */
 function openLoginModal(){
   const modal = document.getElementById("loginModal");
-  if(modal) modal.style.display="flex";
+  if(modal) modal.classList.remove("hidden");
+}
+
+function closeLoginModal(){
+  const modal = document.getElementById("loginModal");
+  if(modal) modal.classList.add("hidden");
 }
 
 function authGuard(){
