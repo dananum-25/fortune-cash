@@ -281,8 +281,6 @@ z-index:10000;
   
 <script src="/js/auth.js"></script>
 
-<script src="/js/auth.js"></script>
-
 <script>
 document.addEventListener("DOMContentLoaded", ()=>{
 
@@ -291,8 +289,11 @@ document.addEventListener("DOMContentLoaded", ()=>{
   const startApptechBtn = document.getElementById("startApptech");
   const loginBtn = document.getElementById("loginBtn");
 
+  /* 항상 모달 표시 */
+  entryModal.classList.remove("hidden");
+
+  /* ENTRY MODAL 버튼 */
   startGuestBtn.onclick = ()=>{
-    localStorage.setItem("guestMode","true");
     entryModal.classList.add("hidden");
   };
 
@@ -300,15 +301,6 @@ document.addEventListener("DOMContentLoaded", ()=>{
     entryModal.classList.add("hidden");
     openLoginModal();
   };
-
-  const phone = localStorage.getItem("phone");
-  const guest = localStorage.getItem("guestMode");
-
-  if(phone || guest){
-    entryModal.classList.add("hidden");
-  }else{
-    entryModal.classList.remove("hidden");
-  }
 
   renderUserBar();
 
