@@ -210,29 +210,24 @@ font-weight:bold;
 </div>
 
 </div>
+  
 <!-- LOGIN MODAL -->
-<div id="loginModal" style="
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.7);
-display:none;
-justify-content:center;
-align-items:center;
-z-index:10000;
-">
-
+<div id="loginModal" class="modal hidden">
   <div style="
-  background:#1a1a1a;
-  padding:20px;
-  border-radius:16px;
-  width:90%;
-  max-width:320px;
+    background:#1a1a1a;
+    padding:20px;
+    border-radius:16px;
+    width:90%;
+    max-width:320px;
   ">
 
     <h3>회원가입 / 로그인</h3>
 
-    <input id="loginName" placeholder="이름" style="width:100%;padding:10px;margin-top:10px;border-radius:8px;border:none;">
-    <input id="loginPhone" placeholder="전화번호 (010xxxxxxxx)" style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:none;">
+    <input id="loginName" placeholder="이름"
+      style="width:100%;padding:10px;margin-top:10px;border-radius:8px;border:none;">
+
+    <input id="loginPhone" placeholder="전화번호 (010xxxxxxxx)"
+      style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:none;">
 
     <button id="loginSubmit" style="
       width:100%;
@@ -241,8 +236,7 @@ z-index:10000;
       border:none;
       border-radius:10px;
       background:#ffd56b;
-      font-weight:bold;
-    ">
+      font-weight:bold;">
       시작하기
     </button>
 
@@ -253,13 +247,11 @@ z-index:10000;
       border:none;
       border-radius:10px;
       background:#2a2a2a;
-      color:white;
-    ">
+      color:white;">
       닫기
     </button>
 
   </div>
-</div>
 </div>
 
 <!-- footer -->
