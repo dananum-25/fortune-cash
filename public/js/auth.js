@@ -122,7 +122,7 @@ function closeLoginModal(){
 }
 
 /* ---------- login flow ---------- */
-function handleSubmitLogin(){
+async function handleSubmitLogin(){
   const nameEl = document.getElementById("loginName");
   const phoneEl = document.getElementById("loginPhone");
 
