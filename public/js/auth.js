@@ -91,43 +91,60 @@ window.addEventListener("DOMContentLoaded", ()=>{
   const closeBtn = document.getElementById("loginClose");
 
   if(submitBtn){
-submitBtn.onclick = async ()=>{
+submitBtn.onclick = ()=>{
   const name = document.getElementById("loginName").value.trim();
-  let phone = document.getElementById("loginPhone").value.trim();
+  const phone = document.getElementById("loginPhone").value.trim();
 
   if(!name || !phone){
     alert("이름과 전화번호를 입력해주세요.");
     return;
   }
 
-  phone = phone.replace(/[^0-9]/g,"");
+  const userKey = "user_" + phone;
+  const existingUser = localStorage.getItem(userKey);
 
-  const res = await fetch(
-    "https://script.google.com/macros/s/AKfycbwL01pmMt2DFpaGIZrQr3rVL8wAj2806Ys3ssKgLqH4cylrQf6wUc83YOo1lDuYTyhHlQ/exec",
-    {
-      method:"POST",
-      body:JSON.stringify({
-        action:"register",
-        name,
-        phone
-      })
-    }
-  ).then(r=>r.json());
+  /* =====================
+     신규 가입
+  ===================== */
+  if(!existingUser){
 
-  if(res.status==="exists"){
-    alert("로그인 되셨습니다.");
-  }else if(res.status==="ok"){
+    const inviteCode = generateInviteCode();
+
+    const userData = {
+      name,
+      phone,
+      inviteCode,
+      points: 0
+    };
+
+    localStorage.setItem(userKey, JSON.stringify(userData));
+    localStorage.setItem("name", name);
+    localStorage.setItem("phone", phone);
+    localStorage.setItem("points", 0);
+
     alert(
-`가입 완료!
-친구초대 코드: ${res.inviteCode}
+`가입이 완료되셨습니다.
 
-친구 초대 시
-양쪽 모두 100점 지급`
+친구초대 코드: ${inviteCode}
+
+친구초대 시 양쪽 100점 지급`
     );
+
+  } 
+  /* =====================
+     기존 사용자 로그인
+  ===================== */
+  else{
+
+    const userData = JSON.parse(existingUser);
+
+    localStorage.setItem("name", userData.name);
+    localStorage.setItem("phone", userData.phone);
+    localStorage.setItem("points", userData.points || 0);
+
+    alert("로그인 되셨습니다.");
   }
 
-  localStorage.setItem("name", name);
-  localStorage.setItem("phone", phone);
   localStorage.removeItem("guestMode");
 
   closeLoginModal();
@@ -138,4 +155,8 @@ function addPoint(amount){
   let p = Number(localStorage.getItem("points") || "0");
   p += amount;
   localStorage.setItem("points", p);
+}
+
+function generateInviteCode(){
+  return Math.random().toString(36).substring(2,8).toUpperCase();
 }
