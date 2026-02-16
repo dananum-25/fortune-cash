@@ -323,11 +323,14 @@ function renderUserBar(){
     `${name}님 | 현재 포인트 ${Number(points).toLocaleString()}점`;
 
     loginBtn.textContent = "로그아웃";
-    loginBtn.onclick = ()=>{
-      localStorage.removeItem("phone");
-      localStorage.removeItem("name");
-      location.reload();
-    };
+loginBtn.onclick = ()=>{
+  localStorage.removeItem("phone");
+  localStorage.removeItem("name");
+  localStorage.removeItem("guestMode");
+  localStorage.removeItem("points");
+
+  location.reload();
+};
   }else{
     info.textContent = "로그인 필요";
     loginBtn.textContent = "로그인";
