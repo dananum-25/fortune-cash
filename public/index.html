@@ -308,17 +308,34 @@ document.addEventListener("DOMContentLoaded", ()=>{
     openLoginModal();
   };
 
-  renderUserBar();
-  activatePointCard();
+renderUserBar();
+activatePointCard();
 
-  function renderUserBar(){
-    const phone = localStorage.getItem("phone");
-    const name = localStorage.getItem("name");
-    const info = document.getElementById("userInfo");
+function renderUserBar(){
+  const phone = localStorage.getItem("phone");
+  const name = localStorage.getItem("name");
+  const info = document.getElementById("userInfo");
 
-    if(phone){
-      const points = localStorage.getItem("points") || "0";
+  if(phone){
+    const points = localStorage.getItem("points") || "0";
 
+    info.textContent =
+    `${name}님 | 현재 포인트 ${Number(points).toLocaleString()}점`;
+
+    loginBtn.textContent = "로그아웃";
+    loginBtn.onclick = ()=>{
+      localStorage.removeItem("phone");
+      localStorage.removeItem("name");
+      location.reload();
+    };
+  }else{
+    info.textContent = "로그인 필요";
+    loginBtn.textContent = "로그인";
+    loginBtn.onclick = openLoginModal;
+  }
+}
+
+/* 포인트 카드 활성화 */
 function activatePointCard(){
   const card = document.getElementById("pointCard");
   const phone = localStorage.getItem("phone");
@@ -328,11 +345,9 @@ function activatePointCard(){
   if(phone){
     card.classList.remove("card-disabled");
     card.classList.add("card-active");
-
     card.onclick = ()=>{
       location.href="/point.html";
     };
-
   }else{
     card.onclick = ()=>{
       alert("로그인 후 이용 가능합니다.");
@@ -340,23 +355,6 @@ function activatePointCard(){
     };
   }
 }
-      
-info.textContent =
-`${name}님 | 현재 포인트 ${Number(points).toLocaleString()}점`;
-      loginBtn.textContent = "로그아웃";
-      loginBtn.onclick = ()=>{
-        localStorage.removeItem("phone");
-        localStorage.removeItem("name");
-        location.reload();
-      };
-    }else{
-      info.textContent = "로그인 필요";
-      loginBtn.textContent = "로그인";
-      loginBtn.onclick = openLoginModal;
-    }
-  }
-
-});
 </script>
   
 </body>
