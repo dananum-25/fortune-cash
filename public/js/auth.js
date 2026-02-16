@@ -64,6 +64,9 @@ function authGuard(){
   if(!phone && !guest){
     createEntryModal();
   }
+function openLoginModal(){
+  document.getElementById("loginModal").style.display="flex";
+}
 }
 
 window.addEventListener("DOMContentLoaded", authGuard);
