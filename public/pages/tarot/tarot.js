@@ -521,7 +521,6 @@ window.addEventListener("load", () => {
     chat?.classList.add("hidden");
 
     renderQ();
-    renderUserBar();
   } catch (e) {
     console.error("[INIT FAIL]", e);
 
