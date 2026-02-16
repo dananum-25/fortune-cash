@@ -194,10 +194,7 @@ window.addEventListener("DOMContentLoaded", ()=>{
   authGuard();
 
   // 2) 우측 상단 로그인 버튼도 연결
-  const loginBtn = document.getElementById("loginBtn");
-  if(loginBtn){
-    loginBtn.onclick = openLoginModal;
-  }
+  
 
   // 3) 모달 버튼 연결
   const submitBtn = document.getElementById("loginSubmit");
