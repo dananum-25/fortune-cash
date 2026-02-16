@@ -92,25 +92,49 @@ window.addEventListener("DOMContentLoaded", ()=>{
 
   if(submitBtn){
     submitBtn.onclick = ()=>{
-      const name = document.getElementById("loginName").value.trim();
-      const phone = document.getElementById("loginPhone").value.trim();
 
-      if(!name || !phone){
-        alert("이름과 전화번호를 입력해주세요.");
-        return;
-      }
+  const name = document.getElementById("loginName").value.trim();
+  const phone = document.getElementById("loginPhone").value.trim();
 
-      localStorage.setItem("name", name);
-      localStorage.setItem("phone", phone);
-      localStorage.removeItem("guestMode");
-
-      closeLoginModal();
-      location.reload();
-    };
+  if(!name || !phone){
+    alert("이름과 전화번호를 입력해주세요.");
+    return;
   }
 
-  if(closeBtn){
-    closeBtn.onclick = closeLoginModal;
+  const savedPhone = localStorage.getItem("phone");
+
+  /* 신규 가입 */
+  if(!savedPhone){
+
+    const inviteCode = "U" + Math.random().toString(36).substring(2,8).toUpperCase();
+
+    localStorage.setItem("name", name);
+    localStorage.setItem("phone", phone);
+    localStorage.setItem("inviteCode", inviteCode);
+    localStorage.setItem("points", "0");
+    localStorage.removeItem("guestMode");
+
+    alert(
+`가입이 완료되었습니다!
+
+친구초대 코드: ${inviteCode}
+
+친구초대 시
+둘 다 100포인트 지급됩니다.`
+    );
+
+    closeLoginModal();
+    location.reload();
+    return;
   }
 
-});
+  /* 기존 회원 */
+  localStorage.setItem("name", name);
+  localStorage.setItem("phone", phone);
+  localStorage.removeItem("guestMode");
+
+  alert("로그인 되셨습니다.");
+
+  closeLoginModal();
+  location.reload();
+};
