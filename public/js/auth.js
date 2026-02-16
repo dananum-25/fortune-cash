@@ -1,7 +1,34 @@
 /* =========================================
-   AUTH GUARD
+   AUTH GUARD + LOGIN (auth.js)
 ========================================= */
 
+/* ---------- utils ---------- */
+function getUserKey(phone){
+  return "user_" + phone;
+}
+
+function normalizePhone(phone){
+  return String(phone || "").replace(/[^0-9]/g, "");
+}
+
+function generateInviteCode(){
+  // 6자리 대문자, 중복방지
+  let code = "";
+  for(let i=0;i<50;i++){
+    code = Math.random().toString(36).substring(2,8).toUpperCase();
+    if(!localStorage.getItem("invite_" + code)) break;
+  }
+  return code;
+}
+
+function addPoint(amount){
+  const cur = Number(localStorage.getItem("points") || "0");
+  const next = cur + Number(amount || 0);
+  localStorage.setItem("points", String(next));
+  return next;
+}
+
+/* ---------- entry modal ---------- */
 function createEntryModal(){
   if(document.getElementById("entryModal")) return;
 
@@ -51,8 +78,15 @@ function createEntryModal(){
 
   document.body.appendChild(modal);
 
-  document.getElementById("guestBtn").onclick = startGuest;
-  document.getElementById("apptechBtn").onclick = openLoginModal;
+  const guestBtn = document.getElementById("guestBtn");
+  const apptechBtn = document.getElementById("apptechBtn");
+
+  if(guestBtn) guestBtn.onclick = startGuest;
+  if(apptechBtn) apptechBtn.onclick = ()=>{
+    // 엔트리 모달은 남겨도 되는데, UX상 닫고 로그인으로
+    document.getElementById("entryModal")?.remove();
+    openLoginModal();
+  };
 }
 
 function startGuest(){
@@ -60,6 +94,21 @@ function startGuest(){
   document.getElementById("entryModal")?.remove();
 }
 
+function authGuard(){
+  const phone = localStorage.getItem("phone");
+  const guest = localStorage.getItem("guestMode");
+
+  // ✅ 캐시 지워도 무조건 처음엔 모달 나오게 하고 싶다 했으니
+  // 조건 없이 항상 보여주되, 이미 로그인/게스트면 자동으로 닫음(0.1초)
+  createEntryModal();
+
+  if(phone || guest){
+    // 이미 상태 있으면 모달 닫기
+    setTimeout(()=>document.getElementById("entryModal")?.remove(), 50);
+  }
+}
+
+/* ---------- login modal ---------- */
 function openLoginModal(){
   const modal = document.getElementById("loginModal");
   if(modal) modal.classList.remove("hidden");
@@ -70,63 +119,50 @@ function closeLoginModal(){
   if(modal) modal.classList.add("hidden");
 }
 
-function authGuard(){
-  const phone = localStorage.getItem("phone");
-  const guest = localStorage.getItem("guestMode");
+/* ---------- login flow ---------- */
+function handleSubmitLogin(){
+  const nameEl = document.getElementById("loginName");
+  const phoneEl = document.getElementById("loginPhone");
 
-  if(!phone && !guest){
-    createEntryModal();
-  }
-}
-
-/* =========================================
-   INIT
-========================================= */
-
-window.addEventListener("DOMContentLoaded", authGuard);
-
-window.addEventListener("DOMContentLoaded", ()=>{
-  const loginBtn = document.getElementById("loginBtn");
-
-  if(loginBtn){
-    loginBtn.onclick = openLoginModal;
-  }
-});
-
-  const submitBtn = document.getElementById("loginSubmit");
-  const closeBtn = document.getElementById("loginClose");
-
-  if(submitBtn){
-submitBtn.onclick = ()=>{
-  const name = document.getElementById("loginName").value.trim();
-  const phone = document.getElementById("loginPhone").value.trim();
+  const name = (nameEl?.value || "").trim();
+  const phoneRaw = (phoneEl?.value || "").trim();
+  const phone = normalizePhone(phoneRaw);
 
   if(!name || !phone){
     alert("이름과 전화번호를 입력해주세요.");
     return;
   }
 
-  const userKey = "user_" + phone;
-  const existingUser = localStorage.getItem(userKey);
+  if(phone.length !== 11 || !phone.startsWith("010")){
+    alert("전화번호는 010xxxxxxxx 형식의 11자리 숫자로 입력해주세요.");
+    return;
+  }
 
-  /* =====================
-     신규 가입
-  ===================== */
-  if(!existingUser){
+  const userKey = getUserKey(phone);
+  const existingUserStr = localStorage.getItem(userKey);
 
+  // 신규 가입
+  if(!existingUserStr){
     const inviteCode = generateInviteCode();
 
     const userData = {
       name,
       phone,
       inviteCode,
-      points: 0
+      points: 0,
+      createdAt: Date.now()
     };
 
+    // 저장 (유저)
     localStorage.setItem(userKey, JSON.stringify(userData));
+    // 초대코드 역인덱스(중복방지/조회용)
+    localStorage.setItem("invite_" + inviteCode, phone);
+
+    // 현재 로그인 상태 저장
     localStorage.setItem("name", name);
     localStorage.setItem("phone", phone);
-    localStorage.setItem("points", 0);
+    localStorage.setItem("points", "0");
+    localStorage.removeItem("guestMode");
 
     alert(
 `가입이 완료되셨습니다.
@@ -135,34 +171,38 @@ submitBtn.onclick = ()=>{
 
 친구초대 시 양쪽 100점 지급`
     );
-
-  } 
-  /* =====================
-     기존 사용자 로그인
-  ===================== */
+  }
+  // 기존 사용자 로그인
   else{
-
-    const userData = JSON.parse(existingUser);
+    const userData = JSON.parse(existingUserStr);
 
     localStorage.setItem("name", userData.name);
     localStorage.setItem("phone", userData.phone);
-    localStorage.setItem("points", userData.points || 0);
+    localStorage.setItem("points", String(userData.points || 0));
+    localStorage.removeItem("guestMode");
 
     alert("로그인 되셨습니다.");
   }
 
-  localStorage.removeItem("guestMode");
-
   closeLoginModal();
   location.reload();
-};
-     
-function addPoint(amount){
-  let p = Number(localStorage.getItem("points") || "0");
-  p += amount;
-  localStorage.setItem("points", p);
 }
 
-function generateInviteCode(){
-  return Math.random().toString(36).substring(2,8).toUpperCase();
-}
+/* ---------- bind events ---------- */
+window.addEventListener("DOMContentLoaded", ()=>{
+  // 1) 진입 가드
+  authGuard();
+
+  // 2) 우측 상단 로그인 버튼도 연결
+  const loginBtn = document.getElementById("loginBtn");
+  if(loginBtn){
+    loginBtn.onclick = openLoginModal;
+  }
+
+  // 3) 모달 버튼 연결
+  const submitBtn = document.getElementById("loginSubmit");
+  const closeBtn = document.getElementById("loginClose");
+
+  if(submitBtn) submitBtn.onclick = handleSubmitLogin;
+  if(closeBtn) closeBtn.onclick = closeLoginModal;
+});
