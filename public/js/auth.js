@@ -61,9 +61,43 @@ function startGuest(){
 }
 
 function openLoginModal(){
-  const modal = document.getElementById("loginModal");
-  if(modal) modal.classList.remove("hidden");
+  document.getElementById("loginModal").classList.remove("hidden");
 }
+
+function closeLoginModal(){
+  document.getElementById("loginModal").classList.add("hidden");
+}
+
+/* 로그인 처리 */
+document.addEventListener("DOMContentLoaded", ()=>{
+
+  const submitBtn = document.getElementById("loginSubmit");
+  const closeBtn = document.getElementById("loginClose");
+
+  if(submitBtn){
+    submitBtn.onclick = ()=>{
+      const name = document.getElementById("loginName").value.trim();
+      const phone = document.getElementById("loginPhone").value.trim();
+
+      if(!name || !phone){
+        alert("이름과 전화번호를 입력해주세요.");
+        return;
+      }
+
+      localStorage.setItem("name", name);
+      localStorage.setItem("phone", phone);
+      localStorage.removeItem("guestMode");
+
+      closeLoginModal();
+      location.reload();
+    };
+  }
+
+  if(closeBtn){
+    closeBtn.onclick = closeLoginModal;
+  }
+
+});
 
 function closeLoginModal(){
   const modal = document.getElementById("loginModal");
