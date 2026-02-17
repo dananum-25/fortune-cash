@@ -487,19 +487,45 @@ async function movePickedToReorderFixed(pickedEls){
 INIT
 ===================================================== */
 window.addEventListener("DOMContentLoaded", () => {
-  const soundBtn = document.getElementById("soundToggle");
+  try {
+    /* 사운드 버튼 초기화 */
+    const soundBtn = document.getElementById("soundToggle");
+    if(soundBtn){
+      soundBtn.onclick = () => {
+        muted = !muted;
+        soundBtn.textContent = muted ? "사운드 🔇" : "사운드 🔊";
 
-  if(soundBtn){
-    soundBtn.onclick = () => {
-      muted = !muted;
-      soundBtn.textContent = muted ? "사운드 🔇" : "사운드 🔊";
+        if(!muted){
+          bgm.play().catch(()=>{});
+        }else{
+          bgm.pause();
+        }
+      };
+    }
 
-      if(!muted){
-        bgm.play().catch(()=>{});
-      }else{
-        bgm.pause();
-      }
-    };
+    /* 상태 초기화 */
+    document.body.classList.remove("lock-scroll");
+
+    step = 0;
+    selected = [];
+    selectedDepth = null;
+    readingVersion = "V3";
+    maxPickCount = 3;
+
+    /* 화면 초기화 */
+    document.querySelector(".topbar")?.classList.remove("hidden");
+    catArea?.classList.remove("hidden");
+    qArea?.classList.remove("hidden");
+    tArea?.classList.add("hidden");
+    bigStage?.classList.add("hidden");
+    spread?.classList.add("hidden");
+    chat?.classList.add("hidden");
+
+    /* 질문 렌더 */
+    renderQ();
+
+  } catch (e) {
+    console.error("INIT ERROR", e);
   }
 });
   
