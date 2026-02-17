@@ -80,6 +80,7 @@ body{
 
 <body>
 
+<!-- USER BAR -->
 <div id="userBar" style="
 background:#1a1a1a;
 padding:10px 14px;
@@ -105,36 +106,36 @@ font-size:14px;
   <div class="grid">
 
     <!-- 기간운세 -->
-    <div class="card" onclick="location.href='/pages/period/index.html'">
+    <div class="card" onclick="location.href='/pages/period.html'">
       <img src="/assets/today_fortune.png">
       <div class="cardTitle">기간운세</div>
     </div>
 
     <!-- 사주 -->
-    <div class="card" onclick="location.href='/pages/saju/index.html'">
+    <div class="card" onclick="location.href='/pages/saju.html'">
       <img src="/assets/saju.png">
       <div class="cardTitle">사주</div>
     </div>
 
-    <!-- 토정비결 -->
-    <div class="card" onclick="location.href='/pages/tojung/index.html'">
+    <!-- 토정 -->
+    <div class="card" onclick="location.href='/pages/tojung.html'">
       <img src="/assets/tojung.png">
       <div class="cardTitle">토정비결</div>
     </div>
 
     <!-- 별자리 -->
-    <div class="card" onclick="location.href='/pages/star/index.html'">
+    <div class="card" onclick="location.href='/pages/star.html'">
       <img src="/assets/star_fortune.png">
       <div class="cardTitle">별자리운세</div>
     </div>
 
     <!-- 띠 -->
-    <div class="card" onclick="location.href='/pages/zodiac/index.html'">
+    <div class="card" onclick="location.href='/pages/zodiac.html'">
       <img src="/assets/zodiac_fortune.png">
       <div class="cardTitle">띠별운세</div>
     </div>
 
-    <!-- 타로 (이미 있음) -->
+    <!-- 타로 -->
     <div class="card" onclick="location.href='/pages/tarot/tarot.html'">
       <img src="/assets/tarot.png">
       <div class="cardTitle">타로</div>
@@ -147,13 +148,13 @@ font-size:14px;
     </div>
 
     <!-- 포춘쿠키 -->
-    <div class="card" onclick="location.href='/pages/cookie/index.html'">
+    <div class="card" onclick="location.href='/pages/cookie.html'">
       <img src="/assets/fortune_cookie.png">
       <div class="cardTitle">포춘쿠키</div>
     </div>
 
     <!-- MBTI -->
-    <div class="card" onclick="location.href='/pages/mbti/index.html'">
+    <div class="card" onclick="location.href='/pages/mbti.html'">
       <img src="/assets/mbti.png">
       <div class="cardTitle">MBTI</div>
     </div>
@@ -171,11 +172,50 @@ font-size:14px;
     </div>
 
     <!-- 게시판 -->
-    <div class="card" onclick="location.href='/pages/board/index.html'">
+    <div class="card" onclick="location.href='/pages/board.html'">
       <img src="/assets/board.png">
       <div class="cardTitle">게시판</div>
     </div>
 
+  </div>
+
+  <!-- LOGIN MODAL -->
+  <div id="loginModal" class="modal hidden">
+    <div style="
+      background:#1a1a1a;
+      padding:20px;
+      border-radius:16px;
+      width:90%;
+      max-width:320px;
+    ">
+      <h3>회원가입 / 로그인</h3>
+
+      <input id="loginName" placeholder="이름"
+        style="width:100%;padding:10px;margin-top:10px;border-radius:8px;border:none;">
+
+      <input id="loginPhone" placeholder="전화번호 (010xxxxxxxx)"
+        style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:none;">
+
+      <button id="loginSubmit" style="
+        width:100%;
+        padding:12px;
+        margin-top:12px;
+        border:none;
+        border-radius:10px;
+        background:#ffd56b;
+        font-weight:bold;
+      ">시작하기</button>
+
+      <button id="loginClose" style="
+        width:100%;
+        padding:12px;
+        margin-top:8px;
+        border:none;
+        border-radius:10px;
+        background:#2a2a2a;
+        color:white;
+      ">닫기</button>
+    </div>
   </div>
 
   <footer style="
@@ -187,14 +227,11 @@ font-size:14px;
   ">
     <div>무료 운세 플랫폼</div>
     <div>문의: daekoju@naver.com</div>
-    <div style="margin-top:8px;">
-      <a href="/privacy.html" style="color:#aaa;text-decoration:none;">개인정보처리방침</a> |
-      <a href="/terms.html" style="color:#aaa;text-decoration:none;">이용약관</a>
-    </div>
   </footer>
 </div>
 
 <script src="/js/auth.js"></script>
 <script src="/js/points.js"></script>
+
 </body>
 </html>
