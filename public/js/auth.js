@@ -181,27 +181,41 @@ async function handleSubmitLogin(){
   }
 
   // ✅ 서버에 회원가입/로그인 저장 시도 (응답 확인)
-  let serverRes = null;
-  try{
-    const r = await fetch(window.API_URL,{
-      method:"POST",
-      headers:{ "Content-Type":"text/plain;charset=utf-8" },
-      body: JSON.stringify({
-        action:"register",
-        phone,
-        name,
-        birth,
-        zodiac,
-        gapja,
-        apptech: true
-      })
-    });
+let serverRes = null;
 
-    const txt = await r.text();
-    serverRes = JSON.parse(txt);
-  }catch(e){
-    serverRes = { status:"network_fail" };
-  }
+try{
+  alert("회원가입 처리 중...");
+
+  const r = await fetch(window.API_URL,{
+    method:"POST",
+    headers:{ "Content-Type":"text/plain;charset=utf-8" },
+    body: JSON.stringify({
+      action:"register",
+      phone,
+      name,
+      birth,
+      zodiac,
+      gapja,
+      apptech: true
+    })
+  });
+
+  const txt = await r.text();
+  serverRes = JSON.parse(txt);
+
+}catch(e){
+  console.log("[register] network error:", e);
+}
+
+if(serverRes?.status === "ok"){
+  alert("회원가입 성공 (시트 저장 완료)");
+}else if(serverRes?.status === "exists"){
+  alert("이미 가입된 번호입니다. 로그인 처리됩니다.");
+}else if(serverRes?.status === "captcha_fail"){
+  alert("captcha 검증 실패");
+}else{
+  alert("서버 저장 실패 (로그인은 유지됨)");
+}
 
   // ✅ 버튼 복구
   if(submitBtn){
