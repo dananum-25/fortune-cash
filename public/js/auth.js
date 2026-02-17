@@ -145,7 +145,8 @@ function refreshTopBar(){
   if(!info || !loginBtn) return;
 
   if(phone){
-    info.textContent = `${name || "회원"} (${phone}) | ${points.toLocaleString()}P`;
+    if(phone){
+    info.textContent = `${name}님`;
     loginBtn.textContent = "로그아웃";
     loginBtn.onclick = ()=>{
       localStorage.removeItem("phone");
@@ -215,16 +216,16 @@ async function handleSubmitLogin(){
     console.error("[register] failed:", e);
   }
 
-  await syncUserFromServer();
-
   closeLoginModal();
-  document.getElementById("entryModal")?.remove();
+document.getElementById("entryModal")?.remove();
 
-  refreshTopBar();
-  refreshPointCard();
+refreshTopBar();
+refreshPointCard();
 
-  alert("로그인 되셨습니다.");
-}
+alert("로그인 되셨습니다.");
+
+/* 서버 동기화는 백그라운드 */
+syncUserFromServer();
 
 /* ---------- BIND EVENTS ---------- */
 window.addEventListener("DOMContentLoaded", async ()=>{
