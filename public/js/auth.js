@@ -1,5 +1,8 @@
 const API_URL =
 "https://script.google.com/macros/s/AKfycbx6NjF9IVzW0eA0fE_q54B8wRQMPq8BivT3snTuNfDTTc-ggaYqoRw7AMqrqOeT5Kz_9A/exec";
+
+console.log("[auth.js] loaded ✅");
+window.__AUTH_LOADED__ = true;
 /* =========================================
    AUTH GUARD + LOGIN (auth.js)
 ========================================= */
@@ -158,16 +161,25 @@ async function handleSubmitLogin(){
     // 저장 (유저)
     localStorage.setItem(userKey, JSON.stringify(userData));
     // 초대코드 역인덱스(중복방지/조회용)
-    // 🔥 서버 등록 추가
-  await fetch(API_URL,{
-  method:"POST",
-  body:JSON.stringify({
-    action:"register",
-    phone,
-    name,
-    inviteBy: localStorage.getItem("inviteCode") || ""
-  })
-});
+// 🔥 서버 등록 추가 (네트워크 실패해도 UI가 멈추지 않게)
+try{
+  const r = await fetch(API_URL,{
+    method:"POST",
+    headers: { "Content-Type":"text/plain;charset=utf-8" },
+    body:JSON.stringify({
+      action:"register",
+      phone,
+      name,
+      inviteBy: localStorage.getItem("inviteCode") || ""
+    })
+  });
+
+  // 응답을 읽어서 Apps Script 에러도 잡기
+  const txt = await r.text();
+  console.log("[register] response:", txt);
+}catch(e){
+  console.error("[register] failed:", e);
+}
     localStorage.setItem("invite_" + inviteCode, phone);
 
     // 현재 로그인 상태 저장
