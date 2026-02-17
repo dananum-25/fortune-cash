@@ -10,10 +10,6 @@ let maxPickCount = 3;
 let selectedTime = null;
 let selectedCategory = null;
 let revealedCards = {};
-let catArea;
-let catTextEl;
-let qArea;
-let tArea;
 /* =====================================================
 1. SOUND
 ===================================================== */
@@ -26,6 +22,15 @@ const sFire   = new Audio("/sounds/tarot/fire.mp3");
 const sReveal = new Audio("/sounds/tarot/reveal.mp3");
 
 let muted = true;
+const soundBtn = document.getElementById("soundToggle");
+
+if(soundBtn){
+  soundBtn.onclick = () => {
+    muted = !muted;
+    soundBtn.textContent = muted ? "사운드 🔇" : "사운드 🔊";
+    muted ? bgm.pause() : bgm.play().catch(()=>{});
+  };
+}
 
 function play(sound){
   if(!muted){
@@ -36,6 +41,10 @@ function play(sound){
 /* =====================================================
 2. QUESTION
 ===================================================== */
+const catArea = document.getElementById("catArea");
+const catTextEl = document.getElementById("catText");
+const qArea = document.getElementById("questionArea");
+const tArea = document.getElementById("transitionArea");
 
 const LABELS = {
   love:"연애", career:"직업 / 진로", money:"금전", relationship:"관계",
@@ -312,10 +321,7 @@ activeSlots.forEach((slot,i)=>{
   }
 });
   
-chat.innerHTML = readingHTML;
-
-/* 포인트 지급 */
-rewardContent("tarot");
+  chat.innerHTML = readingHTML;
 
 setTimeout(()=>{
   renderCheckinUI();
@@ -356,7 +362,7 @@ card.style.backgroundImage = `url('${path}')`;
   });
 }
 function getCardImagePath(card){
-  return `/tarot/${card}.png`;
+  return `/assets/tarot/${card}.png`;
 }
 /* =====================================================
 UTIL
@@ -486,40 +492,18 @@ async function movePickedToReorderFixed(pickedEls){
 /* =====================================================
 INIT
 ===================================================== */
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("load", () => {
   try {
-
-    catArea = document.getElementById("catArea");
-    catTextEl = document.getElementById("catText");
-    qArea = document.getElementById("questionArea");
-    tArea = document.getElementById("transitionArea");
-
-    const soundBtn = document.getElementById("soundToggle");
-    if(soundBtn){
-      soundBtn.onclick = () => {
-        muted = !muted;
-        soundBtn.textContent = muted ? "사운드 🔇" : "사운드 🔊";
-        muted ? bgm.pause() : bgm.play().catch(()=>{});
-      };
-    }
-
-    renderQ();
-
-  } catch (e) {
-    console.error("INIT ERROR", e);
-  }
-});
-
-    /* 상태 초기화 */
     document.body.classList.remove("lock-scroll");
 
+    // 화면 초기화(혹시 이전 상태 남아있을 수 있으니)
     step = 0;
     selected = [];
     selectedDepth = null;
     readingVersion = "V3";
     maxPickCount = 3;
 
-    /* 화면 초기화 */
+    // 필수 UI 복구
     document.querySelector(".topbar")?.classList.remove("hidden");
     catArea?.classList.remove("hidden");
     qArea?.classList.remove("hidden");
@@ -527,8 +511,21 @@ window.addEventListener("DOMContentLoaded", () => {
     bigStage?.classList.add("hidden");
     spread?.classList.add("hidden");
     chat?.classList.add("hidden");
-  
-    
+
+    renderQ();
+    renderUserBar();
+  } catch (e) {
+    console.error("[INIT FAIL]", e);
+
+    // 최후의 안전장치: 화면에 에러 표시
+    const err = document.createElement("div");
+    err.style.padding = "14px";
+    err.style.fontSize = "14px";
+    err.style.color = "tomato";
+    err.textContent = "초기 로딩 에러가 발생했어요. 콘솔(F12) 에러를 확인해주세요.";
+    document.body.prepend(err);
+  }
+});
 
 /* =====================================================
 READING ENGINE (FINAL STABLE)
@@ -772,56 +769,10 @@ function loadUser(){
     streak:0
   };
 }
-/* =====================================================
-CHECKIN SYSTEM (SERVER)
-===================================================== */
-
-const API_URL = "https://script.google.com/macros/s/AKfycbx6NjF9IVzW0eA0fE_q54B8wRQMPq8BivT3snTuNfDTTc-ggaYqoRw7AMqrqOeT5Kz_9A/exec";
-
-async function doCheckin(){
-  const phone = localStorage.getItem("phone");
-
-  if(!phone){
-    alert("회원가입 후 이용해주세요.");
-    return;
-  }
-
-  const res = await fetch(API_URL,{
-    method:"POST",
-    body:JSON.stringify({
-      action:"checkin",
-      phone
-    })
-  }).then(r=>r.json());
-
-  if(res.status === "already"){
-    alert("오늘은 이미 출석 완료했습니다!");
-    return;
-  }
-
-  if(res.status === "ok"){
-    alert(`출석 완료! +${res.points}점 지급`);
-    location.reload();
-    return;
-  }
-
-  alert("출석 처리 실패");
-}
-
-function renderCheckinUI(){
-  const user = loadUser();
-
-  const ui = `
-  <div class="reading-category">
-    <h4>🎁 출석 체크</h4>
-    <p>포인트: <b>${user.points}</b>점</p>
-    <p>연속 출석: ${user.streak}일</p>
-    <button id="checkinBtn">오늘 출석하기 (+10)</button>
-  </div>
 
   <div class="reading-end">
     <button id="restartBtn">처음부터 다시하기</button>
-    <button id="shareBtn">친구 공유하기</button>
+  
   </div>
   `;
 
@@ -833,17 +784,3 @@ function renderCheckinUI(){
   document.getElementById("restartBtn").onclick = ()=>{
     location.reload();
   };
-
-  document.getElementById("shareBtn").onclick = ()=>{
-    if(navigator.share){
-      navigator.share({
-        title:"AI 고양이 타로",
-        text:"AI 고양이 타로 상담 해보기",
-        url:location.href
-      });
-    }else{
-      navigator.clipboard.writeText(location.href);
-      alert("링크가 복사되었어요!");
-    }
-  };
-}
