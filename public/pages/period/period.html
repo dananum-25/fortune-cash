@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>기간운세</title>
+
+<style>
+body{
+  margin:0;
+  background:#111;
+  color:white;
+  font-family:Arial;
+}
+
+.wrap{
+  max-width:420px;
+  margin:auto;
+  padding:20px;
+}
+
+.title{
+  text-align:center;
+  font-size:22px;
+  font-weight:bold;
+  margin-bottom:20px;
+}
+
+.card{
+  background:#1a1a1a;
+  padding:16px;
+  border-radius:14px;
+  margin-bottom:12px;
+}
+
+.btn{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  margin-top:10px;
+  background:#ffd56b;
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<div class="title">📅 기간운세</div>
+
+<input id="name" placeholder="이름 입력"
+style="width:100%;padding:12px;border-radius:10px;border:none;margin-bottom:10px;">
+
+<button class="btn" onclick="showFortune()">운세 보기</button>
+
+<div id="result" style="margin-top:20px;"></div>
+
+<button class="btn" onclick="location.href='/'">허브로 돌아가기</button>
+
+</div>
+
+<script>
+let todayDB = [];
+let tomorrowDB = [];
+let yearDB = [];
+
+async function loadDB(){
+  todayDB = await fetch("/data/fortunes_ko_today.json").then(r=>r.json());
+  tomorrowDB = await fetch("/data/fortunes_ko_tomorrow.json").then(r=>r.json());
+  yearDB = await fetch("/data/fortunes_ko_2026.json").then(r=>r.json());
+}
+
+function rand(arr){
+  return arr[Math.floor(Math.random()*arr.length)];
+}
+
+function showFortune(){
+  const name = document.getElementById("name").value || "당신";
+
+  const today = rand(todayDB.pools.today);
+  const tomorrow = rand(tomorrowDB.pools.tomorrow);
+  const year = rand(yearDB.pools.year_all);
+
+  document.getElementById("result").innerHTML = `
+    <div class="card">
+      <b>${name}님의 오늘의 운세</b><br><br>
+      ${today}
+    </div>
+
+    <div class="card">
+      <b>내일의 운세</b><br><br>
+      ${tomorrow}
+    </div>
+
+    <div class="card">
+      <b>2026년 운세</b><br><br>
+      ${year}
+    </div>
+  `;
+}
+
+loadDB();
+</script>
+
+</body>
+</html>
