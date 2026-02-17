@@ -1,0 +1,156 @@
+body{
+  background:#111;
+  color:#fff;
+  font-family:Arial;
+  margin:0;
+}
+
+.container{
+  max-width:420px;
+  margin:auto;
+  padding:16px;
+}
+
+.hero{
+  padding:18px;
+  background:linear-gradient(135deg,#7f5af0,#2cb67d);
+  border-radius:18px;
+  text-align:center;
+  font-weight:bold;
+}
+
+.subinfo{
+  margin:10px 0;
+  color:#aaa;
+  font-size:14px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:12px;
+}
+
+.card{
+  display:block;
+  background:#1a1a1a;
+  border-radius:16px;
+  padding:14px;
+  text-decoration:none;
+  color:#fff;
+  border:1px solid rgba(255,255,255,0.06);
+}
+
+.cardTitle{
+  font-weight:bold;
+  font-size:16px;
+}
+
+.cardDesc{
+  margin-top:6px;
+  font-size:13px;
+  opacity:.7;
+}
+
+.panel{
+  margin-top:14px;
+}
+
+input, select, button{
+  width:100%;
+  box-sizing:border-box;
+}
+
+input,select{
+  margin:10px 0;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  background:#fff;
+  color:#000;
+}
+
+button{
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  margin-top:10px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.mainBtn{
+  background:#7f5af0;
+  color:white;
+}
+
+.secondaryBtn{
+  background:#2a2a2a;
+  color:white;
+}
+
+.resultBox{
+  background:#1a1a1a;
+  padding:14px;
+  border-radius:12px;
+  margin-top:12px;
+  line-height:1.6;
+  font-size:14px;
+}
+
+.adbox{
+  background:#fff;
+  color:#000;
+  padding:14px;
+  border-radius:12px;
+  margin:12px 0;
+  text-align:center;
+}
+
+.adbox a{
+  display:inline-block;
+  margin-top:10px;
+  padding:10px 12px;
+  background:#111;
+  color:#fff;
+  border-radius:10px;
+  text-decoration:none;
+}
+
+.label{
+  font-size:14px;
+  margin-top:10px;
+  opacity:.85;
+}
+
+.qbox{
+  background:#1a1a1a;
+  padding:14px;
+  border-radius:12px;
+  margin:12px 0;
+}
+
+.qrow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  background:#222;
+  padding:10px;
+  margin-top:8px;
+  border-radius:10px;
+}
+
+.qtext{
+  flex:1;
+  font-size:14px;
+  line-height:1.4;
+  word-break:keep-all;
+}
+
+.qrow input{
+  width:22px;
+  height:22px;
+  flex-shrink:0;
+}
