@@ -139,29 +139,49 @@ z-index:9999;
 
 <!-- LOGIN MODAL -->
 <div id="loginModal" class="modal hidden">
-<div style="background:#1a1a1a;padding:20px;border-radius:16px;width:90%;max-width:320px;">
-<h3>회원가입 / 로그인</h3>
+  <div style="
+    background:#1a1a1a;
+    padding:20px;
+    border-radius:16px;
+    width:90%;
+    max-width:320px;
+  ">
+    <h3>회원가입 / 로그인</h3>
 
-<input id="loginName" placeholder="이름"
-style="width:100%;padding:10px;margin-top:10px;border-radius:8px;border:none;">
+    <input id="loginName" placeholder="이름"
+      style="width:100%;padding:10px;margin-top:10px;border-radius:8px;border:none;">
 
-<input id="loginPhone" placeholder="전화번호 (010xxxxxxxx)"
-style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:none;">
+    <input id="loginPhone" placeholder="전화번호 (010xxxxxxxx)"
+      style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:none;">
 
-<input id="loginBirth" type="date">
+    <input id="loginBirth" type="date"
+      style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:none;">
 
-<div class="g-recaptcha" data-sitekey="6Le2NW4sAAAAAI6Vu2Rn6RKPrZ0VnVCQ2lMj1pIH"></div>
+    <!-- CAPTCHA -->
+    <div style="margin-top:10px;">
+      <div class="g-recaptcha" data-sitekey="여기에_SITE_KEY"></div>
+    </div>
 
-  style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:none;">
+    <button id="loginSubmit" style="
+      width:100%;
+      padding:12px;
+      margin-top:12px;
+      border:none;
+      border-radius:10px;
+      background:#ffd56b;
+      font-weight:bold;
+    ">시작하기</button>
 
-<button id="loginSubmit" style="width:100%;padding:12px;margin-top:12px;border:none;border-radius:10px;background:#ffd56b;font-weight:bold;">
-시작하기
-</button>
-
-<button id="loginClose" style="width:100%;padding:12px;margin-top:8px;border:none;border-radius:10px;background:#2a2a2a;color:white;">
-닫기
-</button>
-</div>
+    <button id="loginClose" style="
+      width:100%;
+      padding:12px;
+      margin-top:8px;
+      border:none;
+      border-radius:10px;
+      background:#2a2a2a;
+      color:white;
+    ">닫기</button>
+  </div>
 </div>
 
 <footer>
