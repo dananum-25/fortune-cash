@@ -215,13 +215,15 @@ location.reload();
 
 /* ---------- bind events ---------- */
 window.addEventListener("DOMContentLoaded", ()=>{
-  // 1) 진입 가드
   authGuard();
 
-  // 2) 우측 상단 로그인 버튼도 연결
-  
+  /* 우측 로그인 버튼 연결 */
+  const loginBtn = document.getElementById("loginBtn");
+  if(loginBtn){
+    loginBtn.onclick = openLoginModal;
+  }
 
-  // 3) 모달 버튼 연결
+  /* 로그인 모달 버튼 */
   const submitBtn = document.getElementById("loginSubmit");
   const closeBtn = document.getElementById("loginClose");
 
