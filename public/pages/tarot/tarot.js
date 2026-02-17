@@ -32,10 +32,10 @@ function play(sound){
 /* =====================================================
 2. QUESTION
 ===================================================== */
-const catArea = document.getElementById("catArea");
-const catTextEl = document.getElementById("catText");
-const qArea = document.getElementById("questionArea");
-const tArea = document.getElementById("transitionArea");
+let catArea;
+let catTextEl;
+let qArea;
+let tArea;
 
 const LABELS = {
   love:"연애", career:"직업 / 진로", money:"금전", relationship:"관계",
@@ -488,6 +488,18 @@ INIT
 ===================================================== */
 window.addEventListener("DOMContentLoaded", () => {
   try {
+
+    catArea = document.getElementById("catArea");
+    catTextEl = document.getElementById("catText");
+    qArea = document.getElementById("questionArea");
+    tArea = document.getElementById("transitionArea");
+
+    renderQ();
+
+  } catch (e) {
+    console.error("INIT ERROR", e);
+  }
+});
     /* 사운드 버튼 초기화 */
     const soundBtn = document.getElementById("soundToggle");
     if(soundBtn){
