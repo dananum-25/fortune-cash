@@ -1,3 +1,17 @@
+window.onerror = function(msg, url, line){
+  const box = document.createElement("div");
+  box.style.position = "fixed";
+  box.style.bottom = "0";
+  box.style.left = "0";
+  box.style.right = "0";
+  box.style.background = "black";
+  box.style.color = "red";
+  box.style.fontSize = "12px";
+  box.style.zIndex = "99999";
+  box.style.padding = "6px";
+  box.textContent = msg + " (" + line + ")";
+  document.body.appendChild(box);
+};
 /* =====================================================
 0. GLOBAL INIT
 ===================================================== */
