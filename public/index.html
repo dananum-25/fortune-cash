@@ -287,124 +287,17 @@ font-weight:bold;
   
 <script src="/js/auth.js"></script>
 <script src="/js/points.js"></script>
-
 <script>
 document.addEventListener("DOMContentLoaded", ()=>{
 
-  const entryModal = document.getElementById("entryModal");
-  const startGuestBtn = document.getElementById("startGuest");
-  const startApptechBtn = document.getElementById("startApptech");
   const loginBtn = document.getElementById("loginBtn");
 
-  /* ENTRY MODAL */
-  entryModal.classList.remove("hidden");
-
-  startGuestBtn.onclick = ()=>{
-    entryModal.classList.add("hidden");
-  };
-
-  startApptechBtn.onclick = ()=>{
-    entryModal.classList.add("hidden");
-    openLoginModal();
-  };
-
-  renderUserBar();
-  activatePointCard();
-
-  /* =========================
-  LOGIN MODAL CONTROL
-  ========================= */
-  function openLoginModal(){
-    document.getElementById("loginModal").classList.remove("hidden");
-  }
-
-  function closeLoginModal(){
-    document.getElementById("loginModal").classList.add("hidden");
-  }
-
-  document.getElementById("loginClose").onclick = closeLoginModal;
-  document.getElementById("loginSubmit").onclick = submitLogin;
-
-  /* =========================
-  USER BAR
-  ========================= */
-  function renderUserBar(){
-    const phone = localStorage.getItem("phone");
-    const name = localStorage.getItem("name");
-    const info = document.getElementById("userInfo");
-
-    if(phone){
-      loadMyPoint().then(points=>{
-        info.textContent =
-        `${name} (${phone}) | 현재 포인트 ${Number(points).toLocaleString()}점`;
-      });
-
-      loginBtn.textContent = "로그아웃";
-      loginBtn.onclick = ()=>{
-        localStorage.clear();
-        location.reload();
-      };
-
-    }else{
-      info.textContent = "로그인 필요";
-      loginBtn.textContent = "로그인";
-      loginBtn.onclick = openLoginModal;
-    }
-  }
-
-  /* =========================
-  POINT CARD
-  ========================= */
-  function activatePointCard(){
-    const card = document.getElementById("pointCard");
-    const phone = localStorage.getItem("phone");
-
-    if(!card) return;
-
-    if(phone){
-      card.classList.remove("card-disabled");
-      card.classList.add("card-active");
-      card.onclick = ()=>{
-        location.href="/point.html";
-      };
-    }else{
-      card.onclick = ()=>{
-        alert("로그인 후 이용 가능합니다.");
-        openLoginModal();
-      };
-    }
-  }
-
-  /* =========================
-  LOGIN SUBMIT
-  ========================= */
-  async function submitLogin(){
-    const name = document.getElementById("loginName").value.trim();
-    let phone = document.getElementById("loginPhone").value.trim();
-
-    if(!name || !phone){
-      alert("이름과 전화번호를 입력해주세요");
-      return;
-    }
-
-    phone = phone.replace(/[^0-9]/g,"");
-
-    if(phone.length !== 11){
-      alert("전화번호는 11자리 숫자로 입력해주세요.");
-      return;
-    }
-
-    const ok = await registerUser(name, phone);
-
-    if(ok){
-      localStorage.setItem("name", name);
-      closeLoginModal();
-      renderUserBar();
-      alert("로그인 완료!");
-    }
+  if(loginBtn){
+    loginBtn.onclick = openLoginModal;
   }
 
 });
-    </script>
+</script>
+      
 </body>
 </html>
