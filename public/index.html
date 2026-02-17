@@ -287,6 +287,7 @@ font-weight:bold;
   
 <script src="/js/auth.js"></script>
 <script src="/js/points.js"></script>
+
 <script>
 document.addEventListener("DOMContentLoaded", ()=>{
 
@@ -295,10 +296,9 @@ document.addEventListener("DOMContentLoaded", ()=>{
   const startApptechBtn = document.getElementById("startApptech");
   const loginBtn = document.getElementById("loginBtn");
 
-  /* 항상 모달 표시 */
+  /* ENTRY MODAL */
   entryModal.classList.remove("hidden");
 
-  /* ENTRY MODAL 버튼 */
   startGuestBtn.onclick = ()=>{
     entryModal.classList.add("hidden");
   };
@@ -308,72 +308,103 @@ document.addEventListener("DOMContentLoaded", ()=>{
     openLoginModal();
   };
 
-renderUserBar();
-activatePointCard();
-/* =========================
-LOGIN MODAL CONTROL
-========================= */
-function openLoginModal(){
-  document.getElementById("loginModal").classList.remove("hidden");
-}
+  renderUserBar();
+  activatePointCard();
 
-function closeLoginModal(){
-  document.getElementById("loginModal").classList.add("hidden");
-}
-
-document.getElementById("loginClose").onclick = closeLoginModal;
-document.getElementById("loginSubmit").onclick = submitLogin;
-
-function renderUserBar(){
-  const phone = localStorage.getItem("phone");
-  const name = localStorage.getItem("name");
-  const info = document.getElementById("userInfo");
-
-  if(phone){
-
-    loadMyPoint().then(points=>{
-      info.textContent =
-`${name} (${phone}) | 현재 포인트 ${Number(points).toLocaleString()}점`;
-    });
-    
-    loginBtn.textContent = "로그아웃";
-loginBtn.onclick = ()=>{
-  localStorage.removeItem("phone");
-  localStorage.removeItem("name");
-  localStorage.removeItem("guestMode");
-  localStorage.removeItem("points");
-
-  location.reload();
-};
-  }else{
-    info.textContent = "로그인 필요";
-    loginBtn.textContent = "로그인";
-    loginBtn.onclick = openLoginModal;
+  /* =========================
+  LOGIN MODAL CONTROL
+  ========================= */
+  function openLoginModal(){
+    document.getElementById("loginModal").classList.remove("hidden");
   }
-}
 
-/* 포인트 카드 활성화 */
-function activatePointCard(){
-  const card = document.getElementById("pointCard");
-  const phone = localStorage.getItem("phone");
-
-  if(!card) return;
-
-  if(phone){
-  card.classList.remove("card-disabled");
-  card.classList.add("card-active");
-  card.onclick = ()=>{
-    location.href="/point.html";
-  };
-}else{
-  card.onclick = ()=>{
-    alert("로그인 후 이용 가능합니다.");
-    openLoginModal();
-  };
+  function closeLoginModal(){
+    document.getElementById("loginModal").classList.add("hidden");
   }
-}
-  });
-</script>
-  
+
+  document.getElementById("loginClose").onclick = closeLoginModal;
+  document.getElementById("loginSubmit").onclick = submitLogin;
+
+  /* =========================
+  USER BAR
+  ========================= */
+  function renderUserBar(){
+    const phone = localStorage.getItem("phone");
+    const name = localStorage.getItem("name");
+    const info = document.getElementById("userInfo");
+
+    if(phone){
+      loadMyPoint().then(points=>{
+        info.textContent =
+        `${name} (${phone}) | 현재 포인트 ${Number(points).toLocaleString()}점`;
+      });
+
+      loginBtn.textContent = "로그아웃";
+      loginBtn.onclick = ()=>{
+        localStorage.clear();
+        location.reload();
+      };
+
+    }else{
+      info.textContent = "로그인 필요";
+      loginBtn.textContent = "로그인";
+      loginBtn.onclick = openLoginModal;
+    }
+  }
+
+  /* =========================
+  POINT CARD
+  ========================= */
+  function activatePointCard(){
+    const card = document.getElementById("pointCard");
+    const phone = localStorage.getItem("phone");
+
+    if(!card) return;
+
+    if(phone){
+      card.classList.remove("card-disabled");
+      card.classList.add("card-active");
+      card.onclick = ()=>{
+        location.href="/point.html";
+      };
+    }else{
+      card.onclick = ()=>{
+        alert("로그인 후 이용 가능합니다.");
+        openLoginModal();
+      };
+    }
+  }
+
+  /* =========================
+  LOGIN SUBMIT
+  ========================= */
+  async function submitLogin(){
+    const name = document.getElementById("loginName").value.trim();
+    let phone = document.getElementById("loginPhone").value.trim();
+
+    if(!name || !phone){
+      alert("이름과 전화번호를 입력해주세요");
+      return;
+    }
+
+    phone = phone.replace(/[^0-9]/g,"");
+
+    if(phone.length !== 11){
+      alert("전화번호는 11자리 숫자로 입력해주세요.");
+      return;
+    }
+
+    const ok = await registerUser(name, phone);
+
+    if(ok){
+      localStorage.setItem("name", name);
+      closeLoginModal();
+      renderUserBar();
+      alert("로그인 완료!");
+    }
+  }
+
+});
+    </script>
 </body>
 </html>
