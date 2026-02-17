@@ -105,12 +105,15 @@ function authGuard(){
 
   // ✅ 캐시 지워도 무조건 처음엔 모달 나오게 하고 싶다 했으니
   // 조건 없이 항상 보여주되, 이미 로그인/게스트면 자동으로 닫음(0.1초)
-  if(phone || guest){
-  // 이미 상태가 있으면 애초에 엔트리 모달 만들지 않음
-  return;
-}
+  
 
-createEntryModal();
+function authGuard(){
+  const phone = localStorage.getItem("phone");
+  const guest = localStorage.getItem("guestMode");
+
+  if(!phone && !guest){
+    createEntryModal();
+  }
 }
 
 /* ---------- login modal ---------- */
