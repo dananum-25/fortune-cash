@@ -2,6 +2,8 @@
    AUTH (auth.js)
    - entry modal
    - login/register + birth + zodiac + gapja
+   - show "processing..." and read server response
+   - points key unify: "point"
 ========================================= */
 
 window.API_URL = window.API_URL || "https://script.google.com/macros/s/AKfycbxOPPekB2KONL7o6zAPoZtg7aBPr9E70pzRAw7s-wYU6ScU6pBD41uLMMBez-wRW-y_6Q/exec";
@@ -42,7 +44,6 @@ function showEntryModal(){
 function authGuard(){
   const phone = localStorage.getItem("phone");
   const guest = localStorage.getItem("guestMode");
-
   if(!phone && !guest){
     showEntryModal();
   }
@@ -73,14 +74,14 @@ async function syncUserFromServer(){
     const res = JSON.parse(txt);
 
     if(res.status === "ok"){
-      localStorage.setItem("points", String(res.points || 0));
+      localStorage.setItem("point", String(res.points || 0)); // ✅ point로 통일
       localStorage.setItem("name", String(res.name || ""));
       if(res.birth) localStorage.setItem("birth", String(res.birth));
       if(res.zodiac) localStorage.setItem("zodiac", String(res.zodiac));
       if(res.gapja) localStorage.setItem("gapja", String(res.gapja));
     }
   }catch(e){
-    console.log("[sync] skipped");
+    console.log("[sync] skipped", e);
   }
 }
 
@@ -91,15 +92,12 @@ function refreshTopBar(){
 
   const info = document.getElementById("userInfo");
   const loginBtn = document.getElementById("loginBtn");
-
   if(!info || !loginBtn) return;
 
   if(phone){
-    // ✅ 허브에서는 전화번호 숨기고 이름만
     info.textContent = `👤 ${name}님`;
     loginBtn.textContent = "로그아웃";
     loginBtn.onclick = ()=>{
-      // 로그인만 정리 (point 등 공용값까지 싹 지우고 싶으면 clear()로 바꿔도 됨)
       localStorage.removeItem("phone");
       localStorage.removeItem("name");
       localStorage.removeItem("birth");
@@ -122,8 +120,6 @@ function refreshPointCard(){
 
   const phone = localStorage.getItem("phone");
 
-  // ✅ 지금은 point.html에서만 포인트 보여주기로 했으니
-  // 허브에서는 로그인 여부만으로 접근만 제어
   if(phone){
     card.classList.add("card-active");
     card.classList.remove("card-disabled");
@@ -142,7 +138,8 @@ function refreshPointCard(){
 async function handleSubmitLogin(){
   const nameEl = document.getElementById("loginName");
   const phoneEl = document.getElementById("loginPhone");
-  const birthEl = document.getElementById("loginBirth"); // ✅ 너가 모달에 추가할 input
+  const birthEl = document.getElementById("loginBirth");
+  const submitBtn = document.getElementById("loginSubmit");
 
   const name = (nameEl?.value || "").trim();
   const phone = normalizePhone((phoneEl?.value || "").trim());
@@ -161,10 +158,12 @@ async function handleSubmitLogin(){
     return;
   }
 
-  // ✅ 입춘DB 로드(없어도 fallback)
-  if(window.BirthUtil?.loadIpchunDB){
-    await window.BirthUtil.loadIpchunDB();
-  }
+  // ✅ 입춘DB 로드(있으면 사용)
+  try{
+    if(window.BirthUtil?.loadIpchunDB){
+      await window.BirthUtil.loadIpchunDB();
+    }
+  }catch(e){}
 
   const zodiac = window.BirthUtil?.calcZodiacByIpchun
     ? window.BirthUtil.calcZodiacByIpchun(birth)
@@ -174,17 +173,17 @@ async function handleSubmitLogin(){
     ? window.BirthUtil.calcGapjaByIpchun(birth)
     : "";
 
-  // ✅ 로컬 먼저 확정 (로그인 유지 최우선)
-  localStorage.setItem("name", name);
-  localStorage.setItem("phone", phone);
-  localStorage.setItem("birth", birth);
-  if(zodiac) localStorage.setItem("zodiac", zodiac);
-  if(gapja) localStorage.setItem("gapja", gapja);
-  localStorage.removeItem("guestMode");
+  // ✅ UX: 처리중 표시
+  const prevText = submitBtn ? submitBtn.textContent : "";
+  if(submitBtn){
+    submitBtn.disabled = true;
+    submitBtn.textContent = "처리 중…";
+  }
 
-  // ✅ 서버 저장 (느려도 UX 멈추지 않게)
+  // ✅ 서버에 회원가입/로그인 저장 시도 (응답 확인)
+  let serverRes = null;
   try{
-    await fetch(window.API_URL,{
+    const r = await fetch(window.API_URL,{
       method:"POST",
       headers:{ "Content-Type":"text/plain;charset=utf-8" },
       body: JSON.stringify({
@@ -194,31 +193,75 @@ async function handleSubmitLogin(){
         birth,
         zodiac,
         gapja,
-        apptech: true  // 앱테크 모드 로그인으로 들어온 케이스
+        apptech: true
       })
     });
+
+    const txt = await r.text();
+    serverRes = JSON.parse(txt);
   }catch(e){
-    console.log("[register] failed (but keep login):", e);
+    serverRes = { status:"network_fail" };
   }
 
-  closeLoginModal();
-  document.getElementById("entryModal")?.classList.add("hidden");
+  // ✅ 버튼 복구
+  if(submitBtn){
+    submitBtn.disabled = false;
+    submitBtn.textContent = prevText || "시작하기";
+  }
 
-  refreshTopBar();
-  refreshPointCard();
+  // ✅ 서버 응답에 따른 안내
+  if(serverRes?.status === "captcha_fail"){
+    alert("서버 보안 검증 실패(captcha). 아직 프론트 captcha 미적용이면 서버에서 captcha 체크를 잠시 끄거나, 토큰을 붙여야 합니다.");
+    return;
+  }
+  if(serverRes?.status === "invalid"){
+    alert("서버에서 invalid 응답. action/파라미터 이름을 확인해주세요.");
+    return;
+  }
+  if(serverRes?.status === "device_required"){
+    alert("서버가 deviceId를 요구하고 있어요. 현재는 deviceId 제외 버전으로 바꿔야 합니다.");
+    return;
+  }
 
-  alert(`로그인 되셨습니다.\n띠: ${zodiac}\n년주: ${gapja}`);
+  // ✅ exists(이미 가입)도 “로그인 성공” 처리
+  if(serverRes?.status === "exists" || serverRes?.status === "ok"){
+    // 로컬 저장 (서버 ok/exists일 때만 확정)
+    localStorage.setItem("name", name);
+    localStorage.setItem("phone", phone);
+    localStorage.setItem("birth", birth);
+    if(zodiac) localStorage.setItem("zodiac", zodiac);
+    if(gapja) localStorage.setItem("gapja", gapja);
+    localStorage.removeItem("guestMode");
 
-  // 서버값이 있으면 보정
-  syncUserFromServer();
+    closeLoginModal();
+    document.getElementById("entryModal")?.classList.add("hidden");
+
+    refreshTopBar();
+    refreshPointCard();
+
+    if(serverRes.status === "exists"){
+      alert("이미 가입된 번호라 로그인 처리했어요 ✅");
+    }else{
+      alert("회원가입 완료 ✅");
+    }
+
+    // 서버값으로 최종 보정 (포인트 등)
+    await syncUserFromServer();
+    return;
+  }
+
+  // 그 외 알 수 없는 상태
+  alert("서버 응답이 예상과 달라 저장이 확인되지 않았어요. (status: " + String(serverRes?.status || "unknown") + ")");
 }
 
 /* ---------- INIT ---------- */
 window.addEventListener("DOMContentLoaded", async ()=>{
   // ✅ 입춘DB를 미리 로드 (계산 즉시 가능)
-  if(window.BirthUtil?.loadIpchunDB){
-    window.BirthUtil.loadIpchunDB();
-  }
+  try{
+    if(window.BirthUtil?.loadIpchunDB){
+      window.BirthUtil.loadIpchunDB();
+    }
+  }catch(e){}
 
   authGuard();
 
