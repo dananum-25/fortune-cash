@@ -5,77 +5,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>기간운세</title>
 
-<style>
-body{
-  background:#111;
-  color:white;
-  font-family:Arial;
-  margin:0;
-}
-
-.container{
-  max-width:420px;
-  margin:auto;
-  padding:20px;
-}
-
-.title{
-  font-size:22px;
-  font-weight:bold;
-  text-align:center;
-  margin-bottom:20px;
-}
-
-.card{
-  background:#1a1a1a;
-  border-radius:14px;
-  padding:16px;
-  margin-bottom:14px;
-}
-
-.cardTitle{
-  font-weight:bold;
-  margin-bottom:8px;
-  color:#ffd56b;
-}
-
-button{
-  width:100%;
-  padding:14px;
-  border:none;
-  border-radius:12px;
-  background:#ffd56b;
-  font-weight:bold;
-  margin-top:10px;
-}
-</style>
+<link rel="stylesheet" href="/css/common.css">
 </head>
 
 <body>
 
 <div class="container">
 
-<div class="title">📅 기간운세</div>
+  <h2>기간 운세</h2>
 
-<div class="card">
-  <div class="cardTitle">오늘의 운세</div>
-  <div id="todayBox">불러오는 중...</div>
-</div>
+  <div id="pointBox"></div>
 
-<div class="card">
-  <div class="cardTitle">내일의 운세</div>
-  <div id="tomorrowBox">불러오는 중...</div>
-</div>
+  <div id="inputSection">
+    <input id="birthInput" type="date">
+    <button onclick="showResult()">운세 보기</button>
+  </div>
 
-<div class="card">
-  <div class="cardTitle">2026년 운세</div>
-  <div id="yearBox">불러오는 중...</div>
-</div>
+  <div id="resultSection" style="display:none;">
+    <div id="resultBox"></div>
 
-<button onclick="location.href='/'">허브로 돌아가기</button>
+    <button onclick="Common.shareAndReward()">공유하고 포인트 받기</button>
+    <button onclick="Common.goHome()">홈으로</button>
+  </div>
 
 </div>
 
-<script src="/js/period.js"></script>
+<script src="/js/common.js"></script>
+<script src="period.js"></script>
+
 </body>
 </html>
