@@ -10,6 +10,20 @@ function normalizePhone(phone){
   return String(phone || "").replace(/[^0-9]/g, "");
 }
 
+function calcZodiac(birth){
+  if(!birth) return "";
+
+  const y = Number(birth.split("-")[0]);
+
+  const animals = [
+    "쥐","소","호랑이","토끼",
+    "용","뱀","말","양",
+    "원숭이","닭","개","돼지"
+  ];
+
+  return animals[(y - 2020 + 120) % 12];
+}
+
 /* ---------- ENTRY MODAL ---------- */
 function showEntryModal(){
   const modal = document.getElementById("entryModal");
@@ -122,23 +136,42 @@ async function handleSubmitLogin(){
   const name = document.getElementById("loginName").value.trim();
   const phone = normalizePhone(document.getElementById("loginPhone").value.trim());
   const birth = document.getElementById("loginBirth").value;
-const zodiac = calcZodiac(birth);
 
-await fetch(API_URL,{
-  method:"POST",
-  headers:{ "Content-Type":"text/plain;charset=utf-8" },
-  body: JSON.stringify({
-    action:"register",
-    phone,
-    name,
-    birth,
-    zodiac
-  })
-});
   if(!name || !phone){
     alert("이름과 전화번호를 입력해주세요.");
     return;
   }
+
+  const zodiac = calcZodiac(birth);
+
+  await fetch(API_URL,{
+    method:"POST",
+    headers:{ "Content-Type":"text/plain;charset=utf-8" },
+    body: JSON.stringify({
+      action:"register",
+      phone,
+      name,
+      birth,
+      zodiac
+    })
+  });
+
+  localStorage.setItem("name", name);
+  localStorage.setItem("phone", phone);
+  localStorage.setItem("birth", birth);
+  localStorage.setItem("zodiac", zodiac);
+  localStorage.removeItem("guestMode");
+
+  closeLoginModal();
+  document.getElementById("entryModal")?.classList.add("hidden");
+
+  refreshTopBar();
+  refreshPointCard();
+
+  alert("로그인 되셨습니다.");
+
+  syncUserFromServer();
+}
 
   localStorage.setItem("name", name);
   localStorage.setItem("phone", phone);
