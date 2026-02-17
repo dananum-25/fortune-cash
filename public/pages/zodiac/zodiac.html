@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>띠 운세</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="hero">🐲 띠 운세(음력 기준)</div>
+    <div class="subinfo" id="pointBox"></div>
+
+    <input id="name" placeholder="성함(선택)" />
+
+    <div class="label">생년월일을 입력해주세요</div>
+    <input type="date" id="birthInput" />
+    <div class="subinfo" id="zodiacResult"></div>
+
+    <button class="mainBtn" id="btn">띠 운세 보기</button>
+
+    <div class="resultBox" id="resultBox" style="display:none;"></div>
+
+    <button class="secondaryBtn" id="shareBtn">공유하고 포인트 받기</button>
+    <button class="secondaryBtn" onclick="Common.goHome()">허브로</button>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/db.js"></script>
+  <script src="/js/zodiac.js"></script>
+</body>
+</html>
