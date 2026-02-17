@@ -85,7 +85,7 @@ function refreshTopBar(){
   if(!info || !loginBtn) return;
 
   if(phone){
-    info.textContent = `${name}님`;
+    info.textContent = `👤 ${name}님`;
     loginBtn.textContent = "로그아웃";
     loginBtn.onclick = ()=>{
       localStorage.clear();
