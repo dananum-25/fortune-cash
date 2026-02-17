@@ -7,8 +7,8 @@
 <title>무료 운세 플랫폼</title>
 
 <script async
-  src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7356591276029815"
-  crossorigin="anonymous"></script>
+src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7356591276029815"
+crossorigin="anonymous"></script>
 
 <style>
 body{ margin:0;background:#111;color:white;font-family:Arial; }
@@ -20,20 +20,29 @@ body{ margin:0;background:#111;color:white;font-family:Arial; }
 .cardTitle{ text-align:center;margin-top:8px;font-weight:bold; }
 
 footer{
-  margin-top:40px;
-  padding:20px 10px;
-  text-align:center;
-  font-size:12px;
-  opacity:0.7;
+margin-top:40px;
+padding:20px 10px;
+text-align:center;
+font-size:12px;
+opacity:0.7;
 }
 
 footer a{
-  color:#aaa;
-  text-decoration:none;
+color:#aaa;
+text-decoration:none;
 }
 
-.modal{ position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;justify-content:center;align-items:center;z-index:9999; }
+.modal{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.8);
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:9999;
+}
 .hidden{ display:none; }
+
 .card-disabled{ opacity:0.4;cursor:not-allowed; }
 .card-active{ border:2px solid #ffd56b; }
 </style>
@@ -42,8 +51,8 @@ footer a{
 <body>
 
 <div id="userBar" style="background:#1a1a1a;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;font-size:14px;">
-  <div id="userInfo">로그인 필요</div>
-  <button id="loginBtn" style="border:none;background:#ffd56b;padding:6px 10px;border-radius:8px;font-weight:bold;">로그인</button>
+<div id="userInfo">로그인 필요</div>
+<button id="loginBtn" style="border:none;background:#ffd56b;padding:6px 10px;border-radius:8px;font-weight:bold;">로그인</button>
 </div>
 
 <div class="wrap">
@@ -101,7 +110,7 @@ footer a{
 <div class="cardTitle">미니게임</div>
 </div>
 
-<div id="pointCard" class="card" onclick="location.href='/point.html'">
+<div id="pointCard" class="card">
 <img src="/assets/point.png">
 <div class="cardTitle">포인트</div>
 </div>
@@ -112,57 +121,53 @@ footer a{
 </div>
 
 </div>
+
+<!-- ENTRY MODAL -->
+<div id="entryModal" class="modal hidden">
+<div style="background:#1a1a1a;padding:20px;border-radius:16px;width:90%;max-width:320px;">
+<h3>이용 방식 선택</h3>
+
+<button id="startGuest" style="width:100%;padding:12px;margin-top:10px;border:none;border-radius:10px;background:#2a2a2a;color:white;">
+비회원으로 보기
+</button>
+
+<button id="startApptech" style="width:100%;padding:12px;margin-top:8px;border:none;border-radius:10px;background:#ffd56b;font-weight:bold;">
+앱테크 시작
+</button>
+</div>
+</div>
+
 <!-- LOGIN MODAL -->
 <div id="loginModal" class="modal hidden">
-  <div style="
-    background:#1a1a1a;
-    padding:20px;
-    border-radius:16px;
-    width:90%;
-    max-width:320px;
-  ">
-    <h3>회원가입 / 로그인</h3>
+<div style="background:#1a1a1a;padding:20px;border-radius:16px;width:90%;max-width:320px;">
+<h3>회원가입 / 로그인</h3>
 
-    <input id="loginName" placeholder="이름"
-      style="width:100%;padding:10px;margin-top:10px;border-radius:8px;border:none;">
+<input id="loginName" placeholder="이름"
+style="width:100%;padding:10px;margin-top:10px;border-radius:8px;border:none;">
 
-    <input id="loginPhone" placeholder="전화번호 (010xxxxxxxx)"
-      style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:none;">
+<input id="loginPhone" placeholder="전화번호 (010xxxxxxxx)"
+style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:none;">
 
-    <!-- 🔥 여기 추가된 부분 -->
-    <input id="loginBirth" type="date"
-      style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:none;">
+<input id="loginBirth" type="date"
+style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:none;">
 
-    <button id="loginSubmit" style="
-      width:100%;
-      padding:12px;
-      margin-top:12px;
-      border:none;
-      border-radius:10px;
-      background:#ffd56b;
-      font-weight:bold;
-    ">시작하기</button>
+<button id="loginSubmit" style="width:100%;padding:12px;margin-top:12px;border:none;border-radius:10px;background:#ffd56b;font-weight:bold;">
+시작하기
+</button>
 
-    <button id="loginClose" style="
-      width:100%;
-      padding:12px;
-      margin-top:8px;
-      border:none;
-      border-radius:10px;
-      background:#2a2a2a;
-      color:white;
-    ">닫기</button>
-  </div>
+<button id="loginClose" style="width:100%;padding:12px;margin-top:8px;border:none;border-radius:10px;background:#2a2a2a;color:white;">
+닫기
+</button>
 </div>
-<!-- footer 추가 -->
-<footer>
-  <div>무료 운세 플랫폼</div>
-  <div>문의: daekoju@naver.com</div>
+</div>
 
-  <div style="margin-top:8px;">
-    <a href="/privacy.html">개인정보처리방침</a> |
-    <a href="/terms.html">이용약관</a>
-  </div>
+<footer>
+<div>무료 운세 플랫폼</div>
+<div>문의: daekoju@naver.com</div>
+<div style="margin-top:8px;">
+<a href="/privacy.html">개인정보처리방침</a> |
+<a href="/terms.html">이용약관</a>
+</div>
 </footer>
 
 </div>
