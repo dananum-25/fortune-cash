@@ -73,7 +73,7 @@ function calcGapjaByIpchun(birthYmd){
   const branches = ["자","축","인","묘","진","사","오","미","신","유","술","해"];
 
   const idx = ((zodiacYear - 1984) % 60 + 60) % 60;
-  return stems[idx % 10] + branches[idx % 12];
+  return stems[idx % 10] + branches[idx % 12] + "년";
 }
 
 /* 전역으로 쓰기 쉽게 */
