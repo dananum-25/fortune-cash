@@ -10,6 +10,10 @@ let maxPickCount = 3;
 let selectedTime = null;
 let selectedCategory = null;
 let revealedCards = {};
+let catArea;
+let catTextEl;
+let qArea;
+let tArea;
 /* =====================================================
 1. SOUND
 ===================================================== */
@@ -32,10 +36,6 @@ function play(sound){
 /* =====================================================
 2. QUESTION
 ===================================================== */
-let catArea;
-let catTextEl;
-let qArea;
-let tArea;
 
 const LABELS = {
   love:"연애", career:"직업 / 진로", money:"금전", relationship:"관계",
@@ -494,26 +494,21 @@ window.addEventListener("DOMContentLoaded", () => {
     qArea = document.getElementById("questionArea");
     tArea = document.getElementById("transitionArea");
 
+    const soundBtn = document.getElementById("soundToggle");
+    if(soundBtn){
+      soundBtn.onclick = () => {
+        muted = !muted;
+        soundBtn.textContent = muted ? "사운드 🔇" : "사운드 🔊";
+        muted ? bgm.pause() : bgm.play().catch(()=>{});
+      };
+    }
+
     renderQ();
 
   } catch (e) {
     console.error("INIT ERROR", e);
   }
 });
-    /* 사운드 버튼 초기화 */
-    const soundBtn = document.getElementById("soundToggle");
-    if(soundBtn){
-      soundBtn.onclick = () => {
-        muted = !muted;
-        soundBtn.textContent = muted ? "사운드 🔇" : "사운드 🔊";
-
-        if(!muted){
-          bgm.play().catch(()=>{});
-        }else{
-          bgm.pause();
-        }
-      };
-    }
 
     /* 상태 초기화 */
     document.body.classList.remove("lock-scroll");
@@ -532,14 +527,6 @@ window.addEventListener("DOMContentLoaded", () => {
     bigStage?.classList.add("hidden");
     spread?.classList.add("hidden");
     chat?.classList.add("hidden");
-
-    /* 질문 렌더 */
-    renderQ();
-
-  } catch (e) {
-    console.error("INIT ERROR", e);
-  }
-});
   
     
 
