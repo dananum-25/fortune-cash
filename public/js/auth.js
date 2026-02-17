@@ -9,11 +9,9 @@ console.log("[auth.js] loaded ✅");
 function normalizePhone(phone){
   return String(phone || "").replace(/[^0-9]/g, "");
 }
-
+window.lunarMap = {};
 function calcZodiac(birth){
   if(!birth) return "";
-
-  const y = Number(birth.split("-")[0]);
 
   const animals = [
     "쥐","소","호랑이","토끼",
@@ -21,7 +19,19 @@ function calcZodiac(birth){
     "원숭이","닭","개","돼지"
   ];
 
-  return animals[(y - 2020 + 120) % 12];
+  const [y,m,d] = birth.split("-").map(Number);
+  let zodiacYear = y;
+
+  const lunar = window.lunarMap?.[y];
+
+  if(lunar){
+    const [ly,lm,ld] = lunar.split("-").map(Number);
+    if(m < lm || (m === lm && d < ld)){
+      zodiacYear = y - 1;
+    }
+  }
+
+  return animals[(zodiacYear - 2020 + 120) % 12];
 }
 
 /* ---------- ENTRY MODAL ---------- */
@@ -195,7 +205,14 @@ window.addEventListener("DOMContentLoaded", async ()=>{
   document.getElementById("loginSubmit")?.addEventListener("click", handleSubmitLogin);
   document.getElementById("loginClose")?.addEventListener("click", closeLoginModal);
   document.getElementById("loginBtn")?.addEventListener("click", openLoginModal);
-
+async function loadLunar(){
+  try{
+    const r = await fetch("/data/lunar_new_year_1920_2026.json");
+    window.lunarMap = await r.json();
+  }catch(e){
+    console.log("lunar load skipped");
+  }
+}
   await syncUserFromServer();
   refreshTopBar();
   refreshPointCard();
