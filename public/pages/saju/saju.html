@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>사주 한마디</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="hero">🀄 사주 한마디</div>
+    <div class="subinfo" id="pointBox"></div>
+
+    <button class="mainBtn" id="btn">사주 한마디 보기</button>
+
+    <div class="resultBox" id="resultBox" style="display:none;"></div>
+
+    <button class="secondaryBtn" id="shareBtn">공유하고 포인트 받기</button>
+    <button class="secondaryBtn" onclick="Common.goHome()">허브로</button>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/db.js"></script>
+  <script src="/js/saju.js"></script>
+</body>
+</html>
