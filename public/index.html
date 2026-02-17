@@ -347,17 +347,16 @@ function activatePointCard(){
   if(!card) return;
 
   if(phone){
-    card.classList.remove("card-disabled");
-    card.classList.add("card-active");
-    card.onclick = ()=>{
-      location.href="/point.html";
-    };
-    });
-  }else{
-    card.onclick = ()=>{
-      alert("로그인 후 이용 가능합니다.");
-      openLoginModal();
-    };
+  card.classList.remove("card-disabled");
+  card.classList.add("card-active");
+  card.onclick = ()=>{
+    location.href="/point.html";
+  };
+}else{
+  card.onclick = ()=>{
+    alert("로그인 후 이용 가능합니다.");
+    openLoginModal();
+  };
   }
 }
   });
