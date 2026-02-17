@@ -2,7 +2,7 @@
    AUTH (auth.js)
 ========================================= */
 
-window.API_URL = window.API_URL || "https://script.google.com/macros/s/AKfycbxmgsOZ3_pBREO63VsXga861TRbcMyvfOFMfapW80H9IPMs5zcxNfdWlCbpK8N27QI/exec";
+window.API_URL = window.API_URL || "https://script.google.com/macros/s/AKfycbxOPPekB2KONL7o6zAPoZtg7aBPr9E70pzRAw7s-wYU6ScU6pBD41uLMMBez-wRW-y_6Q/exec";
 
 console.log("[auth.js] loaded ✅");
 
