@@ -7,8 +7,8 @@
 <title>무료 운세 플랫폼</title>
 
 <script async
-src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7356591276029815"
-crossorigin="anonymous"></script>
+  src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7356591276029815"
+  crossorigin="anonymous"></script>
 
 <style>
 body{
@@ -55,6 +55,7 @@ body{
   font-weight:bold;
 }
 
+/* modal */
 .modal{
   position:fixed;
   inset:0;
@@ -65,9 +66,7 @@ body{
   z-index:9999;
 }
 
-.hidden{
-  display:none;
-}
+.hidden{ display:none; }
 
 .card-disabled{
   opacity:0.4;
@@ -82,7 +81,7 @@ body{
 
 <body>
 
-<!-- USER BAR -->
+<!-- 상단 유저바 -->
 <div id="userBar" style="
 background:#1a1a1a;
 padding:10px 14px;
@@ -91,125 +90,99 @@ justify-content:space-between;
 align-items:center;
 font-size:14px;
 ">
+  <div id="userInfo">로그인 필요</div>
 
-<div id="userInfo">로그인 필요</div>
-
-<button id="loginBtn" style="
-border:none;
-background:#ffd56b;
-padding:6px 10px;
-border-radius:8px;
-font-weight:bold;
-">
-로그인
-</button>
-
+  <button id="loginBtn" style="
+    border:none;
+    background:#ffd56b;
+    padding:6px 10px;
+    border-radius:8px;
+    font-weight:bold;
+  ">로그인</button>
 </div>
 
 <div class="wrap">
+  <div class="title">🔮 무료 운세 플랫폼</div>
 
-<div class="title">🔮 무료 운세 플랫폼</div>
+  <div class="grid">
+    <div class="card"><img src="/assets/today_fortune.png"><div class="cardTitle">기간운세</div></div>
+    <div class="card"><img src="/assets/saju.png"><div class="cardTitle">사주</div></div>
+    <div class="card"><img src="/assets/tojung.png"><div class="cardTitle">토정비결</div></div>
+    <div class="card"><img src="/assets/star_fortune.png"><div class="cardTitle">별자리운세</div></div>
+    <div class="card"><img src="/assets/zodiac_fortune.png"><div class="cardTitle">띠별운세</div></div>
 
-<div class="grid">
+    <div class="card" onclick="location.href='/pages/tarot/tarot.html'">
+      <img src="/assets/tarot.png"><div class="cardTitle">타로</div>
+    </div>
 
-<div class="card"><img src="/assets/today_fortune.png"><div class="cardTitle">기간운세</div></div>
-<div class="card"><img src="/assets/saju.png"><div class="cardTitle">사주</div></div>
-<div class="card"><img src="/assets/tojung.png"><div class="cardTitle">토정비결</div></div>
-<div class="card"><img src="/assets/star_fortune.png"><div class="cardTitle">별자리운세</div></div>
-<div class="card"><img src="/assets/zodiac_fortune.png"><div class="cardTitle">띠별운세</div></div>
+    <div class="card"><img src="/assets/fortune_cookie.png"><div class="cardTitle">포춘쿠키</div></div>
+    <div class="card"><img src="/assets/mbti.png"><div class="cardTitle">MBTI</div></div>
+    <div class="card"><img src="/assets/mini_game.png"><div class="cardTitle">미니게임</div></div>
 
-<div class="card" onclick="location.href='/pages/tarot/tarot.html'">
-<img src="/assets/tarot.png">
-<div class="cardTitle">타로</div>
-</div>
+    <div id="pointCard" class="card card-disabled">
+      <img src="/assets/point.png"><div class="cardTitle">포인트</div>
+    </div>
 
-<div class="card"><img src="/assets/fortune_cookie.png"><div class="cardTitle">포춘쿠키</div></div>
-<div class="card"><img src="/assets/mbti.png"><div class="cardTitle">MBTI</div></div>
-<div class="card"><img src="/assets/mini_game.png"><div class="cardTitle">미니게임</div></div>
+    <div class="card"><img src="/assets/board.png"><div class="cardTitle">게시판</div></div>
+  </div>
 
-<div id="pointCard" class="card card-disabled">
-<img src="/assets/point.png">
-<div class="cardTitle">포인트</div>
-</div>
+  <!-- LOGIN MODAL (이것만 index에 둠) -->
+  <div id="loginModal" class="modal hidden">
+    <div style="
+      background:#1a1a1a;
+      padding:20px;
+      border-radius:16px;
+      width:90%;
+      max-width:320px;
+    ">
+      <h3>회원가입 / 로그인</h3>
 
-<div class="card"><img src="/assets/board.png"><div class="cardTitle">게시판</div></div>
+      <input id="loginName" placeholder="이름"
+        style="width:100%;padding:10px;margin-top:10px;border-radius:8px;border:none;">
 
-</div>
-</div>
+      <input id="loginPhone" placeholder="전화번호 (010xxxxxxxx)"
+        style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:none;">
 
-<!-- LOGIN MODAL -->
-<div id="loginModal" class="modal hidden">
-  <div style="
-    background:#1a1a1a;
-    padding:20px;
-    border-radius:16px;
-    width:90%;
-    max-width:320px;
+      <button id="loginSubmit" style="
+        width:100%;
+        padding:12px;
+        margin-top:12px;
+        border:none;
+        border-radius:10px;
+        background:#ffd56b;
+        font-weight:bold;
+      ">시작하기</button>
+
+      <button id="loginClose" style="
+        width:100%;
+        padding:12px;
+        margin-top:8px;
+        border:none;
+        border-radius:10px;
+        background:#2a2a2a;
+        color:white;
+      ">닫기</button>
+    </div>
+  </div>
+
+  <footer style="
+    margin-top:40px;
+    padding:20px 10px;
+    text-align:center;
+    font-size:12px;
+    opacity:0.7;
   ">
-
-    <h3>회원가입 / 로그인</h3>
-
-    <input id="loginName" placeholder="이름"
-      style="width:100%;padding:10px;margin-top:10px;border-radius:8px;border:none;">
-
-    <input id="loginPhone" placeholder="전화번호 (010xxxxxxxx)"
-      style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:none;">
-
-    <button id="loginSubmit" style="
-      width:100%;
-      padding:12px;
-      margin-top:12px;
-      border:none;
-      border-radius:10px;
-      background:#ffd56b;
-      font-weight:bold;">
-      시작하기
-    </button>
-
-    <button id="loginClose" style="
-      width:100%;
-      padding:12px;
-      margin-top:8px;
-      border:none;
-      border-radius:10px;
-      background:#2a2a2a;
-      color:white;">
-      닫기
-    </button>
-
-  </div>
+    <div>무료 운세 플랫폼</div>
+    <div>문의: daekoju@naver.com</div>
+    <div style="margin-top:8px;">
+      <a href="/privacy.html" style="color:#aaa;text-decoration:none;">개인정보처리방침</a> |
+      <a href="/terms.html" style="color:#aaa;text-decoration:none;">이용약관</a>
+    </div>
+  </footer>
 </div>
 
-<footer style="
-  margin-top:40px;
-  padding:20px 10px;
-  text-align:center;
-  font-size:12px;
-  opacity:0.7;
-">
-  <div>무료 운세 플랫폼</div>
-  <div>문의: daekoju@naver.com</div>
-
-  <div style="margin-top:8px;">
-    <a href="/privacy.html">개인정보처리방침</a> |
-    <a href="/terms.html">이용약관</a>
-  </div>
-</footer>
-
+<!-- ✅ 스크립트는 여기서만 로드 (inline 금지) -->
 <script src="/js/auth.js"></script>
 <script src="/js/points.js"></script>
-
-<script>
-document.addEventListener("DOMContentLoaded", ()=>{
-
-  const loginBtn = document.getElementById("loginBtn");
-
-  if(loginBtn){
-    loginBtn.onclick = openLoginModal;
-  }
-
-});
-</script>
-
 </body>
 </html>
