@@ -317,11 +317,10 @@ function renderUserBar(){
   const info = document.getElementById("userInfo");
 
   if(phone){
-    const points = localStorage.getItem("points") || "0";
-
-    info.textContent =
-`${name} (${phone}) | 현재 포인트 ${Number(points).toLocaleString()}점`;
-
+    loadMyPoint().then(points=>{
+  info.textContent =
+  `${name}님 | 현재 포인트 ${Number(points).toLocaleString()}점`;
+    
     loginBtn.textContent = "로그아웃";
 loginBtn.onclick = ()=>{
   localStorage.removeItem("phone");
