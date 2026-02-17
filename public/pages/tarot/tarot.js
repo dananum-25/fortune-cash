@@ -782,18 +782,3 @@ function loadUser(){
     streak:0
   };
 }
-
-  <div class="reading-end">
-    <button id="restartBtn">처음부터 다시하기</button>
-  
-  </div>
-  `;
-
-  chat.innerHTML += ui;
-
-  
-  document.getElementById("checkinBtn").onclick = doCheckin;
-
-  document.getElementById("restartBtn").onclick = ()=>{
-    location.reload();
-  };
