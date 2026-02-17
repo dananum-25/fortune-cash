@@ -22,15 +22,6 @@ const sFire   = new Audio("/sounds/tarot/fire.mp3");
 const sReveal = new Audio("/sounds/tarot/reveal.mp3");
 
 let muted = true;
-const soundBtn = document.getElementById("soundToggle");
-
-if(soundBtn){
-  soundBtn.onclick = () => {
-    muted = !muted;
-    soundBtn.textContent = muted ? "사운드 🔇" : "사운드 🔊";
-    muted ? bgm.pause() : bgm.play().catch(()=>{});
-  };
-}
 
 function play(sound){
   if(!muted){
@@ -495,8 +486,23 @@ async function movePickedToReorderFixed(pickedEls){
 /* =====================================================
 INIT
 ===================================================== */
-window.addEventListener("load", () => {
-  try {
+window.addEventListener("DOMContentLoaded", () => {
+  const soundBtn = document.getElementById("soundToggle");
+
+  if(soundBtn){
+    soundBtn.onclick = () => {
+      muted = !muted;
+      soundBtn.textContent = muted ? "사운드 🔇" : "사운드 🔊";
+
+      if(!muted){
+        bgm.play().catch(()=>{});
+      }else{
+        bgm.pause();
+      }
+    };
+  }
+});
+  
     document.body.classList.remove("lock-scroll");
 
     // 화면 초기화(혹시 이전 상태 남아있을 수 있으니)
