@@ -55,19 +55,6 @@ body{
   font-weight:bold;
 }
 
-/* footer */
-.footer{
-  text-align:center;
-  margin-top:30px;
-  font-size:13px;
-  opacity:0.7;
-}
-
-.footer a{
-  color:#aaa;
-  text-decoration:none;
-}
-
 .modal{
   position:fixed;
   inset:0;
@@ -90,55 +77,12 @@ body{
 .card-active{
   border:2px solid #ffd56b;
 }
-  
 </style>
 </head>
 
 <body>
-<!-- ENTRY MODAL -->
-<div id="entryModal" class="modal">
 
-  <div style="
-  background:#1a1a1a;
-  padding:20px;
-  border-radius:16px;
-  width:90%;
-  max-width:320px;
-  text-align:center;
-  ">
-
-    <h3>이용 방법 선택</h3>
-    <p style="opacity:.7;font-size:14px;">
-      앱테크 참여 또는 비회원 이용이 가능합니다
-    </p>
-
-    <button id="startApptech" style="
-      width:100%;
-      padding:14px;
-      margin-top:12px;
-      border-radius:12px;
-      border:none;
-      background:#ffd56b;
-      font-weight:bold;
-    ">
-      앱테크 시작하기
-    </button>
-
-    <button id="startGuest" style="
-      width:100%;
-      padding:14px;
-      margin-top:10px;
-      border-radius:12px;
-      border:none;
-      background:#2a2a2a;
-      color:white;
-    ">
-      그냥 운세 보기
-    </button>
-
-  </div>
-</div>
-
+<!-- USER BAR -->
 <div id="userBar" style="
 background:#1a1a1a;
 padding:10px 14px;
@@ -161,70 +105,38 @@ font-weight:bold;
 </button>
 
 </div>
-  
+
 <div class="wrap">
 
 <div class="title">🔮 무료 운세 플랫폼</div>
 
 <div class="grid">
 
-<div class="card">
-<img src="/assets/today_fortune.png">
-<div class="cardTitle">기간운세</div>
-</div>
-
-<div class="card">
-<img src="/assets/saju.png">
-<div class="cardTitle">사주</div>
-</div>
-
-<div class="card">
-<img src="/assets/tojung.png">
-<div class="cardTitle">토정비결</div>
-</div>
-
-<div class="card">
-<img src="/assets/star_fortune.png">
-<div class="cardTitle">별자리운세</div>
-</div>
-
-<div class="card">
-<img src="/assets/zodiac_fortune.png">
-<div class="cardTitle">띠별운세</div>
-</div>
+<div class="card"><img src="/assets/today_fortune.png"><div class="cardTitle">기간운세</div></div>
+<div class="card"><img src="/assets/saju.png"><div class="cardTitle">사주</div></div>
+<div class="card"><img src="/assets/tojung.png"><div class="cardTitle">토정비결</div></div>
+<div class="card"><img src="/assets/star_fortune.png"><div class="cardTitle">별자리운세</div></div>
+<div class="card"><img src="/assets/zodiac_fortune.png"><div class="cardTitle">띠별운세</div></div>
 
 <div class="card" onclick="location.href='/pages/tarot/tarot.html'">
 <img src="/assets/tarot.png">
 <div class="cardTitle">타로</div>
 </div>
 
-<div class="card">
-<img src="/assets/fortune_cookie.png">
-<div class="cardTitle">포춘쿠키</div>
-</div>
-
-<div class="card">
-<img src="/assets/mbti.png">
-<div class="cardTitle">MBTI</div>
-</div>
-
-<div class="card">
-<img src="/assets/mini_game.png">
-<div class="cardTitle">미니게임</div>
-</div>
+<div class="card"><img src="/assets/fortune_cookie.png"><div class="cardTitle">포춘쿠키</div></div>
+<div class="card"><img src="/assets/mbti.png"><div class="cardTitle">MBTI</div></div>
+<div class="card"><img src="/assets/mini_game.png"><div class="cardTitle">미니게임</div></div>
 
 <div id="pointCard" class="card card-disabled">
 <img src="/assets/point.png">
 <div class="cardTitle">포인트</div>
 </div>
 
-<div class="card">
-<img src="/assets/board.png">
-<div class="cardTitle">게시판</div>
-</div>
+<div class="card"><img src="/assets/board.png"><div class="cardTitle">게시판</div></div>
 
 </div>
-  
+</div>
+
 <!-- LOGIN MODAL -->
 <div id="loginModal" class="modal hidden">
   <div style="
@@ -268,7 +180,6 @@ font-weight:bold;
   </div>
 </div>
 
-<!-- footer -->
 <footer style="
   margin-top:40px;
   padding:20px 10px;
@@ -284,9 +195,10 @@ font-weight:bold;
     <a href="/terms.html">이용약관</a>
   </div>
 </footer>
-  
+
 <script src="/js/auth.js"></script>
 <script src="/js/points.js"></script>
+
 <script>
 document.addEventListener("DOMContentLoaded", ()=>{
 
@@ -298,6 +210,6 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
 });
 </script>
-      
+
 </body>
 </html>
