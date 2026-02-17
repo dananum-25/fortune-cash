@@ -55,7 +55,6 @@ body{
   font-weight:bold;
 }
 
-/* modal */
 .modal{
   position:fixed;
   inset:0;
@@ -81,7 +80,6 @@ body{
 
 <body>
 
-<!-- 상단 유저바 -->
 <div id="userBar" style="
 background:#1a1a1a;
 padding:10px 14px;
@@ -115,6 +113,12 @@ font-size:14px;
       <img src="/assets/tarot.png"><div class="cardTitle">타로</div>
     </div>
 
+    <!-- 🔥 손금 카드 추가 -->
+    <div class="card" onclick="location.href='/pages/palm/palm.html'">
+      <img src="/assets/palm.png">
+      <div class="cardTitle">손금</div>
+    </div>
+
     <div class="card"><img src="/assets/fortune_cookie.png"><div class="cardTitle">포춘쿠키</div></div>
     <div class="card"><img src="/assets/mbti.png"><div class="cardTitle">MBTI</div></div>
     <div class="card"><img src="/assets/mini_game.png"><div class="cardTitle">미니게임</div></div>
@@ -126,7 +130,7 @@ font-size:14px;
     <div class="card"><img src="/assets/board.png"><div class="cardTitle">게시판</div></div>
   </div>
 
-  <!-- LOGIN MODAL (이것만 index에 둠) -->
+  <!-- LOGIN MODAL -->
   <div id="loginModal" class="modal hidden">
     <div style="
       background:#1a1a1a;
@@ -181,7 +185,6 @@ font-size:14px;
   </footer>
 </div>
 
-<!-- ✅ 스크립트는 여기서만 로드 (inline 금지) -->
 <script src="/js/auth.js"></script>
 <script src="/js/points.js"></script>
 </body>
