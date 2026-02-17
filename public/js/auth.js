@@ -232,16 +232,23 @@ async function syncUserFromServer(){
   const phone = localStorage.getItem("phone");
   if(!phone) return;
 
-  const res = await fetch(API_URL,{
-    method:"POST",
-    body:JSON.stringify({
-      action:"getUser",
-      phone
-    })
-  }).then(r=>r.json());
+  try{
+    const r = await fetch(API_URL,{
+      method:"POST",
+      headers: { "Content-Type":"text/plain;charset=utf-8" },
+      body:JSON.stringify({ action:"getUser", phone })
+    });
 
-  if(res.status === "ok"){
-    localStorage.setItem("points", res.points || 0);
-    localStorage.setItem("name", res.name || "");
+    const txt = await r.text();
+    console.log("[getUser] raw:", txt);
+
+    const res = JSON.parse(txt);
+
+    if(res.status === "ok"){
+      localStorage.setItem("points", String(res.points || 0));
+      localStorage.setItem("name", String(res.name || ""));
+    }
+  }catch(e){
+    console.error("[syncUserFromServer] failed:", e);
   }
 }
