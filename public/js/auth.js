@@ -121,7 +121,20 @@ function refreshPointCard(){
 async function handleSubmitLogin(){
   const name = document.getElementById("loginName").value.trim();
   const phone = normalizePhone(document.getElementById("loginPhone").value.trim());
+  const birth = document.getElementById("loginBirth").value;
+const zodiac = calcZodiac(birth);
 
+await fetch(API_URL,{
+  method:"POST",
+  headers:{ "Content-Type":"text/plain;charset=utf-8" },
+  body: JSON.stringify({
+    action:"register",
+    phone,
+    name,
+    birth,
+    zodiac
+  })
+});
   if(!name || !phone){
     alert("이름과 전화번호를 입력해주세요.");
     return;
