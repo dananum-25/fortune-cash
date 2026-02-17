@@ -154,8 +154,18 @@ z-index:9999;
     <input id="loginPhone" placeholder="전화번호 (010xxxxxxxx)"
       style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:none;">
 
-    <input id="loginBirth" type="date"
-      style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:none;">
+    <div style="font-size:12px;opacity:.8;margin-top:8px;">
+사주·운세 서비스 이용을 위해 생년월일을 정확히 입력해주세요
+</div>
+
+<select id="birthType"
+  style="width:100%;padding:10px;margin-top:6px;border-radius:8px;border:none;">
+  <option value="solar">양력</option>
+  <option value="lunar">음력</option>
+</select>
+
+<input id="loginBirth" type="date"
+  style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:none;">
 
     <!-- CAPTCHA -->
     <div style="margin-top:10px;">
