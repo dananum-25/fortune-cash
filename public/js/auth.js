@@ -144,8 +144,7 @@ async function handleSubmitLogin(){
   const name = (nameEl?.value || "").trim();
   const phone = normalizePhone((phoneEl?.value || "").trim());
   const birth = (birthEl?.value || "").trim();
-  const token = grecaptcha.getResponse();
-console.log("captcha token:", token);
+  
   if(!name || !phone){
     alert("이름과 전화번호를 입력해주세요.");
     return;
