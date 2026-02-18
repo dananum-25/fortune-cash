@@ -186,19 +186,27 @@ let serverRes = null;
 try{
   alert("회원가입 처리 중...");
 
-  const r = await fetch(window.API_URL,{
-    method:"POST",
-    headers:{ "Content-Type":"text/plain;charset=utf-8" },
-    body: JSON.stringify({
-      action:"register",
-      phone,
-      name,
-      birth,
-      zodiac,
-      gapja,
-      apptech: true
-    })
-  });
+const token = grecaptcha.getResponse();
+
+if(!token){
+  alert("로봇이 아님을 확인해주세요.");
+  return;
+}
+
+await fetch(window.API_URL,{
+  method:"POST",
+  headers:{ "Content-Type":"text/plain;charset=utf-8" },
+  body: JSON.stringify({
+    action:"register",
+    phone,
+    name,
+    birth,
+    zodiac,
+    gapja,
+    token,
+    apptech: true
+  })
+});
 
   const txt = await r.text();
   serverRes = JSON.parse(txt);
