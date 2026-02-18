@@ -186,10 +186,11 @@ let serverRes = null;
 try{
   alert("회원가입 처리 중...");
 
+const widget = document.querySelector(".g-recaptcha");
 const token = grecaptcha.getResponse();
 
 if(!token){
-  alert("로봇이 아님을 확인해주세요.");
+  alert("reCAPTCHA 확인을 먼저 해주세요.");
   return;
 }
 
