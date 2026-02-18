@@ -197,7 +197,6 @@ if(!token){
 
 const r = await fetch(window.API_URL,{
   method:"POST",
-  headers:{ "Content-Type":"application/json" },
   body: JSON.stringify({
     action:"register",
     phone,
@@ -205,11 +204,10 @@ const r = await fetch(window.API_URL,{
     birth,
     zodiac,
     gapja,
-    token,
-    apptech: true
+    token
   })
 });
-
+   
 const txt = await r.text();
 serverRes = JSON.parse(txt);
 
