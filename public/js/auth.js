@@ -193,7 +193,7 @@ if(!token){
   return;
 }
 
-await fetch(window.API_URL,{
+const r = await fetch(window.API_URL,{
   method:"POST",
   headers:{ "Content-Type":"text/plain;charset=utf-8" },
   body: JSON.stringify({
@@ -208,8 +208,8 @@ await fetch(window.API_URL,{
   })
 });
 
-  const txt = await r.text();
-  serverRes = JSON.parse(txt);
+const txt = await r.text();
+serverRes = JSON.parse(txt);
 
 }catch(e){
   console.log("[register] network error:", e);
