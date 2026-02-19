@@ -173,6 +173,19 @@ async function handleSubmitLogin(){
     ? window.BirthUtil.calcGapjaByIpchun(birth)
     : "";
 
+  // ✅ reCAPTCHA 로드 여부 확인
+  if(typeof grecaptcha === "undefined"){
+    alert("reCAPTCHA가 아직 로드되지 않았어요. 잠시 후 다시 시도해주세요.");
+    return;
+  }
+
+  // ✅ 토큰은 처리중 표시 전에 먼저 확인 (버튼 멈춤 방지)
+  const token = grecaptcha.getResponse();
+  if(!token){
+    alert("reCAPTCHA 확인을 먼저 해주세요.");
+    return;
+  }
+
   // ✅ UX: 처리중 표시
   const prevText = submitBtn ? submitBtn.textContent : "";
   if(submitBtn){
@@ -180,60 +193,53 @@ async function handleSubmitLogin(){
     submitBtn.textContent = "처리 중…";
   }
 
-  // ✅ 서버에 회원가입/로그인 저장 시도 (응답 확인)
-let serverRes = null;
+  let serverRes = null;
 
-try{
-  alert("회원가입 처리 중...");
+  try{
+    alert("회원가입 처리 중...");
 
-const widget = document.querySelector(".g-recaptcha");
-const token = grecaptcha.getResponse();
+    const r = await fetch(window.API_URL,{
+      method:"POST",
+      headers:{ "Content-Type":"text/plain;charset=utf-8" },
+      body: JSON.stringify({
+        action:"register",
+        phone,
+        name,
+        birth,
+        zodiac,
+        gapja,
+        token
+      })
+    });
 
-if(!token){
-  alert("reCAPTCHA 확인을 먼저 해주세요.");
-  return;
-}
+    const txt = await r.text();
+    serverRes = JSON.parse(txt);
 
-const r = await fetch(window.API_URL,{
-  method:"POST",
-  headers:{ "Content-Type":"text/plain;charset=utf-8" },
-  body: JSON.stringify({
-    action:"register",
-    phone,
-    name,
-    birth,
-    zodiac,
-    gapja,
-    token
-  })
-});
-   
-const txt = await r.text();
-serverRes = JSON.parse(txt);
+  }catch(e){
+    console.log("[register] network error:", e);
+  }finally{
+    // ✅ 버튼 복구는 무조건 실행
+    if(submitBtn){
+      submitBtn.disabled = false;
+      submitBtn.textContent = prevText || "시작하기";
+    }
+    // ✅ 토큰은 1회성이라 요청 후 리셋 권장
+    try{ grecaptcha.reset(); }catch(e){}
+  }
 
-}catch(e){
-  console.log("[register] network error:", e);
-}
-
-if(serverRes?.status === "ok"){
-  alert("회원가입 성공 (시트 저장 완료)");
-}else if(serverRes?.status === "exists"){
-  alert("이미 가입된 번호입니다. 로그인 처리됩니다.");
-}else if(serverRes?.status === "captcha_fail"){
-  alert("captcha 검증 실패");
-}else{
-  alert("서버 저장 실패 (로그인은 유지됨)");
-}
-
-  // ✅ 버튼 복구
-  if(submitBtn){
-    submitBtn.disabled = false;
-    submitBtn.textContent = prevText || "시작하기";
+  if(serverRes?.status === "ok"){
+    alert("회원가입 성공 (시트 저장 완료)");
+  }else if(serverRes?.status === "exists"){
+    alert("이미 가입된 번호입니다. 로그인 처리됩니다.");
+  }else if(serverRes?.status === "captcha_fail"){
+    alert("captcha 검증 실패");
+  }else{
+    alert("서버 저장 실패 (로그인은 유지됨)");
   }
 
   // ✅ 서버 응답에 따른 안내
   if(serverRes?.status === "captcha_fail"){
-    alert("서버 보안 검증 실패(captcha). 아직 프론트 captcha 미적용이면 서버에서 captcha 체크를 잠시 끄거나, 토큰을 붙여야 합니다.");
+    alert("서버 보안 검증 실패(captcha). 서버(Apps Script)에서 secret으로 siteverify 검증이 통과해야 합니다.");
     return;
   }
   if(serverRes?.status === "invalid"){
@@ -247,7 +253,6 @@ if(serverRes?.status === "ok"){
 
   // ✅ exists(이미 가입)도 “로그인 성공” 처리
   if(serverRes?.status === "exists" || serverRes?.status === "ok"){
-    // 로컬 저장 (서버 ok/exists일 때만 확정)
     localStorage.setItem("name", name);
     localStorage.setItem("phone", phone);
     localStorage.setItem("birth", birth);
@@ -267,18 +272,15 @@ if(serverRes?.status === "ok"){
       alert("회원가입 완료 ✅");
     }
 
-    // 서버값으로 최종 보정 (포인트 등)
     await syncUserFromServer();
     return;
   }
 
-  // 그 외 알 수 없는 상태
   alert("서버 응답이 예상과 달라 저장이 확인되지 않았어요. (status: " + String(serverRes?.status || "unknown") + ")");
 }
 
 /* ---------- INIT ---------- */
 window.addEventListener("DOMContentLoaded", async ()=>{
-  // ✅ 입춘DB를 미리 로드 (계산 즉시 가능)
   try{
     if(window.BirthUtil?.loadIpchunDB){
       window.BirthUtil.loadIpchunDB();
@@ -295,3 +297,5 @@ window.addEventListener("DOMContentLoaded", async ()=>{
   refreshTopBar();
   refreshPointCard();
 });
+
+auth.js
