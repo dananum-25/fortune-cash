@@ -253,8 +253,9 @@ function verifyRecaptcha(token){
 
   // ✅ 서버 응답에 따른 안내
   if(serverRes?.status === "captcha_fail"){
-    alert("서버 보안 검증 실패(captcha). 서버(Apps Script)에서 secret으로 siteverify 검증이 통과해야 합니다.");
-    return;
+  const codes = serverRes?.captcha?.["error-codes"] || [];
+  alert("captcha_fail\n" + JSON.stringify(codes) + "\n\n" + JSON.stringify(serverRes));
+  return;
   }
   if(serverRes?.status === "invalid"){
     alert("서버에서 invalid 응답. action/파라미터 이름을 확인해주세요.");
