@@ -227,15 +227,29 @@ async function handleSubmitLogin(){
     try{ grecaptcha.reset(); }catch(e){}
   }
 
-  if(serverRes?.status === "ok"){
-    alert("회원가입 성공 (시트 저장 완료)");
-  }else if(serverRes?.status === "exists"){
-    alert("이미 가입된 번호입니다. 로그인 처리됩니다.");
-  }else if(serverRes?.status === "captcha_fail"){
-    alert("captcha 검증 실패");
-  }else{
-    alert("서버 저장 실패 (로그인은 유지됨)");
+function verifyRecaptcha(token){
+  if(!token) return { ok:false, data:{ "error-codes":["missing-input-response"] } };
+
+  try{
+    const res = UrlFetchApp.fetch(
+      "https://www.google.com/recaptcha/api/siteverify",
+      {
+        method:"post",
+        payload:{
+          secret: SECRET_KEY,
+          response: token
+        },
+        muteHttpExceptions: true
+      }
+    );
+
+    const data = JSON.parse(res.getContentText());
+    return { ok: data.success === true, data };
+
+  }catch(e){
+    return { ok:false, data:{ "error-codes":["verify-exception", String(e)] } };
   }
+}
 
   // ✅ 서버 응답에 따른 안내
   if(serverRes?.status === "captcha_fail"){
