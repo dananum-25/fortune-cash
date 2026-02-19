@@ -311,5 +311,3 @@ window.addEventListener("DOMContentLoaded", async ()=>{
   refreshTopBar();
   refreshPointCard();
 });
-
-auth.js
