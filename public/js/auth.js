@@ -6,7 +6,7 @@
  - points key unify: "point"
 ========================================= */
 
-window.API_URL = window.API_URL || "https://script.google.com/macros/s/AKfycbxOPPekB2KONL7o6zAPoZtg7aBPr9E70pzRAw7s-wYU6ScU6pBD41uLMMBez-wRW-y_6Q/exec";
+window.API_URL = window.API_URL || "https://script.google.com/macros/s/AKfycbw_wFj8bToTFO70jDSSi9dxnLVWVnMQToApcZ_ILz-WvfJpCgLe4qPius0HFfR8hjfy3g/exec";
 
 console.log("[auth.js] loaded ✅");
 
