@@ -6,12 +6,7 @@
  - points key unify: "point"
 ========================================= */
 
-// ✅ 전역 설정(단 한 번만)
-window.APP_CONFIG = window.APP_CONFIG || {};
-window.APP_CONFIG.API_URL = window.APP_CONFIG.API_URL || 
-  "https://script.google.com/macros/s/AKfycbxV49VtrO-fV68nmPLsZFYZnDp6F8OwDFGaOe3Kj_Syi6LW7znJ5dHlHx5ZgK3uNlClZw/exec";
-
-// ✅ 하위 코드들은 이 함수를 통해 URL을 가져감 (다른 파일도 동일하게 사용 가능)
+// ✅ config.js에서 설정을 가져오기만 함 (여기서 정의하지 않음)
 window.getApiUrl = window.getApiUrl || function () {
   return window.APP_CONFIG?.API_URL || "";
 };
@@ -19,7 +14,7 @@ window.getApiUrl = window.getApiUrl || function () {
 console.log("[auth.js] loaded ✅", window.getApiUrl());
 
 function normalizePhone(phone){
-return String(phone || "").replace(/[^0-9]/g, "");
+  return String(phone || "").replace(/[^0-9]/g, "");
 }
 
 /* ---------- ENTRY MODAL ---------- */
