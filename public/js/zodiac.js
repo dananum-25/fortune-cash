@@ -1,67 +1,58 @@
-const zodiacAnimals = ["쥐","소","호랑이","토끼","용","뱀","말","양","원숭이","닭","개","돼지"];
-const zodiacKeyMap = {
-  "쥐":"rat","소":"ox","호랑이":"tiger","토끼":"rabbit","용":"dragon","뱀":"snake",
-  "말":"horse","양":"sheep","원숭이":"monkey","닭":"rooster","개":"dog","돼지":"pig"
-};
-
-let currentZodiac = null;
 let zodiacDB = {};
-let lunarMap = {};
+let rewarded = false;
 
-function calcZodiacFromBirth(yyyy, mm, dd){
-  let zodiacYear = yyyy;
+async function loadDB(){
+  zodiacDB = await fetch("/data/zodiac_2026.json").then(r=>r.json());
+}
 
-  const lunar = lunarMap?.[yyyy];
-  if(lunar){
-    const [ly,lm,ld] = lunar.split("-").map(Number);
-    if(mm < lm || (mm === lm && dd < ld)){
-      zodiacYear = yyyy - 1;
+function ensureLogin(){
+  const phone = localStorage.getItem("phone");
+  if(!phone){
+    alert("로그인 후 이용 가능합니다.");
+    if(window.openLoginModal) openLoginModal();
+    return false;
+  }
+  return true;
+}
+
+function renderGuide(){
+  document.getElementById("guideBox").innerHTML = `
+    <h3>🔎 해석 가이드</h3>
+    <p>
+    띠별 운세는 한 해의 흐름을 참고하는 자료입니다.
+    좋은 운은 적극 활용하고, 조심해야 할 시기는 신중하게 대응하세요.
+    </p>
+  `;
+}
+
+function showZodiac(){
+  if(!ensureLogin()) return;
+
+  const value = document.getElementById("zodiacSelect").value;
+  const arr = zodiacDB?.[value] || [];
+
+  const text = arr.length ? arr[Math.floor(Math.random()*arr.length)] :
+    "운세 데이터가 준비되지 않았습니다.";
+
+  document.getElementById("resultBox").innerHTML = `
+    <h2>${document.getElementById("zodiacSelect").selectedOptions[0].text} 2026년 운세</h2>
+    <p>${text}</p>
+  `;
+
+  renderGuide();
+
+  document.getElementById("resultSection").style.display = "block";
+
+  if(!rewarded){
+    rewarded = true;
+    if(window.rewardContent){
+      rewardContent("zodiac");
     }
   }
-
-  // 2020 = 쥐 기준
-  const zodiacIndex = (zodiacYear - 2020 + 120) % 12;
-  return zodiacAnimals[zodiacIndex];
 }
 
 document.addEventListener("DOMContentLoaded", async ()=>{
-  Common.renderPoint();
-  document.getElementById("shareBtn").onclick = Common.shareAndReward;
-
-  zodiacDB = await DB.loadJSON("/data/zodiac_fortunes_ko_2026.json");
-  lunarMap  = await DB.loadJSON("/data/lunar_new_year_1920_2026.json");
-
-  const birthInput = document.getElementById("birthInput");
-  birthInput.addEventListener("change", ()=>{
-    if(!birthInput.value) return;
-    const [y,m,d] = birthInput.value.split("-").map(Number);
-
-    currentZodiac = calcZodiacFromBirth(y,m,d);
-
-    const name = (document.getElementById("name").value || "").trim() || "선택한 생년월일";
-    document.getElementById("zodiacResult").innerText =
-      `음력을 적용한 ${name}님은 ${currentZodiac}띠 입니다`;
-  });
-
-  document.getElementById("btn").onclick = ()=>{
-    const box = document.getElementById("resultBox");
-    if(!currentZodiac){
-      alert("생년월일을 먼저 입력해주세요.");
-      return;
-    }
-
-    const zodiacKey = zodiacKeyMap[currentZodiac];
-    const arr = zodiacDB?.[zodiacKey]?.today || [];
-    const todayKey = new Date().toISOString().slice(0,10);
-    const storageKey = "zodiac_" + currentZodiac + "_" + todayKey;
-
-    let msg = localStorage.getItem(storageKey);
-    if(!msg){
-      msg = arr[Math.floor(Math.random()*arr.length)] || "오늘은 균형이 중요한 날이에요.";
-      localStorage.setItem(storageKey, msg);
-    }
-
-    box.style.display = "block";
-    box.innerHTML = `<b>${currentZodiac}띠 운세</b><br><br>${msg}`;
-  };
+  await loadDB();
+  if(window.loadMyPoint) await loadMyPoint();
+  if(window.Common?.renderPoint) Common.renderPoint();
 });
