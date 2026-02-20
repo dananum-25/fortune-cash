@@ -45,6 +45,26 @@ button{
   font-weight:bold;
   cursor:pointer;
 }
+
+.row{
+  display:flex;
+  gap:10px;
+  margin-top:12px;
+}
+
+button.secondary{
+  background:#2a2a2a;
+  color:white;
+  font-weight:normal;
+}
+
+.small{
+  font-size:12px;
+  opacity:.75;
+  margin-top:8px;
+  line-height:1.4;
+  word-break:break-word;
+}
 </style>
 </head>
 
@@ -56,6 +76,14 @@ button{
 <h2>🎁 내 포인트</h2>
 <div id="userInfo">로그인 필요</div>
 <div id="pointBox" class="point">0점</div>
+
+<div id="metaLine" class="small"></div>
+
+<div class="row">
+  <button id="btnCheckin">출석 체크 (+10)</button>
+  <button id="btnUse" class="secondary">컨텐츠 이용 (+1)</button>
+</div>
+
 </div>
 
 <div class="card">
@@ -77,35 +105,50 @@ button{
 
 </div>
 
-<script>
-const API_URL = "https://script.google.com/macros/s/AKfycbxV49VtrO-fV68nmPLsZFYZnDp6F8OwDFGaOe3Kj_Syi6LW7znJ5dHlHx5ZgK3uNlClZw/exec";
+<!-- ✅ 중요: auth.js가 API_URL(전역 설정)을 가지고 있으니 먼저 로드 -->
+<script src="/js/auth.js"></script>
+<script src="/js/points.js"></script>
 
-async function loadPoint(){
+<script>
+async function renderPoint(){
   const phone = localStorage.getItem("phone");
-  const name = localStorage.getItem("name");
+  const name = localStorage.getItem("name") || "회원";
 
   if(!phone){
     document.getElementById("userInfo").textContent = "로그인 필요";
+    document.getElementById("pointBox").textContent = "0점";
+    document.getElementById("metaLine").textContent = "메인에서 로그인 후 이용 가능합니다.";
     return;
   }
 
-  const res = await fetch(API_URL,{
-    method:"POST",
-    body:JSON.stringify({
-      action:"getUser",
-      phone
-    })
-  }).then(r=>r.json());
+  document.getElementById("userInfo").textContent = `${name}님`;
 
-  if(res.status === "ok"){
-    document.getElementById("userInfo").textContent =
-      `${res.name}님`;
-    document.getElementById("pointBox").textContent =
-      res.points.toLocaleString() + "점";
-  }
+  // ✅ points.js의 공용 함수 사용
+  const p = await window.loadMyPoint?.();
+
+  const num = Number(p);
+  document.getElementById("pointBox").textContent =
+    (Number.isFinite(num) ? num.toLocaleString() : "0") + "점";
+
+  // 표시용 메타
+  document.getElementById("metaLine").textContent =
+    "전화번호: " + phone + " · (API 공유: auth.js)";
 }
 
-loadPoint();
+// 버튼 이벤트
+document.getElementById("btnCheckin")?.addEventListener("click", async ()=>{
+  await window.checkinPoint?.();
+  await renderPoint();
+});
+
+document.getElementById("btnUse")?.addEventListener("click", async ()=>{
+  // addPoint +1
+  await window.givePoint?.();
+  await renderPoint();
+});
+
+// 최초 로드
+renderPoint();
 </script>
 
 </body>
