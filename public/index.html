@@ -4,12 +4,16 @@
 <meta charset="UTF-8">
 <meta name="google-adsense-account" content="ca-pub-7356591276029815">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>무료 운세 플랫폼</title>
+<title>무료 운세 플랫폼 | 오늘 운세 · 띠별 · 별자리 · 타로</title>
+
+<meta name="description" content="오늘 운세, 띠별 운세, 별자리 운세, 타로, 손금, 토정비결을 무료로 제공합니다. 앱테크 포인트 적립 기능까지 함께 이용하세요.">
 
 <script async
 src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7356591276029815"
 crossorigin="anonymous"></script>
+
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
 <style>
 body{ margin:0;background:#111;color:white;font-family:Arial; }
 .wrap{ max-width:420px;margin:auto;padding:20px; }
@@ -18,31 +22,12 @@ body{ margin:0;background:#111;color:white;font-family:Arial; }
 .card{ background:#1a1a1a;border-radius:16px;padding:12px;cursor:pointer; }
 .card img{ width:100%;border-radius:10px; }
 .cardTitle{ text-align:center;margin-top:8px;font-weight:bold; }
-
-footer{
-margin-top:40px;
-padding:20px 10px;
-text-align:center;
-font-size:12px;
-opacity:0.7;
-}
-
-footer a{
-color:#aaa;
-text-decoration:none;
-}
-
-.modal{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.8);
-display:flex;
-justify-content:center;
-align-items:center;
-z-index:9999;
-}
+section{ margin-bottom:25px; }
+h1,h2{ color:#ffd56b; }
+footer{margin-top:40px;padding:20px 10px;text-align:center;font-size:12px;opacity:0.7;}
+footer a{color:#aaa;text-decoration:none;}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;justify-content:center;align-items:center;z-index:9999;}
 .hidden{ display:none; }
-
 .card-disabled{ opacity:0.4;cursor:not-allowed; }
 .card-active{ border:2px solid #ffd56b; }
 </style>
@@ -56,7 +41,34 @@ z-index:9999;
 </div>
 
 <div class="wrap">
-<div class="title">🔮 무료 운세 플랫폼</div>
+
+<h1>🔮 무료 운세 플랫폼</h1>
+
+<section>
+<h2>오늘의 운세부터 연간 운세까지</h2>
+<p>
+이곳은 오늘 운세, 띠별 운세, 별자리 운세, 타로, 손금, 토정비결 등
+다양한 무료 운세 서비스를 제공하는 플랫폼입니다.
+운세는 절대적인 미래 예언이 아니라,
+현재의 흐름을 참고하는 방향 제시 도구입니다.
+</p>
+
+<p>
+좋은 흐름은 적극적으로 활용하고,
+조심해야 할 시기는 신중한 선택으로 지혜롭게 넘어가세요.
+무료 운세 서비스를 통해 하루의 기운을 확인하고,
+연간운세로 큰 흐름을 파악해보세요.
+</p>
+</section>
+
+<section>
+<h2>앱테크와 함께하는 운세</h2>
+<p>
+회원가입 후 운세를 이용하면 포인트가 적립됩니다.
+출석 체크, 운세 이용, 공유 활동을 통해 포인트를 모을 수 있으며,
+일정 포인트 이상 적립 시 출금이 가능합니다.
+</p>
+</section>
 
 <div class="grid">
 
@@ -100,99 +112,21 @@ z-index:9999;
 <div class="cardTitle">포춘쿠키</div>
 </div>
 
-<div class="card" onclick="location.href='/pages/mbti/mbti.html'">
-<img src="/assets/mbti.png">
-<div class="cardTitle">MBTI</div>
-</div>
-
-<div class="card" onclick="location.href='https://game-time-kappa.vercel.app/'">
-<img src="/assets/mini_game.png">
-<div class="cardTitle">미니게임</div>
-</div>
-
 <div id="pointCard" class="card">
 <img src="/assets/point.png">
 <div class="cardTitle">포인트</div>
 </div>
 
-<div class="card">
-<img src="/assets/board.png">
-<div class="cardTitle">게시판</div>
 </div>
 
-</div>
+<section>
+<h2>자주 묻는 질문</h2>
+<p><strong>Q. 무료 운세는 믿을 수 있나요?</strong><br>
+무료 운세는 참고 자료로 활용하는 것이 좋습니다. 개인의 선택과 행동이 가장 중요합니다.</p>
 
-<!-- ENTRY MODAL -->
-<div id="entryModal" class="modal hidden">
-<div style="background:#1a1a1a;padding:20px;border-radius:16px;width:90%;max-width:320px;">
-<h3>이용 방식 선택</h3>
-
-<button id="startGuest" style="width:100%;padding:12px;margin-top:10px;border:none;border-radius:10px;background:#2a2a2a;color:white;">
-비회원으로 보기
-</button>
-
-<button id="startApptech" style="width:100%;padding:12px;margin-top:8px;border:none;border-radius:10px;background:#ffd56b;font-weight:bold;">
-앱테크 시작
-</button>
-</div>
-</div>
-
-<!-- LOGIN MODAL -->
-<div id="loginModal" class="modal hidden">
-  <div style="
-    background:#1a1a1a;
-    padding:20px;
-    border-radius:16px;
-    width:90%;
-    max-width:320px;
-  ">
-    <h3>회원가입 / 로그인</h3>
-
-    <input id="loginName" placeholder="이름"
-      style="width:100%;padding:10px;margin-top:10px;border-radius:8px;border:none;">
-
-    <input id="loginPhone" placeholder="전화번호 (010xxxxxxxx)"
-      style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:none;">
-
-    <div style="font-size:12px;opacity:.8;margin-top:8px;">
-사주·운세 서비스 이용을 위해 생년월일을 정확히 입력해주세요
-</div>
-
-<select id="birthType"
-  style="width:100%;padding:10px;margin-top:6px;border-radius:8px;border:none;">
-  <option value="solar">양력</option>
-  <option value="lunar">음력</option>
-</select>
-
-<input id="loginBirth" type="date"
-  style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:none;">
-
-    <!-- CAPTCHA -->
-    <div style="margin-top:10px;">
-      <div class="g-recaptcha" data-sitekey="6Le2NW4sAAAAAI6Vu2Rn6RKPrZ0VnVCQ2lMj1pIH"></div>
-    </div>
-
-    <button id="loginSubmit" style="
-      width:100%;
-      padding:12px;
-      margin-top:12px;
-      border:none;
-      border-radius:10px;
-      background:#ffd56b;
-      font-weight:bold;
-    ">시작하기</button>
-
-    <button id="loginClose" style="
-      width:100%;
-      padding:12px;
-      margin-top:8px;
-      border:none;
-      border-radius:10px;
-      background:#2a2a2a;
-      color:white;
-    ">닫기</button>
-  </div>
-</div>
+<p><strong>Q. 포인트는 어떻게 적립되나요?</strong><br>
+출석, 운세 이용, 공유 활동을 통해 적립됩니다.</p>
+</section>
 
 <footer>
 <div>무료 운세 플랫폼</div>
