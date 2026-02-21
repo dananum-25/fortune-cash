@@ -3,35 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>무료 사주 계산 | 2026년 사주 분석</title>
-<meta name="description" content="로그인 정보 기반 무료 사주 계산. 사주팔자 구조와 2026년 운세 해석 제공.">
+<title>무료 사주 계산 | 4기둥(연·월·일·시) + 오행 + 2026 세운 분석</title>
+<meta name="description" content="로그인 정보 기반 무료 사주 4기둥 계산(연주·월주·일주·시주), 오행 분석(목화토금수), 2026년 세운(병오) 합충 분석까지 제공합니다.">
 <link rel="canonical" href="https://fortune-cash.vercel.app/pages/saju/saju.html">
 <style>
 body{margin:0;background:#111;color:#fff;font-family:Arial;}
 .wrap{max-width:820px;margin:auto;padding:20px;}
 .card{background:#1a1a1a;border-radius:16px;padding:18px;margin:16px 0;}
-h1{font-size:26px;}
-h2{margin-top:18px;}
-p{line-height:1.8;}
+h1{font-size:26px;margin:0 0 10px;}
+h2{margin:18px 0 10px;}
+h3{margin:14px 0 8px;}
+p{line-height:1.8;margin:8px 0;}
 .badge{
-display:inline-block;
-background:#222;
-color:#ffd56b;
-padding:6px 10px;
-border-radius:12px;
-margin:4px 4px 4px 0;
+  display:inline-block;background:#222;color:#ffd56b;
+  padding:6px 10px;border-radius:12px;margin:4px 6px 4px 0;
+}
+.small{font-size:12px;opacity:.8}
+input{
+  width:100%;padding:12px;border-radius:10px;border:none;margin-top:8px;
+  background:#0f0f0f;color:#fff;box-sizing:border-box;
 }
 button{
-width:100%;
-padding:14px;
-border:none;
-border-radius:12px;
-background:#ffd56b;
-font-weight:bold;
-margin-top:10px;
-cursor:pointer;
+  width:100%;padding:14px;border:none;border-radius:12px;
+  background:#ffd56b;font-weight:bold;margin-top:10px;cursor:pointer;
 }
+a{color:#ffd56b;text-decoration:none;}
 footer{opacity:.7;font-size:12px;margin-top:40px;text-align:center;}
+.hr{height:1px;background:#222;margin:14px 0;}
 </style>
 </head>
 
@@ -39,50 +37,74 @@ footer{opacity:.7;font-size:12px;margin-top:40px;text-align:center;}
 <div class="wrap">
 
 <h1>나의 사주 분석</h1>
+<div class="small">※ 정확한 사주는 출생시간(시주)이 중요합니다. 출생시간을 모르면 “12시(정오)”로 임시 확인 후, 나중에 수정해도 됩니다.</div>
 
 <div id="loginCheck" class="card"></div>
-<div class="card" id="timeInputBox">
-<h2>⏰ 출생 시간 입력</h2>
-<p>정확한 사주 계산을 위해 출생 시간을 입력해주세요.</p>
-<input type="number" id="birthHour" min="0" max="23" placeholder="출생 시간 (0~23시)"
-style="width:100%;padding:12px;border-radius:10px;border:none;margin-top:8px;">
-<button onclick="calculateSaju()">사주 계산하기</button>
-</div>
-<div id="sajuResult" style="display:none">
 
-<div class="card">
-<h2>📜 나의 기본 정보</h2>
-<div id="basicInfo"></div>
+<div class="card" id="timeInputBox" style="display:none;">
+  <h2>⏰ 출생 시간 입력</h2>
+  <p>출생 시간(0~23시)을 입력하면 4기둥(연·월·일·시) + 오행 + 2026 세운 분석이 자동으로 생성됩니다.</p>
+  <input type="number" id="birthHour" min="0" max="23" placeholder="출생 시간 (0~23시)">
+  <button onclick="calculateSaju()">사주 계산하기</button>
+  <div class="small" style="margin-top:10px;">
+    TIP) 출생시간을 모르면 12를 넣고 먼저 확인하세요. (정확도는 출생시간을 알면 더 올라갑니다)
+  </div>
 </div>
 
-<div class="card">
-<h2>🔮 사주 구조</h2>
-<div id="sajuBox"></div>
-</div>
+<div id="sajuResult" style="display:none;">
 
-<div class="card">
-<h2>📈 2026년 운세 해석</h2>
-<div id="analysisBox"></div>
-</div>
+  <div class="card">
+    <h2>📜 나의 기본 정보</h2>
+    <div id="basicInfo"></div>
+  </div>
 
-<div class="card">
-<button onclick="location.href='/pages/period/period.html'">오늘 운세 보기</button>
-<button onclick="location.href='/pages/star/index.html'">별자리 운세 보기</button>
-</div>
+  <div class="card">
+    <h2>🔮 4기둥(연·월·일·시)</h2>
+    <div id="sajuBox"></div>
+    <div class="small">※ 월주는 절기(입춘) 기준 간이 반영 버전입니다.</div>
+  </div>
+
+  <div class="card">
+    <h2>🌿 오행 분석</h2>
+    <div id="elementBox"></div>
+    <div class="hr"></div>
+    <div id="elementInterpretation"></div>
+  </div>
+
+  <div class="card">
+    <h2>📈 2026년 세운(병오) 분석</h2>
+    <div id="sewoonBox"></div>
+  </div>
+
+  <div class="card">
+    <h2>✨ 종합 해석</h2>
+    <div id="analysisBox"></div>
+  </div>
+
+  <div class="card">
+    <button onclick="location.href='/pages/period/period.html'">오늘/내일/연간 운세 보기</button>
+    <button onclick="location.href='/pages/star/index.html'">별자리 운세 보기</button>
+    <button onclick="location.href='/'">홈으로</button>
+  </div>
 
 </div>
 
 <footer>
-무료 운세 플랫폼 | 홈으로
+무료 운세 플랫폼 | <a href="/">홈으로</a>
 </footer>
 
 </div>
 
 <script>
-
+// ===============================
+// 0) 기본 테이블
+// ===============================
 const heavenly = ["갑","을","병","정","무","기","경","신","임","계"];
-const earthly = ["자","축","인","묘","진","사","오","미","신","유","술","해"];
+const earthly  = ["자","축","인","묘","진","사","오","미","신","유","술","해"];
 
+// ===============================
+// 1) 60갑자 계산 (연주/일주)
+// ===============================
 function getYearPillar(year){
   const baseYear = 1984; // 갑자년
   const index = (year - baseYear) % 60;
@@ -91,85 +113,17 @@ function getYearPillar(year){
 }
 
 function getDayPillar(date){
-  const baseDate = new Date(1900,0,1); // 1900-01-01 갑자일
+  const baseDate = new Date(1900,0,1); // 1900-01-01 갑자일 (앵커)
   const diff = Math.floor((date - baseDate) / (1000*60*60*24));
   const normalized = (diff % 60 + 60) % 60;
   return heavenly[normalized % 10] + earthly[normalized % 12];
 }
 
-function getHourBranch(hour){
-  return earthly[Math.floor(((hour + 1) % 24) / 2)];
-}
-
-function calculateSaju(){
-
-  const name = localStorage.getItem("name");
-  const birth = localStorage.getItem("birth");
-  const hour = parseInt(document.getElementById("birthHour").value);
-
-  if(!birth){
-    alert("로그인이 필요합니다.");
-    return;
-  }
-
-  if(isNaN(hour) || hour < 0 || hour > 23){
-    alert("출생 시간을 0~23 사이로 입력해주세요.");
-    return;
-  }
-
-  const birthDate = new Date(birth);
-  const year = birthDate.getFullYear();
-
-const yearPillar = getYearPillar(year);
-const monthPillar = getMonthPillar(birthDate);
-const dayPillar = getDayPillar(birthDate);
-const hourPillar = getHourPillar(dayPillar, hour);
-const pillars = [yearPillar, monthPillar, dayPillar, hourPillar];
-const elementResult = analyzeElements(pillars);
-  document.getElementById("timeInputBox").style.display="none";
-  document.getElementById("sajuResult").style.display="block";
-
-  document.getElementById("basicInfo").innerHTML =
-    `<b>${name}</b><br>생년월일: ${birth}<br>출생시간: ${hour}시`;
-
-document.getElementById("sajuBox").innerHTML =
-  `<div class="badge">연주: ${yearPillar}</div>
-   <div class="badge">월주: ${monthPillar}</div>
-   <div class="badge">일주: ${dayPillar}</div>
-   <div class="badge">시주: ${hourPillar}</div>`;
-  
-  let analysis = `
-  <p><b>${yearPillar}</b> 기운을 타고난 당신은 기본 성향이 뚜렷합니다.</p>
-  <p>일주 <b>${dayPillar}</b>는 인생의 중심 에너지를 의미합니다.</p>
-  <p>2026년은 추진력과 실행력이 강화되는 흐름입니다.</p>
-  <p>상반기 재물 흐름 상승, 하반기 안정 흐름이 유리합니다.</p>
-  `;
-  let elementHtml = "<h3>🌿 오행 분석</h3>";
-
-for(let key in elementResult){
-  elementHtml += `<p>${key}: ${elementResult[key]}개</p>`;
-}
-
-let strongest = Object.keys(elementResult).reduce((a,b)=>
-  elementResult[a] > elementResult[b] ? a : b
-);
-
-elementHtml += `<p><b>강한 기운:</b> ${strongest}</p>`;
-
-analysis += elementHtml;
-  document.getElementById("analysisBox").innerHTML = analysis;
-}
-
-document.addEventListener("DOMContentLoaded", function(){
-  const birth = localStorage.getItem("birth");
-  if(!birth){
-    document.getElementById("loginCheck").innerHTML =
-      "⚠ 로그인 후 사주 확인이 가능합니다.";
-  }else{
-    document.getElementById("loginCheck").innerHTML =
-      "출생 시간을 입력하면 60갑자 일주 계산이 진행됩니다.";
-  }
-  function getMonthBranch(date){
+// ===============================
+// 2) 월주(절기 간이) 계산
+//    - 입춘(대략 2/4) 이전은 '축'로 잡고, 이후 인월 시작
+// ===============================
+function getMonthBranch(date){
   const month = date.getMonth() + 1;
   const day = date.getDate();
 
@@ -185,9 +139,11 @@ document.addEventListener("DOMContentLoaded", function(){
   if(month === 10) return "술";
   if(month === 11) return "해";
   if(month === 12) return "자";
-  }
-  function getMonthPillar(date){
+  return "축";
+}
 
+// 월간 공식: (연간index*2 + 월지index) % 10
+function getMonthPillar(date){
   const monthBranch = getMonthBranch(date);
 
   const year = date.getFullYear();
@@ -195,13 +151,21 @@ document.addEventListener("DOMContentLoaded", function(){
   const yearStemIndex = yearIndex % 10;
 
   const branchIndex = earthly.indexOf(monthBranch);
-
   const monthStemIndex = (yearStemIndex * 2 + branchIndex) % 10;
 
   return heavenly[monthStemIndex] + monthBranch;
-  }
-  function getHourPillar(dayPillar, hour){
+}
 
+// ===============================
+// 3) 시주 계산
+//    - 시지: 2시간 단위
+//    - 시간 천간: (일간index*2 + 시지index) % 10
+// ===============================
+function getHourBranch(hour){
+  return earthly[Math.floor(((hour + 1) % 24) / 2)];
+}
+
+function getHourPillar(dayPillar, hour){
   const dayStem = dayPillar[0];
   const dayStemIndex = heavenly.indexOf(dayStem);
 
@@ -209,77 +173,239 @@ document.addEventListener("DOMContentLoaded", function(){
   const hourBranchIndex = earthly.indexOf(hourBranch);
 
   const hourStemIndex = (dayStemIndex * 2 + hourBranchIndex) % 10;
-
   return heavenly[hourStemIndex] + hourBranch;
-  }
-  function getElement(char){
+}
 
-  const wood = ["갑","을","인","묘"];
-  const fire = ["병","정","사","오"];
+// ===============================
+// 4) 오행 분석
+// ===============================
+function getElement(char){
+  const wood  = ["갑","을","인","묘"];
+  const fire  = ["병","정","사","오"];
   const earth = ["무","기","진","술","축","미"];
-  const metal = ["경","신","신","유"];
+  const metal = ["경","신","유"];      // (신은 지지에도 존재)
   const water = ["임","계","해","자"];
 
-  if(wood.includes(char)) return "목";
-  if(fire.includes(char)) return "화";
+  if(wood.includes(char))  return "목";
+  if(fire.includes(char))  return "화";
   if(earth.includes(char)) return "토";
   if(metal.includes(char)) return "금";
   if(water.includes(char)) return "수";
-
+  if(char === "신") return "금";
   return "";
 }
 
 function analyzeElements(pillars){
-
   const counts = {목:0, 화:0, 토:0, 금:0, 수:0};
-
   pillars.forEach(p=>{
-    for(let char of p){
-      const el = getElement(char);
+    for(const ch of p){
+      const el = getElement(ch);
       if(el) counts[el]++;
     }
   });
-
   return counts;
 }
-  function generateElementInterpretation(counts){
 
+function generateElementInterpretation(counts){
   let text = "";
-
   const elements = ["목","화","토","금","수"];
 
   elements.forEach(el=>{
     if(counts[el] >= 3){
-      text += `<p><b>${el}</b> 기운이 강합니다. 이 기운을 중심으로 인생 방향이 형성됩니다.</p>`;
+      text += `<p><b>${el}</b> 기운이 강합니다. 이 오행이 성향/선택을 주도하기 쉽습니다.</p>`;
     }else if(counts[el] === 0){
-      text += `<p><b>${el}</b> 기운이 부족합니다. 해당 오행을 보완하는 생활 습관이 필요합니다.</p>`;
+      text += `<p><b>${el}</b> 기운이 부족합니다. 해당 오행을 보완하면 운의 체감이 좋아질 수 있어요.</p>`;
     }
   });
 
-  if(counts["목"] === 0){
-    text += "<p>🌿 목 보완: 자연, 초록색, 독서, 기획 활동이 좋습니다.</p>";
+  if(counts["목"] === 0) text += "<p>🌿 목 보완: 자연/초록색/독서/기획·성장 루틴이 도움.</p>";
+  if(counts["화"] === 0) text += "<p>🔥 화 보완: 운동/햇빛/표현·발표/따뜻한 인간관계가 도움.</p>";
+  if(counts["토"] === 0) text += "<p>🪨 토 보완: 규칙적인 생활/저축/체력관리/기반 만들기가 도움.</p>";
+  if(counts["금"] === 0) text += "<p>⚙ 금 보완: 정리정돈/규칙/문서화/금융 공부가 도움.</p>";
+  if(counts["수"] === 0) text += "<p>💧 수 보완: 명상/학습/여행/휴식/물과 친해지기(수영 등)가 도움.</p>";
+
+  return text || "<p>오행이 비교적 고르게 분포되어 있어, ‘한 방’보다 ‘꾸준함’이 강점입니다.</p>";
+}
+
+// ===============================
+// 5) 2026 세운(병오) 합충 분석
+// ===============================
+// 지지 충(沖) 쌍
+const BRANCH_CLASH = {
+  "자":"오","오":"자",
+  "축":"미","미":"축",
+  "인":"신","신":"인",
+  "묘":"유","유":"묘",
+  "진":"술","술":"진",
+  "사":"해","해":"사"
+};
+
+// 지지 합(六合) 쌍
+const BRANCH_COMBO = {
+  "자":"축","축":"자",
+  "인":"해","해":"인",
+  "묘":"술","술":"묘",
+  "진":"유","유":"진",
+  "사":"신","신":"사",
+  "오":"미","미":"오"
+};
+
+// 천간 합(干合)
+const STEM_COMBO = {
+  "갑":"기","기":"갑",
+  "을":"경","경":"을",
+  "병":"신","신":"병",
+  "정":"임","임":"정",
+  "무":"계","계":"무"
+};
+
+function sewoonAnalyze(pillars){
+  const sewoon = "병오"; // 2026년 세운
+  const sStem = sewoon[0];
+  const sBranch = sewoon[1];
+
+  const hits = {
+    branchCombo: [],
+    branchClash: [],
+    stemCombo: []
+  };
+
+  pillars.forEach((p, idx)=>{
+    const label = ["연주","월주","일주","시주"][idx] || "기둥";
+    const pStem = p[0];
+    const pBranch = p[1];
+
+    // 지지 합
+    if(BRANCH_COMBO[pBranch] === sBranch){
+      hits.branchCombo.push(`${label}(${p}) ↔ 세운(${sewoon}) 지지합`);
+    }
+    // 지지 충
+    if(BRANCH_CLASH[pBranch] === sBranch){
+      hits.branchClash.push(`${label}(${p}) ↔ 세운(${sewoon}) 지지충`);
+    }
+    // 천간 합
+    if(STEM_COMBO[pStem] === sStem){
+      hits.stemCombo.push(`${label}(${p}) ↔ 세운(${sewoon}) 천간합`);
+    }
+  });
+
+  // 해석 문장 만들기
+  let html = `<p><b>2026년 세운:</b> <span class="badge">${sewoon}</span> (불의 기운(화)이 강한 해로 “속도/결정/노출”이 강조됩니다.)</p>`;
+
+  if(!hits.branchCombo.length && !hits.branchClash.length && !hits.stemCombo.length){
+    html += `<p>올해(병오)와의 합충 신호가 강하게 잡히진 않습니다. 대신 기본 사주 흐름(오행 밸런스)을 우선으로 보면 좋아요.</p>`;
+    html += `<p class="small">※ 그래도 ‘화(火)’ 기운이 강한 해라, 결정/발표/노출/속도전 이슈가 생길 수 있어요.</p>`;
+    return html;
   }
 
-  if(counts["화"] === 0){
-    text += "<p>🔥 화 보완: 운동, 햇빛, 발표 활동이 도움이 됩니다.</p>";
+  if(hits.branchCombo.length){
+    html += `<h3>✅ 합(合) 포인트</h3>`;
+    html += `<p>올해는 “연결/협력/도움”이 생기기 쉬운 구조입니다.</p>`;
+    hits.branchCombo.forEach(t=> html += `<p>• ${t}</p>`);
+    html += `<p class="small">합이 뜨면: 제휴/소개/협업/관계 확장이 유리한 편입니다.</p>`;
   }
 
-  if(counts["토"] === 0){
-    text += "<p>🪨 토 보완: 루틴 만들기, 부동산/저축 관심이 좋습니다.</p>";
+  if(hits.stemCombo.length){
+    html += `<h3>✅ 천간합 포인트</h3>`;
+    html += `<p>일/돈/관계에서 ‘타이밍이 맞는’ 느낌이 오기 쉽습니다. 계약/협상은 조건만 잘 보세요.</p>`;
+    hits.stemCombo.forEach(t=> html += `<p>• ${t}</p>`);
   }
 
-  if(counts["금"] === 0){
-    text += "<p>⚙ 금 보완: 규칙, 정리, 금융 지식 강화가 필요합니다.</p>";
+  if(hits.branchClash.length){
+    html += `<h3>⚠️ 충(沖) 포인트</h3>`;
+    html += `<p>올해는 변화·이동·정리 이슈가 강하게 들어올 수 있어요. ‘급발진’만 주의하면 오히려 기회가 됩니다.</p>`;
+    hits.branchClash.forEach(t=> html += `<p>• ${t}</p>`);
+    html += `<p class="small">충이 뜨면: 이직/이사/관계 재정렬/루틴 변화가 생길 수 있습니다. 안전/건강/충동소비 관리 추천.</p>`;
   }
 
-  if(counts["수"] === 0){
-    text += "<p>💧 수 보완: 명상, 여행, 학습이 좋습니다.</p>";
+  return html;
+}
+
+// ===============================
+// 6) 메인 계산
+// ===============================
+function calculateSaju(){
+
+  const name = localStorage.getItem("name") || "회원";
+  const birth = localStorage.getItem("birth");
+  const hour = parseInt(document.getElementById("birthHour").value, 10);
+
+  if(!birth){
+    alert("로그인이 필요합니다. (생년월일 정보가 없습니다)");
+    return;
+  }
+  if(Number.isNaN(hour) || hour < 0 || hour > 23){
+    alert("출생 시간을 0~23 사이로 입력해주세요.");
+    return;
   }
 
-  return text;
+  const birthDate = new Date(birth);
+  const year = birthDate.getFullYear();
+
+  const yearPillar  = getYearPillar(year);
+  const monthPillar = getMonthPillar(birthDate);
+  const dayPillar   = getDayPillar(birthDate);
+  const hourPillar  = getHourPillar(dayPillar, hour);
+
+  const pillars = [yearPillar, monthPillar, dayPillar, hourPillar];
+
+  // 화면 표시
+  document.getElementById("timeInputBox").style.display="none";
+  document.getElementById("sajuResult").style.display="block";
+
+  document.getElementById("basicInfo").innerHTML =
+    `<p><b>${name}</b></p>
+     <p>생년월일: ${birth}</p>
+     <p>출생시간: ${hour}시</p>`;
+
+  document.getElementById("sajuBox").innerHTML =
+    `<span class="badge">연주: ${yearPillar}</span>
+     <span class="badge">월주: ${monthPillar}</span>
+     <span class="badge">일주: ${dayPillar}</span>
+     <span class="badge">시주: ${hourPillar}</span>`;
+
+  // 오행 분석
+  const elementResult = analyzeElements(pillars);
+  let strongest = Object.keys(elementResult).reduce((a,b)=> elementResult[a] > elementResult[b] ? a : b);
+
+  let elementHtml = "";
+  ["목","화","토","금","수"].forEach(k=>{
+    elementHtml += `<p><b>${k}</b>: ${elementResult[k]}개</p>`;
+  });
+  elementHtml += `<p><b>가장 강한 기운:</b> ${strongest}</p>`;
+
+  document.getElementById("elementBox").innerHTML = elementHtml;
+  document.getElementById("elementInterpretation").innerHTML = generateElementInterpretation(elementResult);
+
+  // 2026 세운 합충
+  document.getElementById("sewoonBox").innerHTML = sewoonAnalyze(pillars);
+
+  // 종합 해석(간단)
+  let analysis = "";
+  analysis += `<p>당신의 4기둥은 <b>${yearPillar} / ${monthPillar} / ${dayPillar} / ${hourPillar}</b> 흐름으로 정리됩니다.</p>`;
+  analysis += `<p>오행 관점에서는 <b>${strongest}</b> 기운이 상대적으로 강해, 올해는 그 특성이 “결정/선택”에 영향을 주기 쉬워요.</p>`;
+  analysis += `<p class="small">TIP) 이 페이지는 “무료/간편 해석” 버전이라, 추후 대운/세운 확장하면 훨씬 더 정밀해집니다.</p>`;
+
+  document.getElementById("analysisBox").innerHTML = analysis;
+}
+
+// ===============================
+// 7) 초기 진입 처리
+// ===============================
+document.addEventListener("DOMContentLoaded", function(){
+  const birth = localStorage.getItem("birth");
+
+  if(!birth){
+    document.getElementById("loginCheck").innerHTML =
+      "<h2>⚠ 로그인 필요</h2><p>사주 계산은 로그인 후 생년월일이 저장되어야 가능합니다.</p><p class='small'>메인으로 가서 로그인(회원가입) 후 다시 들어와주세요.</p>";
+    document.getElementById("timeInputBox").style.display="none";
+    return;
   }
+
+  document.getElementById("loginCheck").innerHTML =
+    "<h2>✅ 준비 완료</h2><p>출생 시간을 입력하면 4기둥 + 오행 + 2026 세운 분석을 보여줄게요.</p>";
+  document.getElementById("timeInputBox").style.display="block";
 });
-
 </script>
 
 </body>
