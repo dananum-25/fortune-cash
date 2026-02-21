@@ -17,6 +17,9 @@ function normalizePhone(phone){
   return String(phone || "").replace(/[^0-9]/g, "");
 }
 
+// ✅ 날짜 저장 포맷 고정: YYYY-MM-DD
+// - 서버에서 ISO(Z)로 오는 값 때문에 "하루 밀림"이 생길 수 있어서
+// - 우선 "앞 10자리(YYYY-MM-DD)"를 신뢰하는 방식이 가장 안전
 function toKoreanYMD(v){
   if(!v) return "";
   const s = String(v).trim();
@@ -25,7 +28,7 @@ function toKoreanYMD(v){
   if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
 
   // ISO가 섞여있으면 날짜 부분만 우선 잘라서 처리
-  // 예: 1982-01-07T15:00:00.000Z -> 1982-01-07 (이게 “기준 날짜”)
+  // 예: 1982-01-07T15:00:00.000Z -> 1982-01-07
   const m = s.match(/^(\d{4}-\d{2}-\d{2})/);
   if(m && m[1]) return m[1];
 
@@ -97,29 +100,44 @@ async function syncUserFromServer(){
   const phone = localStorage.getItem("phone");
   if(!phone) return;
 
-  try{
-const API_URL = getApiUrlOrWarn();
-if(!API_URL) return;
+  const API_URL = getApiUrlOrWarn();
+  if(!API_URL) return;
 
-const r = await fetch(API_URL,{
-  method:"POST",
-  headers:{ "Content-Type":"text/plain;charset=utf-8" },
-  body: JSON.stringify({ action:"getUser", phone })
-});
+  try{
+    const r = await fetch(API_URL,{
+      method:"POST",
+      headers:{ "Content-Type":"text/plain;charset=utf-8" },
+      body: JSON.stringify({ action:"getUser", phone })
+    });
 
     const txt = await r.text();
-    const res = JSON.parse(txt);
+    let res = null;
+
+    try{
+      res = JSON.parse(txt);
+    }catch(e){
+      console.warn("[sync] response not JSON:", txt);
+      return;
+    }
 
     if(res.status === "ok"){
+      // ✅ point 키로 통일
       localStorage.setItem("point", String(res.points || 0));
       localStorage.setItem("name", String(res.name || ""));
 
-      const birthYMD = toKoreanYMD(res.birth);   // ✅ 핵심
+      const birthYMD = toKoreanYMD(res.birth);
       if(birthYMD) localStorage.setItem("birth", birthYMD);
 
+      if(res.birthType) localStorage.setItem("birthType", String(res.birthType));
       if(res.zodiac) localStorage.setItem("zodiac", String(res.zodiac));
       if(res.gapja) localStorage.setItem("gapja", String(res.gapja));
+
+      // ✅ 과거 points 키 제거(혼선 방지)
+      localStorage.removeItem("points");
+    }else{
+      console.warn("[sync] not ok:", res);
     }
+
   }catch(e){
     console.log("[sync] skipped", e);
   }
@@ -141,11 +159,12 @@ function refreshTopBar(){
       localStorage.removeItem("phone");
       localStorage.removeItem("name");
       localStorage.removeItem("birth");
+      localStorage.removeItem("birthType");
       localStorage.removeItem("zodiac");
       localStorage.removeItem("gapja");
       localStorage.removeItem("guestMode");
-      // point도 같이 지우는게 안전
       localStorage.removeItem("point");
+      localStorage.removeItem("points"); // 과거키까지 정리
       location.reload();
     };
   }else{
@@ -181,11 +200,14 @@ async function handleSubmitLogin(){
   const nameEl = document.getElementById("loginName");
   const phoneEl = document.getElementById("loginPhone");
   const birthEl = document.getElementById("loginBirth");
+  const birthTypeEl = document.getElementById("birthType");
   const submitBtn = document.getElementById("loginSubmit");
 
   const name = (nameEl?.value || "").trim();
   const phone = normalizePhone((phoneEl?.value || "").trim());
-  const birth = (birthEl?.value || "").trim();
+  const birthRaw = (birthEl?.value || "").trim();
+  const birth = toKoreanYMD(birthRaw);
+  const birthType = (birthTypeEl?.value || "solar").trim();
 
   if(!name || !phone){
     alert("이름과 전화번호를 입력해주세요.");
@@ -251,7 +273,8 @@ async function handleSubmitLogin(){
         action:"register",
         phone,
         name,
-        birth,
+        birth,       // ✅ YYYY-MM-DD 고정
+        birthType,   // ✅ 저장만 해둠
         zodiac,
         gapja,
         token
@@ -297,16 +320,17 @@ async function handleSubmitLogin(){
     return;
   }
 
-if(st === "exists" || st === "ok"){
-  localStorage.setItem("name", name);
-  localStorage.setItem("phone", phone);
-  localStorage.setItem("birth", toKoreanYMD(birth)); // ✅ 저장도 YMD로 고정
-
-  // ✅ 과거 points 키 제거 (혼선 방지)
-  localStorage.removeItem("points");
+  if(st === "exists" || st === "ok"){
+    localStorage.setItem("name", name);
+    localStorage.setItem("phone", phone);
+    localStorage.setItem("birth", birth); // ✅ YMD 저장
+    localStorage.setItem("birthType", birthType);
     if(zodiac) localStorage.setItem("zodiac", zodiac);
     if(gapja) localStorage.setItem("gapja", gapja);
     localStorage.removeItem("guestMode");
+
+    // ✅ 과거 points 키 제거(혼선 방지)
+    localStorage.removeItem("points");
 
     closeLoginModal();
     document.getElementById("entryModal")?.classList.add("hidden");
