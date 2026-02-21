@@ -5,10 +5,7 @@
 console.log("[points.js] loaded ✅");
 
 function getApiUrlSafe(){
-  return (window.getApiUrl?.() ||
-          window.APP_CONFIG?.API_URL ||
-          window.API_URL ||
-          "");
+  return (window.getApiUrl?.() || window.APP_CONFIG?.API_URL || "");
 }
 
 // point 키 통일
@@ -30,7 +27,26 @@ async function loadMyPoint(){
     method:"POST",
     headers:{ "Content-Type":"text/plain;charset=utf-8" },
     body: JSON.stringify({ action:"getUser", phone })
-  }).then(r=>r.json()).catch(()=>null);
+  async function postJSON(API_URL, payload){
+  try{
+    const r = await fetch(API_URL,{
+      method:"POST",
+      headers:{ "Content-Type":"text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    });
+
+    const txt = await r.text();
+    try{
+      return JSON.parse(txt);
+    }catch(e){
+      console.warn("[points.js] response not JSON:", txt);
+      return null;
+    }
+  }catch(e){
+    console.warn("[points.js] fetch failed:", e);
+    return null;
+  }
+}
 
   if(res?.status === "ok"){
     setLocalPoint(res.points || 0);
@@ -65,9 +81,8 @@ async function checkinPoint(){
   }
 
   if(res.status === "ok"){
-    // 서버 points가 오면 반영
-    if(typeof res.points !== "undefined") setLocalPoint(res.points);
-    alert("출석 완료! +10점 ✅");
+  if(typeof res.points !== "undefined") setLocalPoint(res.points);
+  alert(res.message || "출석 완료 ✅");
   }else if(res.status === "already"){
     alert("오늘은 이미 출석했어요 🙂");
   }else if(res.status === "none"){
