@@ -80,7 +80,33 @@ footer{opacity:.7;font-size:12px;margin-top:40px;text-align:center;}
     <h2>✨ 종합 해석</h2>
     <div id="analysisBox"></div>
   </div>
+<button id="pdfFullBtn" type="button" class="no-print" style="
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:10px;
+  background:#2a2a2a;
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+">
+  📄 전체 리포트 PDF
+</button>
 
+<button id="pdfSummaryBtn" type="button" class="no-print" style="
+  width:100%;
+  padding:12px;
+  margin-top:8px;
+  border:none;
+  border-radius:10px;
+  background:#444;
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+">
+  📄 요약 리포트 PDF
+</button>
   <div class="card">
     <button onclick="location.href='/pages/period/period.html'">오늘/내일/연간 운세 보기</button>
     <button onclick="location.href='/pages/star/index.html'">별자리 운세 보기</button>
@@ -146,6 +172,14 @@ svg{
 .graph-dot{
   fill:#ff9f1a;
 }  
+
+@media print{
+  body{ background:#fff !important; color:#000 !important; }
+  .no-print{ display:none !important; }
+  a{ color:#000 !important; text-decoration:none !important; }
+  .card{ box-shadow:none !important; border:1px solid #ddd !important; }
+}
+  
 <script>
 // ===============================
 // 0) 기본 테이블
@@ -488,6 +522,20 @@ analysis += analyzeDaewoonVsSeowoon(currentDaewoon);
   scores
 );
   document.getElementById("analysisBox").innerHTML = analysis;
+  setupPdfButtons(name, pillars, scores);
+  function setupPdfButton(){
+  const btn = document.getElementById("pdfBtn");
+  if(!btn) return;
+
+  btn.onclick = ()=>{
+    // PDF 저장은 브라우저 인쇄 기능을 사용
+    window.print();
+  };
+}
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  setupPdfButton();
+});
   setTimeout(()=>{
   const scores = calculateFortuneScores(elementResult, currentDaewoon);
 
@@ -925,6 +973,54 @@ function generateMonthlyGraphAll(scores){
   `;
 
   return text;
+  }
+  function generateSummaryContent(name, pillars, scores){
+
+  return `
+    <div id="summaryPrintArea">
+      <h1>2026 사주 요약 리포트</h1>
+
+      <p><b>이름:</b> ${name}</p>
+      <p><b>사주:</b> ${pillars.join(" / ")}</p>
+
+      <h3>📊 운세 점수</h3>
+      <p>💰 재물운: ${scores.wealth}점</p>
+      <p>💖 연애운: ${scores.love}점</p>
+      <p>🏢 직장/사업운: ${scores.career}점</p>
+      <p>💪 건강운: ${scores.health}점</p>
+
+      <p style="margin-top:15px;">
+      본 리포트는 무료 운세 플랫폼 자동 생성 리포트입니다.
+      </p>
+    </div>
+  `;
+  }
+  function setupPdfButtons(name, pillars, scores){
+
+  const fullBtn = document.getElementById("pdfFullBtn");
+  const summaryBtn = document.getElementById("pdfSummaryBtn");
+
+  if(fullBtn){
+    fullBtn.onclick = ()=>{
+      window.print();
+    };
+  }
+
+  if(summaryBtn){
+    summaryBtn.onclick = ()=>{
+
+      const originalContent = document.body.innerHTML;
+
+      document.body.innerHTML =
+        generateSummaryContent(name, pillars, scores);
+
+      window.print();
+
+      document.body.innerHTML = originalContent;
+
+      location.reload(); // 원래 화면 복구
+    };
+  }
   }
 });
 </script>
