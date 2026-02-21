@@ -92,38 +92,26 @@ async function syncUserFromServer(){
   const phone = localStorage.getItem("phone");
   if(!phone) return;
 
-  const API_URL = getApiUrlOrWarn();
-  if(!API_URL) return;
-
   try{
-    const r = await fetch(API_URL,{
+    const r = await fetch(window.getApiUrl(),{   // ✅ window.API_URL 말고 getApiUrl 사용
       method:"POST",
       headers:{ "Content-Type":"text/plain;charset=utf-8" },
       body: JSON.stringify({ action:"getUser", phone })
     });
 
     const txt = await r.text();
-
-    let res = null;
-    try{
-      res = JSON.parse(txt);
-    }catch(e){
-      console.warn("[sync] response not JSON:", txt);
-      return;
-    }
+    const res = JSON.parse(txt);
 
     if(res.status === "ok"){
-      // ✅ point로 통일
       localStorage.setItem("point", String(res.points || 0));
       localStorage.setItem("name", String(res.name || ""));
-      const birthYMD = toKoreanYMD(res.birth);
-if(birthYMD) localStorage.setItem("birth", birthYMD);
+
+      const birthYMD = toKoreanYMD(res.birth);   // ✅ 핵심
+      if(birthYMD) localStorage.setItem("birth", birthYMD);
+
       if(res.zodiac) localStorage.setItem("zodiac", String(res.zodiac));
       if(res.gapja) localStorage.setItem("gapja", String(res.gapja));
-    }else{
-      console.warn("[sync] not ok:", res);
     }
-
   }catch(e){
     console.log("[sync] skipped", e);
   }
