@@ -181,6 +181,9 @@ svg{
 ">
   📄 요약 리포트 PDF
 </button>
+<button onclick="showSavedReports()" class="no-print">
+📚 내 리포트 보기
+</button>
   <div class="card">
     <button onclick="location.href='/pages/period/period.html'">오늘/내일/연간 운세 보기</button>
     <button onclick="location.href='/pages/star/index.html'">별자리 운세 보기</button>
@@ -537,6 +540,14 @@ analysis += analyzeDaewoonVsSeowoon(currentDaewoon);
   scores
 );
   document.getElementById("analysisBox").innerHTML = analysis;
+  saveReport({
+  name,
+  birth,
+  hour,
+  pillars,
+  scores,
+  createdAt: new Date().toISOString()
+});
   setupPdfButtons(name, pillars, scores);
   function setupPdfButton(){
   const btn = document.getElementById("pdfBtn");
@@ -1011,6 +1022,10 @@ function generateMonthlyGraphAll(scores){
   </div>
       <h1>${name}님 2026 사주 요약 리포트</h1>
 
+<p style="font-size:12px;opacity:.6;">
+생성일: ${getTodayString()} |
+발행: fortune-cash.vercel.app
+</p>
       <p><b>이름:</b> ${name}</p>
       <p><b>사주:</b> ${pillars.join(" / ")}</p>
 
@@ -1081,6 +1096,52 @@ location.reload();
   const mm = String(d.getMonth()+1).padStart(2,"0");
   const dd = String(d.getDate()).padStart(2,"0");
   return `${yyyy}-${mm}-${dd}`;
+  }
+  
+  function saveReport(data){
+
+  const existing = JSON.parse(localStorage.getItem("myReports") || "[]");
+
+  existing.unshift(data);
+
+  // 최근 5개만 저장
+  const trimmed = existing.slice(0,5);
+
+  localStorage.setItem("myReports", JSON.stringify(trimmed));
+  }
+  function showSavedReports(){
+
+  const list = JSON.parse(localStorage.getItem("myReports") || "[]");
+
+  if(!list.length){
+    alert("저장된 리포트가 없습니다.");
+    return;
+  }
+
+  let html = "<div class='card'><h2>📚 저장된 리포트</h2>";
+
+  list.forEach((r,i)=>{
+    html += `
+      <p>
+        ${i+1}. ${r.name} / ${r.birth} / ${r.hour}시
+        <button onclick="loadReport(${i})">불러오기</button>
+      </p>
+    `;
+  });
+
+  html += "</div>";
+
+  document.getElementById("analysisBox").innerHTML = html;
+  }
+  function loadReport(index){
+
+  const list = JSON.parse(localStorage.getItem("myReports") || "[]");
+  const r = list[index];
+
+  if(!r) return;
+
+  document.getElementById("analysisBox").innerHTML =
+    generateFullReport(r.name, r.pillars, {}, r.scores);
   }
 });
 </script>
