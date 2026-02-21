@@ -3,16 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>무료 사주풀이 | 2026년 사주 운세 총정리</title>
-<meta name="description" content="무료 사주풀이. 사주팔자의 뜻, 2026년 운세 보는 방법, 재물운·애정운·직장운 분석 가이드.">
+<title>무료 사주 계산 | 2026년 사주 분석</title>
+<meta name="description" content="로그인 정보 기반 무료 사주 계산. 사주팔자 구조와 2026년 운세 해석 제공.">
 <link rel="canonical" href="https://fortune-cash.vercel.app/pages/saju/saju.html">
 <style>
 body{margin:0;background:#111;color:#fff;font-family:Arial;}
 .wrap{max-width:820px;margin:auto;padding:20px;}
 .card{background:#1a1a1a;border-radius:16px;padding:18px;margin:16px 0;}
-h1{font-size:26px;margin-bottom:6px;}
-h2{margin-top:20px;}
+h1{font-size:26px;}
+h2{margin-top:18px;}
 p{line-height:1.8;}
+.badge{
+display:inline-block;
+background:#222;
+color:#ffd56b;
+padding:6px 10px;
+border-radius:12px;
+margin:4px 4px 4px 0;
+}
 button{
 width:100%;
 padding:14px;
@@ -20,10 +28,9 @@ border:none;
 border-radius:12px;
 background:#ffd56b;
 font-weight:bold;
-margin-top:12px;
+margin-top:10px;
 cursor:pointer;
 }
-a{color:#ffd56b;text-decoration:none;}
 footer{opacity:.7;font-size:12px;margin-top:40px;text-align:center;}
 </style>
 </head>
@@ -31,55 +38,81 @@ footer{opacity:.7;font-size:12px;margin-top:40px;text-align:center;}
 <body>
 <div class="wrap">
 
-<h1>무료 사주풀이 안내</h1>
-<p>사주(四柱)는 태어난 연·월·일·시를 기준으로 운명의 흐름을 해석하는 동양 명리학 체계입니다.</p>
+<h1>나의 사주 분석</h1>
+
+<div id="loginCheck" class="card"></div>
+
+<div id="sajuResult" style="display:none">
 
 <div class="card">
-<h2>📌 사주팔자란?</h2>
-<p>사주는 네 개의 기둥(연주, 월주, 일주, 시주)으로 구성되며 각각 천간과 지지로 이루어져 총 여덟 글자가 됩니다. 이를 흔히 사주팔자라 부릅니다.</p>
-<p>이 구조를 통해 성격, 직업운, 재물운, 애정운, 건강 흐름 등을 해석합니다.</p>
+<h2>📜 나의 기본 정보</h2>
+<div id="basicInfo"></div>
 </div>
 
 <div class="card">
-<h2>🔮 2026년 사주 운세 핵심 흐름</h2>
-<p>2026년은 변화와 전환이 강한 해입니다. 개인의 사주 구조에 따라 기회가 확장될 수도, 안정이 중요해질 수도 있습니다.</p>
-<p>특히 재물운과 직업운의 변화 폭이 큰 해로 분석됩니다.</p>
+<h2>🔮 사주 구조</h2>
+<div id="sajuBox"></div>
 </div>
 
 <div class="card">
-<h2>💰 재물운 보는 법</h2>
-<p>재성의 위치와 대운 흐름을 확인해야 합니다. 단기 수익보다 장기 구조가 중요합니다.</p>
+<h2>📈 2026년 운세 해석</h2>
+<div id="analysisBox"></div>
 </div>
 
 <div class="card">
-<h2>❤️ 애정운 보는 법</h2>
-<p>일지와 배우자궁의 관계를 통해 인연의 깊이와 결혼 시기를 예측합니다.</p>
-</div>
-
-<div class="card">
-<h2>💼 직장·사업운</h2>
-<p>관성과 식상의 균형이 중요합니다. 2026년은 새로운 사업 도전보다는 기존 기반 확장이 유리합니다.</p>
-</div>
-
-<div class="card">
-<h2>📖 사주 자주 묻는 질문 (FAQ)</h2>
-<p><b>Q. 사주는 운명을 완전히 결정하나요?</b><br>
-A. 아닙니다. 사주는 가능성의 흐름을 보여줄 뿐, 선택은 개인의 몫입니다.</p>
-
-<p><b>Q. 무료 사주와 유료 사주의 차이?</b><br>
-A. 해석의 깊이와 상담 범위의 차이입니다.</p>
-</div>
-
-<div class="card">
-<h2>✨ 지금 바로 무료 운세 확인</h2>
-<button onclick="location.href='/pages/period/period.html'">오늘의 운세 보기</button>
+<button onclick="location.href='/pages/period/period.html'">오늘 운세 보기</button>
 <button onclick="location.href='/pages/star/index.html'">별자리 운세 보기</button>
 </div>
 
+</div>
+
 <footer>
-무료 운세 플랫폼 | <a href="/">홈으로</a>
+무료 운세 플랫폼 | 홈으로
 </footer>
 
 </div>
+
+<script>
+function renderSaju(){
+
+  const name = localStorage.getItem("name");
+  const birth = localStorage.getItem("birth");
+  const zodiac = localStorage.getItem("zodiac");
+  const gapja = localStorage.getItem("gapja");
+
+  if(!birth){
+    document.getElementById("loginCheck").innerHTML =
+      "⚠ 로그인 후 사주 확인이 가능합니다.";
+    return;
+  }
+
+  document.getElementById("loginCheck").style.display="none";
+  document.getElementById("sajuResult").style.display="block";
+
+  document.getElementById("basicInfo").innerHTML =
+    `<b>${name}</b><br>생년월일: ${birth}<br>띠: ${zodiac || "-"}<br>간지: ${gapja || "-"}`;
+
+  document.getElementById("sajuBox").innerHTML =
+    `<span class="badge">${gapja || "간지 정보"}</span>
+     <span class="badge">${zodiac || "띠 정보"}</span>`;
+
+  let analysis = "";
+
+  if(zodiac){
+    analysis += `<p>${zodiac}의 기운이 강한 해입니다. 2026년은 변화 속 안정이 중요합니다.</p>`;
+  }
+
+  if(gapja){
+    analysis += `<p>${gapja} 기운은 추진력과 실행력을 의미합니다. 올해는 실행이 곧 성과입니다.</p>`;
+  }
+
+  analysis += `<p>2026년은 재물운과 직장운의 변화 폭이 존재합니다. 무리한 확장보다는 기반 강화 전략이 유리합니다.</p>`;
+
+  document.getElementById("analysisBox").innerHTML = analysis;
+}
+
+document.addEventListener("DOMContentLoaded", renderSaju);
+</script>
+
 </body>
 </html>
