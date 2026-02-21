@@ -41,7 +41,13 @@ footer{opacity:.7;font-size:12px;margin-top:40px;text-align:center;}
 <h1>나의 사주 분석</h1>
 
 <div id="loginCheck" class="card"></div>
-
+<div class="card" id="timeInputBox">
+<h2>⏰ 출생 시간 입력</h2>
+<p>정확한 사주 계산을 위해 출생 시간을 입력해주세요.</p>
+<input type="number" id="birthHour" min="0" max="23" placeholder="출생 시간 (0~23시)"
+style="width:100%;padding:12px;border-radius:10px;border:none;margin-top:8px;">
+<button onclick="calculateSaju()">사주 계산하기</button>
+</div>
 <div id="sajuResult" style="display:none">
 
 <div class="card">
@@ -114,28 +120,43 @@ function calculateSaju(){
   const birthDate = new Date(birth);
   const year = birthDate.getFullYear();
 
-  const yearPillar = getYearPillar(year);
-  const dayPillar = getDayPillar(birthDate);
-  const hourPillar = getHourBranch(hour) + "시";
-
+const yearPillar = getYearPillar(year);
+const monthPillar = getMonthPillar(birthDate);
+const dayPillar = getDayPillar(birthDate);
+const hourPillar = getHourPillar(dayPillar, hour);
+const pillars = [yearPillar, monthPillar, dayPillar, hourPillar];
+const elementResult = analyzeElements(pillars);
   document.getElementById("timeInputBox").style.display="none";
   document.getElementById("sajuResult").style.display="block";
 
   document.getElementById("basicInfo").innerHTML =
     `<b>${name}</b><br>생년월일: ${birth}<br>출생시간: ${hour}시`;
 
-  document.getElementById("sajuBox").innerHTML =
-    `<div class="badge">연주: ${yearPillar}</div>
-     <div class="badge">일주: ${dayPillar}</div>
-     <div class="badge">시주: ${hourPillar}</div>`;
-
+document.getElementById("sajuBox").innerHTML =
+  `<div class="badge">연주: ${yearPillar}</div>
+   <div class="badge">월주: ${monthPillar}</div>
+   <div class="badge">일주: ${dayPillar}</div>
+   <div class="badge">시주: ${hourPillar}</div>`;
+  
   let analysis = `
   <p><b>${yearPillar}</b> 기운을 타고난 당신은 기본 성향이 뚜렷합니다.</p>
   <p>일주 <b>${dayPillar}</b>는 인생의 중심 에너지를 의미합니다.</p>
   <p>2026년은 추진력과 실행력이 강화되는 흐름입니다.</p>
   <p>상반기 재물 흐름 상승, 하반기 안정 흐름이 유리합니다.</p>
   `;
+  let elementHtml = "<h3>🌿 오행 분석</h3>";
 
+for(let key in elementResult){
+  elementHtml += `<p>${key}: ${elementResult[key]}개</p>`;
+}
+
+let strongest = Object.keys(elementResult).reduce((a,b)=>
+  elementResult[a] > elementResult[b] ? a : b
+);
+
+elementHtml += `<p><b>강한 기운:</b> ${strongest}</p>`;
+
+analysis += elementHtml;
   document.getElementById("analysisBox").innerHTML = analysis;
 }
 
@@ -148,6 +169,79 @@ document.addEventListener("DOMContentLoaded", function(){
     document.getElementById("loginCheck").innerHTML =
       "출생 시간을 입력하면 60갑자 일주 계산이 진행됩니다.";
   }
+  function getMonthBranch(date){
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+
+  if(month === 1) return "축";
+  if(month === 2) return day < 4 ? "축" : "인";
+  if(month === 3) return "묘";
+  if(month === 4) return "진";
+  if(month === 5) return "사";
+  if(month === 6) return "오";
+  if(month === 7) return "미";
+  if(month === 8) return "신";
+  if(month === 9) return "유";
+  if(month === 10) return "술";
+  if(month === 11) return "해";
+  if(month === 12) return "자";
+  }
+  function getMonthPillar(date){
+
+  const monthBranch = getMonthBranch(date);
+
+  const year = date.getFullYear();
+  const yearIndex = ((year - 1984) % 60 + 60) % 60;
+  const yearStemIndex = yearIndex % 10;
+
+  const branchIndex = earthly.indexOf(monthBranch);
+
+  const monthStemIndex = (yearStemIndex * 2 + branchIndex) % 10;
+
+  return heavenly[monthStemIndex] + monthBranch;
+  }
+  function getHourPillar(dayPillar, hour){
+
+  const dayStem = dayPillar[0];
+  const dayStemIndex = heavenly.indexOf(dayStem);
+
+  const hourBranch = getHourBranch(hour);
+  const hourBranchIndex = earthly.indexOf(hourBranch);
+
+  const hourStemIndex = (dayStemIndex * 2 + hourBranchIndex) % 10;
+
+  return heavenly[hourStemIndex] + hourBranch;
+  }
+  function getElement(char){
+
+  const wood = ["갑","을","인","묘"];
+  const fire = ["병","정","사","오"];
+  const earth = ["무","기","진","술","축","미"];
+  const metal = ["경","신","신","유"];
+  const water = ["임","계","해","자"];
+
+  if(wood.includes(char)) return "목";
+  if(fire.includes(char)) return "화";
+  if(earth.includes(char)) return "토";
+  if(metal.includes(char)) return "금";
+  if(water.includes(char)) return "수";
+
+  return "";
+}
+
+function analyzeElements(pillars){
+
+  const counts = {목:0, 화:0, 토:0, 금:0, 수:0};
+
+  pillars.forEach(p=>{
+    for(let char of p){
+      const el = getElement(char);
+      if(el) counts[el]++;
+    }
+  });
+
+  return counts;
+}
 });
 
 </script>
