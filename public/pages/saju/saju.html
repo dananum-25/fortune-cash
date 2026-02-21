@@ -30,6 +30,80 @@ button{
 a{color:#ffd56b;text-decoration:none;}
 footer{opacity:.7;font-size:12px;margin-top:40px;text-align:center;}
 .hr{height:1px;background:#222;margin:14px 0;}
+.bar-wrap{
+  margin:14px 0;
+}
+
+.bar-label{
+  display:flex;
+  justify-content:space-between;
+  font-size:14px;
+  margin-bottom:6px;
+}
+
+.bar{
+  height:14px;
+  background:#222;
+  border-radius:10px;
+  overflow:hidden;
+}
+
+.bar-fill{
+  height:100%;
+  width:0%;
+  border-radius:10px;
+  transition:width 1s ease;
+}
+
+.bar-high{ background:linear-gradient(90deg,#00c853,#69f0ae); }
+.bar-good{ background:linear-gradient(90deg,#ffd600,#ffea00); }
+.bar-mid{ background:linear-gradient(90deg,#ff9100,#ffab40); }
+.bar-low{ background:linear-gradient(90deg,#d50000,#ff5252); }
+.month-graph{
+  margin-top:20px;
+  background:#1a1a1a;
+  padding:16px;
+  border-radius:14px;
+}
+
+svg{
+  width:100%;
+  height:200px;
+}
+
+.graph-line{
+  fill:none;
+  stroke:#ffd56b;
+  stroke-width:3;
+}
+
+.graph-dot{
+  fill:#ff9f1a;
+}  
+
+@media print{
+  body{ background:#fff !important; color:#000 !important; }
+  .no-print{ display:none !important; }
+  a{ color:#000 !important; text-decoration:none !important; }
+  .card{ box-shadow:none !important; border:1px solid #ddd !important; }
+}
+
+@media print {
+
+  body::after{
+    content: "fortune-cash.vercel.app";
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-30deg);
+    font-size: 48px;
+    color: rgba(0,0,0,0.08);
+    pointer-events: none;
+    z-index: 9999;
+    white-space: nowrap;
+  }
+
+}
 </style>
 </head>
 
@@ -121,65 +195,6 @@ footer{opacity:.7;font-size:12px;margin-top:40px;text-align:center;}
 
 </div>
 
-.bar-wrap{
-.bar-wrap{
-  margin:14px 0;
-}
-
-.bar-label{
-  display:flex;
-  justify-content:space-between;
-  font-size:14px;
-  margin-bottom:6px;
-}
-
-.bar{
-  height:14px;
-  background:#222;
-  border-radius:10px;
-  overflow:hidden;
-}
-
-.bar-fill{
-  height:100%;
-  width:0%;
-  border-radius:10px;
-  transition:width 1s ease;
-}
-
-.bar-high{ background:linear-gradient(90deg,#00c853,#69f0ae); }
-.bar-good{ background:linear-gradient(90deg,#ffd600,#ffea00); }
-.bar-mid{ background:linear-gradient(90deg,#ff9100,#ffab40); }
-.bar-low{ background:linear-gradient(90deg,#d50000,#ff5252); }
-.month-graph{
-  margin-top:20px;
-  background:#1a1a1a;
-  padding:16px;
-  border-radius:14px;
-}
-
-svg{
-  width:100%;
-  height:200px;
-}
-
-.graph-line{
-  fill:none;
-  stroke:#ffd56b;
-  stroke-width:3;
-}
-
-.graph-dot{
-  fill:#ff9f1a;
-}  
-
-@media print{
-  body{ background:#fff !important; color:#000 !important; }
-  .no-print{ display:none !important; }
-  a{ color:#000 !important; text-decoration:none !important; }
-  .card{ box-shadow:none !important; border:1px solid #ddd !important; }
-}
-  
 <script>
 // ===============================
 // 0) 기본 테이블
@@ -977,8 +992,20 @@ function generateMonthlyGraphAll(scores){
   function generateSummaryContent(name, pillars, scores){
 
   return `
-    <div id="summaryPrintArea">
-      <h1>2026 사주 요약 리포트</h1>
+<div id="summaryPrintArea" style="position:relative;">
+  <div style="
+    position:fixed;
+    top:40%;
+    left:50%;
+    transform:translate(-50%,-50%) rotate(-30deg);
+    font-size:48px;
+    color:rgba(0,0,0,0.08);
+    pointer-events:none;
+    white-space:nowrap;
+  ">
+    fortune-cash.vercel.app
+  </div>
+      <h1>${name}님 2026 사주 요약 리포트</h1>
 
       <p><b>이름:</b> ${name}</p>
       <p><b>사주:</b> ${pillars.join(" / ")}</p>
@@ -1024,15 +1051,32 @@ function generateMonthlyGraphAll(scores){
       const originalContent = document.body.innerHTML;
 
       document.body.innerHTML =
-        generateSummaryContent(name, pillars, scores);
+  generateSummaryContent(name, pillars, scores);
 
-      window.print();
+const birth = localStorage.getItem("birth") || "";
+const safeName = String(name || "회원").replace(/\s+/g,"");
+const safeBirth = String(birth).replace(/[^0-9\-]/g,"");
 
-      document.body.innerHTML = originalContent;
+const originalTitle = document.title;
+document.title = `${safeName}_${safeBirth}_2026사주리포트(요약)`;
 
-      location.reload(); // 원래 화면 복구
+window.print();
+
+// 복구
+document.title = originalTitle;
+document.body.innerHTML = originalContent;
+
+// 가장 안전하게 원복
+location.reload();
     };
   }
+  }
+  function getTodayString(){
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  const dd = String(d.getDate()).padStart(2,"0");
+  return `${yyyy}-${mm}-${dd}`;
   }
 });
 </script>
