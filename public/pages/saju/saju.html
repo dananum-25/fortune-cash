@@ -199,6 +199,22 @@ svg{
 </div>
 
 <script>
+function parseLocalYMD(ymd){
+  if(!ymd) return null;
+
+  // ISO(Z)면 먼저 yyyy-mm-dd로 정규화
+  if(ymd.includes("T")) {
+    const d = new Date(ymd);
+    if(Number.isNaN(d.getTime())) return null;
+    ymd = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  }
+
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(ymd);
+  if(!m) return null;
+
+  const y = Number(m[1]), mo = Number(m[2]), da = Number(m[3]);
+  return new Date(y, mo-1, da); // ✅ 로컬 기준 생성 (UTC 밀림 방지)
+}  
 // ===============================
 // 0) 기본 테이블
 // ===============================
@@ -474,7 +490,11 @@ function calculateSaju(){
     return;
   }
 
-  const birthDate = new Date(birth);
+  const birthDate = parseLocalYMD(birth);
+if(!birthDate){
+  alert("생년월일 형식이 이상합니다. 다시 로그인/저장 후 시도해주세요.");
+  return;
+}
   const year = birthDate.getFullYear();
 
   const yearPillar  = getYearPillar(year);
