@@ -6,33 +6,22 @@
  - points key unify: "point"
 ========================================= */
 
-// ✅ config.js에서 설정을 가져오기만 함 (여기서 정의하지 않음)
-window.getApiUrl = window.getApiUrl || function () {
-  return window.APP_CONFIG?.API_URL || "";
-};
-
-console.log("[auth.js] loaded ✅", window.getApiUrl());
+console.log("[auth.js] loaded ✅", window.getApiUrl?.() || "(no getApiUrl)");
 
 function normalizePhone(phone){
   return String(phone || "").replace(/[^0-9]/g, "");
 }
 
 // ✅ 날짜 저장 포맷 고정: YYYY-MM-DD
-// - 서버에서 ISO(Z)로 오는 값 때문에 "하루 밀림"이 생길 수 있어서
-// - 우선 "앞 10자리(YYYY-MM-DD)"를 신뢰하는 방식이 가장 안전
 function toKoreanYMD(v){
   if(!v) return "";
   const s = String(v).trim();
 
-  // 이미 YYYY-MM-DD면 그대로
   if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
 
-  // ISO가 섞여있으면 날짜 부분만 우선 잘라서 처리
-  // 예: 1982-01-07T15:00:00.000Z -> 1982-01-07
   const m = s.match(/^(\d{4}-\d{2}-\d{2})/);
   if(m && m[1]) return m[1];
 
-  // 그래도 안 되면 Date로 파싱하되, UTC 기준으로 YYYY-MM-DD 뽑기
   const d = new Date(s);
   if(Number.isNaN(d.getTime())) return "";
 
@@ -121,19 +110,19 @@ async function syncUserFromServer(){
     }
 
     if(res.status === "ok"){
-      // ✅ point 키로 통일
       localStorage.setItem("point", String(res.points || 0));
       localStorage.setItem("name", String(res.name || ""));
 
       const birthYMD = toKoreanYMD(res.birth);
       if(birthYMD) localStorage.setItem("birth", birthYMD);
 
-      if(res.birthType) localStorage.setItem("birthType", String(res.birthType));
+      if(typeof res.birthType === "string" && res.birthType){
+        localStorage.setItem("birthType", res.birthType);
+      }
       if(res.zodiac) localStorage.setItem("zodiac", String(res.zodiac));
       if(res.gapja) localStorage.setItem("gapja", String(res.gapja));
 
-      // ✅ 과거 points 키 제거(혼선 방지)
-      localStorage.removeItem("points");
+      localStorage.removeItem("points"); // 과거키 정리
     }else{
       console.warn("[sync] not ok:", res);
     }
@@ -164,7 +153,7 @@ function refreshTopBar(){
       localStorage.removeItem("gapja");
       localStorage.removeItem("guestMode");
       localStorage.removeItem("point");
-      localStorage.removeItem("points"); // 과거키까지 정리
+      localStorage.removeItem("points");
       location.reload();
     };
   }else{
@@ -222,7 +211,6 @@ async function handleSubmitLogin(){
     return;
   }
 
-  // ✅ 입춘DB 로드(있으면 사용)
   try{
     if(window.BirthUtil?.loadIpchunDB){
       await window.BirthUtil.loadIpchunDB();
@@ -237,13 +225,11 @@ async function handleSubmitLogin(){
     ? window.BirthUtil.calcGapjaByIpchun(birth)
     : "";
 
-  // ✅ reCAPTCHA 로드 여부 확인
   if(typeof grecaptcha === "undefined"){
     alert("reCAPTCHA가 아직 로드되지 않았어요. 잠시 후 다시 시도해주세요.");
     return;
   }
 
-  // ✅ 토큰 먼저 확보
   const token = grecaptcha.getResponse();
   if(!token){
     alert("reCAPTCHA 확인을 먼저 해주세요.");
@@ -273,8 +259,8 @@ async function handleSubmitLogin(){
         action:"register",
         phone,
         name,
-        birth,       // ✅ YYYY-MM-DD 고정
-        birthType,   // ✅ 저장만 해둠
+        birth,
+        birthType,
         zodiac,
         gapja,
         token
@@ -323,13 +309,11 @@ async function handleSubmitLogin(){
   if(st === "exists" || st === "ok"){
     localStorage.setItem("name", name);
     localStorage.setItem("phone", phone);
-    localStorage.setItem("birth", birth); // ✅ YMD 저장
+    localStorage.setItem("birth", birth);
     localStorage.setItem("birthType", birthType);
     if(zodiac) localStorage.setItem("zodiac", zodiac);
     if(gapja) localStorage.setItem("gapja", gapja);
     localStorage.removeItem("guestMode");
-
-    // ✅ 과거 points 키 제거(혼선 방지)
     localStorage.removeItem("points");
 
     closeLoginModal();
