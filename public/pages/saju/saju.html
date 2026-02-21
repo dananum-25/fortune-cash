@@ -95,6 +95,57 @@ footer{opacity:.7;font-size:12px;margin-top:40px;text-align:center;}
 
 </div>
 
+.bar-wrap{
+.bar-wrap{
+  margin:14px 0;
+}
+
+.bar-label{
+  display:flex;
+  justify-content:space-between;
+  font-size:14px;
+  margin-bottom:6px;
+}
+
+.bar{
+  height:14px;
+  background:#222;
+  border-radius:10px;
+  overflow:hidden;
+}
+
+.bar-fill{
+  height:100%;
+  width:0%;
+  border-radius:10px;
+  transition:width 1s ease;
+}
+
+.bar-high{ background:linear-gradient(90deg,#00c853,#69f0ae); }
+.bar-good{ background:linear-gradient(90deg,#ffd600,#ffea00); }
+.bar-mid{ background:linear-gradient(90deg,#ff9100,#ffab40); }
+.bar-low{ background:linear-gradient(90deg,#d50000,#ff5252); }
+.month-graph{
+  margin-top:20px;
+  background:#1a1a1a;
+  padding:16px;
+  border-radius:14px;
+}
+
+svg{
+  width:100%;
+  height:200px;
+}
+
+.graph-line{
+  fill:none;
+  stroke:#ffd56b;
+  stroke-width:3;
+}
+
+.graph-dot{
+  fill:#ff9f1a;
+}  
 <script>
 // ===============================
 // 0) 기본 테이블
@@ -426,15 +477,28 @@ analysis += daewoonHtml;
 analysis += analyzeDaewoonVsSeowoon(currentDaewoon);
   const scores = calculateFortuneScores(elementResult, currentDaewoon);
 
-analysis += `
-<h3>📊 2026 운세 점수</h3>
-<p>💰 재물운: <b>${scores.wealth}점</b></p>
-<p>💖 연애운: <b>${scores.love}점</b></p>
-<p>🏢 직장/사업운: <b>${scores.career}점</b></p>
-<p>💪 건강운: <b>${scores.health}점</b></p>
-`;
+  analysis += generateScoreGraph(scores);
   analysis += generateScoreInterpretation(scores);
+  analysis += generateMonthlyGraph(scores);
+  analysis += generateYearSummary(scores);
+  analysis += generateFullReport(
+  name,
+  pillars,
+  elementResult,
+  scores
+);
   document.getElementById("analysisBox").innerHTML = analysis;
+  setTimeout(()=>{
+  const scores = calculateFortuneScores(elementResult, currentDaewoon);
+
+  Object.keys(scores).forEach(key=>{
+    const el = document.getElementById("bar-"+key);
+    if(el){
+      el.style.width = scores[key] + "%";
+    }
+  });
+
+}, 200);
 }
 
 // ===============================
@@ -611,6 +675,256 @@ document.addEventListener("DOMContentLoaded", function(){
   낮은 영역은 리스크 관리에 집중하세요.
   </p>
   `;
+  }
+function generateScoreGraph(scores){
+
+  function getClass(score){
+    if(score >= 80) return "bar-high";
+    if(score >= 65) return "bar-good";
+    if(score >= 50) return "bar-mid";
+    return "bar-low";
+  }
+
+  function barRow(label, score, key){
+    return `
+    <div class="bar-wrap">
+      <div class="bar-label">
+        <span>${label}</span>
+        <span><b>${score}점</b></span>
+      </div>
+      <div class="bar">
+        <div id="bar-${key}" class="bar-fill ${getClass(score)}"></div>
+      </div>
+    </div>
+    `;
+  }
+
+  return `
+    <h3>📊 2026 운세 그래프</h3>
+    ${barRow("💰 재물운", scores.wealth, "wealth")}
+    ${barRow("💖 연애운", scores.love, "love")}
+    ${barRow("🏢 직장/사업운", scores.career, "career")}
+    ${barRow("💪 건강운", scores.health, "health")}
+  `;
+}
+  function generateMonthlyScores(baseScore){
+
+  const arr = [];
+  for(let i=0;i<12;i++){
+    const variance = Math.floor(Math.random()*15) - 7; // -7 ~ +7
+    let value = baseScore + variance;
+
+    if(value > 95) value = 95;
+    if(value < 30) value = 30;
+
+    arr.push(value);
+  }
+  return arr;
+  }
+  
+function generateMonthlyGraphAll(scores){
+
+  const categories = [
+    {key:"wealth", label:"💰 재물운"},
+    {key:"love", label:"💖 연애운"},
+    {key:"career", label:"🏢 직장/사업운"},
+    {key:"health", label:"💪 건강운"}
+  ];
+
+  const max = 100;
+  const height = 160;
+  const widthStep = 100 / 11;
+
+  function generateMonthlyScores(baseScore){
+    const arr = [];
+    for(let i=0;i<12;i++){
+      const variance = Math.floor(Math.random()*15) - 7;
+      let value = baseScore + variance;
+      if(value > 95) value = 95;
+      if(value < 30) value = 30;
+      arr.push(value);
+    }
+    return arr;
+  }
+
+  let html = `<div class="month-graph">
+  <h3>📅 2026 월별 운세 변화</h3>`;
+
+  let monthlyData = {};
+
+  categories.forEach(cat=>{
+
+    const monthly = generateMonthlyScores(scores[cat.key]);
+    monthlyData[cat.key] = monthly;
+
+    let points = "";
+    let dots = "";
+
+    monthly.forEach((score,i)=>{
+      const x = i * widthStep;
+      const y = height - (score / max * height);
+      points += `${x},${y} `;
+      dots += `<circle cx="${x}" cy="${y}" r="2" class="graph-dot"></circle>`;
+    });
+
+    html += `
+    <h4 style="margin-top:18px">${cat.label}</h4>
+    <svg viewBox="0 0 100 ${height}">
+      <polyline points="${points}" class="graph-line"></polyline>
+      ${dots}
+    </svg>
+    `;
+  });
+
+  html += `</div>`;
+
+  html += generateMonthlyTextAll(monthlyData);
+
+  return html;
+}
+  function generateMonthlyTextAll(monthlyData){
+
+  function interpret(score, type){
+
+    if(score >= 80){
+      if(type==="wealth") return "수익 확장 가능성 높음. 투자·사업 기회 검토해볼 만한 시기.";
+      if(type==="love") return "연애/관계 진전 가능성 매우 높음.";
+      if(type==="career") return "성과·승진·평가 상승 가능성.";
+      if(type==="health") return "컨디션 양호. 활동량 늘리기 좋음.";
+    }
+
+    if(score >= 65){
+      return "안정적 상승 흐름. 무리하지 않으면 성과 가능.";
+    }
+
+    if(score >= 50){
+      return "평균 흐름. 리스크 관리 중요.";
+    }
+
+    return "주의 필요. 휴식·보수적 운영 추천.";
+  }
+
+  const monthNames = [
+    "1월","2월","3월","4월","5월","6월",
+    "7월","8월","9월","10월","11월","12월"
+  ];
+
+  const types = {
+    wealth:"💰 재물운",
+    love:"💖 연애운",
+    career:"🏢 직장/사업운",
+    health:"💪 건강운"
+  };
+
+  let html = "<h3>🗓 2026 월별 종합 해석</h3>";
+
+  monthNames.forEach((month,i)=>{
+
+    html += `<h4 style="margin-top:14px">${month}</h4>`;
+
+    Object.keys(types).forEach(type=>{
+      const score = monthlyData[type][i];
+      html += `<p>${types[type]}: ${interpret(score,type)}</p>`;
+    });
+
+  });
+
+  return html;
+}
+  function generateYearSummary(scores){
+
+  const avg = Math.round(
+    (scores.wealth + scores.love + scores.career + scores.health) / 4
+  );
+
+  let comment = "";
+
+  if(avg >= 80){
+    comment = "🔥 2026년은 인생 흐름이 강하게 상승하는 해입니다. 확장과 도전이 성과로 이어질 가능성이 높습니다.";
+  }
+  else if(avg >= 65){
+    comment = "✨ 2026년은 안정적 성장 흐름입니다. 준비된 영역에서 결과가 나타날 가능성이 큽니다.";
+  }
+  else if(avg >= 50){
+    comment = "⚖ 2026년은 유지와 관리의 해입니다. 큰 모험보다 전략적 운영이 유리합니다.";
+  }
+  else{
+    comment = "⚠ 2026년은 리스크 관리가 중요한 해입니다. 보수적 판단과 체력 관리에 집중하세요.";
+  }
+
+  return `
+  <div class="card">
+    <h2>📌 2026년 한 줄 총평</h2>
+    <p style="font-size:16px;line-height:1.8;">
+      ${comment}
+    </p>
+  </div>
+  `;
+  }
+  function generateFullReport(name, pillars, elementCounts, scores){
+
+  const strongest = Object.keys(elementCounts)
+    .reduce((a,b)=> elementCounts[a] > elementCounts[b] ? a : b);
+
+  const avg = Math.round(
+    (scores.wealth + scores.love + scores.career + scores.health) / 4
+  );
+
+  let text = `
+  <div class="card">
+  <h2>🧾 2026년 AI 종합 리포트</h2>
+  <p><b>${name}</b>님의 사주 구조는 
+  <b>${pillars.join(" / ")}</b> 흐름으로 구성되어 있습니다.</p>
+
+  <p>오행 분석 결과 <b>${strongest}</b> 기운이 중심이 되는 구조입니다.
+  이는 성향과 선택에서 해당 오행의 특성이 반복적으로 작용할 가능성을 의미합니다.
+  강한 오행은 장점이 되지만 과하면 균형을 깨뜨릴 수 있으므로
+  2026년에는 균형 전략이 중요합니다.</p>
+
+  <p>2026년은 병오년(丙午)으로 화(火)의 기운이 강하게 작용하는 해입니다.
+  이는 속도, 결정, 노출, 확장이라는 키워드를 동반합니다.
+  평균 운세 점수는 <b>${avg}점</b>으로 분석되며,
+  전반적으로 ${avg >= 70 ? "상승 기류가 감지되는 해" : "관리 중심 전략이 필요한 해"}입니다.</p>
+  `;
+
+  if(scores.wealth >= 75){
+    text += `<p>재물운은 확장 가능성이 높습니다.
+    새로운 수익 모델이나 투자 검토에 적합합니다.</p>`;
+  } else if(scores.wealth < 55){
+    text += `<p>재물 영역은 방어 전략이 필요합니다.
+    현금 흐름 관리와 지출 통제가 핵심입니다.</p>`;
+  }
+
+  if(scores.love >= 75){
+    text += `<p>연애·인간관계는 발전 가능성이 높습니다.
+    적극적 표현이 좋은 결과를 만들 수 있습니다.</p>`;
+  } else if(scores.love < 55){
+    text += `<p>관계 영역에서는 갈등 관리가 중요합니다.
+    감정 기복 조절이 관건입니다.</p>`;
+  }
+
+  if(scores.career >= 75){
+    text += `<p>직장·사업 영역은 성과 창출 가능성이 높습니다.
+    브랜딩·노출 활동이 유리합니다.</p>`;
+  }
+
+  if(scores.health < 55){
+    text += `<p>건강 영역은 체력 관리가 필요합니다.
+    과로와 수면 부족을 경계하세요.</p>`;
+  }
+
+  text += `
+  <p style="margin-top:15px;">
+  종합적으로 2026년은 “${strongest}의 활용 전략”이 핵심입니다.
+  강한 영역은 확장하고,
+  약한 영역은 관리하는 균형 운영이
+  가장 높은 성과를 만들 것입니다.
+  </p>
+
+  </div>
+  `;
+
+  return text;
   }
 });
 </script>
