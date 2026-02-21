@@ -1002,8 +1002,20 @@ function generateMonthlyGraphAll(scores){
 
   if(fullBtn){
     fullBtn.onclick = ()=>{
-      window.print();
-    };
+  const birth = localStorage.getItem("birth") || "";
+  const safeName = String(name || "회원").replace(/\s+/g,"");
+  const safeBirth = String(birth).replace(/[^0-9\-]/g,""); // yyyy-mm-dd
+
+  const originalTitle = document.title;
+  document.title = `${safeName}_${safeBirth}_2026사주리포트(전체)`;
+
+  window.print();
+
+  // 인쇄 후 원래 제목 복구
+  setTimeout(()=>{
+    document.title = originalTitle;
+  }, 300);
+};
   }
 
   if(summaryBtn){
