@@ -17,6 +17,23 @@ function normalizePhone(phone){
   return String(phone || "").replace(/[^0-9]/g, "");
 }
 
+function toKoreanYMD(v){
+  if(!v) return "";
+  const s = String(v);
+
+  // 이미 YYYY-MM-DD면 그대로
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+
+  // ISO(Z) 등 → Date로 파싱 후 로컬 날짜로 YYYY-MM-DD 생성
+  const d = new Date(s);
+  if(Number.isNaN(d.getTime())) return "";
+
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  const dd = String(d.getDate()).padStart(2,"0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
 // ✅ 공통: API URL 비어있을 때 안전장치
 function getApiUrlOrWarn(){
   const url = window.getApiUrl?.() || "";
@@ -99,7 +116,8 @@ async function syncUserFromServer(){
       // ✅ point로 통일
       localStorage.setItem("point", String(res.points || 0));
       localStorage.setItem("name", String(res.name || ""));
-      if(res.birth) localStorage.setItem("birth", String(res.birth));
+      const birthYMD = toKoreanYMD(res.birth);
+if(birthYMD) localStorage.setItem("birth", birthYMD);
       if(res.zodiac) localStorage.setItem("zodiac", String(res.zodiac));
       if(res.gapja) localStorage.setItem("gapja", String(res.gapja));
     }else{
