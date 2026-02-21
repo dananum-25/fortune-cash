@@ -73,45 +73,83 @@ footer{opacity:.7;font-size:12px;margin-top:40px;text-align:center;}
 </div>
 
 <script>
-function renderSaju(){
+
+const heavenly = ["갑","을","병","정","무","기","경","신","임","계"];
+const earthly = ["자","축","인","묘","진","사","오","미","신","유","술","해"];
+
+function getYearPillar(year){
+  const baseYear = 1984; // 갑자년
+  const index = (year - baseYear) % 60;
+  const normalized = (index + 60) % 60;
+  return heavenly[normalized % 10] + earthly[normalized % 12];
+}
+
+function getDayPillar(date){
+  const baseDate = new Date(1900,0,1); // 1900-01-01 갑자일
+  const diff = Math.floor((date - baseDate) / (1000*60*60*24));
+  const normalized = (diff % 60 + 60) % 60;
+  return heavenly[normalized % 10] + earthly[normalized % 12];
+}
+
+function getHourBranch(hour){
+  return earthly[Math.floor(((hour + 1) % 24) / 2)];
+}
+
+function calculateSaju(){
 
   const name = localStorage.getItem("name");
   const birth = localStorage.getItem("birth");
-  const zodiac = localStorage.getItem("zodiac");
-  const gapja = localStorage.getItem("gapja");
+  const hour = parseInt(document.getElementById("birthHour").value);
 
   if(!birth){
-    document.getElementById("loginCheck").innerHTML =
-      "⚠ 로그인 후 사주 확인이 가능합니다.";
+    alert("로그인이 필요합니다.");
     return;
   }
 
-  document.getElementById("loginCheck").style.display="none";
+  if(isNaN(hour) || hour < 0 || hour > 23){
+    alert("출생 시간을 0~23 사이로 입력해주세요.");
+    return;
+  }
+
+  const birthDate = new Date(birth);
+  const year = birthDate.getFullYear();
+
+  const yearPillar = getYearPillar(year);
+  const dayPillar = getDayPillar(birthDate);
+  const hourPillar = getHourBranch(hour) + "시";
+
+  document.getElementById("timeInputBox").style.display="none";
   document.getElementById("sajuResult").style.display="block";
 
   document.getElementById("basicInfo").innerHTML =
-    `<b>${name}</b><br>생년월일: ${birth}<br>띠: ${zodiac || "-"}<br>간지: ${gapja || "-"}`;
+    `<b>${name}</b><br>생년월일: ${birth}<br>출생시간: ${hour}시`;
 
   document.getElementById("sajuBox").innerHTML =
-    `<span class="badge">${gapja || "간지 정보"}</span>
-     <span class="badge">${zodiac || "띠 정보"}</span>`;
+    `<div class="badge">연주: ${yearPillar}</div>
+     <div class="badge">일주: ${dayPillar}</div>
+     <div class="badge">시주: ${hourPillar}</div>`;
 
-  let analysis = "";
-
-  if(zodiac){
-    analysis += `<p>${zodiac}의 기운이 강한 해입니다. 2026년은 변화 속 안정이 중요합니다.</p>`;
-  }
-
-  if(gapja){
-    analysis += `<p>${gapja} 기운은 추진력과 실행력을 의미합니다. 올해는 실행이 곧 성과입니다.</p>`;
-  }
-
-  analysis += `<p>2026년은 재물운과 직장운의 변화 폭이 존재합니다. 무리한 확장보다는 기반 강화 전략이 유리합니다.</p>`;
+  let analysis = `
+  <p><b>${yearPillar}</b> 기운을 타고난 당신은 기본 성향이 뚜렷합니다.</p>
+  <p>일주 <b>${dayPillar}</b>는 인생의 중심 에너지를 의미합니다.</p>
+  <p>2026년은 추진력과 실행력이 강화되는 흐름입니다.</p>
+  <p>상반기 재물 흐름 상승, 하반기 안정 흐름이 유리합니다.</p>
+  `;
 
   document.getElementById("analysisBox").innerHTML = analysis;
 }
 
-document.addEventListener("DOMContentLoaded", renderSaju);
+document.addEventListener("DOMContentLoaded", function(){
+  const birth = localStorage.getItem("birth");
+  if(!birth){
+    document.getElementById("loginCheck").innerHTML =
+      "⚠ 로그인 후 사주 확인이 가능합니다.";
+  }else{
+    document.getElementById("loginCheck").innerHTML =
+      "출생 시간을 입력하면 60갑자 일주 계산이 진행됩니다.";
+  }
+});
+
 </script>
 
 </body>
