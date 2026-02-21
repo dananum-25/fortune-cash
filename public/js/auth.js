@@ -98,12 +98,7 @@ async function syncUserFromServer(){
       headers:{ "Content-Type":"text/plain;charset=utf-8" },
       body: JSON.stringify({ action:"getUser", phone })
     });
-const b = localStorage.getItem("birth");
-if(b && b.includes("T")){
-  const d = new Date(b);
-  const ymd = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-  localStorage.setItem("birth", ymd);
-}
+
     const txt = await r.text();
     const res = JSON.parse(txt);
 
