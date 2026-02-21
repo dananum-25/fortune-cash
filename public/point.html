@@ -85,6 +85,8 @@ button.secondary{
     <div id="loginHint" class="small" style="display:none;">
       포인트 기능은 로그인 후 이용 가능합니다. 메인에서 로그인해주세요.
     </div>
+
+    <div id="sysHint" class="small" style="display:none;"></div>
   </div>
 
   <div class="card">
@@ -106,12 +108,33 @@ button.secondary{
 <script src="/js/points.js"></script>
 
 <script>
+function setSysHint(msg){
+  const el = document.getElementById("sysHint");
+  if(!el) return;
+  el.style.display = "block";
+  el.textContent = msg;
+}
+
 async function renderPoint(){
   const phone = localStorage.getItem("phone");
   const name = localStorage.getItem("name") || "회원";
 
   const btnCheckin = document.getElementById("btnCheckin");
   const btnUse = document.getElementById("btnUse");
+
+  // ✅ points.js가 정상 로드되었는지 체크
+  const hasPointsFns = (typeof window.loadMyPoint === "function") &&
+                       (typeof window.checkinPoint === "function") &&
+                       (typeof window.givePoint === "function");
+
+  if(!hasPointsFns){
+    setSysHint("시스템 로딩이 아직 완료되지 않았거나(points.js 미로드), 네트워크 문제일 수 있어요. 새로고침 후 다시 시도해주세요.");
+    if(btnCheckin) btnCheckin.disabled = true;
+    if(btnUse) btnUse.disabled = true;
+  }else{
+    const hint = document.getElementById("sysHint");
+    if(hint) hint.style.display = "none";
+  }
 
   if(!phone){
     document.getElementById("userInfo").textContent = "로그인 필요";
@@ -127,28 +150,51 @@ async function renderPoint(){
   document.getElementById("loginHint").style.display = "none";
   document.getElementById("userInfo").textContent = `${name}님`;
 
-  const p = await window.loadMyPoint?.();
-  const num = Number(p);
+  // ✅ 안전 호출
+  let p = 0;
+  try{
+    p = await window.loadMyPoint();
+  }catch(e){
+    setSysHint("포인트 조회 중 오류가 발생했어요. 새로고침 후 다시 시도해주세요.");
+    console.warn(e);
+    p = Number(localStorage.getItem("point") || "0");
+  }
 
+  const num = Number(p);
   document.getElementById("pointBox").textContent =
     (Number.isFinite(num) ? num.toLocaleString() : "0") + "점";
 
   document.getElementById("metaLine").textContent =
     "전화번호: " + phone + " · (API: config.js)";
+
+  // 로그인 상태면 버튼 활성
+  if(btnCheckin) btnCheckin.disabled = false;
+  if(btnUse) btnUse.disabled = false;
 }
 
 // 버튼 이벤트
 document.getElementById("btnCheckin")?.addEventListener("click", async ()=>{
-  await window.checkinPoint?.();
+  if(typeof window.checkinPoint !== "function"){
+    alert("시스템 로딩이 아직 끝나지 않았어요. 새로고침 후 다시 시도해주세요.");
+    return;
+  }
+  await window.checkinPoint();
   await renderPoint();
 });
 
 document.getElementById("btnUse")?.addEventListener("click", async ()=>{
-  await window.givePoint?.();
+  if(typeof window.givePoint !== "function"){
+    alert("시스템 로딩이 아직 끝나지 않았어요. 새로고침 후 다시 시도해주세요.");
+    return;
+  }
+  await window.givePoint();
   await renderPoint();
 });
 
-renderPoint();
+// ✅ 실행 타이밍 안정화
+document.addEventListener("DOMContentLoaded", ()=>{
+  renderPoint();
+});
 </script>
 
 </body>
