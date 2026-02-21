@@ -297,10 +297,13 @@ async function handleSubmitLogin(){
     return;
   }
 
-  if(st === "exists" || st === "ok"){
-    localStorage.setItem("name", name);
-    localStorage.setItem("phone", phone);
-    localStorage.setItem("birth", birth);
+if(st === "exists" || st === "ok"){
+  localStorage.setItem("name", name);
+  localStorage.setItem("phone", phone);
+  localStorage.setItem("birth", toKoreanYMD(birth)); // ✅ 저장도 YMD로 고정
+
+  // ✅ 과거 points 키 제거 (혼선 방지)
+  localStorage.removeItem("points");
     if(zodiac) localStorage.setItem("zodiac", zodiac);
     if(gapja) localStorage.setItem("gapja", gapja);
     localStorage.removeItem("guestMode");
