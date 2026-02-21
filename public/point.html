@@ -26,9 +26,7 @@ body{
   margin-bottom:14px;
 }
 
-h2{
-  margin-top:0;
-}
+h2{ margin-top:0; }
 
 .point{
   font-size:22px;
@@ -72,41 +70,39 @@ button.secondary{
 
 <div class="wrap">
 
-<div class="card">
-<h2>🎁 내 포인트</h2>
-<div id="userInfo">로그인 필요</div>
-<div id="pointBox" class="point">0점</div>
+  <div class="card">
+    <h2>🎁 내 포인트</h2>
+    <div id="userInfo">로그인 필요</div>
+    <div id="pointBox" class="point">0점</div>
 
-<div id="metaLine" class="small"></div>
+    <div id="metaLine" class="small"></div>
 
-<div class="row">
-  <button id="btnCheckin">출석 체크 (+10)</button>
-  <button id="btnUse" class="secondary">컨텐츠 이용 (+1)</button>
-</div>
+    <div class="row">
+      <button id="btnCheckin">출석 체크 (+10)</button>
+      <button id="btnUse" class="secondary">컨텐츠 이용 (+1)</button>
+    </div>
 
-</div>
+    <div id="loginHint" class="small" style="display:none;">
+      포인트 기능은 로그인 후 이용 가능합니다. 메인에서 로그인해주세요.
+    </div>
+  </div>
 
-<div class="card">
-<h2>📜 앱테크 규칙</h2>
+  <div class="card">
+    <h2>📜 앱테크 규칙</h2>
+    <p>• 출석 체크: +10점</p>
+    <p>• 컨텐츠 이용: +1점</p>
+    <p>• 친구 초대: 양쪽 +100점</p>
+    <br>
+    <p>💰 1점 = 1원</p>
+    <p>💳 5,000점부터 출금 가능</p>
+  </div>
 
-<p>• 출석 체크: +10점</p>
-<p>• 컨텐츠 이용: +1점</p>
-<p>• 친구 초대: 양쪽 +100점</p>
-
-<br>
-
-<p>💰 1점 = 1원</p>
-<p>💳 5,000점부터 출금 가능</p>
-</div>
-
-<button onclick="location.href='/'">
-메인으로 돌아가기
-</button>
+  <button onclick="location.href='/'">메인으로 돌아가기</button>
 
 </div>
 
-<!-- ✅ 중요: auth.js가 API_URL(전역 설정)을 가지고 있으니 먼저 로드 -->
-<script src="/js/auth.js"></script>
+<!-- ✅ API URL은 config.js에서만 관리 -->
+<script src="/js/config.js"></script>
 <script src="/js/points.js"></script>
 
 <script>
@@ -114,25 +110,31 @@ async function renderPoint(){
   const phone = localStorage.getItem("phone");
   const name = localStorage.getItem("name") || "회원";
 
+  const btnCheckin = document.getElementById("btnCheckin");
+  const btnUse = document.getElementById("btnUse");
+
   if(!phone){
     document.getElementById("userInfo").textContent = "로그인 필요";
     document.getElementById("pointBox").textContent = "0점";
-    document.getElementById("metaLine").textContent = "메인에서 로그인 후 이용 가능합니다.";
+    document.getElementById("metaLine").textContent = "로그인 후 포인트가 표시됩니다.";
+    document.getElementById("loginHint").style.display = "block";
+
+    if(btnCheckin) btnCheckin.disabled = true;
+    if(btnUse) btnUse.disabled = true;
     return;
   }
 
+  document.getElementById("loginHint").style.display = "none";
   document.getElementById("userInfo").textContent = `${name}님`;
 
-  // ✅ points.js의 공용 함수 사용
   const p = await window.loadMyPoint?.();
-
   const num = Number(p);
+
   document.getElementById("pointBox").textContent =
     (Number.isFinite(num) ? num.toLocaleString() : "0") + "점";
 
-  // 표시용 메타
   document.getElementById("metaLine").textContent =
-    "전화번호: " + phone + " · (API 공유: auth.js)";
+    "전화번호: " + phone + " · (API: config.js)";
 }
 
 // 버튼 이벤트
@@ -142,12 +144,10 @@ document.getElementById("btnCheckin")?.addEventListener("click", async ()=>{
 });
 
 document.getElementById("btnUse")?.addEventListener("click", async ()=>{
-  // addPoint +1
   await window.givePoint?.();
   await renderPoint();
 });
 
-// 최초 로드
 renderPoint();
 </script>
 
