@@ -8,26 +8,7 @@ function getApiUrlSafe(){
   return (window.getApiUrl?.() || window.APP_CONFIG?.API_URL || "");
 }
 
-// point 키 통일
-function getLocalPoint(){
-  return Number(localStorage.getItem("point") || "0");
-}
-function setLocalPoint(v){
-  localStorage.setItem("point", String(Number(v || 0)));
-}
-
-async function loadMyPoint(){
-  const phone = localStorage.getItem("phone");
-  if(!phone) return getLocalPoint();
-
-  const API_URL = getApiUrlSafe();
-  if(!API_URL) return getLocalPoint();
-
-  const res = await fetch(API_URL,{
-    method:"POST",
-    headers:{ "Content-Type":"text/plain;charset=utf-8" },
-    body: JSON.stringify({ action:"getUser", phone })
-  async function postJSON(API_URL, payload){
+async function postJSON(API_URL, payload){
   try{
     const r = await fetch(API_URL,{
       method:"POST",
@@ -48,8 +29,27 @@ async function loadMyPoint(){
   }
 }
 
+// point 키 통일
+function getLocalPoint(){
+  return Number(localStorage.getItem("point") || "0");
+}
+function setLocalPoint(v){
+  localStorage.setItem("point", String(Number(v || 0)));
+}
+
+async function loadMyPoint(){
+  const phone = localStorage.getItem("phone");
+  if(!phone) return getLocalPoint();
+
+  const API_URL = getApiUrlSafe();
+  if(!API_URL) return getLocalPoint();
+
+  const res = await postJSON(API_URL, { action:"getUser", phone });
+
   if(res?.status === "ok"){
     setLocalPoint(res.points || 0);
+    if(res.name) localStorage.setItem("name", String(res.name));
+    // birth는 auth.js에서 정규화하니까 여기선 건드리지 않아도 됨(원하면 추가 가능)
     return res.points || 0;
   }
 
@@ -69,11 +69,7 @@ async function checkinPoint(){
     return;
   }
 
-  const res = await fetch(API_URL,{
-    method:"POST",
-    headers:{ "Content-Type":"text/plain;charset=utf-8" },
-    body: JSON.stringify({ action:"checkin", phone })
-  }).then(r=>r.json()).catch(()=>null);
+  const res = await postJSON(API_URL, { action:"checkin", phone });
 
   if(!res){
     alert("서버 응답이 없습니다. 잠시 후 다시 시도해주세요.");
@@ -81,8 +77,8 @@ async function checkinPoint(){
   }
 
   if(res.status === "ok"){
-  if(typeof res.points !== "undefined") setLocalPoint(res.points);
-  alert(res.message || "출석 완료 ✅");
+    if(typeof res.points !== "undefined") setLocalPoint(res.points);
+    alert(res.message || "출석 완료 ✅");
   }else if(res.status === "already"){
     alert("오늘은 이미 출석했어요 🙂");
   }else if(res.status === "none"){
@@ -101,12 +97,7 @@ async function givePoint(){
   const API_URL = getApiUrlSafe();
   if(!API_URL) return;
 
-  await fetch(API_URL,{
-    method:"POST",
-    headers:{ "Content-Type":"text/plain;charset=utf-8" },
-    body: JSON.stringify({ action:"addPoint", phone })
-  }).catch(()=>{});
-
+  await postJSON(API_URL, { action:"addPoint", phone });
   await loadMyPoint();
 }
 
@@ -117,17 +108,12 @@ async function rewardContent(type){
   const API_URL = getApiUrlSafe();
   if(!API_URL) return;
 
-  // 현재 Code.gs는 addPoint가 +1 고정이라 amount/type 보내도 무시될 수 있음(보내도 안전)
-  await fetch(API_URL,{
-    method:"POST",
-    headers:{ "Content-Type":"text/plain;charset=utf-8" },
-    body: JSON.stringify({
-      action:"addPoint",
-      phone,
-      amount: 1,
-      type: String(type || "")
-    })
-  }).catch(()=>{});
+  await postJSON(API_URL, {
+    action:"addPoint",
+    phone,
+    amount: 1,
+    type: String(type || "")
+  });
 
   await loadMyPoint();
 }
