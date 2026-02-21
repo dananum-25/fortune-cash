@@ -320,7 +320,39 @@ function sewoonAnalyze(pillars){
 
   return html;
 }
+function analyzeSeowoonWithElements(elementCounts){
 
+  const fireCount = elementCounts["화"] || 0;
+  let text = "";
+
+  text += `<h3>🔥 2026년 화(火) 기운 영향</h3>`;
+
+  if(fireCount >= 3){
+    text += `
+      <p>원국에 이미 화(火) 기운이 강한 편입니다.</p>
+      <p>2026년은 화의 해(병오)라, 과열·속도전·감정기복이 커질 수 있습니다.</p>
+      <p><b>주의:</b> 충동 소비, 급한 결정, 인간관계 갈등 관리 필요.</p>
+      <p><b>기회:</b> 마케팅·노출·발표·SNS·유튜브 활동은 강점이 됩니다.</p>
+    `;
+  }
+  else if(fireCount === 0){
+    text += `
+      <p>원국에 화(火) 기운이 부족한 편입니다.</p>
+      <p>2026년은 부족한 화를 채워주는 해입니다.</p>
+      <p><b>기회:</b> 도전·시작·이직·창업·브랜딩에 유리.</p>
+      <p>그동안 미뤄둔 일을 실행하기 좋은 해입니다.</p>
+    `;
+  }
+  else{
+    text += `
+      <p>화(火) 기운이 적당히 존재합니다.</p>
+      <p>2026년은 활동성과 추진력이 상승하는 해입니다.</p>
+      <p>적극적으로 움직이면 성과를 얻을 수 있습니다.</p>
+    `;
+  }
+
+  return text;
+}
 // ===============================
 // 6) 메인 계산
 // ===============================
@@ -378,14 +410,30 @@ function calculateSaju(){
   document.getElementById("elementInterpretation").innerHTML = generateElementInterpretation(elementResult);
 
   // 2026 세운 합충
-  document.getElementById("sewoonBox").innerHTML = sewoonAnalyze(pillars);
+  let seowoonHtml = sewoonAnalyze(pillars);
+seowoonHtml += analyzeSeowoonWithElements(elementResult);
+
+document.getElementById("sewoonBox").innerHTML = seowoonHtml;
 
   // 종합 해석(간단)
   let analysis = "";
   analysis += `<p>당신의 4기둥은 <b>${yearPillar} / ${monthPillar} / ${dayPillar} / ${hourPillar}</b> 흐름으로 정리됩니다.</p>`;
   analysis += `<p>오행 관점에서는 <b>${strongest}</b> 기운이 상대적으로 강해, 올해는 그 특성이 “결정/선택”에 영향을 주기 쉬워요.</p>`;
   analysis += `<p class="small">TIP) 이 페이지는 “무료/간편 해석” 버전이라, 추후 대운/세운 확장하면 훨씬 더 정밀해집니다.</p>`;
+const daewoonHtml = generateDaewoon(yearPillar, year);
+analysis += daewoonHtml;
+  const currentDaewoon = getCurrentDaewoonPillar(year);
+analysis += analyzeDaewoonVsSeowoon(currentDaewoon);
+  const scores = calculateFortuneScores(elementResult, currentDaewoon);
 
+analysis += `
+<h3>📊 2026 운세 점수</h3>
+<p>💰 재물운: <b>${scores.wealth}점</b></p>
+<p>💖 연애운: <b>${scores.love}점</b></p>
+<p>🏢 직장/사업운: <b>${scores.career}점</b></p>
+<p>💪 건강운: <b>${scores.health}점</b></p>
+`;
+  analysis += generateScoreInterpretation(scores);
   document.getElementById("analysisBox").innerHTML = analysis;
 }
 
@@ -405,6 +453,165 @@ document.addEventListener("DOMContentLoaded", function(){
   document.getElementById("loginCheck").innerHTML =
     "<h2>✅ 준비 완료</h2><p>출생 시간을 입력하면 4기둥 + 오행 + 2026 세운 분석을 보여줄게요.</p>";
   document.getElementById("timeInputBox").style.display="block";
+
+  function generateDaewoon(startYearPillar, birthYear){
+
+  const baseYear = 1984; // 갑자년 기준
+  const yearIndex = ((birthYear - baseYear) % 60 + 60) % 60;
+
+  let html = "<h3>📈 대운(10년 운) 흐름</h3>";
+
+  for(let i=1;i<=8;i++){
+    const ageStart = i*10;
+    const pillarIndex = (yearIndex + i) % 60;
+
+    const stem = heavenly[pillarIndex % 10];
+    const branch = earthly[pillarIndex % 12];
+    const pillar = stem + branch;
+
+    html += `
+      <p><b>${ageStart}세 ~ ${ageStart+9}세</b> :
+      <span class="badge">${pillar}</span></p>
+    `;
+  }
+
+  html += `<p class="small">
+    ※ 간이 대운 계산 버전입니다. (절기·순행·역행 미적용)
+  </p>`;
+
+  return html;
+  }
+  function getCurrentDaewoonPillar(birthYear){
+
+  const currentYear = 2026;
+  const age = currentYear - birthYear;
+
+  const daewoonIndex = Math.floor(age / 10);
+
+  const baseYear = 1984;
+  const yearIndex = ((birthYear - baseYear) % 60 + 60) % 60;
+
+  const pillarIndex = (yearIndex + daewoonIndex) % 60;
+
+  const stem = heavenly[pillarIndex % 10];
+  const branch = earthly[pillarIndex % 12];
+
+  return stem + branch;
+  }
+  function analyzeDaewoonVsSeowoon(currentDaewoon){
+
+  const seowoon = "병오";
+  const sStem = seowoon[0];
+  const sBranch = seowoon[1];
+
+  const dStem = currentDaewoon[0];
+  const dBranch = currentDaewoon[1];
+
+  let html = "<h3>🔥 현재 대운 × 2026 세운 분석</h3>";
+
+  // 지지 충
+  if(BRANCH_CLASH[dBranch] === sBranch){
+    html += `
+      <p><b>⚠ 강한 변화 운</b></p>
+      <p>현재 대운(${currentDaewoon})과 세운(${seowoon})이 충합니다.</p>
+      <p>이직, 이사, 관계 정리, 사업 방향 수정 가능성.</p>
+    `;
+  }
+
+  // 지지 합
+  else if(BRANCH_COMBO[dBranch] === sBranch){
+    html += `
+      <p><b>✅ 확장 운</b></p>
+      <p>현재 대운과 세운이 합을 이룹니다.</p>
+      <p>협력·확장·관계 도움 운 상승.</p>
+    `;
+  }
+
+  else{
+    html += `
+      <p>큰 충합 구조는 아닙니다.</p>
+      <p>기본 흐름을 안정적으로 유지하는 해입니다.</p>
+    `;
+  }
+
+  return html;
+  }
+  function calculateFortuneScores(elementCounts, currentDaewoon){
+
+  let scores = {
+    wealth: 60,
+    love: 60,
+    career: 60,
+    health: 60
+  };
+
+  const fire = elementCounts["화"] || 0;
+  const water = elementCounts["수"] || 0;
+  const metal = elementCounts["금"] || 0;
+  const wood = elementCounts["목"] || 0;
+  const earth = elementCounts["토"] || 0;
+
+  // 🔥 2026은 화의 해 (병오)
+  // 화 많으면 추진력 ↑ but 과열 위험
+  if(fire >= 3){
+    scores.career += 10;
+    scores.love += 5;
+    scores.health -= 5;
+  }
+  else if(fire === 0){
+    scores.career += 5;
+    scores.wealth += 5;
+  }
+
+  // 💰 금/수는 재물 관련
+  if(metal >= 2) scores.wealth += 10;
+  if(water >= 2) scores.wealth += 5;
+
+  // 🌿 목은 인간관계
+  if(wood >= 2) scores.love += 10;
+
+  // 🪨 토는 안정성
+  if(earth >= 2) scores.health += 10;
+
+  // 대운 영향
+  const dBranch = currentDaewoon[1];
+  if(dBranch === "오" || dBranch === "사"){
+    scores.career += 5;
+  }
+
+  // 점수 보정 (0~100)
+  Object.keys(scores).forEach(k=>{
+    if(scores[k] > 95) scores[k] = 95;
+    if(scores[k] < 30) scores[k] = 30;
+  });
+
+  return scores;
+  }
+  function generateScoreInterpretation(scores){
+
+  function interpret(score, type){
+    if(score >= 80) return "매우 강한 흐름입니다. 적극적으로 움직이면 성과가 큽니다.";
+    if(score >= 65) return "좋은 흐름입니다. 준비한 만큼 결과가 나옵니다.";
+    if(score >= 50) return "평균적인 흐름입니다. 무리하지 않는 것이 중요합니다.";
+    return "주의가 필요한 시기입니다. 보수적으로 운영하는 것이 좋습니다.";
+  }
+
+  return `
+  <h3>🧠 2026년 종합 해석</h3>
+
+  <p><b>💰 재물운:</b> ${interpret(scores.wealth,"wealth")}</p>
+  <p><b>💖 연애운:</b> ${interpret(scores.love,"love")}</p>
+  <p><b>🏢 직장/사업운:</b> ${interpret(scores.career,"career")}</p>
+  <p><b>💪 건강운:</b> ${interpret(scores.health,"health")}</p>
+
+  <p style="margin-top:15px;">
+  2026년은 기본적으로 화(火)의 해입니다.
+  당신의 사주 구조에 따라 속도·결정·변화가 키워드가 됩니다.
+  점수가 높은 영역은 과감히 확장하고,
+  낮은 영역은 리스크 관리에 집중하세요.
+  </p>
+  `;
+  }
 });
 </script>
 
