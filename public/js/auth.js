@@ -19,18 +19,23 @@ function normalizePhone(phone){
 
 function toKoreanYMD(v){
   if(!v) return "";
-  const s = String(v);
+  const s = String(v).trim();
 
   // 이미 YYYY-MM-DD면 그대로
   if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
 
-  // ISO(Z) 등 → Date로 파싱 후 로컬 날짜로 YYYY-MM-DD 생성
+  // ISO가 섞여있으면 날짜 부분만 우선 잘라서 처리
+  // 예: 1982-01-07T15:00:00.000Z -> 1982-01-07 (이게 “기준 날짜”)
+  const m = s.match(/^(\d{4}-\d{2}-\d{2})/);
+  if(m && m[1]) return m[1];
+
+  // 그래도 안 되면 Date로 파싱하되, UTC 기준으로 YYYY-MM-DD 뽑기
   const d = new Date(s);
   if(Number.isNaN(d.getTime())) return "";
 
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth()+1).padStart(2,"0");
-  const dd = String(d.getDate()).padStart(2,"0");
+  const yyyy = d.getUTCFullYear();
+  const mm = String(d.getUTCMonth()+1).padStart(2,"0");
+  const dd = String(d.getUTCDate()).padStart(2,"0");
   return `${yyyy}-${mm}-${dd}`;
 }
 
@@ -93,11 +98,14 @@ async function syncUserFromServer(){
   if(!phone) return;
 
   try{
-    const r = await fetch(window.getApiUrl(),{   // ✅ window.API_URL 말고 getApiUrl 사용
-      method:"POST",
-      headers:{ "Content-Type":"text/plain;charset=utf-8" },
-      body: JSON.stringify({ action:"getUser", phone })
-    });
+const API_URL = getApiUrlOrWarn();
+if(!API_URL) return;
+
+const r = await fetch(API_URL,{
+  method:"POST",
+  headers:{ "Content-Type":"text/plain;charset=utf-8" },
+  body: JSON.stringify({ action:"getUser", phone })
+});
 
     const txt = await r.text();
     const res = JSON.parse(txt);
