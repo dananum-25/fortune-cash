@@ -4,24 +4,52 @@ console.log("[cookie.js] loaded ✅");
 let cookieDB = null;
 
 // ---- 유틸: YYYYMMDD 스탬프
+// 1) YYYYMMDD
 function todayStamp(){
   const d = new Date();
   const y = d.getFullYear();
   const m = String(d.getMonth()+1).padStart(2,"0");
-  const dd = String(d.getDate()).padStart(2,"0");
-  return `${y}${m}${dd}`;
+  const da = String(d.getDate()).padStart(2,"0");
+  return `${y}${m}${da}`;
 }
 
-// ---- 유틸: seed (같은 날+같은 사람 = 같은 결과)
-function ymdToSeed(ymd){
-  const m = String(ymd || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if(!m) return 12345;
-  return Number(m[1])*10000 + Number(m[2])*100 + Number(m[3]);
+// 2) 유저 seed (phone 있으면 phone, 없으면 birth)
+function userSeed(){
+  const phone = localStorage.getItem("phone") || "";
+  const birth = localStorage.getItem("birth") || "";
+
+  if(phone){
+    // 010xxxxxxxx → 뒤 6자리 정도 섞기
+    const tail = phone.slice(-6);
+    return Number(tail) || 777777;
+  }
+  // birth: YYYY-MM-DD → 숫자로
+  const m = String(birth).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(m){
+    return (Number(m[1])*10000) + (Number(m[2])*100) + Number(m[3]);
+  }
+  return 777777;
 }
 
-// ---- 고정 랜덤 pick
+// 3) weighted pick (카테고리 선택)
+function weightedPick(weights, seed){
+  const entries = Object.entries(weights || {});
+  let sum = 0;
+  entries.forEach(([k,v]) => sum += Number(v||0));
+  if(sum <= 0) return "overall";
+
+  const r = Math.abs(seed) % sum;
+  let acc = 0;
+  for(const [k,v] of entries){
+    acc += Number(v||0);
+    if(r < acc) return k;
+  }
+  return entries[0]?.[0] || "overall";
+}
+
+// 4) seededPick (배열에서 고정 선택)
 function seededPick(arr, seed, offset){
-  if(!arr?.length) return "";
+  if(!arr || !arr.length) return "";
   const idx = Math.abs((seed + (offset||0)) % arr.length);
   return arr[idx];
 }
