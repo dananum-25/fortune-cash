@@ -1,240 +1,271 @@
+// /public/js/cookie.js
 console.log("[cookie.js] loaded ✅");
 
-function escapeHtml(s){
-  return String(s ?? "")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
+let cookieDB = null;
+
+// ---- 유틸: YYYYMMDD 스탬프
+function todayStamp(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const dd = String(d.getDate()).padStart(2,"0");
+  return `${y}${m}${dd}`;
 }
 
+// ---- 유틸: seed (같은 날+같은 사람 = 같은 결과)
 function ymdToSeed(ymd){
   const m = String(ymd || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if(!m) return 12345;
   return Number(m[1])*10000 + Number(m[2])*100 + Number(m[3]);
 }
 
-function getTodayStamp(){
-  const t = new Date();
-  const y = t.getFullYear();
-  const m = String(t.getMonth()+1).padStart(2,"0");
-  const d = String(t.getDate()).padStart(2,"0");
-  return `${y}${m}${d}`; // YYYYMMDD
-}
-
-function seededPick(arr, seed){
-  if(!Array.isArray(arr) || arr.length === 0) return "";
-  const idx = Math.abs(seed % arr.length);
+// ---- 고정 랜덤 pick
+function seededPick(arr, seed, offset){
+  if(!arr?.length) return "";
+  const idx = Math.abs((seed + (offset||0)) % arr.length);
   return arr[idx];
 }
 
+// ---- 하루 1회만 컨텐츠 보상(+1)
 async function rewardOncePerDay(key){
-  const stamp = getTodayStamp();
+  const stamp = todayStamp();
   const k = `${key}_${stamp}`;
   if(localStorage.getItem(k) === "1") return;
   localStorage.setItem(k, "1");
+
   if(localStorage.getItem("phone")){
-    await window.rewardContent?.(key); // +1 하루 1회
+    await window.rewardContent?.(key);
   }
 }
 
-async function loadJSON(path){
+// ---- DB 로드 (없어도 동작)
+async function loadCookieDB(){
   try{
-    if(window.DB?.loadJSON) return await window.DB.loadJSON(path);
-    return await fetch(path).then(r=>r.json());
+    // 예: /data/cookie_ko.json 이런 식으로 만들면 좋음
+    // 없으면 기본 문구로 fallback
+    const db = await window.DB?.loadJSON?.("/data/cookie_ko.json").catch(()=>null);
+    cookieDB = db;
   }catch(e){
-    console.warn("[cookie.js] load failed:", e);
-    return null;
+    cookieDB = null;
   }
 }
 
-/* ====== 정책: 로그인=하루1개 고정 / 게스트=매번 랜덤 ====== */
-function getCookieMessage(arr){
-  const phone = localStorage.getItem("phone");
-  const birth = localStorage.getItem("birth"); // YYYY-MM-DD (auth.js가 정규화)
-  const stamp = getTodayStamp();
+// ---- 운세 한 줄 생성
+function makeFortuneLine(){
+  const birth = localStorage.getItem("birth") || ""; // 로그인 안 해도 오늘 기준으로 가능
+  const seedBase = birth ? ymdToSeed(birth) : 77777;
 
-  // 로그인 유저: (birth + stamp)로 오늘의 1개 고정
-  if(phone && birth){
-    const base = ymdToSeed(birth);
-    const seed = base + Number(stamp);
-    return {
-      msg: seededPick(arr, seed) || "오늘은 작은 선택이 큰 흐름을 만듭니다.",
-      fixedToday: true
-    };
-  }
+  // "오늘"은 모두 다르게: 날짜 스탬프를 섞어줌
+  const daySeed = Number(todayStamp()); // YYYYMMDD
+  const seed = seedBase + daySeed;
 
-  // 게스트: 매번 랜덤
-  const seed = Math.floor(Math.random() * 999999);
-  return {
-    msg: seededPick(arr, seed) || "오늘은 작은 선택이 큰 흐름을 만듭니다.",
-    fixedToday: false
-  };
+  const pools = cookieDB?.pools;
+
+  const fallback = [
+    "오늘은 작은 친절이 큰 기회를 부릅니다. 먼저 한 번 웃어보세요 🙂",
+    "결정이 흔들릴 땐 ‘가장 단순한 선택’이 정답일 때가 많아요.",
+    "조급함만 내려놓으면, 생각보다 일이 빨리 풀립니다.",
+    "오늘의 운: ‘미루던 1개 끝내면’ 기분이 확 좋아집니다.",
+    "누군가의 말이 신경 쓰였다면… 사실 그 사람도 긴장 중일 가능성 90%!"
+  ];
+
+  const arr = pools?.lines || fallback;
+  return seededPick(arr, seed, 3) || fallback[0];
 }
 
-/* ====== UI: 태그 당기기 ====== */
-function setupPullUI({ onReveal, fixedToday }){
-  const tag = document.getElementById("pullTag");
-  const string = document.getElementById("string");
+// ---- UI 렌더
+function renderBasicInfo(){
+  const name = localStorage.getItem("name") || "회원";
+  const birth = localStorage.getItem("birth");
+
+  const box = document.getElementById("basicInfo");
+  if(!box) return;
+
+  if(birth){
+    box.innerHTML = `<p><b>${name}</b></p><p>생년월일: ${birth}</p><p class="small">※ 오늘은 꼬리표를 당겨 운세를 꺼내보세요.</p>`;
+  }else{
+    box.innerHTML = `<p><b>${name}</b></p><p class="small">로그인하면 생년월일 기반으로 조금 더 “고정된” 결과가 나와요.</p>`;
+  }
+}
+
+// ---- 쿠키 열기(한 번만)
+function revealCookie(){
+  const wrap = document.getElementById("cookieWrap");
+  const shell = document.getElementById("cookieShell");
   const paper = document.getElementById("fortunePaper");
   const msgEl = document.getElementById("fortuneMsg");
-  const shell = document.getElementById("cookieShell");
+  const stringEl = document.getElementById("string");
   const hint = document.getElementById("hintText");
 
-  let pulling = false;
+  if(!wrap || !shell || !paper || !msgEl) return;
+
+  // 이미 열렸으면 그냥 리턴
+  if(wrap.dataset.opened === "1") return;
+  wrap.dataset.opened = "1";
+
+  // 메시지 세팅
+  const line = makeFortuneLine();
+  msgEl.textContent = line;
+
+  // 끈 끊김
+  stringEl?.classList.add("break");
+
+  // 쿠키 열기
+  shell.classList.add("cookie-open");
+
+  // 종이 등장
+  paper.classList.add("show");
+
+  // 텍스트 등장
+  setTimeout(()=> msgEl.classList.add("show"), 50);
+
+  if(hint) hint.textContent = "✅ 열렸어요! (다시 뽑기는 아래 버튼)";
+
+  // 포인트: 하루 1회 +1
+  rewardOncePerDay("cookie");
+}
+
+// ---- 다시 뽑기(리셋)
+function resetCookie(){
+  const wrap = document.getElementById("cookieWrap");
+  const shell = document.getElementById("cookieShell");
+  const paper = document.getElementById("fortunePaper");
+  const msgEl = document.getElementById("fortuneMsg");
+  const stringEl = document.getElementById("string");
+  const hint = document.getElementById("hintText");
+
+  if(wrap) wrap.dataset.opened = "0";
+  shell?.classList.remove("cookie-open");
+  paper?.classList.remove("show");
+  msgEl?.classList.remove("show");
+  if(msgEl) msgEl.textContent = "";
+  stringEl?.classList.remove("break");
+  if(hint) hint.textContent = "👇 아래 꼬리표를 잡아당겨 보세요";
+}
+
+// ---- 드래그(당기기) 처리
+function setupPullInteraction(){
+  const tag = document.getElementById("pullTag");
+  const stringEl = document.getElementById("string");
+  const shell = document.getElementById("cookieShell");
+
+  if(!tag || !stringEl || !shell) return;
+
+  let isDown = false;
   let startY = 0;
-  let current = 0;
-  let revealed = false;
+  let pull = 0; // 0~100 정도
 
-  const MAX_PULL = 120;       // 당길 수 있는 최대 px
-  const REVEAL_AT = 85;       // 이 이상 당기면 공개
+  const THRESHOLD = 55; // 이 이상 당기면 reveal
+  const MAX_PULL = 80;
 
-  function setPull(v){
-    current = Math.max(0, Math.min(MAX_PULL, v));
-    tag.style.transform = `translateY(${current}px)`;
-    string.style.height = `${60 + current}px`;
-    string.classList.add("stretch");
+  function onDown(clientY){
+    // 이미 열렸으면 드래그 금지
+    const wrap = document.getElementById("cookieWrap");
+    if(wrap?.dataset.opened === "1") return;
+
+    isDown = true;
+    startY = clientY;
+    pull = 0;
+    tag.style.transform = "translateY(0px)";
+    stringEl.style.height = "60px";
+    stringEl.classList.add("stretch");
   }
 
-  function resetPull(){
-    tag.style.transition = "transform .25s ease";
-    string.style.transition = "height .25s ease";
-    tag.style.transform = `translateY(0px)`;
-    string.style.height = `60px`;
+  function onMove(clientY){
+    if(!isDown) return;
+    pull = Math.max(0, Math.min(MAX_PULL, clientY - startY));
 
-    setTimeout(()=>{
-      tag.style.transition = "";
-      string.style.transition = "";
-      string.classList.remove("stretch");
-    }, 260);
+    // 태그 내려감
+    tag.style.transform = `translateY(${pull}px)`;
 
-    current = 0;
-  }
+    // 끈 길어짐(시각효과)
+    stringEl.style.height = `${60 + pull}px`;
 
-  function reveal(){
-    if(revealed) return;
-    revealed = true;
-
-    // 쿠키 흔들
-    shell.classList.remove("cookie-shake");
-    void shell.offsetWidth; // reflow
-    shell.classList.add("cookie-shake");
-
-    paper.classList.add("show");
-    hint && (hint.textContent = fixedToday ? "✅ 오늘의 쿠키를 열었어요 (로그인: 하루 1개)" : "✅ 새 쿠키가 나왔어요!");
-
-    onReveal?.({ paper, msgEl });
-  }
-
-  function onDown(e){
-    if(revealed && fixedToday){
-      // 로그인 유저: 이미 열었으면 더 당겨도 변화 없음
-      return;
+    // 쿠키 살짝 흔들(너무 과하지 않게)
+    if(pull > 10){
+      shell.classList.remove("cookie-shake");
+      // reflow
+      void shell.offsetWidth;
+      shell.classList.add("cookie-shake");
     }
-    pulling = true;
-    startY = (e.touches ? e.touches[0].clientY : e.clientY);
-    e.preventDefault?.();
-  }
 
-  function onMove(e){
-    if(!pulling) return;
-    const y = (e.touches ? e.touches[0].clientY : e.clientY);
-    const dy = y - startY;
-    setPull(dy);
-
-    if(current >= REVEAL_AT){
-      reveal();
+    // 임계치 도달하면 즉시 오픈
+    if(pull >= THRESHOLD){
+      isDown = false;
+      stringEl.classList.remove("stretch");
+      tag.style.transform = `translateY(${THRESHOLD}px)`;
+      revealCookie();
     }
   }
 
   function onUp(){
-    if(!pulling) return;
-    pulling = false;
-    if(!revealed) resetPull();
-    else resetPull();
+    if(!isDown) return;
+    isDown = false;
+    stringEl.classList.remove("stretch");
+
+    // 임계치 못 넘기면 원상복구(탄성 느낌)
+    tag.style.transition = "transform .25s ease";
+    stringEl.style.transition = "height .25s ease";
+    tag.style.transform = "translateY(0px)";
+    stringEl.style.height = "60px";
+
+    setTimeout(()=>{
+      tag.style.transition = "";
+      stringEl.style.transition = "";
+    }, 260);
   }
 
-  // Pointer Events 우선, 없으면 touch/mouse
-  tag.addEventListener("pointerdown", onDown);
-  window.addEventListener("pointermove", onMove);
-  window.addEventListener("pointerup", onUp);
-
-  // 모바일 호환(일부 브라우저)
-  tag.addEventListener("touchstart", onDown, { passive:false });
-  window.addEventListener("touchmove", onMove, { passive:false });
-  window.addEventListener("touchend", onUp);
-
-  tag.addEventListener("mousedown", onDown);
-  window.addEventListener("mousemove", onMove);
+  // mouse
+  tag.addEventListener("mousedown", (e)=> onDown(e.clientY));
+  window.addEventListener("mousemove", (e)=> onMove(e.clientY));
   window.addEventListener("mouseup", onUp);
+
+  // touch
+  tag.addEventListener("touchstart", (e)=>{
+    const t = e.touches?.[0];
+    if(!t) return;
+    onDown(t.clientY);
+  }, {passive:true});
+
+  window.addEventListener("touchmove", (e)=>{
+    const t = e.touches?.[0];
+    if(!t) return;
+    onMove(t.clientY);
+  }, {passive:true});
+
+  window.addEventListener("touchend", onUp, {passive:true});
 }
 
 document.addEventListener("DOMContentLoaded", async ()=>{
-  const name = localStorage.getItem("name") || "회원";
-  const birth = localStorage.getItem("birth");
-  const phone = localStorage.getItem("phone");
-
-  const db = await loadJSON("/data/cookie_ko.json");
-  const arr = db?.pools?.cookie || [];
-
   // 기본 정보 표시
-  const infoEl = document.getElementById("basicInfo");
-  if(infoEl){
-    infoEl.innerHTML =
-      `<p><b>${escapeHtml(name)}</b>님</p>` +
-      (phone && birth
-        ? `<p class="small">로그인 상태: 오늘은 쿠키 1개가 고정됩니다.</p>`
-        : `<p class="small">게스트 모드: 당길 때마다 다른 쿠키가 나올 수 있어요.</p>`);
-  }
+  renderBasicInfo();
 
-  let current = getCookieMessage(arr);
-
-  // 메시지는 “당겼을 때” 보여주기 위해 미리 저장만
-  const msg = current.msg;
-
-  setupPullUI({
-    fixedToday: current.fixedToday,
-    onReveal: ({ msgEl })=>{
-      msgEl.innerHTML = escapeHtml(msg);
-
-      // 컨텐츠 이용 보상(+1) 하루 1회
-      rewardOncePerDay("cookie");
+  // 공유 버튼 연결
+  document.getElementById("btnShare")?.addEventListener("click", ()=>{
+    // common.js가 있으면 그걸 쓰고, 없으면 기본 공유
+    if(window.Common?.shareAndReward){
+      window.Common.shareAndReward();
+      return;
+    }
+    if(navigator.share){
+      navigator.share({
+        title: "포춘쿠키",
+        text: "오늘의 한 줄 운세, 포춘쿠키에서 확인해보세요!",
+        url: location.href
+      }).catch(()=>{});
+    }else{
+      alert("공유 기능이 지원되지 않는 환경입니다.");
     }
   });
 
-  // 버튼들
+  // 다시 뽑기
   document.getElementById("btnAgain")?.addEventListener("click", ()=>{
-    const fixed = !!(localStorage.getItem("phone") && localStorage.getItem("birth"));
-    if(fixed){
-      alert("로그인 상태에서는 하루에 1개만 열 수 있어요 🙂");
-      return;
-    }
-    location.reload();
+    resetCookie();
   });
 
-  document.getElementById("btnShare")?.addEventListener("click", async ()=>{
-    // 아직 안 열었으면 먼저 열라고 유도
-    const paperShown = document.getElementById("fortunePaper")?.classList.contains("show");
-    if(!paperShown){
-      alert("먼저 꼬리표를 잡아당겨 쿠키를 열어주세요 🙂");
-      return;
-    }
+  // DB 로드
+  await loadCookieDB();
 
-    const text = "🥠 포춘쿠키: " + msg + "\n" + location.href;
-
-    try{
-      if(navigator.share){
-        await navigator.share({ text });
-      }else{
-        await navigator.clipboard.writeText(text);
-        alert("복사 완료! 친구에게 붙여넣기 해주세요 ✅");
-      }
-    }catch(e){
-      // 취소해도 OK
-    }
-
-    // 공유 보상도 하루 1회로(원하면 cookie_share로 분리 가능)
-    await rewardOncePerDay("cookie");
-  });
+  // 당기기 인터랙션
+  setupPullInteraction();
 });
