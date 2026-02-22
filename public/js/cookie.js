@@ -3,8 +3,7 @@ console.log("[cookie.js] loaded ✅");
 
 let cookieDB = null;
 
-// ---- 유틸: YYYYMMDD 스탬프
-// 1) YYYYMMDD
+// ---- 유틸: YYYYMMDD
 function todayStamp(){
   const d = new Date();
   const y = d.getFullYear();
@@ -13,17 +12,16 @@ function todayStamp(){
   return `${y}${m}${da}`;
 }
 
-// 2) 유저 seed (phone 있으면 phone, 없으면 birth)
+// ---- 유저 seed (phone 우선, 없으면 birth)
 function userSeed(){
   const phone = localStorage.getItem("phone") || "";
   const birth = localStorage.getItem("birth") || "";
 
   if(phone){
-    // 010xxxxxxxx → 뒤 6자리 정도 섞기
     const tail = phone.slice(-6);
     return Number(tail) || 777777;
   }
-  // birth: YYYY-MM-DD → 숫자로
+
   const m = String(birth).match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if(m){
     return (Number(m[1])*10000) + (Number(m[2])*100) + Number(m[3]);
@@ -31,7 +29,7 @@ function userSeed(){
   return 777777;
 }
 
-// 3) weighted pick (카테고리 선택)
+// ---- weighted pick (카테고리 선택)
 function weightedPick(weights, seed){
   const entries = Object.entries(weights || {});
   let sum = 0;
@@ -47,7 +45,7 @@ function weightedPick(weights, seed){
   return entries[0]?.[0] || "overall";
 }
 
-// 4) seededPick (배열에서 고정 선택)
+// ---- seededPick (배열에서 고정 선택)
 function seededPick(arr, seed, offset){
   if(!arr || !arr.length) return "";
   const idx = Math.abs((seed + (offset||0)) % arr.length);
@@ -69,8 +67,7 @@ async function rewardOncePerDay(key){
 // ---- DB 로드 (없어도 동작)
 async function loadCookieDB(){
   try{
-    // 예: /data/cookie_ko.json 이런 식으로 만들면 좋음
-    // 없으면 기본 문구로 fallback
+    // /public/data/cookie_ko.json
     const db = await window.DB?.loadJSON?.("/data/cookie_ko.json").catch(()=>null);
     cookieDB = db;
   }catch(e){
@@ -78,33 +75,22 @@ async function loadCookieDB(){
   }
 }
 
-// ---- 운세 한 줄 생성
-function makeFortuneLine(){
-function makeFortuneLine(){
-  const birth = localStorage.getItem("birth") || "";
-  const phone = localStorage.getItem("phone") || "";
-  const today = todayStamp(); // YYYYMMDD
+// ---- 하루 1개 고정 저장 키
+function getDailyKey(){
+  return `cookie_daily_${todayStamp()}`;
+}
 
-  // 사람 고정 seed
-  let personSeed = 0;
+// ---- 오늘의 쿠키 생성 (B안: 하루 1개 고정)
+function makeDailyCookie(){
+  const stamp = Number(todayStamp());
+  const seed = userSeed() + stamp;
 
-  if(phone){
-    // 로그인 유저는 전화번호 기준
-    personSeed = Number(phone.slice(-4)); // 뒤 4자리
-  }else if(birth){
-    // 비로그인은 생년월일 기준
-    const m = birth.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if(m){
-      personSeed = Number(m[1]) + Number(m[2]) + Number(m[3]);
-    }
-  }else{
-    // 완전 비로그인
-    personSeed = 777;
-  }
+  const weights = cookieDB?.weights || { overall: 100 };
+  const category = weightedPick(weights, seed);
 
-  const seed = personSeed + Number(today);
-
-  const pools = cookieDB?.pools;
+  // JSON 구조: pools.overall / pools.wealth / ...
+  const pools = cookieDB?.pools || {};
+  const pool = pools?.[category] || pools?.overall || [];
 
   const fallback = [
     "오늘은 작은 친절이 큰 기회를 부릅니다.",
@@ -114,45 +100,64 @@ function makeFortuneLine(){
     "오늘의 키워드: 정리, 정돈, 정리정돈."
   ];
 
-  const arr = pools?.lines || fallback;
+  const arr = (pool && pool.length) ? pool : fallback;
+  const text = seededPick(arr, seed, 13) || fallback[0];
 
-  const idx = Math.abs(seed % arr.length);
-  return arr[idx];
+  return { category, text };
 }
 
-// ---- UI 렌더
+// ---- UI 기본 정보
 function renderBasicInfo(){
   const name = localStorage.getItem("name") || "회원";
   const birth = localStorage.getItem("birth");
+  const phone = localStorage.getItem("phone") || "";
 
   const box = document.getElementById("basicInfo");
+  const loginHint = document.getElementById("loginHint");
   if(!box) return;
 
-  if(birth){
-    box.innerHTML = `<p><b>${name}</b></p><p>생년월일: ${birth}</p><p class="small">※ 오늘은 꼬리표를 당겨 운세를 꺼내보세요.</p>`;
+  if(phone){
+    box.innerHTML =
+      `<p><b>${name}</b>님</p><p class="small">로그인 상태: ✅</p>` +
+      (birth ? `<p class="small">생년월일: ${birth}</p>` : "");
+    if(loginHint) loginHint.style.display = "none";
   }else{
-    box.innerHTML = `<p><b>${name}</b></p><p class="small">로그인하면 생년월일 기반으로 조금 더 “고정된” 결과가 나와요.</p>`;
+    box.innerHTML =
+      `<p><b>${name}</b></p>` +
+      (birth ? `<p class="small">생년월일: ${birth}</p>` : `<p class="small">비로그인도 이용 가능</p>`);
+    if(loginHint) loginHint.style.display = "block";
   }
 }
 
-// ---- 쿠키 열기(한 번만)
-function revealCookie(){
+// ---- 쿠키 열기 UI (공통)
+function openCookieUI({ category, text }){
   const wrap = document.getElementById("cookieWrap");
   const shell = document.getElementById("cookieShell");
   const paper = document.getElementById("fortunePaper");
   const msgEl = document.getElementById("fortuneMsg");
+  const titleEl = document.getElementById("fortuneTitle");
   const stringEl = document.getElementById("string");
   const hint = document.getElementById("hintText");
+  const tag = document.getElementById("pullTag");
 
   if(!wrap || !shell || !paper || !msgEl) return;
 
-  // 이미 열렸으면 그냥 리턴
-  if(wrap.dataset.opened === "1") return;
+  const labelMap = {
+    overall: "전체운",
+    wealth: "재물운",
+    love: "연애운",
+    career: "직장/사업운",
+    health: "건강운"
+  };
+
+  // 상태 고정
   wrap.dataset.opened = "1";
 
-  // 메시지 세팅
-  const line = makeFortuneLine();
-  msgEl.textContent = line;
+  // 메시지
+  if(titleEl){
+    titleEl.textContent = `🥠 오늘의 포춘쿠키 · ${labelMap[category] || "전체운"}`;
+  }
+  msgEl.textContent = text || "";
 
   // 끈 끊김
   stringEl?.classList.add("break");
@@ -166,49 +171,51 @@ function revealCookie(){
   // 텍스트 등장
   setTimeout(()=> msgEl.classList.add("show"), 50);
 
-  if(hint) hint.textContent = "✅ 열렸어요! (다시 뽑기는 아래 버튼)";
-
-  // 포인트: 하루 1회 +1
-  rewardOncePerDay("cookie");
+  if(hint) hint.textContent = "✅ 오늘의 쿠키가 열렸어요!";
+  if(tag){
+    tag.disabled = true;
+    tag.textContent = "DONE";
+    tag.style.opacity = "0.85";
+    tag.style.cursor = "default";
+  }
 }
 
-// ---- 다시 뽑기(리셋)
-function resetCookie(){
-  const wrap = document.getElementById("cookieWrap");
+// ---- 쿠키 흔들기(다시뽑기 눌렀을 때 안내용)
+function shakeCookie(){
   const shell = document.getElementById("cookieShell");
-  const paper = document.getElementById("fortunePaper");
-  const msgEl = document.getElementById("fortuneMsg");
-  const stringEl = document.getElementById("string");
-  const hint = document.getElementById("hintText");
-
-  if(wrap) wrap.dataset.opened = "0";
-  shell?.classList.remove("cookie-open");
-  paper?.classList.remove("show");
-  msgEl?.classList.remove("show");
-  if(msgEl) msgEl.textContent = "";
-  stringEl?.classList.remove("break");
-  if(hint) hint.textContent = "👇 아래 꼬리표를 잡아당겨 보세요";
+  if(!shell) return;
+  shell.classList.remove("cookie-shake");
+  void shell.offsetWidth;
+  shell.classList.add("cookie-shake");
 }
 
-// ---- 드래그(당기기) 처리
+// ---- 다시뽑기 (B안: 오늘은 막고 안내만)
+function tryAgain(){
+  const againHint = document.getElementById("againHint");
+  if(againHint) againHint.style.display = "block";
+  shakeCookie();
+}
+
+// ---- 드래그(당기기) 처리 (임계치 넘으면 오픈)
 function setupPullInteraction(){
   const tag = document.getElementById("pullTag");
   const stringEl = document.getElementById("string");
   const shell = document.getElementById("cookieShell");
+  const wrap = document.getElementById("cookieWrap");
 
-  if(!tag || !stringEl || !shell) return;
+  if(!tag || !stringEl || !shell || !wrap) return;
 
   let isDown = false;
   let startY = 0;
-  let pull = 0; // 0~100 정도
+  let pull = 0;
 
-  const THRESHOLD = 55; // 이 이상 당기면 reveal
+  const THRESHOLD = 55;
   const MAX_PULL = 80;
 
   function onDown(clientY){
-    // 이미 열렸으면 드래그 금지
-    const wrap = document.getElementById("cookieWrap");
-    if(wrap?.dataset.opened === "1") return;
+    // 이미 오늘 뽑았으면 당기기 금지
+    if(localStorage.getItem(getDailyKey())) return;
+    if(wrap.dataset.opened === "1") return;
 
     isDown = true;
     startY = clientY;
@@ -220,28 +227,23 @@ function setupPullInteraction(){
 
   function onMove(clientY){
     if(!isDown) return;
+
     pull = Math.max(0, Math.min(MAX_PULL, clientY - startY));
 
-    // 태그 내려감
     tag.style.transform = `translateY(${pull}px)`;
-
-    // 끈 길어짐(시각효과)
     stringEl.style.height = `${60 + pull}px`;
 
-    // 쿠키 살짝 흔들(너무 과하지 않게)
     if(pull > 10){
       shell.classList.remove("cookie-shake");
-      // reflow
       void shell.offsetWidth;
       shell.classList.add("cookie-shake");
     }
 
-    // 임계치 도달하면 즉시 오픈
     if(pull >= THRESHOLD){
       isDown = false;
       stringEl.classList.remove("stretch");
       tag.style.transform = `translateY(${THRESHOLD}px)`;
-      revealCookie();
+      revealCookieOnce();
     }
   }
 
@@ -250,7 +252,6 @@ function setupPullInteraction(){
     isDown = false;
     stringEl.classList.remove("stretch");
 
-    // 임계치 못 넘기면 원상복구(탄성 느낌)
     tag.style.transition = "transform .25s ease";
     stringEl.style.transition = "height .25s ease";
     tag.style.transform = "translateY(0px)";
@@ -283,46 +284,84 @@ function setupPullInteraction(){
   window.addEventListener("touchend", onUp, {passive:true});
 }
 
-document.addEventListener("DOMContentLoaded", async ()=>{
-  // 기본 정보 표시
-  renderBasicInfo();
+// ---- 실제 오픈(오늘 1회 고정 저장)
+async function revealCookieOnce(){
+  const dailyKey = getDailyKey();
 
-  // 공유 버튼 연결
-  document.getElementById("btnShare")?.addEventListener("click", ()=>{
-    // common.js가 있으면 그걸 쓰고, 없으면 기본 공유
-    if(window.Common?.shareAndReward){
-      window.Common.shareAndReward();
+  // 이미 오늘 뽑았으면 저장된 값으로만 열기
+  const saved = localStorage.getItem(dailyKey);
+  if(saved){
+    try{
+      const obj = JSON.parse(saved);
+      openCookieUI(obj);
       return;
-    }
-    if(navigator.share){
-      navigator.share({
-        title: "포춘쿠키",
-        text: "오늘의 한 줄 운세, 포춘쿠키에서 확인해보세요!",
-        url: location.href
-      }).catch(()=>{});
-    }else{
-      alert("공유 기능이 지원되지 않는 환경입니다.");
-    }
-  });
+    }catch(e){}
+  }
 
-  // 다시 뽑기
-  document.getElementById("btnAgain")?.addEventListener("click", ()=>{
-    resetCookie();
-  });
+  // 오늘의 쿠키 만들고 저장
+  const obj = makeDailyCookie();
+  localStorage.setItem(dailyKey, JSON.stringify(obj));
+
+  openCookieUI(obj);
+
+  // 포인트: 하루 1회 +1
+  await rewardOncePerDay("cookie");
+}
+
+document.addEventListener("DOMContentLoaded", async ()=>{
+  renderBasicInfo();
 
   // DB 로드
   await loadCookieDB();
 
+  // 혹시 오늘 이미 뽑았으면 자동 복원(페이지 재방문)
+  const dailyKey = getDailyKey();
+  const saved = localStorage.getItem(dailyKey);
+  if(saved){
+    try{
+      const obj = JSON.parse(saved);
+      openCookieUI(obj);
+      const hint = document.getElementById("hintText");
+      if(hint) hint.textContent = "오늘은 이미 뽑았어요 🙂";
+    }catch(e){}
+  }
+
+  // 공유 버튼
+  document.getElementById("btnShare")?.addEventListener("click", async ()=>{
+    if(window.Common?.shareAndReward){
+      window.Common.shareAndReward();
+      return;
+    }
+
+    try{
+      if(navigator.share){
+        await navigator.share({
+          title: "포춘쿠키",
+          text: "오늘의 한 줄 운세, 포춘쿠키에서 확인해보세요! 🥠",
+          url: location.href
+        });
+        await rewardOncePerDay("share_cookie");
+        alert("공유 완료! ✅");
+      }else{
+        await navigator.clipboard.writeText(location.href);
+        await rewardOncePerDay("share_cookie");
+        alert("링크를 복사했어요 ✅");
+      }
+    }catch(e){
+      console.log("[share] canceled or failed", e);
+    }
+  });
+
+  // 다시 뽑기(B안): 오늘은 안내만
+  document.getElementById("btnAgain")?.addEventListener("click", ()=>{
+    tryAgain();
+  });
+
   // 당기기 인터랙션
   setupPullInteraction();
-  function makeDailyCookie(cookieDB){
-  const stamp = Number(todayStamp());
-  const seed = userSeed() + stamp;
 
-  const category = weightedPick(cookieDB?.weights, seed);
-  const pool = cookieDB?.pools?.[category] || cookieDB?.pools?.overall || [];
-
-  const text = seededPick(pool, seed, 13) || "오늘은 천천히 가도 괜찮습니다.";
-  return { category, text };
-  }
+  // 클릭으로도 오픈 가능하게(원하면) - 태그 클릭 시
+  document.getElementById("pullTag")?.addEventListener("click", ()=>{
+    revealCookieOnce();
+  });
 });
