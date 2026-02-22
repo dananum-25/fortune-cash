@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>포춘쿠키 | 오늘의 한 줄 운세</title>
+  <meta name="description" content="오늘의 포춘쿠키 한 줄 운세. 로그인 시 포인트도 적립됩니다.">
+  <link rel="canonical" href="https://fortune-cash.vercel.app/pages/cookie/cookie.html">
+
+  <style>
+    body{margin:0;background:#111;color:#fff;font-family:Arial;}
+    .wrap{max-width:820px;margin:auto;padding:20px;}
+    .card{background:#1a1a1a;border-radius:16px;padding:18px;margin:16px 0;}
+    h1{font-size:26px;margin:0 0 10px;}
+    .small{font-size:12px;opacity:.8}
+    .cookie{background:#141414;border:1px solid #222;border-radius:16px;padding:18px;}
+    .cookie-top{font-weight:bold;color:#ffd56b;margin-bottom:10px;}
+    .cookie-msg{font-size:18px;line-height:1.8;}
+    button{width:100%;padding:14px;border:none;border-radius:12px;background:#ffd56b;font-weight:bold;margin-top:10px;cursor:pointer;}
+    button.secondary{background:#2a2a2a;color:#fff;font-weight:normal;}
+    a{color:#ffd56b;text-decoration:none;}
+    .row{display:flex;gap:10px;}
+    .row button{width:100%;}
+    .hr{height:1px;background:#222;margin:14px 0;}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🥠 포춘쿠키</h1>
+    <div class="small">※ 가볍게 참고용이에요. 대신 가끔은… 은근히 맞습니다.</div>
+
+    <div class="card">
+      <h2 style="margin:0 0 10px;">👤 기본 정보</h2>
+      <div id="basicInfo"></div>
+    </div>
+
+    <div class="card">
+      <div id="cookieBox"></div>
+      <div class="hr"></div>
+
+      <div class="row">
+        <button id="btnShare">공유하고 포인트 받기</button>
+        <button id="btnAgain" class="secondary">다시 뽑기</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <button onclick="location.href='/pages/period/period.html'">오늘/내일/연간 운세</button>
+      <button onclick="location.href='/pages/star/index.html'">별자리 운세</button>
+      <button onclick="location.href='/point.html'">포인트</button>
+      <button onclick="location.href='/'">홈으로</button>
+    </div>
+
+    <footer class="small" style="margin-top:40px;text-align:center;opacity:.7;">
+      무료 운세 플랫폼 | <a href="/">홈으로</a>
+    </footer>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/points.js"></script>
+  <script src="/js/db.js"></script>
+  <script src="/js/cookie.js"></script>
+</body>
+</html>
