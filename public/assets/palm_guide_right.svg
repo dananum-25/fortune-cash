@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 520">
+  <style>
+    .hand{fill:#151515;stroke:#2a2a2a;stroke-width:3}
+    .line{fill:none;stroke:#ffd56b;stroke-width:5;stroke-linecap:round;opacity:.45}
+    .label{fill:#bbb;font-size:14px;font-family:Arial}
+    .hl{fill:#ffd56b;opacity:0}
+    .hl.on{opacity:.22}
+  </style>
+
+  <path class="hand" d="M350,70
+    C370,40,330,20,310,50
+    C300,20,260,20,250,52
+    C230,25,190,35,200,70
+    C160,60,130,95,160,120
+    C125,150,120,190,150,215
+    C130,250,145,330,190,400
+    C220,450,300,470,350,430
+    C400,390,405,330,390,280
+    C425,245,425,195,395,170
+    C415,140,400,105,350,70 Z"/>
+
+  <!-- 라인(거울 배치) -->
+  <path class="line" d="M270 135 C310 145, 335 190, 340 240 C345 290, 335 335, 310 380"/>
+  <path class="line" d="M310 210 C260 220, 200 220, 160 205"/>
+  <path class="line" d="M330 170 C270 155, 210 150, 150 165"/>
+  <path class="line" d="M260 255 C260 215, 260 175, 260 135"/>
+  <path class="line" d="M205 245 C190 260, 175 285, 165 315"/>
+  <path class="line" d="M220 265 C205 285, 195 310, 190 335"/>
+
+  <!-- 하이라이트 -->
+  <rect id="hl_life_strong" class="hl" x="245" y="125" width="120" height="290" rx="22"/>
+  <rect id="hl_life_weak" class="hl" x="245" y="125" width="120" height="290" rx="22"/>
+
+  <rect id="hl_head_long" class="hl" x="130" y="195" width="190" height="55" rx="18"/>
+  <rect id="hl_head_curve" class="hl" x="130" y="195" width="190" height="55" rx="18"/>
+
+  <rect id="hl_heart_clear" class="hl" x="115" y="145" width="230" height="60" rx="18"/>
+  <rect id="hl_heart_chain" class="hl" x="115" y="145" width="230" height="60" rx="18"/>
+
+  <rect id="hl_fate_clear" class="hl" x="230" y="120" width="55" height="200" rx="18"/>
+  <rect id="hl_money_many" class="hl" x="115" y="220" width="120" height="160" rx="18"/>
+
+  <text class="label" x="18" y="30">오른손 가이드</text>
+</svg>
