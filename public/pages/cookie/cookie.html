@@ -13,199 +13,181 @@
     .card{background:#1a1a1a;border-radius:16px;padding:18px;margin:16px 0;}
     h1{font-size:26px;margin:0 0 10px;}
     .small{font-size:12px;opacity:.8}
-    .cookie{background:#141414;border:1px solid #222;border-radius:16px;padding:18px;}
-    .cookie-top{font-weight:bold;color:#ffd56b;margin-bottom:10px;}
-    .cookie-msg{font-size:18px;line-height:1.8;}
     button{width:100%;padding:14px;border:none;border-radius:12px;background:#ffd56b;font-weight:bold;margin-top:10px;cursor:pointer;}
     button.secondary{background:#2a2a2a;color:#fff;font-weight:normal;}
     a{color:#ffd56b;text-decoration:none;}
     .row{display:flex;gap:10px;}
     .row button{width:100%;}
     .hr{height:1px;background:#222;margin:14px 0;}
+
     /* ===== Fortune Cookie Pull UI ===== */
-.cookie-stage{
-  display:flex; flex-direction:column; align-items:center;
-  padding:10px 0;
-}
+    .cookie-stage{
+      display:flex; flex-direction:column; align-items:center;
+      padding:10px 0;
+    }
 
-.cookie-wrap{
-  position:relative;
-  width:min(520px, 92vw);
-  height:320px;
-  display:flex;
-  justify-content:center;
-  align-items:flex-end;
-  user-select:none;
-}
+    .cookie-wrap{
+      position:relative;
+      width:min(520px, 92vw);
+      height:320px;
+      display:flex;
+      justify-content:center;
+      align-items:flex-end;
+      user-select:none;
+    }
 
-/* ===== 쿠키 좌우 분리 구조 ===== */
+    /* ===== 쿠키 좌우 분리 구조 ===== */
+    .cookie-shell{
+      width:260px;
+      height:200px;
+      position:relative;
+      filter: drop-shadow(0 18px 40px rgba(0,0,0,.45));
+    }
 
-.cookie-shell{
-  width:260px;
-  height:200px;
-  position:relative;
-}
+    .cookie-half{
+      position:absolute;
+      width:130px;
+      height:200px;
+      background: linear-gradient(180deg, #f6d28b, #d19a43);
+      transition: transform .6s cubic-bezier(.2,.9,.2,1);
+    }
 
-.cookie-half{
-  position:absolute;
-  width:130px;
-  height:200px;
-  background: linear-gradient(180deg, #f6d28b, #d19a43);
-  box-shadow: 0 18px 40px rgba(0,0,0,.45);
-  transition: transform .6s cubic-bezier(.2,.9,.2,1);
-}
+    /* 왼쪽 */
+    .cookie-half.left{
+      left:0;
+      border-radius:140px 0 0 90px;
+      transform-origin:right center;
+    }
 
-/* 왼쪽 */
-.cookie-half.left{
-  left:0;
-  border-radius:140px 0 0 90px;
-  transform-origin:right center;
-}
+    /* 오른쪽 */
+    .cookie-half.right{
+      right:0;
+      border-radius:0 140px 90px 0;
+      transform-origin:left center;
+    }
 
-/* 오른쪽 */
-.cookie-half.right{
-  right:0;
-  border-radius:0 140px 90px 0;
-  transform-origin:left center;
-}
+    /* ===== 열릴 때(안전하게 id로 지정) ===== */
+    .cookie-open #cookieLeft{
+      transform: rotate(-35deg) translateX(-30px);
+    }
+    .cookie-open #cookieRight{
+      transform: rotate(35deg) translateX(30px);
+    }
 
-/* ===== 열릴 때 ===== */
-.cookie-open .left{
-  transform: rotate(-35deg) translateX(-30px);
-}
+    .cookie-shine{
+      position:absolute; top:24px; left:30px;
+      width:80px; height:50px;
+      border-radius: 50px;
+      background: rgba(255,255,255,.18);
+      filter: blur(0.2px);
+      pointer-events:none;
+    }
 
-.cookie-open .right{
-  transform: rotate(35deg) translateX(30px);
-}
+    /* ===== 종이 등장 ===== */
+    .fortune-paper{
+      position:absolute;
+      bottom:120px;
+      width: min(460px, 88vw);
+      max-width:460px;
+      background:#141414;
+      border:1px solid #222;
+      border-radius:16px;
+      padding:16px 16px 14px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.35);
 
-/* ===== 종이 등장 업그레이드 ===== */
-.fortune-paper{
-  transform: translateY(80px) scale(.85);
-  opacity:0;
-  pointer-events:none;
-  transition: all .6s cubic-bezier(.2,.9,.2,1);
-}
+      transform: translateY(80px) scale(.85);
+      opacity:0;
+      pointer-events:none;
+      transition: all .6s cubic-bezier(.2,.9,.2,1);
+    }
 
-.fortune-paper.show{
-  transform: translateY(0px) scale(1);
-  opacity:1;
-}
+    .fortune-paper.show{
+      transform: translateY(0px) scale(1);
+      opacity:1;
+    }
 
-/* ===== 끈 끊김 효과 ===== */
-.string.break{
-  animation: stringSnap .25s ease forwards;
-}
+    .fortune-title{
+      color:#ffd56b; font-weight:bold; margin-bottom:8px;
+    }
 
-@keyframes stringSnap{
-  0%{ transform:scaleY(1); opacity:1; }
-  100%{ transform:scaleY(0); opacity:0; }
-}
+    /* ===== 텍스트 등장 ===== */
+    .fortune-msg{
+      font-size:18px;
+      line-height:1.8;
+      opacity:0;
+      transform: translateY(12px);
+      transition: all .5s ease .3s;
+    }
+    .fortune-msg.show{
+      opacity:1;
+      transform: translateY(0);
+    }
 
-/* ===== 텍스트 등장 ===== */
-.fortune-msg{
-  opacity:0;
-  transform: translateY(12px);
-  transition: all .5s ease .3s;
-}
+    /* ===== 끈 + 태그 ===== */
+    .pull-zone{
+      position:absolute;
+      bottom:10px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:10px;
+    }
 
-.fortune-msg.show{
-  opacity:1;
-  transform: translateY(0);
-}
+    .string{
+      width:3px;
+      height:60px;
+      background:#cfcfcf;
+      border-radius:4px;
+      transform-origin: top center;
+    }
 
-.cookie-shine{
-  position:absolute; top:24px; left:30px;
-  width:80px; height:50px;
-  border-radius: 50px;
-  background: rgba(255,255,255,.18);
-  filter: blur(0.2px);
-}
+    .tag{
+      width:120px;
+      border:none;
+      border-radius:14px;
+      background:#ffd56b;
+      font-weight:900;
+      letter-spacing:1px;
+      padding:12px 0;
+      cursor:grab;
+    }
+    .tag:active{ cursor:grabbing; }
 
-.fortune-paper{
-  position:absolute;
-  bottom:120px;
-  width: min(460px, 88vw);
-  max-width:460px;
-  background:#141414;
-  border:1px solid #222;
-  border-radius:16px;
-  padding:16px 16px 14px;
-  box-shadow: 0 10px 25px rgba(0,0,0,.35);
+    .hint{
+      margin-top:12px;
+      font-size:12px;
+      opacity:.75;
+    }
 
-  transform: translateY(60px);
-  opacity:0;
-  pointer-events:none;
-  transition: transform .5s ease, opacity .5s ease;
-}
+    /* ===== 끈 끊김 효과 ===== */
+    .string.break{
+      animation: stringSnap .25s ease forwards;
+    }
+    @keyframes stringSnap{
+      0%{ transform:scaleY(1); opacity:1; }
+      100%{ transform:scaleY(0); opacity:0; }
+    }
 
-.fortune-paper.show{
-  transform: translateY(0px);
-  opacity:1;
-}
+    /* ===== 쿠키 흔들림 ===== */
+    @keyframes cookieShake{
+      0%{ transform: rotate(0deg); }
+      20%{ transform: rotate(-2deg); }
+      40%{ transform: rotate(2deg); }
+      60%{ transform: rotate(-1deg); }
+      80%{ transform: rotate(1deg); }
+      100%{ transform: rotate(0deg); }
+    }
+    .cookie-shake{
+      animation: cookieShake .35s ease;
+    }
 
-.fortune-title{
-  color:#ffd56b; font-weight:bold; margin-bottom:8px;
-}
-
-.fortune-msg{
-  font-size:18px; line-height:1.8;
-}
-
-.pull-zone{
-  position:absolute;
-  bottom:10px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:10px;
-}
-
-.string{
-  width:3px;
-  height:60px;
-  background:#cfcfcf;
-  border-radius:4px;
-  transform-origin: top center;
-}
-
-.tag{
-  width:120px;
-  border:none;
-  border-radius:14px;
-  background:#ffd56b;
-  font-weight:900;
-  letter-spacing:1px;
-  padding:12px 0;
-  cursor:grab;
-}
-
-.tag:active{ cursor:grabbing; }
-
-.hint{
-  margin-top:12px;
-  font-size:12px;
-  opacity:.75;
-}
-
-/* 쿠키 흔들림 */
-@keyframes cookieShake{
-  0%{ transform: rotate(0deg); }
-  20%{ transform: rotate(-2deg); }
-  40%{ transform: rotate(2deg); }
-  60%{ transform: rotate(-1deg); }
-  80%{ transform: rotate(1deg); }
-  100%{ transform: rotate(0deg); }
-}
-.cookie-shake{
-  animation: cookieShake .35s ease;
-}
-
-/* 태그 당기는 동안 살짝 탄성 느낌 */
-.string.stretch{
-  filter: brightness(1.05);
-}
+    /* ===== 태그 당기는 동안 탄성 ===== */
+    .string.stretch{
+      filter: brightness(1.05);
+    }
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <h1>🥠 포춘쿠키</h1>
@@ -218,33 +200,34 @@
 
     <div class="card">
       <div id="cookieBox">
-  <div class="cookie-stage">
-    <div class="cookie-wrap" id="cookieWrap">
+        <div class="cookie-stage">
+          <div class="cookie-wrap" id="cookieWrap">
 
-      <!-- 쿠키 본체 -->
-<!-- 쿠키 본체 (좌/우 분리) -->
-<div class="cookie-shell" id="cookieShell">
-  <div class="cookie-half left" id="cookieLeft"></div>
-  <div class="cookie-half right" id="cookieRight"></div>
-</div>
+            <!-- 쿠키 본체 (좌/우 분리) -->
+            <div class="cookie-shell" id="cookieShell">
+              <div class="cookie-half left" id="cookieLeft"></div>
+              <div class="cookie-half right" id="cookieRight"></div>
+              <div class="cookie-shine"></div>
+            </div>
 
-      <!-- 종이(운세) : 처음엔 안 보이고, 당기면 올라옴 -->
-      <div class="fortune-paper" id="fortunePaper">
-        <div class="fortune-title">🥠 오늘의 포춘쿠키</div>
-        <div class="fortune-msg" id="fortuneMsg"></div>
+            <!-- 종이(운세) -->
+            <div class="fortune-paper" id="fortunePaper">
+              <div class="fortune-title">🥠 오늘의 포춘쿠키</div>
+              <div class="fortune-msg" id="fortuneMsg"></div>
+            </div>
+
+            <!-- 끈 + 태그 -->
+            <div class="pull-zone" id="pullZone">
+              <div class="string" id="string"></div>
+              <button class="tag" id="pullTag" type="button">PULL</button>
+            </div>
+
+          </div>
+
+          <div class="hint" id="hintText">👇 아래 꼬리표를 잡아당겨 보세요</div>
+        </div>
       </div>
 
-      <!-- 끈 + 태그 -->
-      <div class="pull-zone" id="pullZone">
-        <div class="string" id="string"></div>
-        <button class="tag" id="pullTag" type="button">PULL</button>
-      </div>
-
-    </div>
-
-    <div class="hint" id="hintText">👇 아래 꼬리표를 잡아당겨 보세요</div>
-  </div>
-      </div>
       <div class="hr"></div>
 
       <div class="row">
