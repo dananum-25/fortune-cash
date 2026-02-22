@@ -1,373 +1,586 @@
-console.log("palm.js loaded (expert version)");
+console.log("[palm.js] loaded ✅");
 
-/* =====================================================
-   상태 관리
-===================================================== */
+/**
+ * 요구사항 반영:
+ * - 10문항(Y/N) 체크
+ * - 체크 → 가이드 SVG에서 정확한 선(hl_*)을 파랗게 표시
+ * - 결과는 점수보다 "조합 리딩" 중심
+ * - 왼손/오른손 전환
+ * - 카메라 촬영 + 토치(플래시) ON/OFF
+ * - 로그인 시 하루 1회 +1 포인트
+ */
 
-let currentHand = "left"; // left | right
-let guideSvgRoot = null;
+let currentHand = "left";        // left | right
+let guideSvgRoot = null;         // loaded SVG root
+let answers = {};                // {id: true|false|null}
+let camStream = null;            // MediaStream
+let camTrack = null;             // video track
+let torchOn = false;             // torch state
 
-const answers = {
-  left: {},
-  right: {}
-};
-
-/* =====================================================
-   10문항 정의 (전문화)
-===================================================== */
-
+// ===== 10문항 정의 (8개 유지 + 2개 추가) =====
+// id는 SVG highlight id와 1:1 대응: #hl_<id> 를 켜야 함
 const QUESTIONS = [
-  { id:"q1",  text:"생명선과 두뇌선 시작이 붙어 있나요?", axis:"personality", line:"life_head_start" },
-  { id:"q2",  text:"생명선이 길고 끊김 없이 이어져 있나요?", axis:"energy", line:"life_line" },
-  { id:"q3",  text:"생명선이 굵고 깊게 보이나요?", axis:"energy", line:"life_line" },
-  { id:"q4",  text:"두뇌선이 길고 선명한가요?", axis:"mind", line:"head_line" },
-  { id:"q5",  text:"두뇌선이 아래로 휘어 내려가나요?", axis:"mind", line:"head_line" },
-  { id:"q6",  text:"두뇌선이 끊기거나 섬 형태가 있나요?", axis:"mind", line:"head_line" },
-  { id:"q7",  text:"감정선이 선명하고 안정적인가요?", axis:"emotion", line:"heart_line" },
-  { id:"q8",  text:"감정선이 사슬형으로 보이나요?", axis:"emotion", line:"heart_line" },
-  { id:"q9",  text:"운명선이 뚜렷하게 올라오나요?", axis:"career", line:"fate_line" },
-  { id:"q10", text:"태양선(약지 아래 세로선)이 보이나요?", axis:"career", line:"sun_line" }
+  {
+    id: "life_line",
+    title: "생명선이 끊김 없이 이어져 있다",
+    desc: "체력/회복/생활 리듬",
+    guide: "엄지 아래를 감싸며 내려가는 큰 곡선(손바닥 바깥쪽)"
+  },
+  {
+    id: "head_line",
+    title: "두뇌선이 길고 또렷하다",
+    desc: "집중/분석/기획",
+    guide: "손바닥 중앙을 가로지르는 선(감정선 아래쪽)"
+  },
+  {
+    id: "head_curve",
+    title: "두뇌선이 아래로 휘어 감성형이다",
+    desc: "상상력/콘텐츠/감성",
+    guide: "두뇌선이 손바닥 아래 방향으로 완만하게 내려감"
+  },
+  {
+    id: "heart_line",
+    title: "감정선이 또렷하고 균형이 좋다",
+    desc: "관계 안정/표현",
+    guide: "손가락 아래쪽을 가로지르는 선(위쪽 가로선)"
+  },
+  {
+    id: "heart_chain",
+    title: "감정선이 사슬/끊김처럼 보여 예민하다",
+    desc: "오해/기복 주의",
+    guide: "감정선이 점선/체인처럼 울퉁불퉁하거나 끊겨보임"
+  },
+  {
+    id: "fate_line",
+    title: "운명선(세로선)이 중앙에서 또렷하다",
+    desc: "일/책임/커리어",
+    guide: "손바닥 중앙 아래에서 위로 올라가는 세로선"
+  },
+  {
+    id: "money_lines",
+    title: "재물선/잔선이 많아 수입 루트가 다양해 보인다",
+    desc: "부수입/다변화",
+    guide: "새끼손가락 아래/손바닥 곳곳의 잔선이 많은 편"
+  },
+  {
+    id: "health_line",
+    title: "건강선(수은선)이 선명하게 보인다",
+    desc: "컨디션/소화/리듬 신호",
+    guide: "새끼손가락 아래에서 아래로 내려오는 비스듬한 선"
+  },
+  {
+    id: "sun_line",
+    title: "태양선(명예선)이 또렷하게 보인다",
+    desc: "평판/성과/인정",
+    guide: "약지(네번째 손가락) 아래로 올라가는 세로선"
+  },
+  {
+    id: "breaks_many",
+    title: "주요 선에 잔끊김/교차가 많다",
+    desc: "스트레스/변동/예민",
+    guide: "큰 선들이 교차·가지치기·잔끊김이 많은 편"
+  }
 ];
 
-/* =====================================================
-   로그인 표시
-===================================================== */
+// ===== 유틸 =====
+function $(id){ return document.getElementById(id); }
 
-function renderLoginCheck(){
-  const box = document.getElementById("loginCheck");
-  if(!box) return;
-  const phone = localStorage.getItem("phone");
+function todayStamp(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const da = String(d.getDate()).padStart(2,"0");
+  return `${y}${m}${da}`;
+}
 
-  if(phone){
-    box.innerHTML = `
-      <h2 style="margin:0 0 8px;">✅ 로그인 상태</h2>
-      <div class="small">리딩 보기 시 하루 1회 포인트 +1 적립</div>
-    `;
-  }else{
-    box.innerHTML = `
-      <h2 style="margin:0 0 8px;">🙂 비로그인 이용 중</h2>
-      <div class="small">로그인하면 포인트 적립 + 리딩 고정화 기능 가능</div>
-    `;
+async function rewardOncePerDay(key){
+  const stamp = todayStamp();
+  const k = `${key}_${stamp}`;
+  if(localStorage.getItem(k) === "1") return;
+  localStorage.setItem(k, "1");
+  if(localStorage.getItem("phone")){
+    await window.rewardContent?.(key);
   }
 }
 
-/* =====================================================
-   질문 UI 렌더
-===================================================== */
+// ===== 로그인 표시 =====
+function renderLoginCheck(){
+  const box = $("loginCheck");
+  if(!box) return;
+
+  const phone = localStorage.getItem("phone");
+  if(phone){
+    box.innerHTML =
+      `<h2 style="margin:0 0 8px;">✅ 로그인 상태</h2>
+       <p class="small">로그인 상태에서는 손금 리딩 결과 확인 시 하루 1회 포인트 +1이 적립됩니다.</p>`;
+  }else{
+    box.innerHTML =
+      `<h2 style="margin:0 0 8px;">🙂 비로그인도 이용 가능</h2>
+       <p class="small">로그인하면 포인트 적립과 “더 고정된 사용자 기준(전화번호 seed)”을 적용하기가 쉬워집니다.</p>`;
+  }
+}
+
+function renderBasicInfo(){
+  const name = localStorage.getItem("name") || "회원";
+  const phone = localStorage.getItem("phone");
+  const birth = localStorage.getItem("birth");
+  const box = $("basicInfo");
+  if(!box) return;
+
+  if(phone){
+    box.innerHTML = `<p><b>${name}</b>님</p>` + (birth ? `<p class="small">생년월일: ${birth}</p>` : ``);
+  }else{
+    box.innerHTML = `<p><b>${name}</b></p><p class="small">비로그인도 이용 가능 (로그인 시 포인트 적립)</p>`;
+  }
+}
+
+// ===== 손 탭 =====
+function setHand(hand){
+  currentHand = hand;
+  $("btnLeft")?.classList.toggle("active", hand==="left");
+  $("btnRight")?.classList.toggle("active", hand==="right");
+  const pill = $("handPill");
+  if(pill) pill.textContent = `현재: ${hand === "left" ? "왼손" : "오른손"}`;
+
+  // 가이드 reload
+  loadGuideSvg(hand);
+}
+
+// ===== 가이드 SVG 로드/하이라이트 =====
+async function loadGuideSvg(hand){
+  const guideBox = $("guideBox");
+  if(!guideBox) return;
+
+  guideBox.innerHTML = `<div class="ph">가이드 로딩 중…</div>`;
+
+  const url = (hand === "right")
+    ? "/assets/palm_guide_right.svg"
+    : "/assets/palm_guide_left.svg";
+
+  try{
+    const txt = await fetch(url).then(r=>r.text());
+    guideBox.innerHTML = txt;
+
+    guideSvgRoot = guideBox.querySelector("svg");
+    if(!guideSvgRoot){
+      guideBox.innerHTML = `<div class="ph">SVG 로드 실패</div>`;
+      return;
+    }
+
+    // 현재 답변 상태를 반영
+    syncHighlights();
+  }catch(e){
+    console.warn("[palm] guide load failed", e);
+    guideBox.innerHTML = `<div class="ph">가이드 로드 실패</div>`;
+  }
+}
+
+function setHighlight(id, on){
+  if(!guideSvgRoot) return;
+  const el = guideSvgRoot.querySelector(`#hl_${id}`);
+  if(!el) return;
+  el.classList.toggle("on", !!on);
+}
+
+function syncHighlights(){
+  QUESTIONS.forEach(q=>{
+    // Y(yes)인 것만 하이라이트
+    const v = answers[q.id];
+    setHighlight(q.id, v === true);
+  });
+  renderGuideTip();
+}
+
+// 선택된 항목 설명(최대 3개)
+function renderGuideTip(){
+  const tipBox = $("guideTip");
+  if(!tipBox) return;
+
+  const yesList = QUESTIONS.filter(q => answers[q.id] === true);
+  if(yesList.length === 0){
+    tipBox.classList.remove("show");
+    tipBox.innerHTML = "";
+    return;
+  }
+
+  const top = yesList.slice(0,3).map(q =>
+    `<div>• <b>${q.title}</b><div class="small" style="opacity:.8;margin-top:4px;">${q.guide}</div></div>`
+  ).join("");
+
+  const more = yesList.length > 3
+    ? `<div class="small" style="margin-top:10px;opacity:.75;">+ ${yesList.length-3}개 더 체크됨</div>`
+    : "";
+
+  tipBox.innerHTML = `<div style="font-weight:900;margin-bottom:8px;">가이드 체크 포인트</div>${top}${more}`;
+  tipBox.classList.add("show");
+}
+
+// ===== 체크(Y/N) UI 렌더 =====
+function initAnswers(){
+  // null = 미선택, true/false = 선택
+  answers = {};
+  QUESTIONS.forEach(q => answers[q.id] = null);
+}
 
 function renderQuestions(){
-  const grid = document.getElementById("qGrid");
-  grid.innerHTML = "";
+  const grid = $("checkGrid");
+  if(!grid) return;
 
-  QUESTIONS.forEach(q=>{
-    const card = document.createElement("div");
-    card.className = "qCard";
-
-    card.innerHTML = `
-      <div class="qTop">
-        <div>
-          <div class="qTitle">${q.text}</div>
+  grid.innerHTML = QUESTIONS.map(q => {
+    const yesOn = answers[q.id] === true ? "on" : "";
+    const noOn  = answers[q.id] === false ? "on" : "";
+    return `
+      <div class="q" data-id="${q.id}">
+        <div class="qTop">
+          <div style="flex:1;">
+            <div class="qTitle">${q.title}</div>
+            <div class="qDesc">${q.desc}</div>
+            <div class="small muted" style="margin-top:8px;opacity:.75;">가이드: ${q.guide}</div>
+          </div>
         </div>
         <div class="yn">
-          <button data-val="Y">Y</button>
-          <button data-val="N">N</button>
+          <button type="button" class="yes ${yesOn}" data-yn="yes">YES</button>
+          <button type="button" class="no ${noOn}" data-yn="no">NO</button>
         </div>
       </div>
     `;
+  }).join("");
 
-    const btns = card.querySelectorAll(".yn button");
+  grid.querySelectorAll(".q").forEach(card=>{
+    const id = card.getAttribute("data-id");
+    const yesBtn = card.querySelector('button[data-yn="yes"]');
+    const noBtn  = card.querySelector('button[data-yn="no"]');
 
-    btns.forEach(btn=>{
-      btn.addEventListener("click",()=>{
-        answers[currentHand][q.id] = btn.dataset.val;
-
-        btns.forEach(b=>b.classList.remove("active"));
-        btn.classList.add("active");
-
-        updateGuideLine(q.line, btn.dataset.val === "Y");
-      });
+    yesBtn?.addEventListener("click", ()=>{
+      answers[id] = true;
+      yesBtn.classList.add("on");
+      noBtn?.classList.remove("on");
+      // 하이라이트 ON
+      setHighlight(id, true);
+      renderGuideTip();
     });
 
-    grid.appendChild(card);
+    noBtn?.addEventListener("click", ()=>{
+      answers[id] = false;
+      noBtn.classList.add("on");
+      yesBtn?.classList.remove("on");
+      // 하이라이트 OFF
+      setHighlight(id, false);
+      renderGuideTip();
+    });
   });
 }
 
-/* =====================================================
-   가이드 SVG 처리
-===================================================== */
-
-async function loadGuide(hand){
-  const box = document.getElementById("guideBox");
-  const file = hand === "left"
-    ? "/assets/palm_guide_left.svg"
-    : "/assets/palm_guide_right.svg";
-
-  const txt = await fetch(file).then(r=>r.text());
-  box.innerHTML = txt;
-  guideSvgRoot = box.querySelector("svg");
+function countAnswered(){
+  let c = 0;
+  for(const k in answers){
+    if(answers[k] !== null) c++;
+  }
+  return c;
 }
 
-function updateGuideLine(lineId, on){
-  if(!guideSvgRoot) return;
-  const el = guideSvgRoot.querySelector(`#${lineId}`);
-  if(!el) return;
-  el.style.stroke = on ? "#4da3ff" : "#ffffff33";
+// ===== 사진 업로드 미리보기 =====
+function setupUploadPreview(){
+  const file = $("palmFile");
+  const img = $("previewImg");
+  const ph = $("previewPlaceholder");
+
+  file?.addEventListener("change", ()=>{
+    const f = file.files?.[0];
+    if(!f) return;
+
+    const reader = new FileReader();
+    reader.onload = (e)=>{
+      if(img){
+        img.src = e.target.result;
+        img.style.display = "block";
+      }
+      if(ph) ph.style.display = "none";
+    };
+    reader.readAsDataURL(f);
+  });
 }
 
-/* =====================================================
-   리딩 엔진 (전문화 핵심)
-===================================================== */
-
-function analyzeHand(hand){
-  const a = answers[hand] || {};
-  const yes = (id)=> a[id] === "Y";
-  const no  = (id)=> a[id] === "N";
-
-  // ---------------------------
-  // 0) 데이터 유효성
-  // ---------------------------
-  const answeredCount = QUESTIONS.filter(q => a[q.id] === "Y" || a[q.id] === "N").length;
-  if(answeredCount < 6){
-    return `
-      <h3>체크가 조금 더 필요해요</h3>
-      <p>현재 <b>${answeredCount}/10</b>개만 체크되어 있어 정확도가 떨어집니다.</p>
-      <p class="small">최소 6개 이상 체크하면 리딩이 훨씬 안정적으로 나와요.</p>
-    `;
-  }
-
-  // ---------------------------
-  // 1) 핵심 패턴(전문가식 조합 규칙)
-  // ---------------------------
-
-  // A. 기질/결정 스타일 (Q1)
-  let temperament = "";
-  let temperamentAdvice = "";
-  if(yes("q1")){
-    temperament = "신중·안정형(리스크를 줄이고 안전하게 가는 타입)";
-    temperamentAdvice = "급한 결정보다 ‘조건 정리 → 실행’이 맞습니다. 확인/검증이 강점이에요.";
-  }else if(no("q1")){
-    temperament = "독립·실행형(속도가 빠르고 결단이 빠른 타입)";
-    temperamentAdvice = "속도가 장점이지만, 큰 계약/돈/관계 결정은 ‘하루 숙성’ 규칙을 두면 손실을 줄입니다.";
-  }else{
-    temperament = "기질 체크가 미완료(기본 성향 판단 보류)";
-    temperamentAdvice = "Q1을 체크하면 리딩의 전체 톤이 더 정확해져요.";
-  }
-
-  // B. 체력/회복(생명선) (Q2,Q3)
-  let energy = "";
-  let energyAdvice = "";
-  if(yes("q2") && yes("q3")){
-    energy = "체력/회복력 강(지구력형)";
-    energyAdvice = "강하게 몰아붙여도 버티는 편. 다만 ‘과신’이 과로로 연결되기 쉬워 휴식 루틴만 고정하세요.";
-  }else if(yes("q2") && no("q3")){
-    energy = "지구력은 있으나 컨디션 기복 가능(길지만 얕은 편)";
-    energyAdvice = "밤샘·불규칙이 반복되면 급격히 떨어질 수 있어요. 수면/식사 리듬이 핵심.";
-  }else if(no("q2")){
-    energy = "체력 관리가 운의 바닥(끊김/짧음 가능)";
-    energyAdvice = "무리한 확장보다 ‘회복 → 안정화’가 먼저. 일정 빡빡하게 잡으면 성과도 흔들립니다.";
-  }else{
-    energy = "체력 파트 정보가 애매(추가 체크 권장)";
-    energyAdvice = "Q2, Q3 체크 정확도를 올리면 건강/일 흐름이 더 선명해져요.";
-  }
-
-  // C. 사고/두뇌선(집중 vs 감성 vs 스트레스) (Q4,Q5,Q6)
-  let mind = "";
-  let mindAdvice = "";
-
-  // 스트레스 신호 우선
-  if(yes("q6")){
-    mind = "생각 과부하/스트레스 민감(두뇌선 섬/끊김 신호)";
-    mindAdvice = "중요한 결정은 ‘피곤한 날 금지’. 업무는 쪼개고, 기록으로 실수 방어하는 타입이 유리합니다.";
-  }else if(yes("q4") && yes("q5")){
-    mind = "분석 + 창의 혼합형(기획/콘텐츠/전략에 강함)";
-    mindAdvice = "아이디어를 ‘루틴/템플릿’으로 시스템화하면 돈이 됩니다. 하나를 끝까지 만드는 습관이 최강.";
-  }else if(yes("q4") && no("q5")){
-    mind = "분석/기획형(직관보다 논리)";
-    mindAdvice = "데이터/기록 기반으로 밀면 승률이 올라갑니다. 다만 ‘완벽주의로 지연’만 조심하세요.";
-  }else if(yes("q5") && no("q4")){
-    mind = "감성/상상형(콘텐츠/관계/감각에 강함)";
-    mindAdvice = "환경·기분 영향을 받기 쉬워요. 집중 시간대를 고정하면 생산성이 확 뛰는 타입입니다.";
-  }else{
-    mind = "두뇌선 스타일이 중립 또는 체크 부족";
-    mindAdvice = "Q4~Q6을 다시 확인하면 ‘일/학습/결정’ 방향 제시가 더 정확해져요.";
-  }
-
-  // D. 감정선/관계 (Q7,Q8)
-  let emotion = "";
-  let emotionAdvice = "";
-  if(yes("q7") && yes("q8")){
-    // 둘 다 yes는 모순 가능(선명 + 사슬형). “부분적 사슬형”으로 처리
-    emotion = "겉으론 안정적이지만 예민 구간이 존재(부분 사슬형 가능)";
-    emotionAdvice = "오해가 생기면 ‘바로 확인’이 최선. 감정이 올라올수록 메시지/말은 한 박자 쉬세요.";
-  }else if(yes("q7")){
-    emotion = "관계 안정/표현형(감정선 안정)";
-    emotionAdvice = "관계 운은 유지력이 좋아요. ‘작은 표현’이 복을 부르는 손금 흐름입니다.";
-  }else if(yes("q8")){
-    emotion = "예민/오해 주의(감정선 사슬형)";
-    emotionAdvice = "상대 의도를 ‘추측’하면 손해. 확인 질문이 관계 운을 살립니다. 감정 소비 줄이는 게 핵심.";
-  }else{
-    emotion = "관계 파트 중립 또는 체크 부족";
-    emotionAdvice = "Q7/Q8 중 하나라도 체크되면 연애·대인 흐름이 더 선명해져요.";
-  }
-
-  // E. 커리어/사회선(운명선/태양선) (Q9,Q10)
-  let career = "";
-  let careerAdvice = "";
-
-  if(yes("q9") && yes("q10")){
-    career = "커리어 + 인정운 동시(성과가 ‘보이기’ 좋은 타입)";
-    careerAdvice = "포트폴리오/성과정리/공개가 운을 끌어올립니다. ‘보여주는 능력’이 돈으로 연결돼요.";
-  }else if(yes("q9") && no("q10")){
-    career = "책임/일 중심(성과는 쌓이지만 티가 덜 날 수 있음)";
-    careerAdvice = "성과를 문서/리포트/수치로 남기면 평가가 올라갑니다. ‘보이는 결과물’이 필수.";
-  }else if(no("q9") && yes("q10")){
-    career = "인정/브랜딩은 있으나 루틴/조직선은 약할 수 있음";
-    careerAdvice = "프리랜서/개인브랜드형으로 강점. 대신 일정·수입 구조를 시스템화해야 안정됩니다.";
-  }else{
-    career = "커리어선 중립 또는 체크 부족";
-    careerAdvice = "Q9/Q10을 다시 보면 ‘일 방향성’이 확실히 잡혀요.";
-  }
-
-  // ---------------------------
-  // 2) 손(왼/오) 의미를 합쳐서 설명
-  // ---------------------------
-  const handMeaning = (hand === "left")
-    ? "왼손은 ‘타고난 기질/기본 흐름’"
-    : "오른손은 ‘현재/노력/변화된 흐름’";
-
-  // ---------------------------
-  // 3) 최종 문장(전문가식 구조)
-  // ---------------------------
-  return `
-    <h3>핵심 요약 (${handMeaning})</h3>
-    <p><b>기질:</b> ${temperament}</p>
-    <p><b>체력:</b> ${energy}</p>
-    <p><b>사고/집중:</b> ${mind}</p>
-    <p><b>관계/감정:</b> ${emotion}</p>
-    <p><b>커리어:</b> ${career}</p>
-
-    <div class="hr"></div>
-
-    <h3>근거(체크된 포인트 기반)</h3>
-    <ul>
-      ${yes("q1") ? "<li>Q1: 시작선 결합 → 신중·안정형 경향</li>" : (no("q1") ? "<li>Q1: 시작선 분리 → 독립·실행형 경향</li>" : "")}
-      ${yes("q2") ? "<li>Q2: 생명선 끊김 적음 → 회복/지구력 기반</li>" : (no("q2") ? "<li>Q2: 생명선이 약하거나 끊김 → 리듬/과로 관리 중요</li>" : "")}
-      ${yes("q3") ? "<li>Q3: 생명선 굵음 → 체력 에너지 강</li>" : ""}
-      ${yes("q4") ? "<li>Q4: 두뇌선 길고 선명 → 분석/기획 강</li>" : ""}
-      ${yes("q5") ? "<li>Q5: 두뇌선 하강 → 감성/상상 강</li>" : ""}
-      ${yes("q6") ? "<li>Q6: 두뇌선 섬/끊김 → 스트레스/과부하 신호</li>" : ""}
-      ${yes("q7") ? "<li>Q7: 감정선 안정 → 관계 유지력</li>" : ""}
-      ${yes("q8") ? "<li>Q8: 감정선 사슬형 → 예민/오해 주의</li>" : ""}
-      ${yes("q9") ? "<li>Q9: 운명선 뚜렷 → 일/책임/커리어 중심</li>" : ""}
-      ${yes("q10") ? "<li>Q10: 태양선 존재 → 인정/평판/브랜딩 운</li>" : ""}
-    </ul>
-
-    <div class="hr"></div>
-
-    <h3>행동 조언(현실 적용)</h3>
-    <p>• <b>기질:</b> ${temperamentAdvice}</p>
-    <p>• <b>체력:</b> ${energyAdvice}</p>
-    <p>• <b>사고:</b> ${mindAdvice}</p>
-    <p>• <b>관계:</b> ${emotionAdvice}</p>
-    <p>• <b>커리어:</b> ${careerAdvice}</p>
-
-    <p class="small">※ 전문 손금도 ‘선의 형태/깊이/교차/방향’을 종합합니다. 현재는 10문항으로 압축한 간편 리딩입니다.</p>
-  `;
+// ===== 카메라 =====
+function showCameraModal(show){
+  const modal = $("cameraModal");
+  if(!modal) return;
+  modal.classList.toggle("show", !!show);
 }
-
-/* =====================================================
-   결과 출력
-===================================================== */
-
-function renderResult(single=true){
-  const box = document.getElementById("textBox");
-  const resultWrap = document.getElementById("result");
-
-  if(single){
-    box.innerHTML = analyzeHand(currentHand);
-  }else{
-    box.innerHTML = `
-      <h2>왼손 리딩</h2>
-      ${analyzeHand("left")}
-      <hr>
-      <h2>오른손 리딩</h2>
-      ${analyzeHand("right")}
-    `;
-  }
-
-  resultWrap.style.display="block";
-  window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
-}
-
-/* =====================================================
-   카메라 (기본형)
-===================================================== */
-
-let camStream=null;
 
 async function openCamera(){
-  const modal=document.getElementById("camModal");
-  const video=document.getElementById("camVideo");
-  modal.classList.add("show");
+  showCameraModal(true);
 
-  camStream = await navigator.mediaDevices.getUserMedia({
-    video:{facingMode:"environment"}
-  });
+  const video = $("camVideo");
+  const ph = $("camPh");
+  if(ph) ph.style.display = "flex";
 
-  video.srcObject=camStream;
-}
+  try{
+    // 후면 카메라 우선
+    camStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: "environment" } },
+      audio: false
+    });
 
-function closeCamera(){
-  document.getElementById("camModal").classList.remove("show");
-  if(camStream){
-    camStream.getTracks().forEach(t=>t.stop());
+    if(!video) return;
+    video.srcObject = camStream;
+
+    // track 확보
+    camTrack = camStream.getVideoTracks?.()[0] || null;
+
+    if(ph) ph.style.display = "none";
+
+    // 토치 초기화: OFF
+    torchOn = false;
+    updateTorchButton();
+  }catch(e){
+    console.warn("[camera] open failed", e);
+    if(ph){
+      ph.style.display = "flex";
+      ph.innerHTML = "카메라를 열 수 없어요.<br>브라우저 권한/HTTPS/기기 지원을 확인해주세요.";
+    }
   }
 }
 
-function capture(){
-  const video=document.getElementById("camVideo");
-  const canvas=document.createElement("canvas");
-  canvas.width=video.videoWidth;
-  canvas.height=video.videoHeight;
-  canvas.getContext("2d").drawImage(video,0,0);
-
-  const img=document.getElementById("previewImg");
-  img.src=canvas.toDataURL("image/jpeg");
-  img.style.display="block";
-  document.getElementById("previewPlaceholder").style.display="none";
-
-  closeCamera();
+function stopCamera(){
+  if(camStream){
+    camStream.getTracks().forEach(t => t.stop());
+  }
+  camStream = null;
+  camTrack = null;
+  torchOn = false;
+  updateTorchButton();
 }
 
-/* =====================================================
-   초기화
-===================================================== */
+function updateTorchButton(){
+  const btn = $("torchBtn");
+  if(!btn) return;
+  btn.textContent = torchOn ? "🔦 플래시 ON" : "🔦 플래시 OFF";
+}
 
-document.addEventListener("DOMContentLoaded", async()=>{
+async function toggleTorch(){
+  // 토치는 지원 기기/브라우저에서만 적용 가능
+  if(!camTrack){
+    alert("카메라가 켜져있지 않아요.");
+    return;
+  }
 
+  const caps = camTrack.getCapabilities ? camTrack.getCapabilities() : null;
+  if(!caps || !("torch" in caps)){
+    alert("이 기기/브라우저에서는 플래시(토치)를 지원하지 않아요 🙂\n(대신 밝은 곳에서 촬영을 추천!)");
+    return;
+  }
+
+  torchOn = !torchOn;
+
+  try{
+    await camTrack.applyConstraints({ advanced: [{ torch: torchOn }] });
+  }catch(e){
+    console.warn("[torch] apply failed", e);
+    torchOn = false;
+    alert("플래시 적용에 실패했어요. 기기 지원을 확인해주세요.");
+  }
+
+  updateTorchButton();
+}
+
+function takeShot(){
+  const video = $("camVideo");
+  const canvas = $("camCanvas");
+  if(!video || !canvas) return;
+
+  const w = video.videoWidth || 0;
+  const h = video.videoHeight || 0;
+  if(!w || !h){
+    alert("카메라 준비 중입니다. 잠시 후 다시 시도해주세요.");
+    return;
+  }
+
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(video, 0, 0, w, h);
+
+  // 결과를 previewImg에 반영
+  const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
+  const img = $("previewImg");
+  const ph = $("previewPlaceholder");
+  if(img){
+    img.src = dataUrl;
+    img.style.display = "block";
+  }
+  if(ph) ph.style.display = "none";
+
+  // 카메라 닫기
+  showCameraModal(false);
+  stopCamera();
+}
+
+// ===== 리딩(조합 해석) =====
+function yn(id){ return answers[id] === true; }
+function nn(id){ return answers[id] === false; }
+
+function buildReadingText(){
+  const handLabel = currentHand === "left"
+    ? "왼손(기질/기본 흐름)"
+    : "오른손(현재/노력/변화)";
+
+  // 핵심 해석 로직(전문가식: 조합 우선)
+  const parts = [];
+
+  // 1) 기본 프레임
+  parts.push(`<p><b>${handLabel}</b> 기준으로, 체크한 항목을 조합해 해석했습니다.</p>`);
+
+  // 2) 생명선
+  if(yn("life_line")){
+    parts.push(`<p>• <b>기본 체력/회복</b>은 비교적 안정적입니다. 장기전(꾸준함)이 강점으로 작동하기 쉬워요.</p>`);
+  }else if(nn("life_line")){
+    parts.push(`<p>• <b>컨디션/리듬</b>은 관리가 성패를 좌우합니다. 무리한 일정이 누적되면 성과가 흔들릴 수 있어요.</p>`);
+  }
+
+  // 3) 두뇌선(분석 vs 감성)
+  if(yn("head_line") && !yn("head_curve")){
+    parts.push(`<p>• <b>두뇌선이 또렷/길다</b> 쪽이라, 분석/기획/정리에서 강점이 큽니다. 결정을 내릴 때 ‘근거/데이터’가 도움이 됩니다.</p>`);
+  }
+  if(yn("head_curve")){
+    parts.push(`<p>• <b>감성·상상형</b> 성향이 강하게 들어옵니다. 콘텐츠/디자인/기획 감각이 살아나지만, 기분에 따라 집중력 변동이 있을 수 있어요.</p>`);
+  }
+  if(nn("head_line") && nn("head_curve")){
+    parts.push(`<p>• 두뇌선 특징이 뚜렷하지 않다면, 지금은 “집중력보다 루틴”이 더 중요한 시기일 수 있어요.</p>`);
+  }
+
+  // 4) 감정선(관계)
+  if(yn("heart_line") && !yn("heart_chain")){
+    parts.push(`<p>• <b>관계/연애</b>는 안정적으로 굴러갈 확률이 높습니다. 표현을 조금만 더 하면 관계 만족도가 올라가요.</p>`);
+  }
+  if(yn("heart_chain")){
+    parts.push(`<p>• <b>예민/오해 포인트</b>가 있어요. 말투/타이밍에서 작은 삐끗이 커질 수 있으니 ‘확인→해석’ 순서가 좋습니다.</p>`);
+  }
+
+  // 5) 운명선(커리어)
+  if(yn("fate_line")){
+    parts.push(`<p>• <b>일/커리어</b>는 책임이 늘수록 평가가 올라가는 흐름입니다. “내 역할 고정 + 반복 성과”가 운을 키웁니다.</p>`);
+  }else if(nn("fate_line")){
+    parts.push(`<p>• 커리어는 하나로 고정되기보다, 방향을 탐색/조정하는 흐름일 수 있어요. ‘조건 정리 후 선택’이 유리합니다.</p>`);
+  }
+
+  // 6) 재물선/잔선(수입)
+  if(yn("money_lines")){
+    parts.push(`<p>• <b>수입 루트 다변화</b>가 가능한 손입니다. 한 방보다 “작게 여러 번”이 더 잘 맞습니다.</p>`);
+  }else if(nn("money_lines")){
+    parts.push(`<p>• 재물은 “확장”보다 “관리/누수 차단”이 먼저 먹히는 흐름일 수 있어요.</p>`);
+  }
+
+  // 7) 건강선(신호)
+  if(yn("health_line")){
+    parts.push(`<p>• <b>컨디션 신호가 잘 올라오는 타입</b>일 수 있어요. 피로/소화/수면에 작은 신호가 오면 바로 조정하면 손해를 줄입니다.</p>`);
+  }
+
+  // 8) 태양선(평판/인정)
+  if(yn("sun_line")){
+    parts.push(`<p>• <b>태양선</b>이 보이면, 성과가 “평판/인정”으로 연결되기 쉬워요. 포트폴리오/기록/노출이 특히 효과적입니다.</p>`);
+  }
+
+  // 9) 잔끊김/교차(스트레스)
+  if(yn("breaks_many")){
+    parts.push(`<p>• 선의 <b>잔끊김/교차</b>가 많으면, 스트레스/변동 이슈가 자주 들어옵니다. 이럴수록 ‘결정은 천천히, 실행은 단순하게’가 좋아요.</p>`);
+  }
+
+  // 10) 조합 보너스(전문가식)
+  if(yn("fate_line") && yn("sun_line")){
+    parts.push(`<p><b>조합 포인트</b>: 운명선 + 태양선이 함께면 “일의 성과 → 인정 → 기회”가 연결되기 쉬운 손입니다.</p>`);
+  }
+  if(yn("head_curve") && yn("money_lines")){
+    parts.push(`<p><b>조합 포인트</b>: 감성/상상형 + 잔선 많음이면, 콘텐츠/아이디어를 수익 구조로 연결하기 좋습니다(작게 테스트 추천).</p>`);
+  }
+  if(yn("heart_chain") && yn("breaks_many")){
+    parts.push(`<p><b>주의 조합</b>: 예민 + 교차 많음이면, 사람/일 둘 다 “오해→피로”가 쌓일 수 있어요. 휴식 루틴을 먼저 고정하세요.</p>`);
+  }
+
+  // 11) 마무리
+  const answered = countAnswered();
+  if(answered < 6){
+    parts.push(`<p class="small">※ 현재 ${answered}/10개만 선택됐어요. 6개 이상 선택하면 리딩 정확도가 더 좋아집니다.</p>`);
+  }else{
+    parts.push(`<p class="small">※ 이 리딩은 체크 기반 “간편 해석”입니다. 왼손/오른손 모두 체크 후 비교하면 가장 정교합니다.</p>`);
+  }
+
+  return parts.join("\n");
+}
+
+function renderResult(){
+  const result = $("result");
+  if(result) result.style.display = "block";
+
+  renderBasicInfo();
+
+  const box = $("textBox");
+  if(box){
+    box.innerHTML = buildReadingText();
+  }
+
+  window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+}
+
+// ===== INIT =====
+document.addEventListener("DOMContentLoaded", async ()=>{
   renderLoginCheck();
+  initAnswers();
   renderQuestions();
-  await loadGuide("left");
+  setupUploadPreview();
 
-  document.getElementById("btnLeft").addEventListener("click",async()=>{
-    currentHand="left";
-    await loadGuide("left");
+  // 손 탭
+  $("btnLeft")?.addEventListener("click", ()=> setHand("left"));
+  $("btnRight")?.addEventListener("click", ()=> setHand("right"));
+
+  // 기본: 왼손
+  await loadGuideSvg("left");
+
+  // 결과 보기
+  $("analyzeBtn")?.addEventListener("click", async ()=>{
+    // 최소 몇개 선택 권장
+    if(countAnswered() < 4){
+      const hint = $("againHint");
+      if(hint) hint.style.display = "block";
+      // 그래도 결과는 보여줌(막지는 않음)
+    }else{
+      const hint = $("againHint");
+      if(hint) hint.style.display = "none";
+    }
+
+    renderResult();
+
+    // 포인트: 하루 1회 +1 (로그인 시)
+    await rewardOncePerDay("palm");
   });
 
-  document.getElementById("btnRight").addEventListener("click",async()=>{
-    currentHand="right";
-    await loadGuide("right");
+  // ===== 카메라 모달 이벤트 =====
+  $("openCameraBtn")?.addEventListener("click", async ()=>{
+    if(!navigator.mediaDevices?.getUserMedia){
+      alert("이 브라우저에서는 카메라 기능을 지원하지 않아요.");
+      return;
+    }
+    await openCamera();
   });
 
-  document.getElementById("analyzeBtn").addEventListener("click",()=>{
-    renderResult(true);
+  $("closeCameraBtn")?.addEventListener("click", ()=>{
+    showCameraModal(false);
+    stopCamera();
   });
 
-  document.getElementById("analyzeBothBtn").addEventListener("click",()=>{
-    renderResult(false);
+  // 바깥 클릭 닫기(원하면)
+  $("cameraModal")?.addEventListener("click", (e)=>{
+    if(e.target?.id === "cameraModal"){
+      showCameraModal(false);
+      stopCamera();
+    }
   });
 
-  document.getElementById("btnOpenCamera").addEventListener("click",openCamera);
-  document.getElementById("btnCloseCamera").addEventListener("click",closeCamera);
-  document.getElementById("btnCapture").addEventListener("click",capture);
+  $("torchBtn")?.addEventListener("click", async ()=>{
+    await toggleTorch();
+  });
+
+  $("shotBtn")?.addEventListener("click", ()=>{
+    takeShot();
+  });
 });
