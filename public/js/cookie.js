@@ -159,7 +159,16 @@ function openCookieUI({ category, text }){
     career: "직장/사업운",
     health: "건강운"
   };
-// 희귀 UI
+
+// 상태 고정
+wrap.dataset.opened = "1";
+
+// 메시지
+if(titleEl){
+  titleEl.textContent = `🥠 오늘의 포춘쿠키 · ${labelMap[category] || "전체운"}`;
+}
+
+// 희귀 UI (메시지 세팅 후)
 if(rare){
   document.getElementById("cookieWrap")?.classList.add("rare-glow");
 
@@ -168,13 +177,6 @@ if(rare){
       `<span class="rare-badge">RARE</span> 🥠 오늘의 포춘쿠키`;
   }
 }
-  // 상태 고정
-  wrap.dataset.opened = "1";
-
-  // 메시지
-  if(titleEl){
-    titleEl.textContent = `🥠 오늘의 포춘쿠키 · ${labelMap[category] || "전체운"}`;
-  }
   msgEl.textContent = text || "";
 
   // 끈 끊김
