@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 520">
+  <style>
+    .hand{fill:#151515;stroke:#2a2a2a;stroke-width:3}
+    .line{fill:none;stroke:#ffd56b;stroke-width:5;stroke-linecap:round;opacity:.45}
+    .label{fill:#bbb;font-size:14px;font-family:Arial}
+    .hl{fill:#ffd56b;opacity:0}
+    .hl.on{opacity:.22}
+  </style>
+
+  <!-- 손바닥 실루엣(단순화) -->
+  <path class="hand" d="M170,70
+    C150,40,190,20,210,50
+    C220,20,260,20,270,52
+    C290,25,330,35,320,70
+    C360,60,390,95,360,120
+    C395,150,400,190,370,215
+    C390,250,375,330,330,400
+    C300,450,220,470,170,430
+    C120,390,115,330,130,280
+    C95,245,95,195,125,170
+    C105,140,120,105,170,70 Z"/>
+
+  <!-- 주요 라인(대충 위치) -->
+  <!-- 생명선 -->
+  <path class="line" d="M250 135 C210 145, 185 190, 180 240 C175 290, 185 335, 210 380"/>
+  <!-- 두뇌선 -->
+  <path class="line" d="M210 210 C260 220, 320 220, 360 205"/>
+  <!-- 감정선 -->
+  <path class="line" d="M190 170 C250 155, 310 150, 370 165"/>
+  <!-- 운명선 -->
+  <path class="line" d="M260 255 C260 215, 260 175, 260 135"/>
+  <!-- 재물/잔선 -->
+  <path class="line" d="M315 245 C330 260, 345 285, 355 315"/>
+  <path class="line" d="M300 265 C315 285, 325 310, 330 335"/>
+
+  <!-- 하이라이트(체크포인트 id와 연결: hl_<id>) -->
+  <rect id="hl_life_strong" class="hl" x="155" y="125" width="120" height="290" rx="22"/>
+  <rect id="hl_life_weak" class="hl" x="155" y="125" width="120" height="290" rx="22"/>
+
+  <rect id="hl_head_long" class="hl" x="200" y="195" width="190" height="55" rx="18"/>
+  <rect id="hl_head_curve" class="hl" x="200" y="195" width="190" height="55" rx="18"/>
+
+  <rect id="hl_heart_clear" class="hl" x="175" y="145" width="230" height="60" rx="18"/>
+  <rect id="hl_heart_chain" class="hl" x="175" y="145" width="230" height="60" rx="18"/>
+
+  <rect id="hl_fate_clear" class="hl" x="235" y="120" width="55" height="200" rx="18"/>
+  <rect id="hl_money_many" class="hl" x="285" y="220" width="120" height="160" rx="18"/>
+
+  <text class="label" x="18" y="30">왼손 가이드</text>
+</svg>
