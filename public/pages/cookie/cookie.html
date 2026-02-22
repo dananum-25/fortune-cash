@@ -38,13 +38,79 @@
   user-select:none;
 }
 
+/* ===== 쿠키 좌우 분리 구조 ===== */
+
 .cookie-shell{
-  width:260px; height:200px;
-  border-radius: 140px 140px 90px 90px;
+  width:260px;
+  height:200px;
+  position:relative;
+}
+
+.cookie-half{
+  position:absolute;
+  width:130px;
+  height:200px;
   background: linear-gradient(180deg, #f6d28b, #d19a43);
   box-shadow: 0 18px 40px rgba(0,0,0,.45);
-  position:relative;
-  transform-origin:center bottom;
+  transition: transform .6s cubic-bezier(.2,.9,.2,1);
+}
+
+/* 왼쪽 */
+.cookie-half.left{
+  left:0;
+  border-radius:140px 0 0 90px;
+  transform-origin:right center;
+}
+
+/* 오른쪽 */
+.cookie-half.right{
+  right:0;
+  border-radius:0 140px 90px 0;
+  transform-origin:left center;
+}
+
+/* ===== 열릴 때 ===== */
+.cookie-open .left{
+  transform: rotate(-35deg) translateX(-30px);
+}
+
+.cookie-open .right{
+  transform: rotate(35deg) translateX(30px);
+}
+
+/* ===== 종이 등장 업그레이드 ===== */
+.fortune-paper{
+  transform: translateY(80px) scale(.85);
+  opacity:0;
+  pointer-events:none;
+  transition: all .6s cubic-bezier(.2,.9,.2,1);
+}
+
+.fortune-paper.show{
+  transform: translateY(0px) scale(1);
+  opacity:1;
+}
+
+/* ===== 끈 끊김 효과 ===== */
+.string.break{
+  animation: stringSnap .25s ease forwards;
+}
+
+@keyframes stringSnap{
+  0%{ transform:scaleY(1); opacity:1; }
+  100%{ transform:scaleY(0); opacity:0; }
+}
+
+/* ===== 텍스트 등장 ===== */
+.fortune-msg{
+  opacity:0;
+  transform: translateY(12px);
+  transition: all .5s ease .3s;
+}
+
+.fortune-msg.show{
+  opacity:1;
+  transform: translateY(0);
 }
 
 .cookie-shine{
@@ -156,9 +222,11 @@
     <div class="cookie-wrap" id="cookieWrap">
 
       <!-- 쿠키 본체 -->
-      <div class="cookie-shell" id="cookieShell">
-        <div class="cookie-shine"></div>
-      </div>
+<!-- 쿠키 본체 (좌/우 분리) -->
+<div class="cookie-shell" id="cookieShell">
+  <div class="cookie-half left" id="cookieLeft"></div>
+  <div class="cookie-half right" id="cookieRight"></div>
+</div>
 
       <!-- 종이(운세) : 처음엔 안 보이고, 당기면 올라옴 -->
       <div class="fortune-paper" id="fortunePaper">
