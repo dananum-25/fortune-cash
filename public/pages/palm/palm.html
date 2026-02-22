@@ -1,143 +1,310 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>손금 분석 | 사진 업로드 + 간편 진단</title>
-  <meta name="description" content="손바닥 사진 업로드 후 간단 체크로 손금(재물/연애/직업/건강) 흐름을 무료로 확인하세요.">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>손금 분석 | 왼손·오른손 비교 + 간편 진단</title>
+  <meta name="description" content="왼손(기질)·오른손(현재)을 나란히 비교하며 10문항 Y/N 체크로 손금 해석을 제공합니다. 사진은 서버 업로드 없이 기기 내에서만 처리됩니다.">
   <link rel="canonical" href="https://fortune-cash.vercel.app/pages/palm/palm.html">
 
   <style>
     body{margin:0;background:#111;color:#fff;font-family:Arial;}
-    .wrap{max-width:920px;margin:auto;padding:20px;}
+    .wrap{max-width:980px;margin:auto;padding:20px;}
     .card{background:#1a1a1a;border-radius:16px;padding:18px;margin:16px 0;}
     h1{font-size:26px;margin:0 0 10px;}
-    h2{margin:18px 0 10px;}
+    h2{margin:16px 0 10px;}
     p{line-height:1.8;margin:8px 0;}
-    .small{font-size:12px;opacity:.8}
-    .muted{opacity:.85}
-    .hr{height:1px;background:#222;margin:14px 0;}
+    .small{font-size:12px;opacity:.8;line-height:1.6}
+    .badge{display:inline-block;background:#222;color:#ffd56b;padding:6px 10px;border-radius:12px;margin:4px 6px 4px 0;}
     a{color:#ffd56b;text-decoration:none;}
     button{width:100%;padding:14px;border:none;border-radius:12px;background:#ffd56b;font-weight:bold;margin-top:10px;cursor:pointer;}
     button.secondary{background:#2a2a2a;color:#fff;font-weight:normal;}
-    input[type="file"]{width:100%;padding:12px;border-radius:12px;background:#0f0f0f;border:1px solid #222;color:#fff;}
+    button.ghost{background:#111;border:1px solid #333;color:#fff;font-weight:700;}
+    .hr{height:1px;background:#222;margin:14px 0;}
 
-    /* ---- 손 선택 토글 ---- */
-    .hand-toggle{display:flex;gap:10px;margin-top:12px;}
-    .hand-toggle button{flex:1;background:#222;color:#fff;border:1px solid #2a2a2a}
-    .hand-toggle button.active{background:#ffd56b;color:#111;border-color:#ffd56b}
+    /* 상단 선택 바 */
+    .topRow{display:flex;gap:10px;flex-wrap:wrap}
+    .handBtn{
+      flex:1;
+      min-width:140px;
+      background:#111;border:1px solid #333;color:#fff;
+      padding:12px;border-radius:12px;font-weight:900;cursor:pointer;
+    }
+    .handBtn.active{border-color:#ffd56b; box-shadow:0 0 0 2px rgba(255,213,107,.15) inset;}
+    .hintBox{background:#121212;border:1px solid #222;border-radius:12px;padding:12px;margin-top:10px}
 
-    /* ---- 비교(내사진/가이드) ---- */
-    .compare-wrap{display:flex;gap:14px;flex-wrap:wrap;}
-    .pane{flex:1;min-width:280px;background:#121212;border:1px solid #222;border-radius:16px;padding:12px;}
-    .paneTitle{font-weight:800;margin:0 0 10px;color:#ffd56b;}
-    .imgbox{border-radius:14px;overflow:hidden;border:1px solid #222;background:#0f0f0f;}
-    .imgbox img{width:100%;display:block;}
-    .imgbox .ph{padding:18px;text-align:center;font-size:13px;opacity:.8;}
-    #previewBox{display:none;}
+    /* 2열 비교 레이아웃 */
+    .compareGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width: 880px){
+      .compareGrid{grid-template-columns:1fr;}
+    }
 
-    /* ---- 체크리스트(8개) ---- */
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
-    .q{background:#0f0f0f;border:1px solid #222;padding:12px;border-radius:14px;cursor:pointer;user-select:none;}
-    .q:hover{border-color:#333}
-    .q.active{border-color:#ffd56b; box-shadow:0 0 0 1px rgba(255,213,107,.3) inset;}
-    .qTop{display:flex;gap:10px;align-items:flex-start;}
-    .qTop input{margin-top:4px;}
-    .qTitle{font-weight:800;}
-    .qDesc{margin-top:6px;font-size:12px;opacity:.8;line-height:1.4}
+    /* 이미지/가이드 스테이지 */
+    .stage{
+      background:#0f0f0f;border:1px solid #222;border-radius:14px;overflow:hidden;
+      position:relative;
+      min-height: 360px;
+    }
+    .stageHead{
+      display:flex;justify-content:space-between;align-items:center;
+      padding:12px;border-bottom:1px solid #222;background:#121212;
+      gap:10px;flex-wrap:wrap;
+    }
+    .stageHead .title{font-weight:900}
+    .stageBody{padding:12px}
+    .stageNote{font-size:12px;opacity:.8;margin-top:8px}
 
-    /* ---- 가이드 설명 박스 ---- */
+    /* 내 사진 영역 */
+    .previewWrap{
+      position:relative;
+      border:1px solid #222;border-radius:14px;overflow:hidden;
+      background:#0b0b0b;
+    }
+    .previewWrap img{
+      width:100%;
+      display:block;
+      max-height: 520px;
+      object-fit: contain;
+      background:#0b0b0b;
+    }
+    .previewWrap .ph{
+      padding:18px;
+      color:#aaa;
+      font-size:13px;
+    }
+
+    /* 가이드 SVG 영역 */
+    .guideWrap{
+      position:relative;
+      border:1px solid #222;border-radius:14px;overflow:hidden;
+      background:#0b0b0b;
+    }
+    .guideWrap .ph{
+      padding:18px;
+      color:#aaa;
+      font-size:13px;
+    }
+    /* SVG는 내부에서 선 하이라이트 */
     .guideTip{
       margin-top:10px;
+      background:#121212;border:1px solid #222;border-radius:12px;
       padding:12px;
-      background:#0f0f0f;
-      border:1px solid #222;
-      border-radius:14px;
-      font-size:13px;
-      line-height:1.6;
       display:none;
     }
     .guideTip.show{display:block;}
-    .guideTip b{color:#ffd56b;}
 
-    /* ---- 점수 UI (기존 유지) ---- */
-    .scoreRow{display:grid;grid-template-columns:1fr 90px;gap:10px;align-items:center;margin:10px 0;}
-    .bar{height:12px;background:#222;border-radius:999px;overflow:hidden;}
-    .fill{height:100%;width:0%;background:#ffd56b;transition:width .8s ease;}
+    /* 업로드/카메라 컨트롤 */
+    .ctrlRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .ctrlRow > *{flex:1;min-width:160px}
+
+    input[type="file"]{
+      width:100%;
+      padding:12px;
+      border-radius:12px;
+      background:#0f0f0f;
+      border:1px solid #222;
+      color:#fff;
+    }
+
+    /* 질문(10문항) */
+    .qGrid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+    @media (max-width: 720px){
+      .qGrid{grid-template-columns:1fr;}
+    }
+    .qCard{
+      background:#121212;border:1px solid #222;border-radius:14px;
+      padding:12px;
+    }
+    .qTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    .qTitle{font-weight:900;line-height:1.35}
+    .qDesc{font-size:12px;opacity:.8;margin-top:6px;line-height:1.5}
+    .yn{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      flex-shrink:0;
+    }
+    .yn button{
+      margin-top:0;
+      width:auto;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid #333;
+      background:#111;
+      color:#fff;
+      font-weight:900;
+    }
+    .yn button.active{
+      border-color:#ffd56b;
+      box-shadow:0 0 0 2px rgba(255,213,107,.14) inset;
+      color:#ffd56b;
+    }
+
+    /* 결과 */
     .pill{display:inline-block;background:#0f0f0f;border:1px solid #222;padding:6px 10px;border-radius:999px;margin:4px 6px 0 0;font-size:12px;}
+    .resultBox{line-height:1.85}
+    .warn{color:#ffd56b;font-weight:900}
 
-    /* ---- SVG 하이라이트 룩 ---- */
-    .svgWrap{width:100%;}
-    .svgWrap svg{width:100%;height:auto;display:block;}
-    .hl{opacity:0; transition:opacity .15s ease;}
-    .hl.on{opacity:1;}
+    /* 카메라 모달(선택) */
+    .modal{
+      position:fixed; inset:0;
+      background:rgba(0,0,0,.82);
+      display:none;
+      justify-content:center;
+      align-items:center;
+      z-index:9999;
+      padding:16px;
+    }
+    .modal.show{display:flex;}
+    .modalCard{
+      width:min(760px, 96vw);
+      background:#111;
+      border:1px solid #333;
+      border-radius:16px;
+      overflow:hidden;
+    }
+    .modalHead{
+      display:flex;justify-content:space-between;align-items:center;
+      padding:12px 14px;
+      background:#121212;
+      border-bottom:1px solid #222;
+      gap:10px;
+    }
+    .modalHead .mTitle{font-weight:900}
+    .modalBody{padding:12px}
+    video{
+      width:100%;
+      max-height:70vh;
+      background:#000;
+      border-radius:14px;
+      border:1px solid #222;
+    }
+    .modalBtns{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .modalBtns button{margin-top:0}
+    .danger{background:#3a1a1a;color:#fff;border:1px solid #663;}
   </style>
 </head>
 
 <body>
   <div class="wrap">
-    <h1>✋ 손금 분석</h1>
-    <div class="small">※ 사진은 서버로 업로드되지 않고, 내 폰/브라우저에서만 미리보기로 사용됩니다. 결과는 체크 항목 기반 “간편 해석”입니다.</div>
+    <h1>✋ 손금 분석 (전문화 버전)</h1>
+    <div class="small">
+      • <b>왼손</b> = 타고난 기질/기본 흐름 &nbsp; • <b>오른손</b> = 현재 습관/노력/변화<br/>
+      • 사진은 <b class="warn">서버로 업로드되지 않고</b>, 내 브라우저(기기)에서만 미리보기/분석에 사용됩니다.
+    </div>
 
     <div id="loginCheck" class="card"></div>
 
-    <!-- ✅ 전문가 설명 + 손 선택 -->
+    <!-- 0) 손 선택 -->
     <div class="card">
-      <h2 style="margin:0 0 8px;">손금 보는 손(왼손/오른손)</h2>
-      <p class="muted"><b>왼손</b>은 타고난 기질/기본 흐름, <b>오른손</b>은 현재의 모습/노력으로 만든 흐름을 봅니다.</p>
-      <p class="small">가장 정확한 건 “두 손을 비교”하는 방식입니다. (처음엔 한 손만 봐도 충분해요)</p>
-
-      <div class="hand-toggle">
-        <button id="btnLeft" class="active" type="button">왼손</button>
-        <button id="btnRight" type="button">오른손</button>
+      <h2>0) 어떤 손을 볼까요?</h2>
+      <div class="topRow">
+        <button id="btnLeft" class="handBtn active" type="button">왼손(기질/기본)</button>
+        <button id="btnRight" class="handBtn" type="button">오른손(현재/노력)</button>
       </div>
-      <div class="small">선택한 손 기준으로 가이드가 바뀝니다.</div>
-    </div>
 
-    <!-- ✅ 사진 2장 나란히 -->
-    <div class="card">
-      <h2 style="margin:0 0 10px;">1) 사진 준비</h2>
-      <p class="muted">밝은 곳에서 손바닥을 펴고, 선이 보이도록 가까이 찍어주세요. (역광/그림자/흐림은 피하기)</p>
-
-      <div class="compare-wrap">
-        <div class="pane">
-          <div class="paneTitle">내 손바닥 사진</div>
-          <input id="palmFile" type="file" accept="image/*">
-          <div id="previewBox" class="imgbox" style="margin-top:10px;display:none;">
-            <img id="previewImg" alt="손바닥 미리보기">
-          </div>
-          <div id="previewPlaceholder" class="imgbox" style="margin-top:10px;">
-            <div class="ph">사진을 올리면 여기에 표시돼요</div>
-          </div>
-          <div class="small">TIP) 선이 잘 안 보이면, 더 가까이/조명 아래로!</div>
-        </div>
-
-        <div class="pane">
-          <div class="paneTitle">가이드(체크 포인트)</div>
-
-          <!-- ✅ SVG 가이드가 여기에 로드됨 -->
-          <div class="imgbox svgWrap" id="guideBox">
-            <div class="ph">가이드 로딩 중…</div>
-          </div>
-
-          <div id="guideTip" class="guideTip"></div>
-          <div class="small">체크포인트를 누르면 가이드에서 해당 위치가 표시돼요. 다시 누르면 해제됩니다.</div>
+      <div class="hintBox">
+        <div class="small">
+          ✅ 전문가 흐름: <b>왼손 → 오른손</b> 순으로 보면 “기질 vs 현재” 차이가 더 또렷해져요.<br/>
+          ✅ 10문항을 전부 <b>Y/N</b>로 체크하면, 점수 대신 <b>체계적인 문장 리딩</b>으로 결과가 나옵니다.
         </div>
       </div>
     </div>
 
-    <!-- ✅ 체크리스트 -->
+    <!-- 1) 사진/가이드 나란히 -->
     <div class="card">
-      <h2 style="margin:0 0 10px;">2) 간단 체크(8개)</h2>
-      <p class="muted">사진을 보면서 “가장 가까운 것”을 체크하세요. 모르겠으면 느낌대로 체크해도 됩니다.</p>
+      <h2>1) 사진과 가이드를 한 화면에서 비교</h2>
 
-      <div class="grid" id="checkGrid"><!-- JS가 채움 --></div>
+      <div class="compareGrid">
+        <!-- 내 사진/카메라 -->
+        <div class="stage">
+          <div class="stageHead">
+            <div class="title">📷 내 손바닥 사진</div>
+            <div class="small" id="handLabelA">현재: 왼손</div>
+          </div>
+          <div class="stageBody">
 
-      <button id="analyzeBtn" type="button">손금 결과 보기</button>
-      <div class="small">※ 하루 1회만 포인트 +1 (로그인 시)</div>
+            <div class="previewWrap" id="previewWrap">
+              <div class="ph" id="previewPlaceholder">
+                아직 사진이 없어요.<br/>
+                아래에서 <b>파일 선택</b> 또는 <b>카메라로 촬영</b>을 해주세요.
+                <div class="small" style="margin-top:10px;">
+                  • iPhone에서 HEIC로 찍히는 경우, 일부 브라우저에서 미리보기가 안 될 수 있어요.<br/>
+                  • 이 경우 프로그램이 자동 감지해서 안내/변환을 시도하도록 만들 예정입니다.
+                </div>
+              </div>
+              <img id="previewImg" alt="손바닥 미리보기" style="display:none;">
+            </div>
+
+            <div class="ctrlRow">
+              <!-- iOS/모바일 기본 카메라 호출 (HEIC 가능) -->
+              <input id="palmFile" type="file" accept="image/*" capture="environment"/>
+
+              <!-- 브라우저 카메라(토치 토글은 palm.js에서 지원) -->
+              <button id="btnOpenCamera" class="ghost" type="button">웹에서 바로 촬영</button>
+            </div>
+
+            <div class="stageNote small">
+              TIP) 밝은 곳에서 손바닥을 펴고, 선이 보이도록 가까이 찍어주세요. 역광/그림자/흐림은 피하기!
+            </div>
+          </div>
+        </div>
+
+        <!-- 가이드 -->
+        <div class="stage">
+          <div class="stageHead">
+            <div class="title">🧭 가이드 (선 위치 확인)</div>
+            <div class="small" id="handLabelB">현재: 왼손</div>
+          </div>
+          <div class="stageBody">
+            <div class="guideWrap" id="guideBox">
+              <div class="ph">가이드를 불러오는 중…</div>
+            </div>
+
+            <div id="guideTip" class="guideTip"></div>
+
+            <div class="stageNote small">
+              • 질문을 체크하면 가이드 이미지에서 <b>해당 선(라인)이 정확히 파랗게 표시</b>됩니다.<br/>
+              • “범위 하이라이트”가 아니라 <b>선 자체</b>를 바꾸는 방식으로 수정합니다.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="heicHint" class="small" style="margin-top:10px;display:none;">
+        ⚠ 현재 파일이 HEIC로 보이거나 브라우저 미리보기가 실패했어요. 자동 변환/대체 경로를 시도합니다…
+      </div>
     </div>
 
-    <!-- ✅ 결과 -->
+    <!-- 2) 10문항 Y/N -->
+    <div class="card">
+      <h2>2) 손금 체크 (10문항 · Y/N)</h2>
+      <p class="small">
+        사진을 보면서 “가장 가까운 것”을 선택하세요. 애매하면 <b>가이드(파란 선)</b>를 기준으로 판단하면 됩니다.
+      </p>
+
+      <div id="qGrid" class="qGrid"><!-- palm.js가 채움 --></div>
+
+      <div class="hr"></div>
+
+      <button id="analyzeBtn" type="button">이 손(현재 선택) 리딩 보기</button>
+      <button id="analyzeBothBtn" class="secondary" type="button">왼손+오른손 비교 리딩 보기</button>
+
+      <div class="small" style="margin-top:10px;">
+        ※ 로그인 상태에서는 하루 1회 포인트 +1 (손금 리딩 보기 기준)
+      </div>
+    </div>
+
+    <!-- 결과 -->
     <div id="result" style="display:none;">
       <div class="card">
         <h2>👤 기본 정보</h2>
@@ -145,52 +312,16 @@
       </div>
 
       <div class="card">
-        <h2>📊 점수 요약</h2>
-
-        <div class="scoreRow">
-          <div>
-            <div class="bar"><div id="fill-wealth" class="fill"></div></div>
-            <div class="small">💰 재물운</div>
-          </div>
-          <div><b id="score-wealth">0</b>점</div>
-        </div>
-
-        <div class="scoreRow">
-          <div>
-            <div class="bar"><div id="fill-love" class="fill"></div></div>
-            <div class="small">💖 연애운</div>
-          </div>
-          <div><b id="score-love">0</b>점</div>
-        </div>
-
-        <div class="scoreRow">
-          <div>
-            <div class="bar"><div id="fill-career" class="fill"></div></div>
-            <div class="small">🏢 직장/사업운</div>
-          </div>
-          <div><b id="score-career">0</b>점</div>
-        </div>
-
-        <div class="scoreRow">
-          <div>
-            <div class="bar"><div id="fill-health" class="fill"></div></div>
-            <div class="small">💪 건강운</div>
-          </div>
-          <div><b id="score-health">0</b>점</div>
-        </div>
-
-        <div class="hr"></div>
+        <h2>🔮 자동 리딩 결과</h2>
         <div id="keywordBox"></div>
-      </div>
-
-      <div class="card">
-        <h2>🔮 자동 해석</h2>
-        <div id="textBox"></div>
+        <div class="hr"></div>
+        <div id="textBox" class="resultBox"></div>
       </div>
 
       <div class="card">
         <button onclick="location.href='/pages/period/period.html'">오늘/내일/연간 운세</button>
         <button onclick="location.href='/pages/tojung/tojung.html'">토정비결</button>
+        <button onclick="location.href='/pages/cookie/cookie.html'">포춘쿠키</button>
         <button onclick="location.href='/point.html'">포인트</button>
         <button onclick="location.href='/'">홈으로</button>
       </div>
@@ -201,10 +332,38 @@
     </footer>
   </div>
 
+  <!-- 카메라 모달 -->
+  <div id="camModal" class="modal" aria-hidden="true">
+    <div class="modalCard">
+      <div class="modalHead">
+        <div class="mTitle">📷 웹 카메라 촬영</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button id="btnTorch" class="ghost" type="button" style="width:auto;padding:10px 12px;">플래시 OFF</button>
+          <button id="btnCloseCamera" class="danger" type="button" style="width:auto;padding:10px 12px;">닫기</button>
+        </div>
+      </div>
+      <div class="modalBody">
+        <video id="camVideo" playsinline autoplay></video>
+        <div class="modalBtns">
+          <button id="btnCapture" type="button">촬영해서 적용</button>
+          <button id="btnSwitchCam" class="secondary" type="button">전/후면 전환</button>
+        </div>
+        <div class="small" style="margin-top:10px;">
+          • “플래시(토치)”는 기기/브라우저가 지원할 때만 동작합니다.<br/>
+          • 지원하지 않으면 버튼이 자동으로 비활성화되도록 처리합니다.
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="/js/config.js"></script>
   <script src="/js/auth.js"></script>
   <script src="/js/points.js"></script>
   <script src="/js/db.js"></script>
+
+  <!-- (선택) HEIC 변환 라이브러리: 무료/오픈소스. 파일로 내려받아 /public/js/heic2any.min.js 로 두는 방식 권장 -->
+  <!-- <script src="/js/heic2any.min.js"></script> -->
+
   <script src="/js/palm.js"></script>
 </body>
 </html>
