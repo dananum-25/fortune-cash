@@ -52,25 +52,44 @@ async function loadCookieDB(){
 
 // ---- 운세 한 줄 생성
 function makeFortuneLine(){
-  const birth = localStorage.getItem("birth") || ""; // 로그인 안 해도 오늘 기준으로 가능
-  const seedBase = birth ? ymdToSeed(birth) : 77777;
+function makeFortuneLine(){
+  const birth = localStorage.getItem("birth") || "";
+  const phone = localStorage.getItem("phone") || "";
+  const today = todayStamp(); // YYYYMMDD
 
-  // "오늘"은 모두 다르게: 날짜 스탬프를 섞어줌
-  const daySeed = Number(todayStamp()); // YYYYMMDD
-  const seed = seedBase + daySeed;
+  // 사람 고정 seed
+  let personSeed = 0;
+
+  if(phone){
+    // 로그인 유저는 전화번호 기준
+    personSeed = Number(phone.slice(-4)); // 뒤 4자리
+  }else if(birth){
+    // 비로그인은 생년월일 기준
+    const m = birth.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(m){
+      personSeed = Number(m[1]) + Number(m[2]) + Number(m[3]);
+    }
+  }else{
+    // 완전 비로그인
+    personSeed = 777;
+  }
+
+  const seed = personSeed + Number(today);
 
   const pools = cookieDB?.pools;
 
   const fallback = [
-    "오늘은 작은 친절이 큰 기회를 부릅니다. 먼저 한 번 웃어보세요 🙂",
-    "결정이 흔들릴 땐 ‘가장 단순한 선택’이 정답일 때가 많아요.",
-    "조급함만 내려놓으면, 생각보다 일이 빨리 풀립니다.",
-    "오늘의 운: ‘미루던 1개 끝내면’ 기분이 확 좋아집니다.",
-    "누군가의 말이 신경 쓰였다면… 사실 그 사람도 긴장 중일 가능성 90%!"
+    "오늘은 작은 친절이 큰 기회를 부릅니다.",
+    "결정이 흔들릴 땐 가장 단순한 선택이 답입니다.",
+    "조급함만 내려놓으면 일이 풀립니다.",
+    "미루던 일 하나만 끝내도 운이 열립니다.",
+    "오늘의 키워드: 정리, 정돈, 정리정돈."
   ];
 
   const arr = pools?.lines || fallback;
-  return seededPick(arr, seed, 3) || fallback[0];
+
+  const idx = Math.abs(seed % arr.length);
+  return arr[idx];
 }
 
 // ---- UI 렌더
@@ -268,4 +287,14 @@ document.addEventListener("DOMContentLoaded", async ()=>{
 
   // 당기기 인터랙션
   setupPullInteraction();
+  function makeDailyCookie(cookieDB){
+  const stamp = Number(todayStamp());
+  const seed = userSeed() + stamp;
+
+  const category = weightedPick(cookieDB?.weights, seed);
+  const pool = cookieDB?.pools?.[category] || cookieDB?.pools?.overall || [];
+
+  const text = seededPick(pool, seed, 13) || "오늘은 천천히 가도 괜찮습니다.";
+  return { category, text };
+  }
 });
