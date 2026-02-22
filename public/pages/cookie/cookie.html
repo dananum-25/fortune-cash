@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>포춘쿠키 | 오늘의 한 줄 운세</title>
+  <meta name="description" content="오늘의 포춘쿠키 한 줄 운세. 로그인 시 포인트도 적립됩니다.">
+  <link rel="canonical" href="https://fortune-cash.vercel.app/pages/cookie/cookie.html">
+
+  <style>
+    body{margin:0;background:#111;color:#fff;font-family:Arial;}
+    .wrap{max-width:820px;margin:auto;padding:20px;}
+    .card{background:#1a1a1a;border-radius:16px;padding:18px;margin:16px 0;}
+    h1{font-size:26px;margin:0 0 10px;}
+    .small{font-size:12px;opacity:.8}
+    .cookie{background:#141414;border:1px solid #222;border-radius:16px;padding:18px;}
+    .cookie-top{font-weight:bold;color:#ffd56b;margin-bottom:10px;}
+    .cookie-msg{font-size:18px;line-height:1.8;}
+    button{width:100%;padding:14px;border:none;border-radius:12px;background:#ffd56b;font-weight:bold;margin-top:10px;cursor:pointer;}
+    button.secondary{background:#2a2a2a;color:#fff;font-weight:normal;}
+    a{color:#ffd56b;text-decoration:none;}
+    .row{display:flex;gap:10px;}
+    .row button{width:100%;}
+    .hr{height:1px;background:#222;margin:14px 0;}
+    /* ===== Fortune Cookie Pull UI ===== */
+.cookie-stage{
+  display:flex; flex-direction:column; align-items:center;
+  padding:10px 0;
+}
+
+.cookie-wrap{
+  position:relative;
+  width:min(520px, 92vw);
+  height:320px;
+  display:flex;
+  justify-content:center;
+  align-items:flex-end;
+  user-select:none;
+}
+
+.cookie-shell{
+  width:260px; height:200px;
+  border-radius: 140px 140px 90px 90px;
+  background: linear-gradient(180deg, #f6d28b, #d19a43);
+  box-shadow: 0 18px 40px rgba(0,0,0,.45);
+  position:relative;
+  transform-origin:center bottom;
+}
+
+.cookie-shine{
+  position:absolute; top:24px; left:30px;
+  width:80px; height:50px;
+  border-radius: 50px;
+  background: rgba(255,255,255,.18);
+  filter: blur(0.2px);
+}
+
+.fortune-paper{
+  position:absolute;
+  bottom:120px;
+  width: min(460px, 88vw);
+  max-width:460px;
+  background:#141414;
+  border:1px solid #222;
+  border-radius:16px;
+  padding:16px 16px 14px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.35);
+
+  transform: translateY(60px);
+  opacity:0;
+  pointer-events:none;
+  transition: transform .5s ease, opacity .5s ease;
+}
+
+.fortune-paper.show{
+  transform: translateY(0px);
+  opacity:1;
+}
+
+.fortune-title{
+  color:#ffd56b; font-weight:bold; margin-bottom:8px;
+}
+
+.fortune-msg{
+  font-size:18px; line-height:1.8;
+}
+
+.pull-zone{
+  position:absolute;
+  bottom:10px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+}
+
+.string{
+  width:3px;
+  height:60px;
+  background:#cfcfcf;
+  border-radius:4px;
+  transform-origin: top center;
+}
+
+.tag{
+  width:120px;
+  border:none;
+  border-radius:14px;
+  background:#ffd56b;
+  font-weight:900;
+  letter-spacing:1px;
+  padding:12px 0;
+  cursor:grab;
+}
+
+.tag:active{ cursor:grabbing; }
+
+.hint{
+  margin-top:12px;
+  font-size:12px;
+  opacity:.75;
+}
+
+/* 쿠키 흔들림 */
+@keyframes cookieShake{
+  0%{ transform: rotate(0deg); }
+  20%{ transform: rotate(-2deg); }
+  40%{ transform: rotate(2deg); }
+  60%{ transform: rotate(-1deg); }
+  80%{ transform: rotate(1deg); }
+  100%{ transform: rotate(0deg); }
+}
+.cookie-shake{
+  animation: cookieShake .35s ease;
+}
+
+/* 태그 당기는 동안 살짝 탄성 느낌 */
+.string.stretch{
+  filter: brightness(1.05);
+}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🥠 포춘쿠키</h1>
+    <div class="small">※ 가볍게 참고용이에요. 대신 가끔은… 은근히 맞습니다.</div>
+
+    <div class="card">
+      <h2 style="margin:0 0 10px;">👤 기본 정보</h2>
+      <div id="basicInfo"></div>
+    </div>
+
+    <div class="card">
+      <div id="cookieBox">
+  <div class="cookie-stage">
+    <div class="cookie-wrap" id="cookieWrap">
+
+      <!-- 쿠키 본체 -->
+      <div class="cookie-shell" id="cookieShell">
+        <div class="cookie-shine"></div>
+      </div>
+
+      <!-- 종이(운세) : 처음엔 안 보이고, 당기면 올라옴 -->
+      <div class="fortune-paper" id="fortunePaper">
+        <div class="fortune-title">🥠 오늘의 포춘쿠키</div>
+        <div class="fortune-msg" id="fortuneMsg"></div>
+      </div>
+
+      <!-- 끈 + 태그 -->
+      <div class="pull-zone" id="pullZone">
+        <div class="string" id="string"></div>
+        <button class="tag" id="pullTag" type="button">PULL</button>
+      </div>
+
+    </div>
+
+    <div class="hint" id="hintText">👇 아래 꼬리표를 잡아당겨 보세요</div>
+  </div>
+      </div>
+      <div class="hr"></div>
+
+      <div class="row">
+        <button id="btnShare">공유하고 포인트 받기</button>
+        <button id="btnAgain" class="secondary">다시 뽑기</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <button onclick="location.href='/pages/period/period.html'">오늘/내일/연간 운세</button>
+      <button onclick="location.href='/pages/star/index.html'">별자리 운세</button>
+      <button onclick="location.href='/point.html'">포인트</button>
+      <button onclick="location.href='/'">홈으로</button>
+    </div>
+
+    <footer class="small" style="margin-top:40px;text-align:center;opacity:.7;">
+      무료 운세 플랫폼 | <a href="/">홈으로</a>
+    </footer>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/points.js"></script>
+  <script src="/js/db.js"></script>
+  <script src="/js/cookie.js"></script>
+</body>
+</html>
