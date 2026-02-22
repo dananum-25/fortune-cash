@@ -364,4 +364,55 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   document.getElementById("pullTag")?.addEventListener("click", ()=>{
     revealCookieOnce();
   });
+  // ---- 운세 한 줄 생성 (희귀 5% 포함)
+function makeFortuneLine(){
+  const birth = localStorage.getItem("birth") || "";
+  const phone = localStorage.getItem("phone") || "";
+  const stamp = todayStamp(); // YYYYMMDD
+
+  // 사람 고정 seed
+  let personSeed = 0;
+  if(phone){
+    personSeed = Number(phone.slice(-6)) || 777777; // 좀 더 분산
+  }else if(birth){
+    const m = birth.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(m) personSeed = (Number(m[1])*10000) + (Number(m[2])*100) + Number(m[3]);
+    else personSeed = 777777;
+  }else{
+    personSeed = 777777;
+  }
+
+  const seed = personSeed + Number(stamp);
+
+  const pools = cookieDB?.pools;
+
+  // ✅ 5% 희귀 트리거 (seed 기반: 하루/유저 고정)
+  const isRare = (Math.abs(seed) % 100) < 5;
+
+  // 기본 풀
+  const fallbackOverall = [
+    "오늘은 작은 친절이 큰 기회를 부릅니다.",
+    "결정이 흔들릴 땐 가장 단순한 선택이 답입니다.",
+    "조급함만 내려놓으면 일이 풀립니다.",
+    "미루던 일 하나만 끝내도 운이 열립니다.",
+    "오늘의 키워드: 정리, 정돈, 정리정돈."
+  ];
+
+  // ✅ 희귀면 rare 풀에서 뽑고, 아니면 기존 방식(카테고리 가중치)
+  if(isRare && pools?.rare?.length){
+    const arr = pools.rare;
+    const idx = Math.abs((seed + 13) % arr.length);
+    return { text: arr[idx], rare: true, category: "rare" };
+  }
+
+  // 일반 카테고리 선택
+  const weights = cookieDB?.weights || { overall: 100 };
+  const category = weightedPick(weights, seed);
+  const arr =
+    (pools && pools[category] && pools[category].length ? pools[category] : null) ||
+    (pools?.overall?.length ? pools.overall : fallbackOverall);
+
+  const idx = Math.abs((seed + 17) % arr.length);
+  return { text: arr[idx], rare: false, category };
+}
 });
