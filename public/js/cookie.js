@@ -140,7 +140,7 @@ function renderBasicInfo(){
 }
 
 // ---- 쿠키 열기 UI (공통)
-function openCookieUI({ category, text }){
+function openCookieUI({ category, text, rare }){
   const wrap = document.getElementById("cookieWrap");
   const shell = document.getElementById("cookieShell");
   const paper = document.getElementById("fortunePaper");
@@ -152,46 +152,43 @@ function openCookieUI({ category, text }){
 
   if(!wrap || !shell || !paper || !msgEl) return;
 
+  // 이전 희귀 효과 제거
+  wrap.classList.remove("rare-glow");
+
   const labelMap = {
     overall: "전체운",
     wealth: "재물운",
     love: "연애운",
     career: "직장/사업운",
-    health: "건강운"
+    health: "건강운",
+    rare: "희귀운"
   };
 
-// 상태 고정
-wrap.dataset.opened = "1";
-
-// 메시지
-if(titleEl){
-  titleEl.textContent = `🥠 오늘의 포춘쿠키 · ${labelMap[category] || "전체운"}`;
-}
-
-// 희귀 UI (메시지 세팅 후)
-if(rare){
-  document.getElementById("cookieWrap")?.classList.add("rare-glow");
+  wrap.dataset.opened = "1";
 
   if(titleEl){
-    titleEl.innerHTML =
-      `<span class="rare-badge">RARE</span> 🥠 오늘의 포춘쿠키`;
+    titleEl.textContent = `🥠 오늘의 포춘쿠키 · ${labelMap[category] || "전체운"}`;
   }
-}
+
+  // 희귀 UI
+  if(rare){
+    wrap.classList.add("rare-glow");
+    if(titleEl){
+      titleEl.innerHTML =
+        `<span class="rare-badge">RARE</span> 🥠 오늘의 포춘쿠키`;
+    }
+  }
+
   msgEl.textContent = text || "";
 
-  // 끈 끊김
   stringEl?.classList.add("break");
-
-  // 쿠키 열기
   shell.classList.add("cookie-open");
-
-  // 종이 등장
   paper.classList.add("show");
 
-  // 텍스트 등장
   setTimeout(()=> msgEl.classList.add("show"), 50);
 
   if(hint) hint.textContent = "✅ 오늘의 쿠키가 열렸어요!";
+
   if(tag){
     tag.disabled = true;
     tag.textContent = "DONE";
