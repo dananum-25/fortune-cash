@@ -6,32 +6,74 @@
   <title>손금 분석 | 사진 업로드 + 간편 진단</title>
   <meta name="description" content="손바닥 사진 업로드 후 간단 체크로 손금(재물/연애/직업/건강) 흐름을 무료로 확인하세요.">
   <link rel="canonical" href="https://fortune-cash.vercel.app/pages/palm/palm.html">
+
   <style>
     body{margin:0;background:#111;color:#fff;font-family:Arial;}
-    .wrap{max-width:820px;margin:auto;padding:20px;}
+    .wrap{max-width:920px;margin:auto;padding:20px;}
     .card{background:#1a1a1a;border-radius:16px;padding:18px;margin:16px 0;}
     h1{font-size:26px;margin:0 0 10px;}
     h2{margin:18px 0 10px;}
     p{line-height:1.8;margin:8px 0;}
     .small{font-size:12px;opacity:.8}
-    .badge{display:inline-block;background:#222;color:#ffd56b;padding:6px 10px;border-radius:12px;margin:4px 6px 4px 0;}
-    button{width:100%;padding:14px;border:none;border-radius:12px;background:#ffd56b;font-weight:bold;margin-top:10px;cursor:pointer;}
-    a{color:#ffd56b;text-decoration:none;}
+    .muted{opacity:.85}
     .hr{height:1px;background:#222;margin:14px 0;}
+    a{color:#ffd56b;text-decoration:none;}
+    button{width:100%;padding:14px;border:none;border-radius:12px;background:#ffd56b;font-weight:bold;margin-top:10px;cursor:pointer;}
+    button.secondary{background:#2a2a2a;color:#fff;font-weight:normal;}
     input[type="file"]{width:100%;padding:12px;border-radius:12px;background:#0f0f0f;border:1px solid #222;color:#fff;}
-    .imgbox{margin-top:10px;border-radius:14px;overflow:hidden;border:1px solid #222;background:#0f0f0f;}
+
+    /* ---- 손 선택 토글 ---- */
+    .hand-toggle{display:flex;gap:10px;margin-top:12px;}
+    .hand-toggle button{flex:1;background:#222;color:#fff;border:1px solid #2a2a2a}
+    .hand-toggle button.active{background:#ffd56b;color:#111;border-color:#ffd56b}
+
+    /* ---- 비교(내사진/가이드) ---- */
+    .compare-wrap{display:flex;gap:14px;flex-wrap:wrap;}
+    .pane{flex:1;min-width:280px;background:#121212;border:1px solid #222;border-radius:16px;padding:12px;}
+    .paneTitle{font-weight:800;margin:0 0 10px;color:#ffd56b;}
+    .imgbox{border-radius:14px;overflow:hidden;border:1px solid #222;background:#0f0f0f;}
     .imgbox img{width:100%;display:block;}
+    .imgbox .ph{padding:18px;text-align:center;font-size:13px;opacity:.8;}
+    #previewBox{display:none;}
+
+    /* ---- 체크리스트(8개) ---- */
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
-    .q{background:#121212;border:1px solid #222;padding:12px;border-radius:12px;}
-    .q label{display:flex;gap:10px;align-items:flex-start;cursor:pointer;}
-    .q input{margin-top:4px;}
-    .muted{opacity:.8}
-    .scoreRow{display:grid;grid-template-columns:1fr 80px;gap:10px;align-items:center;margin:10px 0;}
+    .q{background:#0f0f0f;border:1px solid #222;padding:12px;border-radius:14px;cursor:pointer;user-select:none;}
+    .q:hover{border-color:#333}
+    .q.active{border-color:#ffd56b; box-shadow:0 0 0 1px rgba(255,213,107,.3) inset;}
+    .qTop{display:flex;gap:10px;align-items:flex-start;}
+    .qTop input{margin-top:4px;}
+    .qTitle{font-weight:800;}
+    .qDesc{margin-top:6px;font-size:12px;opacity:.8;line-height:1.4}
+
+    /* ---- 가이드 설명 박스 ---- */
+    .guideTip{
+      margin-top:10px;
+      padding:12px;
+      background:#0f0f0f;
+      border:1px solid #222;
+      border-radius:14px;
+      font-size:13px;
+      line-height:1.6;
+      display:none;
+    }
+    .guideTip.show{display:block;}
+    .guideTip b{color:#ffd56b;}
+
+    /* ---- 점수 UI (기존 유지) ---- */
+    .scoreRow{display:grid;grid-template-columns:1fr 90px;gap:10px;align-items:center;margin:10px 0;}
     .bar{height:12px;background:#222;border-radius:999px;overflow:hidden;}
     .fill{height:100%;width:0%;background:#ffd56b;transition:width .8s ease;}
     .pill{display:inline-block;background:#0f0f0f;border:1px solid #222;padding:6px 10px;border-radius:999px;margin:4px 6px 0 0;font-size:12px;}
+
+    /* ---- SVG 하이라이트 룩 ---- */
+    .svgWrap{width:100%;}
+    .svgWrap svg{width:100%;height:auto;display:block;}
+    .hl{opacity:0; transition:opacity .15s ease;}
+    .hl.on{opacity:1;}
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <h1>✋ 손금 분석</h1>
@@ -39,28 +81,63 @@
 
     <div id="loginCheck" class="card"></div>
 
+    <!-- ✅ 전문가 설명 + 손 선택 -->
     <div class="card">
-      <h2>1) 손바닥 사진 올리기</h2>
-      <p class="muted">밝은 곳에서 손바닥을 펴고, 선이 보이도록 가까이 찍어주세요. (역광/그림자/흐림은 피하기)</p>
-      <input id="palmFile" type="file" accept="image/*">
-      <div id="previewBox" class="imgbox" style="display:none;">
-        <img id="previewImg" alt="손바닥 미리보기">
+      <h2 style="margin:0 0 8px;">손금 보는 손(왼손/오른손)</h2>
+      <p class="muted"><b>왼손</b>은 타고난 기질/기본 흐름, <b>오른손</b>은 현재의 모습/노력으로 만든 흐름을 봅니다.</p>
+      <p class="small">가장 정확한 건 “두 손을 비교”하는 방식입니다. (처음엔 한 손만 봐도 충분해요)</p>
+
+      <div class="hand-toggle">
+        <button id="btnLeft" class="active" type="button">왼손</button>
+        <button id="btnRight" type="button">오른손</button>
       </div>
-      <p class="small">TIP) 선이 잘 안 보이면, 카메라를 살짝 더 가까이/밝은 조명 아래로 이동!</p>
+      <div class="small">선택한 손 기준으로 가이드가 바뀝니다.</div>
     </div>
 
+    <!-- ✅ 사진 2장 나란히 -->
     <div class="card">
-      <h2>2) 간단 체크(8개)</h2>
+      <h2 style="margin:0 0 10px;">1) 사진 준비</h2>
+      <p class="muted">밝은 곳에서 손바닥을 펴고, 선이 보이도록 가까이 찍어주세요. (역광/그림자/흐림은 피하기)</p>
+
+      <div class="compare-wrap">
+        <div class="pane">
+          <div class="paneTitle">내 손바닥 사진</div>
+          <input id="palmFile" type="file" accept="image/*">
+          <div id="previewBox" class="imgbox" style="margin-top:10px;display:none;">
+            <img id="previewImg" alt="손바닥 미리보기">
+          </div>
+          <div id="previewPlaceholder" class="imgbox" style="margin-top:10px;">
+            <div class="ph">사진을 올리면 여기에 표시돼요</div>
+          </div>
+          <div class="small">TIP) 선이 잘 안 보이면, 더 가까이/조명 아래로!</div>
+        </div>
+
+        <div class="pane">
+          <div class="paneTitle">가이드(체크 포인트)</div>
+
+          <!-- ✅ SVG 가이드가 여기에 로드됨 -->
+          <div class="imgbox svgWrap" id="guideBox">
+            <div class="ph">가이드 로딩 중…</div>
+          </div>
+
+          <div id="guideTip" class="guideTip"></div>
+          <div class="small">체크포인트를 누르면 가이드에서 해당 위치가 표시돼요. 다시 누르면 해제됩니다.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ 체크리스트 -->
+    <div class="card">
+      <h2 style="margin:0 0 10px;">2) 간단 체크(8개)</h2>
       <p class="muted">사진을 보면서 “가장 가까운 것”을 체크하세요. 모르겠으면 느낌대로 체크해도 됩니다.</p>
 
-      <div class="grid" id="checkGrid">
-        <!-- JS가 채움 -->
-      </div>
+      <div class="grid" id="checkGrid"><!-- JS가 채움 --></div>
 
-      <button id="analyzeBtn">손금 결과 보기</button>
+      <button id="analyzeBtn" type="button">손금 결과 보기</button>
       <div class="small">※ 하루 1회만 포인트 +1 (로그인 시)</div>
     </div>
 
+    <!-- ✅ 결과 -->
     <div id="result" style="display:none;">
       <div class="card">
         <h2>👤 기본 정보</h2>
