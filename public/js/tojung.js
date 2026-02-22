@@ -1,22 +1,127 @@
 console.log("[tojung.js] loaded ✅");
 
 function ymdToSeed(ymd){
-  // "YYYY-MM-DD" -> 숫자 seed
   const m = String(ymd || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if(!m) return 12345;
   const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
   return (y * 10000) + (mo * 100) + d;
 }
 
-// 간단한 고정 랜덤(같은 사람은 같은 결과)
+// 같은 생년월일이면 같은 결과(고정 랜덤)
 function seededPick(arr, seed, offset){
-  if(!arr?.length) return "";
-  const idx = Math.abs((seed + (offset||0)) % arr.length);
+  if(!Array.isArray(arr) || arr.length === 0) return "";
+  const idx = Math.abs((seed + (offset || 0)) % arr.length);
   return arr[idx];
 }
 
+function safeNum(v, fallback=0){
+  const n = Number(v);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function pickBand(scoreGuide, score){
+  const bands = scoreGuide?.bands || [];
+  const sorted = [...bands].sort((a,b)=>(b.min||0)-(a.min||0));
+  return sorted.find(b => score >= (b.min || 0)) || sorted[sorted.length - 1] || null;
+}
+
+function categoryLabel(key){
+  if(key === "wealth") return "💰 재물운";
+  if(key === "love") return "💖 연애운";
+  if(key === "career") return "🏢 직장/사업운";
+  if(key === "health") return "💪 건강운";
+  return key;
+}
+
+// 점수 기반 자동 해석 HTML 생성
+function buildAutoInterpretation(db, seed){
+  const scores = db?.scores || {};
+  const cats = scores?.categories || {};
+  const guide = db?.scoreGuide || {};
+
+  const total = safeNum(scores.total, 0);
+  const bandTotal = pickBand(guide, total);
+
+  const oneLine = scores.oneLine || seededPick(db?.summary, seed, 1) || "";
+  const keywords = Array.isArray(scores.keywords) ? scores.keywords : [];
+
+  // 상단(총평)
+  let html = `
+    <div class="card">
+      <h2>📌 2026 토정비결 리포트</h2>
+      <p><b>총점:</b> ${total}점 ${bandTotal?.title ? `· <b>${bandTotal.title}</b>` : ""}</p>
+      ${bandTotal?.text ? `<p>${bandTotal.text}</p>` : ""}
+      ${oneLine ? `<div class="hr"></div><p><b>한 줄 총평</b><br>${oneLine}</p>` : ""}
+      ${keywords.length ? `<p class="small">키워드: ${keywords.map(k=>`#${k}`).join(" ")}</p>` : ""}
+    </div>
+  `;
+
+  // 카테고리별 자동 해석
+  ["wealth","love","career","health"].forEach((key, i)=>{
+    const s = safeNum(cats[key], 0);
+    const band = pickBand(guide, s);
+    const tips = guide?.categoryTips?.[key] || [];
+
+    // 각 카테고리 긴 해석은 DB의 배열에서 seed로 1개 고정 선택
+    const longArr = db?.[key] || [];
+    const longPick = seededPick(longArr, seed, 10 + i);
+
+    html += `
+      <div class="card">
+        <h2>${categoryLabel(key)}</h2>
+        <p><b>${s}점</b> ${band?.title ? `· <b>${band.title}</b>` : ""}</p>
+        ${band?.text ? `<p>${band.text}</p>` : ""}
+        ${longPick ? `<div class="hr"></div><p>${longPick}</p>` : ""}
+        ${(tips && tips.length) ? `
+          <div class="hr"></div>
+          <p><b>실전 팁</b><br>
+            ${tips[0] ? `• ${tips[0]}<br>` : ""}
+            ${tips[1] ? `• ${tips[1]}` : ""}
+          </p>
+        ` : ""}
+      </div>
+    `;
+  });
+
+  // 체크리스트(상단 일부만 보여주고 더보기 느낌)
+  const checklist = Array.isArray(db?.checklist) ? db.checklist : [];
+  if(checklist.length){
+    const pick1 = seededPick(checklist, seed, 101);
+    const pick2 = seededPick(checklist, seed, 102);
+    const pick3 = seededPick(checklist, seed, 103);
+
+    html += `
+      <div class="card">
+        <h2>✅ 올해 체크리스트</h2>
+        <p>• ${pick1}</p>
+        <p>• ${pick2}</p>
+        <p>• ${pick3}</p>
+        <p class="small">※ 전체 체크리스트는 DB에 저장되어 있어요.</p>
+      </div>
+    `;
+  }
+
+  // 월별(현재 달 3개 문장 고정)
+  const months = db?.months || {};
+  const now = new Date();
+  const mm = String(now.getMonth()+1); // "1"~"12"
+  const monthArr = months?.[mm];
+
+  if(Array.isArray(monthArr) && monthArr.length){
+    html += `
+      <div class="card">
+        <h2>🗓 ${mm}월 포인트</h2>
+        <p>• ${monthArr[0] || ""}</p>
+        <p>• ${monthArr[1] || ""}</p>
+        <p>• ${monthArr[2] || ""}</p>
+      </div>
+    `;
+  }
+
+  return html;
+}
+
 async function rewardOncePerDay(key){
-  // 하루 1회만 +1 (같은 페이지 중복방지)
   const today = new Date();
   const y = today.getFullYear();
   const m = String(today.getMonth()+1).padStart(2,"0");
@@ -27,14 +132,12 @@ async function rewardOncePerDay(key){
   if(localStorage.getItem(k) === "1") return;
   localStorage.setItem(k, "1");
 
-  // 로그인 상태면 +1
   if(localStorage.getItem("phone")){
     await window.rewardContent?.(key);
   }
 }
 
 document.addEventListener("DOMContentLoaded", async ()=>{
-  // 로그인 체크
   const birth = localStorage.getItem("birth");
   const name = localStorage.getItem("name") || "회원";
 
@@ -47,56 +150,34 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   document.getElementById("loginCheck").innerHTML =
     "<h2>✅ 준비 완료</h2><p>2026년 토정비결을 불러올게요.</p>";
 
-  // DB 로드 (없으면 기본 문구로 처리)
+  // DB 로드
   const db = await (window.DB?.loadJSON?.("/data/tojung_2026.json").catch(()=>null));
-  const pools = db?.pools || null;
+  if(!db){
+    document.getElementById("loginCheck").innerHTML =
+      "<h2>⚠ 데이터 로드 실패</h2><p>tojung_2026.json을 불러오지 못했어요. /data 경로를 확인해주세요.</p>";
+    return;
+  }
 
   const seed = ymdToSeed(birth);
 
-  const summary = pools?.summary || [
-    "2026년은 방향을 정리하고 실행력을 붙이기 좋은 해입니다.",
-    "2026년은 관계와 돈의 균형이 핵심입니다. 한쪽으로 치우치지 마세요.",
-    "2026년은 기회가 오지만 과속하면 손해가 납니다. 속도 조절이 중요합니다."
-  ];
+  // 기본 정보
+  const basicInfo = document.getElementById("basicInfo");
+  if(basicInfo){
+    basicInfo.innerHTML =
+      `<p><b>${name}</b></p><p>생년월일: ${birth}</p><p class="small">※ 같은 생년월일은 같은 해석 흐름이 나옵니다.</p>`;
+  }
 
-  const wealth = pools?.wealth || [
-    "재물운: 새 수입원 탐색에 좋습니다. 다만 충동지출만 조심하세요.",
-    "재물운: 큰 돈보다 작은 돈이 꾸준히 쌓입니다. 지출 통제가 핵심입니다.",
-    "재물운: 계약/거래는 조건을 꼼꼼히 보면 유리합니다."
-  ];
+  // ✅ 기존 summaryBox/detailBox/result 구조를 그대로 쓰되,
+  //    내용은 “점수 기반 자동 해석”으로 넣어줌
+  const summaryBox = document.getElementById("summaryBox");
+  if(summaryBox){
+    summaryBox.innerHTML = `<span class="badge">자동 해석</span><p>점수 기반 리포트를 생성했습니다.</p>`;
+  }
 
-  const love = pools?.love || [
-    "연애운: 관계가 부드럽게 풀릴 수 있습니다. 먼저 표현하면 유리합니다.",
-    "연애운: 오해가 생기기 쉬우니 말투/타이밍을 조심하세요.",
-    "연애운: 새로운 인연보다 기존 관계를 다듬는 것이 더 좋습니다."
-  ];
-
-  const career = pools?.career || [
-    "직장/사업운: 맡은 일을 정리하고 성과로 연결하기 좋습니다.",
-    "직장/사업운: 이동/변경 운이 있습니다. 준비하면 기회가 됩니다.",
-    "직장/사업운: 협업이 유리합니다. 혼자보다 팀으로 가세요."
-  ];
-
-  const health = pools?.health || [
-    "건강운: 수면/식습관을 잡으면 체감이 크게 좋아집니다.",
-    "건강운: 과로가 누적되기 쉬워요. 휴식 루틴이 필요합니다.",
-    "건강운: 가벼운 운동을 꾸준히 하면 회복이 빠릅니다."
-  ];
-
-  const s0 = seededPick(summary, seed, 1);
-  const s1 = seededPick(wealth, seed, 2);
-  const s2 = seededPick(love, seed, 3);
-  const s3 = seededPick(career, seed, 4);
-  const s4 = seededPick(health, seed, 5);
-
-  document.getElementById("basicInfo").innerHTML =
-    `<p><b>${name}</b></p><p>생년월일: ${birth}</p><p class="small">※ 같은 생년월일은 같은 토정비결이 나옵니다.</p>`;
-
-  document.getElementById("summaryBox").innerHTML =
-    `<span class="badge">한 줄 총평</span><p>${s0}</p>`;
-
-  document.getElementById("detailBox").innerHTML =
-    `<p>• ${s1}</p><p>• ${s2}</p><p>• ${s3}</p><p>• ${s4}</p>`;
+  const detailBox = document.getElementById("detailBox");
+  if(detailBox){
+    detailBox.innerHTML = buildAutoInterpretation(db, seed);
+  }
 
   document.getElementById("result").style.display = "block";
 
