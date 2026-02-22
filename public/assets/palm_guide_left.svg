@@ -1,51 +1,138 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="768" height="1024" viewBox="0 0 768 1024">
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="800" height="800" viewBox="0 0 800 800">
+
   <defs>
-    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="3" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
     <style>
-      .baseLine{ fill:none; stroke: rgba(255,255,255,0.18); stroke-width:4; stroke-linecap:round; stroke-linejoin:round; }
-      .hl{ fill:none; stroke: rgba(61,165,255,0); stroke-width:6; stroke-linecap:round; stroke-linejoin:round; opacity:0; }
-      .hl.on{ stroke: rgba(61,165,255,0.95); opacity:1; filter:url(#glow); }
-      .hlBad{ fill:none; stroke: rgba(255,90,90,0); stroke-width:6; stroke-linecap:round; stroke-linejoin:round; opacity:0; stroke-dasharray:10 8; }
-      .hlBad.on{ stroke: rgba(255,90,90,0.95); opacity:1; filter:url(#glow); }
-      .hlGroup{ opacity:0; }
-      .hlGroup.on{ opacity:1; }
-      .hlGroup path{ fill:none; stroke: rgba(61,165,255,0.95); stroke-width:6; stroke-linecap:round; stroke-linejoin:round; filter:url(#glow); }
+      /* 기본: 선은 거의 안 보이게(투명) */
+      .hl{
+        fill: none;
+        stroke: rgba(0,0,0,0);
+        stroke-width: 10;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        filter: drop-shadow(0 6px 10px rgba(0,0,0,.35));
+      }
+      /* 켜짐: 정확한 선만 파랗게 */
+      .hl.on{
+        stroke: #2F7BFF;
+        stroke-width: 12;
+      }
+
+      /* 잔선/다중선 */
+      .hlThin{ stroke-width: 7; }
+      .hlThin.on{ stroke-width: 9; }
+
+      /* 교차(스트레스) 표시용 점/짧은 선 */
+      .hlDot{
+        fill: #2F7BFF;
+        opacity: 0;
+      }
+      .hlDot.on{
+        opacity: 0.95;
+        filter: drop-shadow(0 6px 10px rgba(47,123,255,.25));
+      }
     </style>
   </defs>
 
-  <image href="/assets/palm_base_left.png" x="0" y="0" width="768" height="1024" preserveAspectRatio="xMidYMid slice"/>
+  <!-- 배경(왼손 이미지) -->
+  <image href="/assets/asset_palm_base_left.png"
+         x="0" y="0" width="800" height="800"
+         preserveAspectRatio="xMidYMid meet" />
 
-  <!-- Base lines -->
-  <path class="baseLine" d="M 250 295 C 205 330, 185 410, 190 500 C 195 610, 245 710, 320 820" />
-  <path class="baseLine" d="M 240 420 C 320 455, 415 475, 560 470" />
-  <path class="baseLine" d="M 240 420 C 330 480, 420 560, 520 660" />
-  <path class="baseLine" d="M 240 330 C 350 305, 465 310, 585 350" />
-  <path class="baseLine" d="M 395 820 C 395 720, 390 615, 385 510 C 380 420, 390 360, 410 305" />
-  <path class="baseLine" d="M 520 290 C 520 330, 520 365, 520 400" />
-  <path class="baseLine" d="M 565 300 C 565 345, 565 375, 565 410" />
+  <!-- 하이라이트 선들(정확한 선 path) -->
+  <g id="highlights">
 
-  <!-- Highlights -->
-  <path id="hl_life_strong" class="hl" d="M 250 295 C 205 330, 185 410, 190 500 C 195 610, 245 710, 320 820" />
-  <path id="hl_life_weak" class="hlBad" d="M 250 295 C 205 330, 185 410, 190 500 C 195 610, 245 710, 320 820" />
+    <!-- 생명선: 엄지 아래 큰 곡선 -->
+    <path id="hl_life_line" class="hl"
+      d="M 505 220
+         C 450 255, 420 310, 420 370
+         C 420 450, 465 520, 520 585
+         C 555 625, 585 660, 600 700" />
 
-  <path id="hl_head_long" class="hl" d="M 240 420 C 320 455, 415 475, 560 470" />
-  <path id="hl_head_curve" class="hl" d="M 240 420 C 330 480, 420 560, 520 660" />
+    <!-- 두뇌선: 중앙 가로선(또렷/길다) -->
+    <path id="hl_head_line" class="hl"
+      d="M 280 345
+         C 355 350, 430 360, 510 370
+         C 560 376, 610 380, 650 378" />
 
-  <path id="hl_heart_clear" class="hl" d="M 240 330 C 350 305, 465 310, 585 350" />
-  <path id="hl_heart_chain" class="hlBad" d="M 240 330 C 350 305, 465 310, 585 350" />
+    <!-- 두뇌선(감성형): 아래로 휘는 버전 -->
+    <path id="hl_head_curve" class="hl"
+      d="M 285 350
+         C 360 370, 430 410, 495 455
+         C 545 490, 590 525, 640 555" />
 
-  <path id="hl_fate_clear" class="hl" d="M 395 820 C 395 720, 390 615, 385 510 C 380 420, 390 360, 410 305" />
+    <!-- 감정선: 손가락 아래 가로선 -->
+    <path id="hl_heart_line" class="hl"
+      d="M 260 265
+         C 330 250, 410 245, 500 255
+         C 575 265, 640 275, 705 290" />
 
-  <g id="hl_money_many" class="hlGroup">
-    <path d="M 520 290 C 520 330, 520 365, 520 400" />
-    <path d="M 565 300 C 565 345, 565 375, 565 410" />
-    <path d="M 485 320 C 505 365, 520 420, 540 470" />
+    <!-- 감정선(사슬/끊김 느낌): 같은 자리에서 짧게 끊긴 선들 -->
+    <path id="hl_heart_chain" class="hl hlThin"
+      d="M 270 270
+         C 310 260, 350 255, 390 258" />
+    <path id="hl_heart_chain_2" class="hl hlThin"
+      d="M 405 258
+         C 450 262, 495 270, 540 280" />
+    <path id="hl_heart_chain_3" class="hl hlThin"
+      d="M 555 285
+         C 605 295, 655 300, 705 310" />
+
+    <!-- 운명선: 중앙 세로선 -->
+    <path id="hl_fate_line" class="hl"
+      d="M 455 690
+         C 450 610, 445 540, 448 470
+         C 450 410, 455 350, 465 290" />
+
+    <!-- 재물선/잔선: 여러 가는 세로/비스듬 선 -->
+    <path id="hl_money_lines" class="hl hlThin"
+      d="M 610 520 C 600 470, 595 420, 600 365" />
+    <path id="hl_money_lines_2" class="hl hlThin"
+      d="M 645 535 C 632 485, 625 430, 628 380" />
+    <path id="hl_money_lines_3" class="hl hlThin"
+      d="M 565 545 C 560 500, 555 450, 555 400" />
+
+    <!-- 건강선(수은선): 새끼손가락 아래에서 내려오는 비스듬 -->
+    <path id="hl_health_line" class="hl"
+      d="M 650 345
+         C 615 395, 590 455, 570 520
+         C 555 570, 540 620, 520 690" />
+
+    <!-- 태양선(명예선): 약지 아래 세로선 -->
+    <path id="hl_sun_line" class="hl"
+      d="M 520 640
+         C 515 580, 512 520, 515 465
+         C 518 410, 525 360, 540 305" />
+
+    <!-- 주요선 잔끊김/교차(스트레스/변동): 점/짧은 표시 -->
+    <circle id="hl_breaks_many" class="hlDot" cx="430" cy="360" r="7"/>
+    <circle id="hl_breaks_many_2" class="hlDot" cx="505" cy="372" r="7"/>
+    <circle id="hl_breaks_many_3" class="hlDot" cx="560" cy="382" r="7"/>
+    <circle id="hl_breaks_many_4" class="hlDot" cx="470" cy="275" r="7"/>
+    <circle id="hl_breaks_many_5" class="hlDot" cx="590" cy="505" r="7"/>
+
   </g>
+
+  <!-- JS는 #hl_<id>에 .on만 붙임.
+       아래는 JS 호환을 위해 "breaks_many"가 켜질 때 점들도 같이 켜지게 하는 트릭:
+       breaks_many를 그룹으로 묶고, JS는 #hl_breaks_many에만 on을 붙여도 되게. -->
+  <script><![CDATA[
+    // SVG 단독으로도 동작하게(옵션) - JS가 hl_breaks_many에 on을 붙이면 나머지도 같이 켜지게
+    const syncBreaks = () => {
+      const main = document.getElementById('hl_breaks_many');
+      const on = main && main.classList.contains('on');
+      ['hl_breaks_many_2','hl_breaks_many_3','hl_breaks_many_4','hl_breaks_many_5']
+        .forEach(id=>{
+          const el = document.getElementById(id);
+          if(!el) return;
+          el.classList.toggle('on', !!on);
+        });
+    };
+    const mo = new MutationObserver(syncBreaks);
+    const main = document.getElementById('hl_breaks_many');
+    if(main) mo.observe(main, { attributes:true, attributeFilter:['class'] });
+    syncBreaks();
+  ]]></script>
+
 </svg>
