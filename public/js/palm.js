@@ -4,6 +4,19 @@ let currentHand = "left"; // left | right
 let guideSvgRoot = null;  // 로드된 SVG DOM root
 const selected = new Set(); // 체크된 id들
 
+// ✅ 상호배타(라디오) 그룹: 같은 그룹에서는 1개만 선택 가능
+const EXCLUSIVE_GROUPS = [
+  // 생명선
+  ["life_strong", "life_weak"],
+  // 감정선
+  ["heart_clear", "heart_chain"],
+  // 두뇌선
+  ["head_long", "head_curve"],
+  // 운명선 vs 재물선(둘 중 하나만 선택하게 하고 싶으면 유지)
+  // 둘 다 체크 가능하게 하고 싶으면 이 줄은 지우세요.
+  ["fate_clear", "money_many"],
+];
+
 // ---- 체크포인트 8개 정의 (id는 SVG highlight id와 연결)
 const CHECKS = [
   { id:"life_strong",  title:"생명선이 굵고 길다",     desc:"체력/회복력/지구력", weights:{health:+18, career:+6} , tip:"생명선이 굵고 길면 기본 체력과 회복력이 좋은 편이에요." },
@@ -18,6 +31,31 @@ const CHECKS = [
   { id:"fate_clear",   title:"운명선(세로선)이 또렷하다", desc:"일/책임/커리어",      weights:{career:+14, wealth:+6} , tip:"운명선이 또렷하면 일/책임운이 강하게 들어오는 편이에요." },
   { id:"money_many",   title:"재물선/잔선이 많다(손바닥 잔선 많음)", desc:"수입 루트 다변화", weights:{wealth:+14} , tip:"잔선이 많으면 다양한 수입 루트를 만들 가능성이 있어요." }
 ];
+
+// ---- 상호배타 유틸
+function getExclusiveGroup(id){
+  for(const g of EXCLUSIVE_GROUPS){
+    if(g.includes(id)) return g;
+  }
+  return null;
+}
+
+// ✅ 같은 그룹의 다른 항목을 강제로 OFF (id를 ON 할 때만)
+function enforceExclusive(id, nextOn){
+  if(!nextOn) return;
+
+  const group = getExclusiveGroup(id);
+  if(!group) return;
+
+  for(const other of group){
+    if(other === id) continue;
+    if(selected.has(other)){
+      selected.delete(other);
+      // 가이드 OFF
+      setHighlight(other, false);
+    }
+  }
+}
 
 // ---- 하루 1회 보상(+1)
 function todayStamp(){
@@ -66,7 +104,7 @@ function setupPreview(){
     reader.onload = (e)=>{
       previewImg.src = e.target.result;
       previewBox.style.display = "block";
-      ph.style.display = "none";
+      if(ph) ph.style.display = "none";
     };
     reader.readAsDataURL(f);
   });
@@ -75,6 +113,8 @@ function setupPreview(){
 // ---- 가이드 SVG 로드 (inline 삽입: 하이라이트 제어하려고)
 async function loadGuideSvg(hand){
   const guideBox = document.getElementById("guideBox");
+  if(!guideBox) return;
+
   guideBox.innerHTML = `<div class="ph">가이드 로딩 중…</div>`;
 
   const url = (hand === "right")
@@ -156,26 +196,38 @@ function renderChecks(){
     </div>
   `).join("");
 
+  function applyCardState(card, id){
+    const cb = card.querySelector("input");
+    const on = selected.has(id);
+    if(cb) cb.checked = on;
+    card.classList.toggle("active", on);
+  }
+
   grid.querySelectorAll(".q").forEach(card=>{
     const id = card.getAttribute("data-id");
-    const cb = card.querySelector("input");
 
     // 카드 클릭 = 토글
     card.addEventListener("click", (e)=>{
-      // checkbox 자체 클릭도 자연스럽게 처리
       e.preventDefault();
 
       const isOn = selected.has(id);
-      if(isOn) selected.delete(id);
-      else selected.add(id);
+      const nextOn = !isOn;
 
-      // UI 반영
-      cb.checked = !isOn;
-      card.classList.toggle("active", !isOn);
+      // ✅ 상호배타 강제(ON 되는 경우)
+      enforceExclusive(id, nextOn);
 
-      // 가이드 반영
-      setHighlight(id, !isOn);
-      renderGuideTip();
+      // 본인 토글
+      if(nextOn) selected.add(id);
+      else selected.delete(id);
+
+      // ✅ 체크 UI 전체 재동기화(그룹에서 꺼진 항목까지 반영)
+      grid.querySelectorAll(".q").forEach(c=>{
+        const cid = c.getAttribute("data-id");
+        applyCardState(c, cid);
+      });
+
+      // ✅ 가이드 전체 재동기화
+      syncHighlights();
     });
 
     // 초기 active 표시
@@ -191,14 +243,14 @@ function setupHandToggle(){
   btnLeft?.addEventListener("click", async ()=>{
     currentHand = "left";
     btnLeft.classList.add("active");
-    btnRight.classList.remove("active");
+    btnRight?.classList.remove("active");
     await loadGuideSvg("left");
   });
 
   btnRight?.addEventListener("click", async ()=>{
     currentHand = "right";
     btnRight.classList.add("active");
-    btnLeft.classList.remove("active");
+    btnLeft?.classList.remove("active");
     await loadGuideSvg("right");
   });
 }
