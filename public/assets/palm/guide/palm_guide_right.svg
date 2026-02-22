@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="1024" height="1024" viewBox="0 0 1024 1024">
+
+  <defs>
+    <style>
+      .hl{
+        fill: none;
+        stroke: #2F7BFF;
+        stroke-width: 14;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        opacity: 0;
+        filter: drop-shadow(0 10px 18px rgba(0,0,0,.25));
+        transition: opacity .18s ease;
+      }
+      .on{ opacity: 1 !important; }
+      .dash{ stroke-dasharray: 18 16; }
+      .thin{ stroke-width: 10; }
+    </style>
+  </defs>
+
+  <!-- 베이스 PNG (오른손) -->
+  <image href="/assets/palm/guide/base_right.png"
+         x="0" y="0" width="1024" height="1024"
+         preserveAspectRatio="xMidYMid meet" />
+
+  <!-- 하이라이트만 좌우반전(왼손 좌표 그대로 사용) -->
+  <g transform="translate(1024 0) scale(-1 1)">
+
+    <path id="hl_life_long" class="hl"
+          d="M 660 260
+             C 600 310, 560 380, 560 455
+             C 560 560, 625 640, 705 720
+             C 760 775, 805 820, 830 885" />
+
+    <path id="hl_life_break" class="hl dash"
+          d="M 650 330
+             C 610 370, 585 420, 585 470
+             C 585 530, 625 585, 690 650" />
+
+    <path id="hl_head_long" class="hl"
+          d="M 330 470
+             C 420 475, 520 495, 640 515
+             C 730 530, 820 540, 910 535" />
+
+    <path id="hl_head_curve" class="hl"
+          d="M 330 480
+             C 430 520, 520 590, 610 665
+             C 690 730, 770 785, 860 830" />
+
+    <path id="hl_heart_clear" class="hl"
+          d="M 310 350
+             C 420 325, 535 320, 650 335
+             C 760 350, 860 372, 940 405" />
+
+    <path id="hl_heart_chain" class="hl dash thin"
+          d="M 320 360
+             C 400 340, 475 335, 545 345
+             C 615 355, 690 368, 760 385
+             C 835 405, 900 420, 950 445" />
+
+    <path id="hl_fate_line" class="hl"
+          d="M 585 900
+             C 575 800, 570 710, 572 625
+             C 575 540, 585 455, 610 370" />
+
+    <path id="hl_sun_line" class="hl"
+          d="M 705 860
+             C 695 770, 690 690, 695 615
+             C 700 530, 715 455, 740 385" />
+
+    <path id="hl_money_lines" class="hl thin"
+          d="M 820 720 C 800 650, 790 585, 795 520
+             M 865 735 C 840 660, 830 590, 835 525
+             M 775 745 C 760 675, 755 610, 760 545" />
+
+    <path id="hl_cross_lines" class="hl thin"
+          d="M 520 520 L 560 480
+             M 540 540 L 590 505
+             M 500 450 L 545 420
+             M 650 520 L 700 485
+             M 610 420 L 650 390" />
+
+  </g>
+</svg>
