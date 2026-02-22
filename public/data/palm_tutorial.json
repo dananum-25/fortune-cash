@@ -2,70 +2,39 @@
   "tutorials": [
     {
       "id": 1,
-      "title": "기본형 손금 (균형형)",
-      "image": "/assets/tutorial_1.jpg",
+      "title": "균형형 손금",
       "hand": "left",
-      "ground_truth": {
-        "life_connected": true,
-        "life_deep": true,
-        "head_long": true,
-        "head_curve": false,
-        "heart_clear": true,
-        "heart_chain": false,
-        "fate_clear": false,
-        "sun_line": false,
-        "money_many": false,
-        "breaks_many": false
-      }
+      "image": "/assets/palm/tutorial/left/tutorial_01_balanced.png"
     },
     {
       "id": 2,
       "title": "감성형 + 잔선 많은 손",
-      "image": "/assets/tutorial_2.jpg",
       "hand": "left",
-      "ground_truth": {
-        "life_connected": true,
-        "life_deep": false,
-        "head_long": false,
-        "head_curve": true,
-        "heart_clear": false,
-        "heart_chain": true,
-        "fate_clear": false,
-        "sun_line": false,
-        "money_many": true,
-        "breaks_many": true
-      }
+      "image": "/assets/palm/tutorial/left/tutorial_02_emotional.png"
     },
     {
       "id": 3,
-      "title": "커리어형 손금 (운명선/태양선 뚜렷)",
-      "image": "/assets/tutorial_3.jpg",
+      "title": "커리어형 손금",
+      "hand": "left",
+      "image": "/assets/palm/tutorial/left/tutorial_03_career.png"
+    },
+    {
+      "id": 4,
+      "title": "균형형 손금",
       "hand": "right",
-      "ground_truth": {
-        "life_connected": true,
-        "life_deep": true,
-        "head_long": true,
-        "head_curve": false,
-        "heart_clear": true,
-        "heart_chain": false,
-        "fate_clear": true,
-        "sun_line": true,
-        "money_many": false,
-        "breaks_many": false
-      }
+      "image": "/assets/palm/tutorial/right/tutorial_01_balanced.png"
+    },
+    {
+      "id": 5,
+      "title": "감성형 + 잔선 많은 손",
+      "hand": "right",
+      "image": "/assets/palm/tutorial/right/tutorial_02_emotional.png"
+    },
+    {
+      "id": 6,
+      "title": "커리어형 손금",
+      "hand": "right",
+      "image": "/assets/palm/tutorial/right/tutorial_03_career.png"
     }
-  ],
-
-  "feedback_text": {
-    "life_connected": "생명선은 엄지 아래를 감싸며 끊기지 않고 이어지는지를 확인하세요.",
-    "life_deep": "생명선이 피부결보다 굵고 선명하면 '깊다'로 판단합니다.",
-    "head_long": "두뇌선이 손바닥 중앙을 길게 가로지르면 YES입니다.",
-    "head_curve": "두뇌선이 아래쪽으로 휘어 내려가면 감성형으로 판단합니다.",
-    "heart_clear": "감정선이 선명하고 크게 끊기지 않으면 YES입니다.",
-    "heart_chain": "감정선이 사슬처럼 끊겨 보이거나 잔선이 많으면 YES입니다.",
-    "fate_clear": "손바닥 중앙 세로선(운명선)이 뚜렷하면 YES입니다.",
-    "sun_line": "약지 아래 세로선(태양선)이 보이면 YES입니다.",
-    "money_many": "잔선이나 세로선이 여러 개 보이면 YES입니다.",
-    "breaks_many": "주요 선 위에 교차선/점 형태 끊김이 많으면 YES입니다."
-  }
+  ]
 }
