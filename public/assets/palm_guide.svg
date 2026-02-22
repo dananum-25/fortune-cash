@@ -1,0 +1,140 @@
+<!-- /public/assets/palm_guide.svg -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600">
+  <defs>
+    <style>
+      .bg { fill: #0f0f0f; }
+      .panel { fill: #141414; stroke:#262626; stroke-width:2; rx:20; }
+      .title { fill:#ffd56b; font:700 28px Arial, sans-serif; }
+      .sub { fill:#cfcfcf; font:400 14px Arial, sans-serif; opacity:.9; }
+      .label { fill:#ffffff; font:700 14px Arial, sans-serif; }
+      .chip { fill:#1f1f1f; stroke:#2b2b2b; stroke-width:1; rx:12; }
+      .chipText { fill:#ffd56b; font:700 13px Arial, sans-serif; }
+
+      /* 손바닥 */
+      .handFill { fill: #f6d28b; }
+      .handShadow { fill: rgba(0,0,0,.35); }
+      .handStroke { fill: none; stroke: rgba(0,0,0,.35); stroke-width: 6; }
+
+      /* 기본 라인(가이드용) */
+      .line { fill:none; stroke: rgba(70,45,10,.65); stroke-width:6; stroke-linecap:round; stroke-linejoin:round; }
+      .lineThin { fill:none; stroke: rgba(70,45,10,.45); stroke-width:4; stroke-linecap:round; stroke-linejoin:round; }
+
+      /* 오버레이(토글 하이라이트) */
+      .ov { opacity:0; transition: opacity .18s ease; }
+      .ov.on { opacity:1; }
+      .ovFill { fill: rgba(255,213,107,.18); stroke: rgba(255,213,107,.85); stroke-width:4; rx:18; }
+      .ovText { fill:#ffd56b; font:700 14px Arial, sans-serif; }
+
+      /* 점(번호) */
+      .dot { fill:#ffd56b; }
+      .dotText { fill:#111; font:900 14px Arial, sans-serif; }
+    </style>
+  </defs>
+
+  <!-- background -->
+  <rect class="bg" x="0" y="0" width="900" height="600"/>
+
+  <!-- left panel -->
+  <rect class="panel" x="30" y="30" width="840" height="540" rx="22"/>
+  <text class="title" x="60" y="75">손금 가이드</text>
+  <text class="sub" x="60" y="102">체크포인트를 누르면 아래 손바닥에서 해당 구간이 강조 표시됩니다.</text>
+
+  <!-- GUIDE AREA (hand) -->
+  <!-- shadow -->
+  <path class="handShadow" d="M360 490c-55-40-90-92-92-155-3-88 51-165 123-206 27-15 57-22 86-21 46 2 84 23 116 54 34 33 62 77 73 131 10 48 0 91-18 125-21 41-52 72-90 97-36 24-78 40-122 40-30 0-58-6-76-15z" transform="translate(10,10)"/>
+  <!-- palm body -->
+  <path class="handFill" d="M360 490c-55-40-90-92-92-155-3-88 51-165 123-206 27-15 57-22 86-21 46 2 84 23 116 54 34 33 62 77 73 131 10 48 0 91-18 125-21 41-52 72-90 97-36 24-78 40-122 40-30 0-58-6-76-15z"/>
+  <path class="handStroke" d="M360 490c-55-40-90-92-92-155-3-88 51-165 123-206 27-15 57-22 86-21 46 2 84 23 116 54 34 33 62 77 73 131 10 48 0 91-18 125-21 41-52 72-90 97-36 24-78 40-122 40-30 0-58-6-76-15z"/>
+
+  <!-- simplified line map -->
+  <!-- Life line -->
+  <path class="line" d="M410 445c-45-40-63-88-55-135 8-44 38-78 86-94"/>
+  <!-- Head line -->
+  <path class="line" d="M410 320c58-18 120-12 175 16"/>
+  <!-- Head line (curve hint) -->
+  <path class="lineThin" d="M410 320c48 15 85 45 120 85"/>
+  <!-- Heart line -->
+  <path class="line" d="M400 265c40-40 120-55 195-30"/>
+  <!-- Fate line -->
+  <path class="line" d="M500 470c-10-70-10-140 0-210"/>
+  <!-- Money lines -->
+  <path class="lineThin" d="M590 280c10-25 25-40 45-55"/>
+  <path class="lineThin" d="M605 300c12-20 28-34 48-48"/>
+  <path class="lineThin" d="M575 305c8-18 20-32 36-44"/>
+
+  <!-- 번호 점(8개) -->
+  <g>
+    <circle class="dot" cx="410" cy="430" r="13"/><text class="dotText" x="405" y="436">1</text>
+    <circle class="dot" cx="430" cy="300" r="13"/><text class="dotText" x="425" y="306">2</text>
+    <circle class="dot" cx="420" cy="250" r="13"/><text class="dotText" x="415" y="256">3</text>
+    <circle class="dot" cx="500" cy="420" r="13"/><text class="dotText" x="495" y="426">4</text>
+    <circle class="dot" cx="590" cy="300" r="13"/><text class="dotText" x="585" y="306">5</text>
+    <circle class="dot" cx="455" cy="365" r="13"/><text class="dotText" x="450" y="371">6</text>
+    <circle class="dot" cx="535" cy="270" r="13"/><text class="dotText" x="530" y="276">7</text>
+    <circle class="dot" cx="610" cy="350" r="13"/><text class="dotText" x="605" y="356">8</text>
+  </g>
+
+  <!-- ========== OVERLAYS (toggle with IDs) ========== -->
+  <!-- 1 생명선: 깊고 길다 -->
+  <g id="ov_life_strong" class="ov">
+    <rect class="ovFill" x="350" y="350" width="160" height="150" rx="18"/>
+    <text class="ovText" x="365" y="378">생명선(깊고 길다)</text>
+  </g>
+
+  <!-- 2 생명선: 끊기거나 약하다 -->
+  <g id="ov_life_weak" class="ov">
+    <rect class="ovFill" x="330" y="335" width="200" height="185" rx="18"/>
+    <text class="ovText" x="345" y="365">생명선(끊김/약함)</text>
+  </g>
+
+  <!-- 3 두뇌선: 길고 또렷 -->
+  <g id="ov_head_clear" class="ov">
+    <rect class="ovFill" x="370" y="285" width="310" height="90" rx="18"/>
+    <text class="ovText" x="385" y="315">두뇌선(길고 또렷)</text>
+  </g>
+
+  <!-- 4 두뇌선: 아래로 휨 -->
+  <g id="ov_head_curve" class="ov">
+    <rect class="ovFill" x="375" y="300" width="280" height="150" rx="18"/>
+    <text class="ovText" x="390" y="330">두뇌선(아래로 휨)</text>
+  </g>
+
+  <!-- 5 감정선: 또렷/균형 -->
+  <g id="ov_heart_bal" class="ov">
+    <rect class="ovFill" x="360" y="210" width="360" height="85" rx="18"/>
+    <text class="ovText" x="375" y="240">감정선(또렷/균형)</text>
+  </g>
+
+  <!-- 6 감정선: 사슬처럼 끊겨 보임 -->
+  <g id="ov_heart_chain" class="ov">
+    <rect class="ovFill" x="350" y="205" width="380" height="110" rx="18"/>
+    <text class="ovText" x="365" y="235">감정선(사슬/끊김)</text>
+  </g>
+
+  <!-- 7 운명선(세로선)이 또렷 -->
+  <g id="ov_fate_clear" class="ov">
+    <rect class="ovFill" x="470" y="235" width="120" height="260" rx="18"/>
+    <text class="ovText" x="485" y="265">운명선(또렷)</text>
+  </g>
+
+  <!-- 8 재물선/잔선 많음 -->
+  <g id="ov_money_lines" class="ov">
+    <rect class="ovFill" x="560" y="250" width="170" height="170" rx="18"/>
+    <text class="ovText" x="575" y="280">재물선/잔선</text>
+  </g>
+
+  <!-- 오른쪽 설명 패널(키 매핑용) -->
+  <g transform="translate(610,130)">
+    <rect class="chip" x="0" y="0" width="240" height="36" rx="12"/>
+    <text class="chipText" x="12" y="24">KEY 매핑 (JS에서 사용)</text>
+
+    <text class="sub" x="0" y="70">1) life_strong → ov_life_strong</text>
+    <text class="sub" x="0" y="95">2) life_weak → ov_life_weak</text>
+    <text class="sub" x="0" y="120">3) head_clear → ov_head_clear</text>
+    <text class="sub" x="0" y="145">4) head_curve → ov_head_curve</text>
+    <text class="sub" x="0" y="170">5) heart_bal → ov_heart_bal</text>
+    <text class="sub" x="0" y="195">6) heart_chain → ov_heart_chain</text>
+    <text class="sub" x="0" y="220">7) fate_clear → ov_fate_clear</text>
+    <text class="sub" x="0" y="245">8) money_lines → ov_money_lines</text>
+  </g>
+</svg>
