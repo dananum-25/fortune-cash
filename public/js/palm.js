@@ -95,8 +95,8 @@ async function loadGuide(){
   guideBox.innerHTML = `<div class="ph">가이드 로딩 중…</div>`;
 
   const url = currentHand === "left"
-    ? "/assets/palm_guide_left.svg"
-    : "/assets/palm_guide_right.svg";
+  ? "/assets/palm/guide/palm_guide_left.svg"
+  : "/assets/palm/guide/palm_guide_right.svg";
 
   try{
     const txt = await fetch(url).then(r=>r.text());
