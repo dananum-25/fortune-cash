@@ -14,19 +14,23 @@ function normalizePhone(phone){
 
 // ✅ 날짜 저장 포맷 고정: YYYY-MM-DD
 
+// ✅ 날짜 저장 포맷 고정: YYYY-MM-DD (로컬 기준)
 function toKoreanYMD(v){
   if(!v) return "";
   const s = String(v).trim();
 
-  // ✅ date input은 이미 이 형식으로 들어옴 (타임존 없음)
   if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
 
-  // (혹시 "YYYY-MM-DD ..." 형태로 올 때만 잘라주기)
   const m = s.match(/^(\d{4}-\d{2}-\d{2})/);
   if(m && m[1]) return m[1];
 
-  // ❌ 여기서 new Date() 타면 타임존 이슈 다시 생김 → 그냥 실패 처리
-  return "";
+  const d = new Date(s);
+  if(Number.isNaN(d.getTime())) return "";
+
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  const dd = String(d.getDate()).padStart(2,"0");
+  return `${yyyy}-${mm}-${dd}`;
 }
 
 // ✅ 공통: API URL 비어있을 때 안전장치
