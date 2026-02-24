@@ -31,7 +31,6 @@ async function loadIpchunDB(){
   }
 }
 
-/* DB 값이 "MM-DD" 또는 "YYYY-MM-DD" 둘 다 허용 */
 function getIpchunDateOfYear(year){
   const raw = (window.__IPCHUN_DB__ && window.__IPCHUN_DB__[String(year)]) || "02-04";
 
@@ -41,7 +40,7 @@ function getIpchunDateOfYear(year){
   }
 
   // raw가 MM-DD면 year 붙여서 사용
-  const [mm, dd] = String(raw).split("-").map(Number);
+  const [mm,dd] = String(raw).split("-").map(Number);
   return new Date(year, (mm||2)-1, (dd||4));
 }
 
