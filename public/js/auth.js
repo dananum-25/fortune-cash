@@ -195,7 +195,38 @@ async function handleSubmitLogin(){
   const birthRaw = (birthEl?.value || "").trim();
   const birth = toKoreanYMD(birthRaw);
   const birthType = (birthTypeEl?.value || "solar").trim();
+  const birthRaw = (birthEl?.value || "").trim();
+  const birth = toKoreanYMD(birthRaw);           // 사용자가 입력한 날짜 (YYYY-MM-DD)
+  const birthType = (birthTypeEl?.value || "solar").trim(); // solar | lunar
 
+  if(!birth){
+    alert("생년월일을 입력해주세요.");
+    return;
+  }
+
+  // ✅ 계산용 날짜는 양력(solarBirth)로 통일
+  let solarBirth = birth;
+
+  // ✅ 음력 선택 시: BirthUtil에 변환 함수가 있는 경우 사용
+  if(birthType === "lunar"){
+    if(typeof window.BirthUtil?.lunarToSolar === "function"){
+      solarBirth = window.BirthUtil.lunarToSolar(birth); // "YYYY-MM-DD" -> "YYYY-MM-DD"
+    }else if(typeof window.BirthUtil?.convertLunarToSolar === "function"){
+      solarBirth = window.BirthUtil.convertLunarToSolar(birth);
+    }else{
+      alert("음력→양력 변환 함수(BirthUtil.lunarToSolar)가 없습니다. birth.js에 추가가 필요해요.");
+      return;
+    }
+  }
+
+  // ✅ 입춘 기준 띠/갑자 계산은 'solarBirth'로 진행
+  const zodiac = window.BirthUtil?.calcZodiacByIpchun
+    ? window.BirthUtil.calcZodiacByIpchun(solarBirth)
+    : "";
+
+  const gapja = window.BirthUtil?.calcGapjaByIpchun
+    ? window.BirthUtil.calcGapjaByIpchun(solarBirth)
+    : "";
   if(!name || !phone){
     alert("이름과 전화번호를 입력해주세요.");
     return;
@@ -341,7 +372,6 @@ window.addEventListener("DOMContentLoaded", async ()=>{
 
   document.getElementById("loginSubmit")?.addEventListener("click", handleSubmitLogin);
   document.getElementById("loginClose")?.addEventListener("click", closeLoginModal);
-  document.getElementById("loginBtn")?.addEventListener("click", openLoginModal);
 
   await syncUserFromServer();
   refreshTopBar();
