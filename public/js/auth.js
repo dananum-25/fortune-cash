@@ -2,6 +2,7 @@
  AUTH (auth.js)
  - entry modal
  - login/register + birth + zodiac + gapja
+ - show "processing..." and read server response
  - points key unify: "point"
 ========================================= */
 
@@ -11,7 +12,7 @@ function normalizePhone(phone){
   return String(phone || "").replace(/[^0-9]/g, "");
 }
 
-// ✅ 날짜 저장 포맷 고정: YYYY-MM-DD (로컬 기준)
+// ✅ YYYY-MM-DD (로컬 기준 문자열 유지)
 function toKoreanYMD(v){
   if(!v) return "";
   const s = String(v).trim();
@@ -33,7 +34,7 @@ function toKoreanYMD(v){
 function getApiUrlOrWarn(){
   const url = window.getApiUrl?.() || "";
   if(!url){
-    console.warn("[auth.js] API_URL is empty. Check config.js load order.");
+    console.warn("[auth.js] API_URL is empty. Check config.js is loaded BEFORE auth.js");
   }
   return url;
 }
@@ -100,9 +101,8 @@ async function syncUserFromServer(){
     const txt = await r.text();
     let res = null;
 
-    try{
-      res = JSON.parse(txt);
-    }catch(e){
+    try{ res = JSON.parse(txt); }
+    catch(e){
       console.warn("[sync] response not JSON:", txt);
       return;
     }
@@ -111,7 +111,6 @@ async function syncUserFromServer(){
       localStorage.setItem("point", String(res.points || 0));
       localStorage.setItem("name", String(res.name || ""));
 
-      // ✅ 서버에서 어떤 포맷이 오든 YYYY-MM-DD로 고정
       const birthYMD = toKoreanYMD(res.birth);
       if(birthYMD) localStorage.setItem("birth", birthYMD);
 
@@ -121,11 +120,10 @@ async function syncUserFromServer(){
       if(res.zodiac) localStorage.setItem("zodiac", String(res.zodiac));
       if(res.gapja) localStorage.setItem("gapja", String(res.gapja));
 
-      localStorage.removeItem("points"); // 과거키 정리
+      localStorage.removeItem("points");
     }else{
       console.warn("[sync] not ok:", res);
     }
-
   }catch(e){
     console.log("[sync] skipped", e);
   }
@@ -193,10 +191,8 @@ async function handleSubmitLogin(){
 
   const name = (nameEl?.value || "").trim();
   const phone = normalizePhone((phoneEl?.value || "").trim());
-
-  const birthRaw = (birthEl?.value || "").trim();
-  const birth = toKoreanYMD(birthRaw); // 사용자가 입력한 값(YYYY-MM-DD)
-  const birthType = (birthTypeEl?.value || "solar").trim(); // solar | lunar
+  const birth = toKoreanYMD((birthEl?.value || "").trim());
+  const birthType = (birthTypeEl?.value || "solar").trim();
 
   if(!name || !phone){
     alert("이름과 전화번호를 입력해주세요.");
@@ -211,43 +207,20 @@ async function handleSubmitLogin(){
     return;
   }
 
-  // 입춘 DB 로드
-  try{
-    if(window.BirthUtil?.loadIpchunDB){
-      await window.BirthUtil.loadIpchunDB();
-    }
-  }catch(e){}
-
-  // ✅ 계산용 날짜는 양력(solarBirth)로 통일
-  let solarBirth = birth;
-
-  // ✅ 음력 선택 시: birth.js에 BirthUtil.lunarToSolar 구현되어 있어야 함
+  // ✅ A: 음력은 제거(준비중)
   if(birthType === "lunar"){
-    if(typeof window.BirthUtil?.lunarToSolar === "function"){
-      try{
-        solarBirth = window.BirthUtil.lunarToSolar(birth);
-      }catch(e){
-        alert("음력→양력 변환 실패: " + String(e));
-        return;
-      }
-    }else{
-      alert("음력→양력 변환 함수(BirthUtil.lunarToSolar)가 없습니다. birth.js에 추가가 필요해요.");
-      return;
-    }
-    if(!solarBirth || !/^\d{4}-\d{2}-\d{2}$/.test(solarBirth)){
-      alert("음력→양력 변환 결과가 올바르지 않습니다: " + String(solarBirth));
-      return;
-    }
+    alert("음력은 현재 준비중입니다. 양력으로 입력해주세요.");
+    return;
   }
 
-  // ✅ 입춘 기준 띠/갑자 계산은 'solarBirth'로 진행
-  const zodiac = window.BirthUtil?.calcZodiacByIpchun
-    ? window.BirthUtil.calcZodiacByIpchun(solarBirth)
-    : "";
+  // 입춘 DB 로드
+  try{
+    await window.BirthUtil?.loadIpchunDB?.();
+  }catch(e){}
 
-  const gapja = window.BirthUtil?.calcGapjaByIpchun
-    ? window.BirthUtil.calcGapjaByIpchun(solarBirth)
-    : "";
+  // ✅ 계산은 양력 birth 그대로
+  const zodiac = window.BirthUtil?.calcZodiacByIpchun ? window.BirthUtil.calcZodiacByIpchun(birth) : "";
+  const gapja  = window.BirthUtil?.calcGapjaByIpchun  ? window.BirthUtil.calcGapjaByIpchun(birth)  : "";
 
   if(typeof grecaptcha === "undefined"){
     alert("reCAPTCHA가 아직 로드되지 않았어요. 잠시 후 다시 시도해주세요.");
@@ -283,19 +256,17 @@ async function handleSubmitLogin(){
         action:"register",
         phone,
         name,
-        birth,        // 사용자가 입력한 원본(음력일 수도 있음)
-        birthType,    // solar | lunar
-        zodiac,       // 입춘기준(양력 환산 후)
-        gapja,        // 입춘기준(양력 환산 후)
+        birth,        // ✅ 양력 YYYY-MM-DD
+        birthType,    // solar
+        zodiac,
+        gapja,
         token
       })
     });
 
     rawTxt = await r.text();
-
-    try{
-      serverRes = JSON.parse(rawTxt);
-    }catch(parseErr){
+    try{ serverRes = JSON.parse(rawTxt); }
+    catch(e){
       alert("서버 응답이 JSON이 아니에요.\n\nRAW:\n" + rawTxt);
       return;
     }
@@ -313,18 +284,16 @@ async function handleSubmitLogin(){
   }
 
   const st = serverRes?.status;
-
   if(!st){
-    alert("서버 응답에 status가 없어요.\n\nOBJ:\n" + JSON.stringify(serverRes) + "\n\nRAW:\n" + rawTxt);
+    alert("서버 응답에 status가 없어요.\n\n" + JSON.stringify(serverRes) + "\n\nRAW:\n" + rawTxt);
     return;
   }
 
   if(st === "captcha_fail"){
     const codes = serverRes?.captcha?.["error-codes"] || serverRes?.errors || [];
-    alert("captcha_fail\n" + JSON.stringify(codes) + "\n\n" + JSON.stringify(serverRes));
+    alert("captcha_fail\n" + JSON.stringify(codes));
     return;
   }
-
   if(st === "invalid"){
     alert("서버에서 invalid 응답.\n\n" + JSON.stringify(serverRes));
     return;
@@ -333,14 +302,10 @@ async function handleSubmitLogin(){
   if(st === "exists" || st === "ok"){
     localStorage.setItem("name", name);
     localStorage.setItem("phone", phone);
-
-    // ✅ 여기서 UTC 밀림 원천 차단: 무조건 YYYY-MM-DD 저장
-    localStorage.setItem("birth", toKoreanYMD(birth));
-
+    localStorage.setItem("birth", birth);
     localStorage.setItem("birthType", birthType);
     if(zodiac) localStorage.setItem("zodiac", zodiac);
-    if(gapja) localStorage.setItem("gapja", gapja);
-
+    if(gapja)  localStorage.setItem("gapja", gapja);
     localStorage.removeItem("guestMode");
     localStorage.removeItem("points");
 
@@ -351,7 +316,6 @@ async function handleSubmitLogin(){
     refreshPointCard();
 
     alert(st === "exists" ? "이미 가입된 번호라 로그인 처리했어요 ✅" : "회원가입 완료 ✅");
-
     await syncUserFromServer();
     return;
   }
