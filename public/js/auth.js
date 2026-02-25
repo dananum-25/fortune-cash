@@ -338,7 +338,7 @@ async function handleSubmitLogin(){
   if(st === "exists" || st === "ok"){
     localStorage.setItem("name", name);
     localStorage.setItem("phone", phone);
-    localStorage.setItem("birth", birth);
+    localStorage.setItem("birth", toKoreanYMD(birth));
     localStorage.setItem("birthType", birthType);
     if(zodiac) localStorage.setItem("zodiac", zodiac);
     if(gapja) localStorage.setItem("gapja", gapja);
