@@ -2,7 +2,6 @@
  AUTH (auth.js)
  - entry modal
  - login/register + birth + zodiac + gapja
- - show "processing..." and read server response
  - points key unify: "point"
 ========================================= */
 
@@ -31,11 +30,10 @@ function toKoreanYMD(v){
   return `${yyyy}-${mm}-${dd}`;
 }
 
-// ✅ 공통: API URL 비어있을 때 안전장치
 function getApiUrlOrWarn(){
   const url = window.getApiUrl?.() || "";
   if(!url){
-    console.warn("[auth.js] API_URL is empty. Check <script src='/js/config.js'> is loaded BEFORE auth.js");
+    console.warn("[auth.js] API_URL is empty. Check config.js load order.");
   }
   return url;
 }
@@ -113,6 +111,7 @@ async function syncUserFromServer(){
       localStorage.setItem("point", String(res.points || 0));
       localStorage.setItem("name", String(res.name || ""));
 
+      // ✅ 서버에서 어떤 포맷이 오든 YYYY-MM-DD로 고정
       const birthYMD = toKoreanYMD(res.birth);
       if(birthYMD) localStorage.setItem("birth", birthYMD);
 
@@ -220,13 +219,10 @@ async function handleSubmitLogin(){
   }catch(e){}
 
   // ✅ 계산용 날짜는 양력(solarBirth)로 통일
-  // - 양력 선택: 그대로
-  // - 음력 선택: lunar.js + birth.js 변환 함수가 있어야 함
   let solarBirth = birth;
 
+  // ✅ 음력 선택 시: birth.js에 BirthUtil.lunarToSolar 구현되어 있어야 함
   if(birthType === "lunar"){
-    // birth.js에서 구현한 변환 함수 이름에 맞춰 1개만 쓰자
-    // 권장: BirthUtil.lunarToSolar("YYYY-MM-DD") -> "YYYY-MM-DD"
     if(typeof window.BirthUtil?.lunarToSolar === "function"){
       try{
         solarBirth = window.BirthUtil.lunarToSolar(birth);
@@ -238,7 +234,6 @@ async function handleSubmitLogin(){
       alert("음력→양력 변환 함수(BirthUtil.lunarToSolar)가 없습니다. birth.js에 추가가 필요해요.");
       return;
     }
-
     if(!solarBirth || !/^\d{4}-\d{2}-\d{2}$/.test(solarBirth)){
       alert("음력→양력 변환 결과가 올바르지 않습니다: " + String(solarBirth));
       return;
@@ -338,10 +333,14 @@ async function handleSubmitLogin(){
   if(st === "exists" || st === "ok"){
     localStorage.setItem("name", name);
     localStorage.setItem("phone", phone);
+
+    // ✅ 여기서 UTC 밀림 원천 차단: 무조건 YYYY-MM-DD 저장
     localStorage.setItem("birth", toKoreanYMD(birth));
+
     localStorage.setItem("birthType", birthType);
     if(zodiac) localStorage.setItem("zodiac", zodiac);
     if(gapja) localStorage.setItem("gapja", gapja);
+
     localStorage.removeItem("guestMode");
     localStorage.removeItem("points");
 
