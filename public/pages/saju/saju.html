@@ -199,6 +199,23 @@ svg{
 </div>
 
 <script>
+function normalizeBirthYMD(v){
+  if(!v) return "";
+  const s = String(v).trim();
+
+  // 이미 YYYY-MM-DD면 그대로
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+
+  // ISO 형태면 로컬 기준으로 YYYY-MM-DD로 변환
+  const d = new Date(s);
+  if(Number.isNaN(d.getTime())) return "";
+
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  const dd = String(d.getDate()).padStart(2,"0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+  
 function parseLocalYMD(ymd){
   if(!ymd) return null;
 
@@ -478,7 +495,7 @@ function analyzeSeowoonWithElements(elementCounts){
 function calculateSaju(){
 
   const name = localStorage.getItem("name") || "회원";
-  const birth = localStorage.getItem("birth");
+  const birth = normalizeBirthYMD(localStorage.getItem("birth"));
   const hour = parseInt(document.getElementById("birthHour").value, 10);
 
   if(!birth){
