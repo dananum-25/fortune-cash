@@ -8,7 +8,7 @@
 
 <meta name="description" content="오늘 운세, 띠별 운세, 별자리 운세, 타로, 토정비결을 무료로 제공합니다. 앱테크 포인트 적립 기능까지 함께 이용하세요.">
 
-<!-- ✅ 전역 설정은 head에서 1번만 -->
+<!-- ✅ 전역 설정은 가장 먼저 (1번만) -->
 <script src="/js/config.js"></script>
 
 <script async
@@ -35,7 +35,7 @@
   .card-disabled{ opacity:0.4;cursor:not-allowed; }
   .card-active{ border:2px solid #ffd56b; }
 
-  #userBar{ background:#1a1a1a;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;font-size:14px; position:sticky; top:0; z-index:50; }
+  #userBar{ background:#1a1a1a;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;font-size:14px; }
   #loginBtn{ border:none;background:#ffd56b;padding:6px 10px;border-radius:8px;font-weight:bold; cursor:pointer; }
   #userInfo{ opacity:.9; }
 </style>
@@ -43,11 +43,9 @@
 
 <body>
 
-<!-- TOP BAR -->
 <div id="userBar">
   <div id="userInfo">로그인 필요</div>
-  <!-- ✅ 안전장치: JS가 늦어도 openLoginModal 있으면 동작 -->
-  <button id="loginBtn" onclick="window.openLoginModal?.()">로그인</button>
+  <button id="loginBtn" type="button">로그인</button>
 </div>
 
 <div class="wrap">
@@ -150,8 +148,14 @@
       게스트로 둘러보거나, 로그인/가입 후 포인트 적립을 이용할 수 있어요.
     </p>
     <div style="display:flex;gap:10px;">
-      <button id="startGuest" style="flex:1;border:none;background:#333;color:#fff;padding:10px;border-radius:10px;font-weight:700;cursor:pointer;">게스트</button>
-      <button id="startApptech" style="flex:1;border:none;background:#ffd56b;color:#111;padding:10px;border-radius:10px;font-weight:700;cursor:pointer;">로그인/가입</button>
+      <button id="startGuest" type="button"
+        style="flex:1;border:none;background:#333;color:#fff;padding:10px;border-radius:10px;font-weight:700;cursor:pointer;">
+        게스트
+      </button>
+      <button id="startApptech" type="button"
+        style="flex:1;border:none;background:#ffd56b;color:#111;padding:10px;border-radius:10px;font-weight:700;cursor:pointer;">
+        로그인/가입
+      </button>
     </div>
   </div>
 </div>
@@ -161,7 +165,8 @@
   <div style="width:min(360px,92vw);background:#1a1a1a;border-radius:16px;padding:16px;">
     <div style="display:flex;justify-content:space-between;align-items:center;">
       <h3 style="margin:0;color:#ffd56b;">로그인 / 회원가입</h3>
-      <button id="loginClose" style="border:none;background:transparent;color:#aaa;font-size:18px;cursor:pointer;">✕</button>
+      <button id="loginClose" type="button"
+        style="border:none;background:transparent;color:#aaa;font-size:18px;cursor:pointer;">✕</button>
     </div>
 
     <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px;">
@@ -171,6 +176,7 @@
       <input id="loginPhone" placeholder="전화번호 (010xxxxxxxx)" inputmode="numeric"
         style="padding:10px;border-radius:10px;border:1px solid #333;background:#111;color:#fff;outline:none;">
 
+      <!-- ✅ 달력 입력: type="date" -->
       <input id="loginBirth" type="date"
         style="padding:10px;border-radius:10px;border:1px solid #333;background:#111;color:#fff;outline:none;">
 
@@ -180,9 +186,10 @@
         <option value="lunar">음력</option>
       </select>
 
+      <!-- ✅ 여기 data-sitekey에 너의 사이트키 -->
       <div class="g-recaptcha" data-sitekey="6Le2NW4sAAAAAI6Vu2Rn6RKPrZ0VnVCQ2lMj1pIH"></div>
 
-      <button id="loginSubmit"
+      <button id="loginSubmit" type="button"
         style="border:none;background:#ffd56b;color:#111;padding:12px;border-radius:10px;font-weight:800;cursor:pointer;">
         시작하기
       </button>
@@ -194,7 +201,7 @@
   </div>
 </div>
 
-<!-- ✅ 기능 스크립트 -->
+<!-- ✅ 스크립트는 여기서부터: config.js는 이미 head에서 로드됨 -->
 <script src="/js/lib/lunar.js"></script>
 <script src="/js/birth.js"></script>
 <script src="/js/auth.js"></script>
