@@ -77,63 +77,79 @@ function calcGapjaByIpchun(solarYmd){
   return stems[idx % 10] + branches[idx % 12] + "년";
 }
 
-/* ==============================
-   2) 오프라인 음력 DB 변환 (윤달 포함)
-   - /data/lunar_map.json
-   - 형식: { "map": { "YYYY-MM-DD": "YYYY-MM-DD|0/1", ... } }
-   - solarYmd -> "lunarYmd|leap"
-============================== */
+// ==============================
+// LUNAR <-> SOLAR (Offline, no DB)
+// Uses Intl (ICU) chinese calendar in Asia/Seoul
+// ==============================
 
-let __LUNAR_DB__ = null;
-let __LUNAR_REV__ = null;
-
-async function loadLunarDB(){
-  if(__LUNAR_DB__) return __LUNAR_DB__;
-
-  const res = await fetch("/data/lunar_map.json", { cache:"force-cache" });
-  __LUNAR_DB__ = await res.json();
-
-  const map = __LUNAR_DB__.map || {};
-
-  // 역방향 인덱스: "lunar|leap" -> solar
-  __LUNAR_REV__ = {};
-  for(const solar in map){
-    __LUNAR_REV__[map[solar]] = solar;
-  }
-
-  console.log("[lunar] DB loaded:", Object.keys(map).length);
-  return __LUNAR_DB__;
+function _ymdToDateSeoul(ymd){
+  // "YYYY-MM-DD" -> Date (KST 자정 고정)
+  return new Date(`${ymd}T00:00:00+09:00`);
 }
 
-// 음력 → 양력
-// lunarYmd: "YYYY-MM-DD"
-// isLeap: boolean
-async function lunarToSolar(lunarYmd, isLeap=false){
-  await loadLunarDB();
-  const key = `${lunarYmd}|${isLeap ? 1 : 0}`;
-  return __LUNAR_REV__[key] || "";
+function _dateToYMDSeoul(date){
+  // Date -> "YYYY-MM-DD" (KST 기준)
+  const dtf = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  return dtf.format(date); // YYYY-MM-DD
 }
 
-// 양력 → 음력
+function _solarToLunarParts(solarYmd){
+  const d = _ymdToDateSeoul(solarYmd);
+
+  const fmt = new Intl.DateTimeFormat("ko-KR-u-ca-chinese", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  });
+
+  const parts = fmt.formatToParts(d);
+  const year = Number(parts.find(p => p.type === "year")?.value);
+  const monthRaw = parts.find(p => p.type === "month")?.value || "";
+  const day = Number(parts.find(p => p.type === "day")?.value);
+
+  const isLeap =
+    /윤/.test(monthRaw) ||
+    /bis/i.test(monthRaw) ||
+    /\(윤\)/.test(monthRaw);
+
+  const month = Number(String(monthRaw).replace(/[^0-9]/g, ""));
+
+  const lunarYmd =
+    `${String(year).padStart(4,"0")}-${String(month).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+
+  return { lunarYmd, isLeap, year, month, day, monthRaw };
+}
+
+// 양력 -> 음력
 async function solarToLunar(solarYmd){
-  await loadLunarDB();
-  const map = __LUNAR_DB__.map || {};
-  const value = map[solarYmd];
-  if(!value) return null;
-
-  const [lun, leap] = value.split("|");
-  return { lunar: lun, isLeap: leap === "1" };
+  const { lunarYmd, isLeap } = _solarToLunarParts(solarYmd);
+  return { lunar: lunarYmd, isLeap };
 }
 
-/* ==============================
-   3) 전역 Export
-============================== */
-window.BirthUtil = window.BirthUtil || {};
-window.BirthUtil.loadIpchunDB = loadIpchunDB;
-window.BirthUtil.resolveZodiacYearByIpchun = resolveZodiacYearByIpchun;
-window.BirthUtil.calcZodiacByIpchun = calcZodiacByIpchun;
-window.BirthUtil.calcGapjaByIpchun = calcGapjaByIpchun;
+// 음력 -> 양력 (역변환은 범위 브루트포스)
+async function lunarToSolar(lunarYmd, isLeap=false){
+  const [y] = lunarYmd.split("-").map(Number);
 
-window.BirthUtil.loadLunarDB = loadLunarDB;
+  const start = _ymdToDateSeoul(`${y-1}-01-01`);
+  const end   = _ymdToDateSeoul(`${y+1}-12-31`);
+
+  for(let cur = new Date(start); cur <= end; cur.setDate(cur.getDate()+1)){
+    const solarYmd = _dateToYMDSeoul(cur);
+    const p = _solarToLunarParts(solarYmd);
+    if(p.lunarYmd === lunarYmd && p.isLeap === !!isLeap){
+      return solarYmd;
+    }
+  }
+  return "";
+}
+
+// BirthUtil 확장
+window.BirthUtil = window.BirthUtil || {};
 window.BirthUtil.lunarToSolar = lunarToSolar;
 window.BirthUtil.solarToLunar = solarToLunar;
