@@ -209,8 +209,12 @@ async function handleSubmitLogin(){
 
   // ✅ A: 음력은 제거(준비중)
   if(birthType === "lunar"){
-    alert("음력은 현재 준비중입니다. 양력으로 입력해주세요.");
+  try{
+    solarBirth = await window.BirthUtil.lunarToSolar(birth, false);
+  }catch(e){
+    alert("음력→양력 변환 실패");
     return;
+  }
   }
 
   // 입춘 DB 로드
