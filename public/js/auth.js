@@ -1,9 +1,9 @@
 /* =========================================
- AUTH (auth.js)
+ AUTH (auth.js) - B (음력+윤달 지원)
  - entry modal
  - login/register + birth + zodiac + gapja
- - show "processing..." and read server response
  - points key unify: "point"
+ - 서버에는 birth를 "양력(solarBirth)"로 저장해 downstream 전체 통일
 ========================================= */
 
 console.log("[auth.js] loaded ✅", window.getApiUrl?.() || "(no getApiUrl)");
@@ -12,23 +12,18 @@ function normalizePhone(phone){
   return String(phone || "").replace(/[^0-9]/g, "");
 }
 
-// ✅ YYYY-MM-DD (로컬 기준 문자열 유지)
+// ✅ YYYY-MM-DD 문자열 유지(UTC 파싱 금지)
 function toKoreanYMD(v){
   if(!v) return "";
   const s = String(v).trim();
 
   if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
 
+  // 혹시 "2026-02-17T..." 들어오면 앞 10자리만
   const m = s.match(/^(\d{4}-\d{2}-\d{2})/);
   if(m && m[1]) return m[1];
 
-  const d = new Date(s);
-  if(Number.isNaN(d.getTime())) return "";
-
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth()+1).padStart(2,"0");
-  const dd = String(d.getDate()).padStart(2,"0");
-  return `${yyyy}-${mm}-${dd}`;
+  return "";
 }
 
 function getApiUrlOrWarn(){
@@ -111,12 +106,15 @@ async function syncUserFromServer(){
       localStorage.setItem("point", String(res.points || 0));
       localStorage.setItem("name", String(res.name || ""));
 
+      // 서버에는 solarBirth가 저장될 예정이라 여기서도 그대로 저장
       const birthYMD = toKoreanYMD(res.birth);
       if(birthYMD) localStorage.setItem("birth", birthYMD);
 
+      // 서버는 birthType=solar로 통일할 것 (아래 register 참고)
       if(typeof res.birthType === "string" && res.birthType){
         localStorage.setItem("birthType", res.birthType);
       }
+
       if(res.zodiac) localStorage.setItem("zodiac", String(res.zodiac));
       if(res.gapja) localStorage.setItem("gapja", String(res.gapja));
 
@@ -151,6 +149,12 @@ function refreshTopBar(){
       localStorage.removeItem("guestMode");
       localStorage.removeItem("point");
       localStorage.removeItem("points");
+
+      // B 확장 저장값
+      localStorage.removeItem("birth_input");
+      localStorage.removeItem("birth_input_type");
+      localStorage.removeItem("birth_input_isLeap");
+
       location.reload();
     };
   }else{
@@ -187,12 +191,15 @@ async function handleSubmitLogin(){
   const phoneEl = document.getElementById("loginPhone");
   const birthEl = document.getElementById("loginBirth");
   const birthTypeEl = document.getElementById("birthType");
+  const isLeapEl = document.getElementById("isLeapMonth");
   const submitBtn = document.getElementById("loginSubmit");
 
   const name = (nameEl?.value || "").trim();
   const phone = normalizePhone((phoneEl?.value || "").trim());
-  const birth = toKoreanYMD((birthEl?.value || "").trim());
-  const birthType = (birthTypeEl?.value || "solar").trim();
+
+  const birthInput = toKoreanYMD((birthEl?.value || "").trim()); // 사용자가 입력한 YYYY-MM-DD
+  const birthTypeInput = (birthTypeEl?.value || "solar").trim(); // solar | lunar
+  const isLeap = !!(isLeapEl && isLeapEl.checked);
 
   if(!name || !phone){
     alert("이름과 전화번호를 입력해주세요.");
@@ -202,46 +209,50 @@ async function handleSubmitLogin(){
     alert("전화번호는 010xxxxxxxx 형식의 11자리 숫자로 입력해주세요.");
     return;
   }
-  if(!birth){
+  if(!birthInput){
     alert("생년월일을 입력해주세요.");
     return;
   }
 
-  // ✅ A: 음력은 제거(준비중)
-if(birthType === "lunar"){
-  if(typeof window.BirthUtil?.lunarToSolar === "function"){
+  // 입춘DB 로드(띠/갑자)
+  try{ await window.BirthUtil?.loadIpchunDB?.(); }catch(e){}
+
+  // ✅ 계산/저장/서버전송 기준은 무조건 solarBirth
+  let solarBirth = birthInput;
+
+  if(birthTypeInput === "lunar"){
+    if(typeof window.BirthUtil?.lunarToSolar !== "function"){
+      alert("음력 변환 DB가 준비되지 않았습니다. /data/lunar_map.json 및 birth.js를 확인해주세요.");
+      return;
+    }
+
     try{
-      // ✅ 반드시 await
-      solarBirth = await window.BirthUtil.lunarToSolar(birth, false); // 윤달이면 true
+      // ✅ 윤달 포함
+      solarBirth = await window.BirthUtil.lunarToSolar(birthInput, isLeap);
     }catch(e){
       alert("음력→양력 변환 실패: " + String(e));
       return;
     }
-  }else{
-    alert("음력→양력 변환 함수(BirthUtil.lunarToSolar)가 없습니다.");
-    return;
+
+    if(!solarBirth || !/^\d{4}-\d{2}-\d{2}$/.test(solarBirth)){
+      alert(
+        "음력→양력 변환 결과를 찾지 못했습니다.\n" +
+        `입력: ${birthInput} (윤달=${isLeap ? "예" : "아니오"})\n\n` +
+        "DB에 해당 연도가 아직 없거나(예: 1940~), 윤달 체크가 틀릴 수 있어요."
+      );
+      return;
+    }
   }
 
-  if(!solarBirth || !/^\d{4}-\d{2}-\d{2}$/.test(solarBirth)){
-    alert("음력→양력 변환 결과가 올바르지 않습니다: " + String(solarBirth));
-    return;
-  }
-}
+  // ✅ 띠/갑자 계산은 solarBirth로
+  const zodiac = window.BirthUtil?.calcZodiacByIpchun ? window.BirthUtil.calcZodiacByIpchun(solarBirth) : "";
+  const gapja  = window.BirthUtil?.calcGapjaByIpchun  ? window.BirthUtil.calcGapjaByIpchun(solarBirth)  : "";
 
-  // 입춘 DB 로드
-  try{
-    await window.BirthUtil?.loadIpchunDB?.();
-  }catch(e){}
-
-  // ✅ 계산은 양력 birth 그대로
-  const zodiac = window.BirthUtil?.calcZodiacByIpchun ? window.BirthUtil.calcZodiacByIpchun(birth) : "";
-  const gapja  = window.BirthUtil?.calcGapjaByIpchun  ? window.BirthUtil.calcGapjaByIpchun(birth)  : "";
-
+  // reCAPTCHA
   if(typeof grecaptcha === "undefined"){
     alert("reCAPTCHA가 아직 로드되지 않았어요. 잠시 후 다시 시도해주세요.");
     return;
   }
-
   const token = grecaptcha.getResponse();
   if(!token){
     alert("reCAPTCHA 확인을 먼저 해주세요.");
@@ -264,6 +275,8 @@ if(birthType === "lunar"){
   let rawTxt = "";
 
   try{
+    // ✅ 앱스크립트 건드리기 싫다고 했으니:
+    // 서버 저장값도 solar로 통일해야(다른 페이지/동기화에서 꼬임 방지)
     const r = await fetch(API_URL,{
       method:"POST",
       headers:{ "Content-Type":"text/plain;charset=utf-8" },
@@ -271,8 +284,8 @@ if(birthType === "lunar"){
         action:"register",
         phone,
         name,
-        birth,        // ✅ 양력 YYYY-MM-DD
-        birthType,    // solar
+        birth: solarBirth,   // ✅ 서버에는 "양력" 저장
+        birthType: "solar",  // ✅ 서버도 solar로 통일
         zodiac,
         gapja,
         token
@@ -315,10 +328,17 @@ if(birthType === "lunar"){
   }
 
   if(st === "exists" || st === "ok"){
+    // ✅ 로컬 저장도 solar 기준으로 통일 (사주/다른 페이지에서 UTC/음력 문제 예방)
     localStorage.setItem("name", name);
     localStorage.setItem("phone", phone);
-    localStorage.setItem("birth", solarbirth);
-    localStorage.setItem("birthType", birthType);
+    localStorage.setItem("birth", solarBirth);
+    localStorage.setItem("birthType", "solar"); // 앱 전체 기준
+
+    // ✅ 사용자 입력 원본도 보관(표시용)
+    localStorage.setItem("birth_input", birthInput);
+    localStorage.setItem("birth_input_type", birthTypeInput); // solar|lunar
+    localStorage.setItem("birth_input_isLeap", isLeap ? "1" : "0");
+
     if(zodiac) localStorage.setItem("zodiac", zodiac);
     if(gapja)  localStorage.setItem("gapja", gapja);
     localStorage.removeItem("guestMode");
@@ -331,6 +351,7 @@ if(birthType === "lunar"){
     refreshPointCard();
 
     alert(st === "exists" ? "이미 가입된 번호라 로그인 처리했어요 ✅" : "회원가입 완료 ✅");
+
     await syncUserFromServer();
     return;
   }
