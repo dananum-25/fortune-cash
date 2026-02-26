@@ -208,14 +208,25 @@ async function handleSubmitLogin(){
   }
 
   // ✅ A: 음력은 제거(준비중)
-  if(birthType === "lunar"){
-  try{
-    solarBirth = await window.BirthUtil.lunarToSolar(birth, false);
-  }catch(e){
-    alert("음력→양력 변환 실패");
+if(birthType === "lunar"){
+  if(typeof window.BirthUtil?.lunarToSolar === "function"){
+    try{
+      // ✅ 반드시 await
+      solarBirth = await window.BirthUtil.lunarToSolar(birth, false); // 윤달이면 true
+    }catch(e){
+      alert("음력→양력 변환 실패: " + String(e));
+      return;
+    }
+  }else{
+    alert("음력→양력 변환 함수(BirthUtil.lunarToSolar)가 없습니다.");
     return;
   }
+
+  if(!solarBirth || !/^\d{4}-\d{2}-\d{2}$/.test(solarBirth)){
+    alert("음력→양력 변환 결과가 올바르지 않습니다: " + String(solarBirth));
+    return;
   }
+}
 
   // 입춘 DB 로드
   try{
