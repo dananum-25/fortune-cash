@@ -30,9 +30,7 @@ button{
 a{color:#ffd56b;text-decoration:none;}
 footer{opacity:.7;font-size:12px;margin-top:40px;text-align:center;}
 .hr{height:1px;background:#222;margin:14px 0;}
-.bar-wrap{
-  margin:14px 0;
-}
+.bar-wrap{ margin:14px 0; }
 
 .bar-label{
   display:flex;
@@ -40,46 +38,32 @@ footer{opacity:.7;font-size:12px;margin-top:40px;text-align:center;}
   font-size:14px;
   margin-bottom:6px;
 }
-
 .bar{
   height:14px;
   background:#222;
   border-radius:10px;
   overflow:hidden;
 }
-
 .bar-fill{
   height:100%;
   width:0%;
   border-radius:10px;
   transition:width 1s ease;
 }
-
 .bar-high{ background:linear-gradient(90deg,#00c853,#69f0ae); }
 .bar-good{ background:linear-gradient(90deg,#ffd600,#ffea00); }
 .bar-mid{ background:linear-gradient(90deg,#ff9100,#ffab40); }
 .bar-low{ background:linear-gradient(90deg,#d50000,#ff5252); }
+
 .month-graph{
   margin-top:20px;
   background:#1a1a1a;
   padding:16px;
   border-radius:14px;
 }
-
-svg{
-  width:100%;
-  height:200px;
-}
-
-.graph-line{
-  fill:none;
-  stroke:#ffd56b;
-  stroke-width:3;
-}
-
-.graph-dot{
-  fill:#ff9f1a;
-}  
+svg{ width:100%; height:200px; }
+.graph-line{ fill:none; stroke:#ffd56b; stroke-width:3; }
+.graph-dot{ fill:#ff9f1a; }
 
 @media print{
   body{ background:#fff !important; color:#000 !important; }
@@ -87,9 +71,7 @@ svg{
   a{ color:#000 !important; text-decoration:none !important; }
   .card{ box-shadow:none !important; border:1px solid #ddd !important; }
 }
-
-@media print {
-
+@media print{
   body::after{
     content: "fortune-cash.vercel.app";
     position: fixed;
@@ -102,7 +84,6 @@ svg{
     z-index: 9999;
     white-space: nowrap;
   }
-
 }
 </style>
 </head>
@@ -119,7 +100,7 @@ svg{
   <h2>⏰ 출생 시간 입력</h2>
   <p>출생 시간(0~23시)을 입력하면 4기둥(연·월·일·시) + 오행 + 2026 세운 분석이 자동으로 생성됩니다.</p>
   <input type="number" id="birthHour" min="0" max="23" placeholder="출생 시간 (0~23시)">
- <button id="calcBtn" type="button">사주 계산하기</button>
+  <button id="calcBtn" type="button">사주 계산하기</button>
   <div class="small" style="margin-top:10px;">
     TIP) 출생시간을 모르면 12를 넣고 먼저 확인하세요. (정확도는 출생시간을 알면 더 올라갑니다)
   </div>
@@ -154,34 +135,37 @@ svg{
     <h2>✨ 종합 해석</h2>
     <div id="analysisBox"></div>
   </div>
-<button id="pdfFullBtn" type="button" class="no-print" style="
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border:none;
-  border-radius:10px;
-  background:#2a2a2a;
-  color:#fff;
-  font-weight:bold;
-  cursor:pointer;
-">
-  📄 전체 리포트 PDF
-</button>
 
-<button id="pdfSummaryBtn" type="button" class="no-print" style="
-  width:100%;
-  padding:12px;
-  margin-top:8px;
-  border:none;
-  border-radius:10px;
-  background:#444;
-  color:#fff;
-  font-weight:bold;
-  cursor:pointer;
-">
-  📄 요약 리포트 PDF
-</button>
-<button id="reportBtn" type="button" class="no-print">📚 내 리포트 보기</button>
+  <button id="pdfFullBtn" type="button" class="no-print" style="
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border:none;
+    border-radius:10px;
+    background:#2a2a2a;
+    color:#fff;
+    font-weight:bold;
+    cursor:pointer;
+  ">
+    📄 전체 리포트 PDF
+  </button>
+
+  <button id="pdfSummaryBtn" type="button" class="no-print" style="
+    width:100%;
+    padding:12px;
+    margin-top:8px;
+    border:none;
+    border-radius:10px;
+    background:#444;
+    color:#fff;
+    font-weight:bold;
+    cursor:pointer;
+  ">
+    📄 요약 리포트 PDF
+  </button>
+
+  <button id="reportBtn" type="button" class="no-print">📚 내 리포트 보기</button>
+
   <div class="card">
     <button onclick="location.href='/pages/period/period.html'">오늘/내일/연간 운세 보기</button>
     <button onclick="location.href='/pages/star/index.html'">별자리 운세 보기</button>
@@ -196,7 +180,7 @@ svg{
 
 </div>
 
+<!-- ✅ 인라인 script 제거, 아래 js로 전부 이전 -->
 <script defer src="/pages/saju/saju.js"></script>
-
 </body>
 </html>
