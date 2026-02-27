@@ -119,7 +119,7 @@ svg{
   <h2>⏰ 출생 시간 입력</h2>
   <p>출생 시간(0~23시)을 입력하면 4기둥(연·월·일·시) + 오행 + 2026 세운 분석이 자동으로 생성됩니다.</p>
   <input type="number" id="birthHour" min="0" max="23" placeholder="출생 시간 (0~23시)">
-  <button onclick="calculateSaju()">사주 계산하기</button>
+ <button id="calcBtn" type="button">사주 계산하기</button>
   <div class="small" style="margin-top:10px;">
     TIP) 출생시간을 모르면 12를 넣고 먼저 확인하세요. (정확도는 출생시간을 알면 더 올라갑니다)
   </div>
@@ -181,9 +181,7 @@ svg{
 ">
   📄 요약 리포트 PDF
 </button>
-<button onclick="showSavedReports()" class="no-print">
-📚 내 리포트 보기
-</button>
+<button id="reportBtn" type="button" class="no-print">📚 내 리포트 보기</button>
   <div class="card">
     <button onclick="location.href='/pages/period/period.html'">오늘/내일/연간 운세 보기</button>
     <button onclick="location.href='/pages/star/index.html'">별자리 운세 보기</button>
@@ -1167,21 +1165,7 @@ location.reload();
   });
 
   html += "</div>";
-
-  document.getElementById("analysisBox").innerHTML = html;
-  }
-  function loadReport(index){
-
-  const list = JSON.parse(localStorage.getItem("myReports") || "[]");
-  const r = list[index];
-
-  if(!r) return;
-
-  document.getElementById("analysisBox").innerHTML =
-    generateFullReport(r.name, r.pillars, {}, r.scores);
-  }
-});
-</script>
+<script defer src="/pages/saju/saju.js"></script>
 
 </body>
 </html>
