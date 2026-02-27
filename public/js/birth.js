@@ -149,7 +149,15 @@ async function lunarToSolar(lunarYmd, isLeap=false){
   return "";
 }
 
-// BirthUtil 확장
+// BirthUtil 확장(필수 export)
 window.BirthUtil = window.BirthUtil || {};
+
+// ✅ 입춘/띠/갑자 기능 export
+window.BirthUtil.loadIpchunDB = loadIpchunDB;
+window.BirthUtil.resolveZodiacYearByIpchun = resolveZodiacYearByIpchun;
+window.BirthUtil.calcZodiacByIpchun = calcZodiacByIpchun;
+window.BirthUtil.calcGapjaByIpchun = calcGapjaByIpchun;
+
+// ✅ 음력<->양력 변환 export
 window.BirthUtil.lunarToSolar = lunarToSolar;
 window.BirthUtil.solarToLunar = solarToLunar;
