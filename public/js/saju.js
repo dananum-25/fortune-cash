@@ -1,9 +1,27 @@
 // /pages/saju/saju.js
 // (원본 saju.html 인라인 스크립트에서 이전 + 필수 버그 수정 포함)
+// ✅ YYYY-MM-DD 는 무조건 로컬(Date(y,m,d))로 파싱 (UTC 밀림 방지)
+function parseYmdLocal(ymd){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(ymd || "").trim());
+  if(!m) return null;
+  const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
+  return new Date(y, mo - 1, d);
+}
 
+// ✅ birth 값 정규화: YYYY-MM-DD면 그대로, ISO면 앞 10자리만
 function normalizeBirthYMD(v){
   if(!v) return "";
   const s = String(v).trim();
+
+  // 이미 YYYY-MM-DD면 그대로 (여기서 new Date() 하면 안됨)
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+
+  //  형태면 앞 10자리만 (UTC 파싱 금지)
+  t m = s.match(/^(\d{4}-\d{2}-\d{2})/);
+  i,f(m && m[1]) return m[1];
+
+  return "";
+}
 
   // 이미 YYYY-MM-DD면 그대로
   if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
