@@ -817,18 +817,30 @@ window.loadReport = loadReport;
 document.addEventListener("DOMContentLoaded", function(){
   console.log("[saju.js] DOMContentLoaded ✅");
 
-  const birth = localStorage.getItem("birth");
+// ✅ birth는 "있다/없다"를 raw로 판단하면 실패할 수 있어서 정규화해서 체크
+const birthRaw = localStorage.getItem("birth");
+const birth = normalizeBirthYMD(birthRaw);
 
-  if(!birth){
-    document.getElementById("loginCheck").innerHTML =
-      "<h2>⚠ 로그인 필요</h2><p>사주 계산은 로그인 후 생년월일이 저장되어야 가능합니다.</p><p class='small'>메인으로 가서 로그인(회원가입) 후 다시 들어와주세요.</p>";
-    document.getElementById("timeInputBox").style.display="none";
-    return;
-  }
-
+if(!birth){
   document.getElementById("loginCheck").innerHTML =
-    "<h2>✅ 준비 완료</h2><p>출생 시간을 입력하면 4기둥 + 오행 + 2026 세운 분석을 보여줄게요.</p>";
-  document.getElementById("timeInputBox").style.display="block";
+    "<h2>⚠ 로그인 필요</h2><p>사주 계산은 로그인 후 생년월일이 저장되어야 가능합니다.</p><p class='small'>메인으로 가서 로그인(회원가입) 후 다시 들어와주세요.</p>";
+
+  // ✅ (선택) 입력창을 아예 숨기지 말고, 안내는 띄우되 입력창은 보여주고 싶으면 block 유지
+  // 숨기고 싶으면 아래 줄을 "none"으로 바꾸면 됨.
+  document.getElementById("timeInputBox").style.display = "block";
+  return;
+}
+
+// ✅ ISO 같은 값이 들어와도 YYYY-MM-DD로 고정 저장 (다른 페이지에서도 꼬임 방지)
+localStorage.setItem("birth", birth);
+
+document.getElementById("loginCheck").innerHTML =
+  "<h2>✅ 준비 완료</h2><p>출생 시간을 입력하면 4기둥 + 오행 + 2026 세운 분석을 보여줄게요.</p>";
+document.getElementById("timeInputBox").style.display = "block";
+
+// ✅ saju.html에서 onclick을 지웠다면 버튼 이벤트 연결이 필요
+document.getElementById("calcBtn")?.addEventListener("click", calculateSaju);
+document.getElementById("reportBtn")?.addEventListener("click", showSavedReports);
 
   // ✅ (정리버전 핵심) onclick 제거했으니 여기서 바인딩
   document.getElementById("calcBtn")?.addEventListener("click", calculateSaju);
