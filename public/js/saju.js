@@ -845,4 +845,16 @@ document.getElementById("reportBtn")?.addEventListener("click", showSavedReports
   // ✅ (정리버전 핵심) onclick 제거했으니 여기서 바인딩
   document.getElementById("calcBtn")?.addEventListener("click", calculateSaju);
   document.getElementById("reportBtn")?.addEventListener("click", showSavedReports);
+
+  document.addEventListener("DOMContentLoaded", function(){
+
+  const debug = document.createElement("div");
+  debug.style.background = "#300";
+  debug.style.padding = "10px";
+  debug.style.marginTop = "10px";
+  debug.style.fontSize = "12px";
+  debug.innerHTML = "birth raw: " + localStorage.getItem("birth");
+  document.body.appendChild(debug);
+
+});
 });
