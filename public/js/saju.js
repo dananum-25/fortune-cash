@@ -8,17 +8,17 @@ function parseYmdLocal(ymd){
   return new Date(y, mo - 1, d);
 }
 
-// ✅ birth 값 정규화: YYYY-MM-DD면 그대로, ISO면 앞 10자리만
+// ✅ birth 값 정규화: YYYY-MM-DD면 그대로, ISO면 앞 10자리만 (UTC 파싱 금지)
 function normalizeBirthYMD(v){
   if(!v) return "";
   const s = String(v).trim();
 
-  // 이미 YYYY-MM-DD면 그대로 (여기서 new Date() 하면 안됨)
+  // 이미 YYYY-MM-DD면 그대로
   if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
 
-  //  형태면 앞 10자리만 (UTC 파싱 금지)
-  t m = s.match(/^(\d{4}-\d{2}-\d{2})/);
-  i,f(m && m[1]) return m[1];
+  // ISO/기타 문자열이면 앞 10자리(YYYY-MM-DD)만 추출
+  const m = s.match(/^(\d{4}-\d{2}-\d{2})/);
+  if(m && m[1]) return m[1];
 
   return "";
 }
@@ -318,7 +318,7 @@ function calculateSaju(){
     return;
   }
 
-  const birthDate = parseLocalYMD(birth);
+  const birthDate = parseYmdLocal(birth);
   if(!birthDate){
     alert("생년월일 형식이 이상합니다. 다시 로그인/저장 후 시도해주세요.");
     return;
@@ -832,47 +832,32 @@ window.loadReport = loadReport;
 // ===============================
 // INIT
 // ===============================
-document.addEventListener("DOMContentLoaded", function(){
+document.addEventListener("DOMContentLoaded", () => {
   console.log("[saju.js] DOMContentLoaded ✅");
 
-// ✅ birth는 "있다/없다"를 raw로 판단하면 실패할 수 있어서 정규화해서 체크
-const birthRaw = localStorage.getItem("birth");
-const birth = normalizeBirthYMD(birthRaw);
+  const birthRaw = localStorage.getItem("birth");
+  const birth = normalizeBirthYMD(birthRaw);
 
-if(!birth){
+  if(!birth){
+    document.getElementById("loginCheck").innerHTML =
+      "<h2>⚠ 로그인 필요</h2><p>사주 계산은 로그인 후 생년월일이 저장되어야 가능합니다.</p><p class='small'>메인으로 가서 로그인(회원가입) 후 다시 들어와주세요.</p>";
+    document.getElementById("timeInputBox").style.display = "none";
+    return;
+  }
+
+  // ISO가 들어있어도 YYYY-MM-DD로 고정 저장
+  localStorage.setItem("birth", birth);
+
   document.getElementById("loginCheck").innerHTML =
-    "<h2>⚠ 로그인 필요</h2><p>사주 계산은 로그인 후 생년월일이 저장되어야 가능합니다.</p><p class='small'>메인으로 가서 로그인(회원가입) 후 다시 들어와주세요.</p>";
-
-  // ✅ (선택) 입력창을 아예 숨기지 말고, 안내는 띄우되 입력창은 보여주고 싶으면 block 유지
-  // 숨기고 싶으면 아래 줄을 "none"으로 바꾸면 됨.
+    "<h2>✅ 준비 완료</h2><p>출생 시간을 입력하면 4기둥 + 오행 + 2026 세운 분석을 보여줄게요.</p>";
   document.getElementById("timeInputBox").style.display = "block";
-  return;
-}
 
-// ✅ ISO 같은 값이 들어와도 YYYY-MM-DD로 고정 저장 (다른 페이지에서도 꼬임 방지)
-localStorage.setItem("birth", birth);
-
-document.getElementById("loginCheck").innerHTML =
-  "<h2>✅ 준비 완료</h2><p>출생 시간을 입력하면 4기둥 + 오행 + 2026 세운 분석을 보여줄게요.</p>";
-document.getElementById("timeInputBox").style.display = "block";
-
-// ✅ saju.html에서 onclick을 지웠다면 버튼 이벤트 연결이 필요
-document.getElementById("calcBtn")?.addEventListener("click", calculateSaju);
-document.getElementById("reportBtn")?.addEventListener("click", showSavedReports);
-
-  // ✅ (정리버전 핵심) onclick 제거했으니 여기서 바인딩
   document.getElementById("calcBtn")?.addEventListener("click", calculateSaju);
   document.getElementById("reportBtn")?.addEventListener("click", showSavedReports);
 
-  document.addEventListener("DOMContentLoaded", function(){
-
-  const debug = document.createElement("div");
-  debug.style.background = "#300";
-  debug.style.padding = "10px";
-  debug.style.marginTop = "10px";
-  debug.style.fontSize = "12px";
-  debug.innerHTML = "birth raw: " + localStorage.getItem("birth");
-  document.body.appendChild(debug);
-
-});
+  // (선택) 모바일 디버그 텍스트
+  // const debug = document.createElement("div");
+  // debug.style.cssText="background:#300;padding:10px;margin-top:10px;font-size:12px;";
+  // debug.innerHTML = "birth raw: " + birthRaw + "<br>birth normalized: " + birth;
+  // document.body.appendChild(debug);
 });
