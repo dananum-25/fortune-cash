@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>무료 사주 계산 | 4기둥(연·월·일·시) + 오행 + 2026 세운 분석</title>
+<meta name="description" content="로그인 정보 기반 무료 사주 4기둥 계산(연주·월주·일주·시주), 오행 분석(목화토금수), 2026년 세운(병오) 합충 분석까지 제공합니다.">
+<!-- saju.html -->
+<link rel="stylesheet" href="/css/common.css">
+<link rel="stylesheet" href="/css/saju.css">
+</head>
+
+<body>
+<div class="wrap">
+
+<h1>나의 사주 분석</h1>
+<div class="small">※ 정확한 사주는 출생시간(시주)이 중요합니다. 출생시간을 모르면 “12시(정오)”로 임시 확인 후, 나중에 수정해도 됩니다.</div>
+
+<div id="loginCheck" class="card"></div>
+
+<div class="card" id="timeInputBox" style="display:none;">
+  <h2>⏰ 출생 시간 입력</h2>
+  <p>출생 시간(0~23시)을 입력하면 4기둥(연·월·일·시) + 오행 + 2026 세운 분석이 자동으로 생성됩니다.</p>
+  <input type="number" id="birthHour" min="0" max="23" placeholder="출생 시간 (0~23시)">
+  <button id="calcBtn" type="button">사주 계산하기</button>
+  <div class="small" style="margin-top:10px;">
+    TIP) 출생시간을 모르면 12를 넣고 먼저 확인하세요. (정확도는 출생시간을 알면 더 올라갑니다)
+  </div>
+</div>
+
+<div id="sajuResult" style="display:none;">
+
+  <div class="card">
+    <h2>📜 나의 기본 정보</h2>
+    <div id="basicInfo"></div>
+  </div>
+
+  <div class="card">
+    <h2>🔮 4기둥(연·월·일·시)</h2>
+    <div id="sajuBox"></div>
+    <div class="small">※ 월주는 절기(입춘) 기준 간이 반영 버전입니다.</div>
+  </div>
+
+  <div class="card">
+    <h2>🌿 오행 분석</h2>
+    <div id="elementBox"></div>
+    <div class="hr"></div>
+    <div id="elementInterpretation"></div>
+  </div>
+
+  <div class="card">
+    <h2>📈 2026년 세운(병오) 분석</h2>
+    <div id="sewoonBox"></div>
+  </div>
+
+  <div class="card">
+    <h2>✨ 종합 해석</h2>
+    <div id="analysisBox"></div>
+  </div>
+
+<button id="pdfFullBtn" type="button" class="no-print btn btn-dark">
+  📄 전체 리포트 PDF
+</button>
+
+<button id="pdfSummaryBtn" type="button" class="no-print btn btn-gray">
+  📄 요약 리포트 PDF
+</button>
+
+  <button id="reportBtn" type="button" class="no-print">📚 내 리포트 보기</button>
+
+  <div class="card">
+    <button onclick="location.href='/pages/period/period.html'">오늘/내일/연간 운세 보기</button>
+    <button onclick="location.href='/pages/star/index.html'">별자리 운세 보기</button>
+    <button onclick="location.href='/'">홈으로</button>
+  </div>
+
+</div>
+
+<footer>
+무료 운세 플랫폼 | <a href="/">홈으로</a>
+</footer>
+
+</div>
+
+<!-- ✅ 인라인 script 제거, 아래 js로 전부 이전 -->
+<script src="/js/config.js"></script>
+<script src="/js/birth.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/saju.js"></script>
+
+</body>
+</html>
