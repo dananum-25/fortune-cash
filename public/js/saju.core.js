@@ -2,8 +2,8 @@
 // SAJU CORE ENGINE (1940~2040)
 // ===============================
 
-export const YEAR_MIN = 1940;
-export const YEAR_MAX = 2040;
+const YEAR_MIN = 1940;
+const YEAR_MAX = 2040;
 
 const heavenly = ["갑","을","병","정","무","기","경","신","임","계"];
 const earthly  = ["자","축","인","묘","진","사","오","미","신","유","술","해"];
@@ -11,7 +11,7 @@ const earthly  = ["자","축","인","묘","진","사","오","미","신","유","�
 // -------------------------------
 // 1. 범위 체크
 // -------------------------------
-export function assertYearRange(y){
+function assertYearRange(y){
   if(y < YEAR_MIN || y > YEAR_MAX){
     throw new Error(`지원 범위는 ${YEAR_MIN}~${YEAR_MAX}년입니다.`);
   }
@@ -20,7 +20,7 @@ export function assertYearRange(y){
 // -------------------------------
 // 2. YYYY-MM-DD → 로컬 정오
 // -------------------------------
-export function parseYMDLocalNoon(ymd){
+function parseYMDLocalNoon(ymd){
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(ymd||""));
   if(!m) return null;
 
@@ -41,7 +41,7 @@ export function parseYMDLocalNoon(ymd){
 const DAY_BASE_DATE = new Date(1984, 1, 2, 12, 0, 0);
 const DAY_BASE_INDEX = 2;
 
-export function getDayPillar(ymd){
+function getDayPillar(ymd){
   const d = parseYMDLocalNoon(ymd);
   if(!d) return "";
 
@@ -59,7 +59,7 @@ function getHourBranch(hour){
   return earthly[Math.floor(((hour + 1) % 24) / 2)];
 }
 
-export function getHourPillar(dayPillar, hour){
+function getHourPillar(dayPillar, hour){
   const dayStem = dayPillar[0];
   const dayStemIndex = heavenly.indexOf(dayStem);
 
@@ -70,6 +70,10 @@ export function getHourPillar(dayPillar, hour){
 
   return heavenly[hourStemIndex] + hourBranch;
 }
+
+// -------------------------------
+// 전역 노출 (module 대신)
+// -------------------------------
 window.SajuCore = {
   getDayPillar,
   getHourPillar,
