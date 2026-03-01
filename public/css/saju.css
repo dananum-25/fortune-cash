@@ -1,0 +1,38 @@
+/* /css/saju.css */
+/* saju.html 인라인 중 "사주 전용 컴포넌트"만 분리 */
+
+.bar-wrap{ margin:14px 0; }
+
+.bar-label{
+  display:flex;
+  justify-content:space-between;
+  font-size:14px;
+  margin-bottom:6px;
+}
+.bar{
+  height:14px;
+  background:#222;
+  border-radius:10px;
+  overflow:hidden;
+}
+.bar-fill{
+  height:100%;
+  width:0%;
+  border-radius:10px;
+  transition:width 1s ease;
+}
+
+.bar-high{ background:linear-gradient(90deg,#00c853,#69f0ae); }
+.bar-good{ background:linear-gradient(90deg,#ffd600,#ffea00); }
+.bar-mid { background:linear-gradient(90deg,#ff9100,#ffab40); }
+.bar-low { background:linear-gradient(90deg,#d50000,#ff5252); }
+
+.month-graph{
+  margin-top:20px;
+  background:#1a1a1a;
+  padding:16px;
+  border-radius:14px;
+}
+svg{ width:100%; height:200px; }
+.graph-line{ fill:none; stroke:#ffd56b; stroke-width:3; }
+.graph-dot{ fill:#ff9f1a; }
