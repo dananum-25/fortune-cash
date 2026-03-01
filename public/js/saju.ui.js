@@ -838,7 +838,6 @@ function calculateSaju(){
   const monthPillar = getMonthPillar(birthDate);
   const dayPillar = window.SajuCore.getDayPillar(birth);
 const hourPillar = window.SajuCore.getHourPillar(dayPillar, hour);
-  const hourPillar  = getHourPillar(dayPillar, hour);
 
   const pillars = [yearPillar, monthPillar, dayPillar, hourPillar];
 
