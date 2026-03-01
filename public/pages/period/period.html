@@ -7,8 +7,81 @@
 
 <meta name="description" content="오늘 운세, 내일 운세, 2026년 연간운세를 무료로 확인하세요. 기간운세 해석 방법과 활용법까지 함께 제공합니다.">
 
-<link rel="stylesheet" href="/css/common.css">
-<link rel="stylesheet" href="/css/period.css">
+<style>
+body{margin:0;background:#111;color:#fff;font-family:Arial;}
+/* ✅ period는 container를 쓰니까 wrap과 같은 역할로 매핑 */
+.container{max-width:820px;margin:auto;padding:20px;}
+
+/* ✅ saju 톤 그대로 */
+.card{background:#1a1a1a;border-radius:16px;padding:18px;margin:16px 0;}
+h1{font-size:26px;margin:0 0 10px;}
+h2{margin:18px 0 10px;}
+h3{margin:14px 0 8px;}
+p{line-height:1.8;margin:8px 0;}
+.badge{
+  display:inline-block;background:#222;color:#ffd56b;
+  padding:6px 10px;border-radius:12px;margin:4px 6px 4px 0;
+}
+.small{font-size:12px;opacity:.8}
+
+input{
+  width:100%;padding:12px;border-radius:10px;border:none;margin-top:8px;
+  background:#0f0f0f;color:#fff;box-sizing:border-box;
+}
+
+/* ✅ period 버튼도 saju와 동일 */
+button{
+  width:100%;padding:14px;border:none;border-radius:12px;
+  background:#ffd56b;font-weight:bold;margin-top:10px;cursor:pointer;
+}
+
+/* ✅ period에 버튼 3개가 있으니 간격만 보기 좋게 */
+#actionSection button{ margin-top:0; }
+#actionSection{ display:grid; gap:10px; }
+
+a{color:#ffd56b;text-decoration:none;}
+footer{opacity:.7;font-size:12px;margin-top:40px;text-align:center;}
+.hr{height:1px;background:#222;margin:14px 0;}
+
+/* ✅ period에 있는 구역들을 카드처럼 보이게 */
+#pointBox, #seoContent, #actionSection, #resultSection, section{
+  background:#1a1a1a;border-radius:16px;padding:18px;margin:16px 0;
+}
+
+/* ✅ result 영역 내부 박스 톤 */
+#resultBox, #guideBox{
+  background:#141414;
+  border-radius:14px;
+  padding:16px;
+  margin-top:12px;
+}
+
+/* ✅ 리스트 톤 */
+ul{ padding-left:18px; }
+li{ margin:8px 0; opacity:.92; }
+
+/* ✅ print는 saju와 같은 워터마크 방식 그대로 */
+@media print{
+  body{ background:#fff !important; color:#000 !important; }
+  .no-print{ display:none !important; }
+  a{ color:#000 !important; text-decoration:none !important; }
+  .card{ box-shadow:none !important; border:1px solid #ddd !important; }
+}
+@media print{
+  body::after{
+    content: "fortune-cash.vercel.app";
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-30deg);
+    font-size: 48px;
+    color: rgba(0,0,0,0.08);
+    pointer-events: none;
+    z-index: 9999;
+    white-space: nowrap;
+  }
+}
+</style>
 </head>
 
 <body>
@@ -20,7 +93,7 @@
 <div id="pointBox"></div>
 
 <!-- 🔹 설명 콘텐츠 (SEO 핵심) -->
-<section id="seoContent">
+<section id="seoContent" class="card">
 
 <h2>기간운세란 무엇인가요?</h2>
 
@@ -52,14 +125,14 @@
 <hr>
 
 <!-- 🔹 버튼 영역 -->
-<section id="actionSection">
+<section id="actionSection" class="card">
   <button onclick="showToday()">오늘 운세 보기</button>
   <button onclick="showTomorrow()">내일 운세 보기</button>
   <button onclick="showYear()">2026년 연간운세 보기</button>
 </section>
 
 <!-- 🔹 결과 영역 -->
-<section id="resultSection" style="display:none;">
+<section id="resultSection" class="card" style="display:none;">
   <div id="resultBox"></div>
   <div id="guideBox"></div>
 
@@ -78,7 +151,7 @@
 <hr>
 
 <!-- 🔹 FAQ (승인에 매우 중요) -->
-<section>
+<section class="card">
 <h2>자주 묻는 질문 (FAQ)</h2>
 
 <h4>Q. 오늘 운세는 얼마나 정확한가요?</h4>
