@@ -19,23 +19,6 @@ import {
 // 0) Date helpers (UTC-safe)
 // ===============================
 
-// ===============================
-// 4) Hour pillar
-// ===============================
-function getHourBranch(hour){
-  return earthly[Math.floor(((hour + 1) % 24) / 2)];
-}
-
-function getHourPillar(dayPillar, hour){
-  const dayStem = dayPillar[0];
-  const dayStemIndex = heavenly.indexOf(dayStem);
-
-  const hourBranch = getHourBranch(hour);
-  const hourBranchIndex = earthly.indexOf(hourBranch);
-
-  const hourStemIndex = (dayStemIndex * 2 + hourBranchIndex) % 10;
-  return heavenly[hourStemIndex] + hourBranch;
-}
 
 // ===============================
 // 5) 5 elements (simple distribution)
