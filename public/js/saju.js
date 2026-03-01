@@ -23,16 +23,6 @@ function normalizeBirthYMD(v){
   return "";
 }
 
-  // ISO 형태면 로컬 기준으로 YYYY-MM-DD로 변환
-  const d = new Date(s);
-  if(Number.isNaN(d.getTime())) return "";
-
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth()+1).padStart(2,"0");
-  const dd = String(d.getDate()).padStart(2,"0");
-  return `${yyyy}-${mm}-${dd}`;
-}
-
 function parseLocalYMD(ymd){
   if(!ymd) return null;
 
