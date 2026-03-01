@@ -816,8 +816,10 @@ function loadReport(index){
   const r = list[index];
   if(!r) return;
 
+  const elementCounts = analyzeElements(r.pillars);
+
   document.getElementById("analysisBox").innerHTML =
-    generateFullReport(r.name, r.pillars, {}, r.scores);
+    generateFullReport(r.name, r.pillars, elementCounts, r.scores);
 }
 
 // 전역 노출 (HTML에서 onclick 쓰는 버튼이 있으면 필요)
