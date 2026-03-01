@@ -282,7 +282,8 @@ function calculateSaju(){
   const name = localStorage.getItem("name") || "회원";
   const birth = normalizeBirthYMD(localStorage.getItem("birth"));
   const hour = parseInt(document.getElementById("birthHour").value, 10);
-
+// ✅ 출생시간 저장
+localStorage.setItem("birthHour", hour);
   if(!birth){
     alert("로그인이 필요합니다. (생년월일 정보가 없습니다)");
     return;
