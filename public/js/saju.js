@@ -5,38 +5,21 @@ function parseYmdLocal(ymd){
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(ymd || "").trim());
   if(!m) return null;
   const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
-  return new Date(y, mo - 1, d);
+  return new Date(y, mo - 1, d); // 로컬 타임존 기준 (한국이면 KST)
 }
 
 // ✅ birth 값 정규화: YYYY-MM-DD면 그대로, ISO면 앞 10자리만 (UTC 파싱 금지)
-
 function normalizeBirthYMD(v){
   if(!v) return "";
-  const m = String(v).match(/^(\d{4}-\d{2}-\d{2})/);
+  const s = String(v).trim();
+  const m = s.match(/^(\d{4}-\d{2}-\d{2})/);
   return m ? m[1] : "";
 }
-  // ISO/기타 문자열이면 앞 10자리(YYYY-MM-DD)만 추출
-  const m = s.match(/^(\d{4}-\d{2}-\d{2})/);
-  if(m && m[1]) return m[1];
 
-  return "";
-}
-
-function parseLocalYMD(ymd){
-  if(!ymd) return null;
-
-  // ISO(Z)면 먼저 yyyy-mm-dd로 정규화
-  if(String(ymd).includes("T")) {
-    const d = new Date(ymd);
-    if(Number.isNaN(d.getTime())) return null;
-    ymd = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-  }
-
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(ymd);
-  if(!m) return null;
-
-  const y = Number(m[1]), mo = Number(m[2]), da = Number(m[3]);
-  return new Date(y, mo-1, da); // ✅ 로컬 기준 생성 (UTC 밀림 방지)
+// (선택) parseLocalYMD는 parseYmdLocal로 통일
+function parseLocalYMD(v){
+  const ymd = normalizeBirthYMD(v);
+  return ymd ? parseYmdLocal(ymd) : null;
 }
 
 // ===============================
