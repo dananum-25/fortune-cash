@@ -1,3 +1,8 @@
+import {
+  getDayPillar,
+  getHourPillar,
+  parseYMDLocalNoon
+} from "./saju.core.js";
 // /js/saju.js
 // fortune-cash - saju page engine (clean + fixed)
 // - Local date parsing (UTC 밀림 방지)
