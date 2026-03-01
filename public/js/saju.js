@@ -9,13 +9,12 @@ function parseYmdLocal(ymd){
 }
 
 // ✅ birth 값 정규화: YYYY-MM-DD면 그대로, ISO면 앞 10자리만 (UTC 파싱 금지)
+
 function normalizeBirthYMD(v){
   if(!v) return "";
-  const s = String(v).trim();
-
-  // 이미 YYYY-MM-DD면 그대로
-  if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
-
+  const m = String(v).match(/^(\d{4}-\d{2}-\d{2})/);
+  return m ? m[1] : "";
+}
   // ISO/기타 문자열이면 앞 10자리(YYYY-MM-DD)만 추출
   const m = s.match(/^(\d{4}-\d{2}-\d{2})/);
   if(m && m[1]) return m[1];
