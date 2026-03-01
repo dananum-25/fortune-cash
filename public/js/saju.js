@@ -818,7 +818,7 @@ function loadReport(index){
   const r = list[index];
   if(!r) return;
 
-  const elementCounts = analyzeElements(r.pillars);
+  const elementCounts = r.elementCounts || analyzeElements(r.pillars);
 
   document.getElementById("analysisBox").innerHTML =
     generateFullReport(r.name, r.pillars, elementCounts, r.scores);
