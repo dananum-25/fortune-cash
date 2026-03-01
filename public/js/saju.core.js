@@ -70,3 +70,8 @@ export function getHourPillar(dayPillar, hour){
 
   return heavenly[hourStemIndex] + hourBranch;
 }
+window.SajuCore = {
+  getDayPillar,
+  getHourPillar,
+  parseYMDLocalNoon
+};
