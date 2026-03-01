@@ -200,7 +200,16 @@ async function handleSubmitLogin(){
   const name = (nameEl?.value || "").trim();
   const phone = normalizePhone((phoneEl?.value || "").trim());
 
-  const birthInput = toKoreanYMD((birthEl?.value || "").trim()); // 사용자가 입력한 YYYY-MM-DD
+  // ✅ 달력 입력값은 그대로 문자열 유지 (절대 Date로 변환하지 않음)
+const rawBirth = (birthEl?.value || "").trim();
+
+// YYYY-MM-DD 형태만 허용
+if(!/^\d{4}-\d{2}-\d{2}$/.test(rawBirth)){
+  alert("생년월일 형식이 올바르지 않습니다.");
+  return;
+}
+
+const birthInput = rawBirth;  // 절대 new Date() 거치지 않음
   const birthTypeInput = (birthTypeEl?.value || "solar").trim(); // solar | lunar
   const isLeap = !!(isLeapEl && isLeapEl.checked);
 
