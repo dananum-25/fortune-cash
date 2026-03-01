@@ -1,12 +1,13 @@
 // /js/saju.ui.js  (type="module")
 
 import {
-  parseYmdLocal,
+  YEAR_MIN, YEAR_MAX,
   normalizeBirthYMD,
-  toLocalNoon,
-  getYearPillar,
-  getMonthPillar
-} from "./saju.core.js";
+  parseYMDLocalNoon,
+  parseYmdLocal,
+  getYearPillar, getMonthPillar, getDayPillar, getHourPillar,
+  heavenly, earthly
+} from "/js/saju.core.js";
 // /js/saju.js
 // fortune-cash - saju page engine (clean + fixed)
 // - Local date parsing (UTC 밀림 방지)
