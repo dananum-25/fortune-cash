@@ -87,7 +87,6 @@ function renderResult(title, content, type){
 
   renderGuide(type);
 
-  document.getElementById("actionSection").style.display = "none";
   document.getElementById("resultSection").style.display = "block";
 
   if(!rewarded){
