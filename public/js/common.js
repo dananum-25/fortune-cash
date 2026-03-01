@@ -65,3 +65,36 @@ const Common = (() => {
   return { getPoint, setPoint, addPoint, renderPoint, shareAndReward, goHome };
 })();
 window.Common = Common;
+
+// ✅ 공통: "나의 기본 정보" 카드 렌더
+Common.renderMyInfo = function(targetId = "myInfoBox"){
+  const box = document.getElementById(targetId);
+  if(!box) return;
+
+  const name  = localStorage.getItem("name") || "회원";
+  const birth = localStorage.getItem("birth_input") || localStorage.getItem("birth") || "";
+  // 사주 페이지에서 시간 저장 키가 다를 수 있어서 여러 후보로 읽음
+  const hour =
+    localStorage.getItem("birthHour") ||
+    localStorage.getItem("hour") ||
+    localStorage.getItem("saju_hour") ||
+    "";
+
+  // 로그인 안 했으면 안내만
+  const phone = localStorage.getItem("phone");
+  if(!phone){
+    box.innerHTML = `
+      <h2>📜 나의 기본 정보</h2>
+      <p class="small">로그인 후 자동으로 표시됩니다.</p>
+      <button class="btn" onclick="openLoginModal?.()">로그인/가입</button>
+    `;
+    return;
+  }
+
+  box.innerHTML = `
+    <h2>📜 나의 기본 정보</h2>
+    <p><strong>${name}</strong></p>
+    ${birth ? `<p>생년월일: ${birth}</p>` : `<p class="small">생년월일 정보가 없습니다.</p>`}
+    ${hour !== "" ? `<p>출생시간: ${hour}시</p>` : `<p class="small">출생시간: 미입력</p>`}
+  `;
+};
