@@ -334,13 +334,21 @@ async function handleSubmitLogin(){
     // ✅ 로컬 저장도 solar 기준으로 통일 (사주/다른 페이지에서 UTC/음력 문제 예방)
     localStorage.setItem("name", name);
     localStorage.setItem("phone", phone);
-    localStorage.setItem("birth", toKoreanYMD(solarBirth));
-    localStorage.setItem("birthType", "solar"); // 앱 전체 기준
+    localStorage.setItem("birth", solarBirth);
+localStorage.setItem("birthType", "solar");
 
-    // ✅ 사용자 입력 원본도 보관(표시용)
-    localStorage.setItem("birth_input", birthInput);
-    localStorage.setItem("birth_input_type", birthTypeInput); // solar|lunar
-    localStorage.setItem("birth_input_isLeap", isLeap ? "1" : "0");
+localStorage.setItem("birth_input", birthInput);
+localStorage.setItem("birth_input_type", birthTypeInput);
+localStorage.setItem("birth_input_isLeap", isLeap ? "1" : "0");
+
+// ✅ 안전장치: "양력 입력"인데 저장된 birth가 다르면 입력값으로 복구
+if(birthTypeInput === "solar"){
+  const saved = localStorage.getItem("birth");
+  if(saved && saved !== birthInput){
+    console.warn("[fixBirthShift] corrected birth:", saved, "->", birthInput);
+    localStorage.setItem("birth", birthInput);
+  }
+}
 
     if(zodiac) localStorage.setItem("zodiac", zodiac);
     if(gapja)  localStorage.setItem("gapja", gapja);
