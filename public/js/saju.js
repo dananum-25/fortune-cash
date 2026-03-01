@@ -23,9 +23,6 @@ function normalizeBirthYMD(v){
   return "";
 }
 
-  // 이미 YYYY-MM-DD면 그대로
-  if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
-
   // ISO 형태면 로컬 기준으로 YYYY-MM-DD로 변환
   const d = new Date(s);
   if(Number.isNaN(d.getTime())) return "";
