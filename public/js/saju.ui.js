@@ -748,7 +748,7 @@ function calculateSaju(){
   // ✅ 검증 통과 후 저장
   localStorage.setItem("birthHour", String(hour));
 
-  const birthDate = parseYmdLocal(birth);
+  const birthDate = parseYMDLocalNoon(birth);
   if(!birthDate){
     alert("생년월일 형식이 이상합니다. 다시 로그인/저장 후 시도해주세요.");
     return;
@@ -758,8 +758,8 @@ function calculateSaju(){
 
   const yearPillar  = getYearPillar(year);
   const monthPillar = getMonthPillar(birthDate);
-  const dayPillar  = getDayPillar(birth);            // core export
-const hourPillar = getHourPillar(dayPillar, hour); // core export
+  const dayPillar   = getDayPillar(birth);              // ✅ window.SajuCore 제거
+  const hourPillar  = getHourPillar(dayPillar, hour);   // ✅ window.SajuCore 제거
 
   const pillars = [yearPillar, monthPillar, dayPillar, hourPillar];
 
