@@ -1,0 +1,160 @@
+/* /css/period.css
+   saju.html 스타일 톤(다크 + 카드 + 노랑 포인트)로 period.html 맞추기
+*/
+
+:root{
+  --bg:#0f0f10;
+  --panel:#1a1a1a;
+  --panel2:#151515;
+  --text:#ffffff;
+  --muted:rgba(255,255,255,.78);
+  --muted2:rgba(255,255,255,.62);
+  --accent:#ffd56b;
+  --border:rgba(255,255,255,.08);
+  --radius:16px;
+}
+
+/* 전체 배경/폰트 */
+body{
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+}
+
+/* common.css에서 container가 이미 있을 수 있어서 "덮어쓰기"만 최소로 */
+.container{
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 18px;
+}
+
+/* 제목 */
+h1{
+  margin: 8px 0 18px;
+  font-size: 26px;
+  line-height: 1.2;
+  font-weight: 900;
+  color: var(--text);
+}
+h2{
+  margin: 18px 0 10px;
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--accent);
+}
+h3{
+  margin: 18px 0 10px;
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--accent);
+}
+h4{
+  margin: 14px 0 6px;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+  opacity: .95;
+}
+
+p{
+  margin: 10px 0;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+/* 구분선 */
+hr{
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 18px 0;
+}
+
+/* 카드 느낌 섹션 */
+#seoContent,
+#actionSection,
+#resultSection,
+section{
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin: 14px 0;
+  box-shadow: 0 8px 22px rgba(0,0,0,.25);
+}
+
+/* 버튼 영역 */
+#actionSection{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+/* 버튼 공통 */
+button{
+  width: 100%;
+  border: none;
+  background: var(--accent);
+  color: #111;
+  padding: 14px 12px;
+  border-radius: 12px;
+  font-weight: 900;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+button:active{
+  transform: translateY(1px);
+}
+
+button.secondary{
+  background: #2a2a2a;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+/* 결과 박스들 */
+#resultBox, #guideBox{
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  margin-top: 10px;
+}
+
+#resultBox{
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--text);
+}
+
+#guideBox{
+  color: var(--muted2);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* 링크 */
+a{
+  color: var(--accent);
+  text-decoration: none;
+}
+a:visited{ color: var(--accent); }
+a:hover{ text-decoration: underline; }
+
+/* 관련 운세 리스트 */
+#resultSection ul{
+  margin: 10px 0 0;
+  padding-left: 18px;
+}
+#resultSection li{
+  margin: 8px 0;
+  color: var(--muted);
+}
+
+/* pointBox (포인트 카드 느낌) */
+#pointBox{
+  margin: 8px 0 14px;
+}
+
+/* 모바일 입력 UI 안정 */
+*{ -webkit-tap-highlight-color: transparent; }
