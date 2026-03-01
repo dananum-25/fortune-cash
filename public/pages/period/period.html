@@ -125,8 +125,13 @@ li{ margin:8px 0; opacity:.92; }
 
 <hr>
 
-    <!-- ✅ 항상 보이는 홈 버튼 -->
-    <button class="btn btn-ghost" style="margin-top:14px;" onclick="Common.goHome()">홈으로</button>
+  <!-- ✅ 버튼 영역: 이제 결과 봐도 안 사라지게 유지 -->
+  <section id="actionSection" class="card">
+    <div class="btn-row">
+      <button class="btn" onclick="showToday()">오늘 운세</button>
+      <button class="btn" onclick="showTomorrow()">내일 운세</button>
+      <button class="btn" onclick="showYear()">2026 연간운세</button>
+    </div>
   </section>
 
   <!-- ✅ 결과 영역 -->
@@ -134,7 +139,14 @@ li{ margin:8px 0; opacity:.92; }
     <div id="resultBox"></div>
     <div class="hr"></div>
     <div id="guideBox"></div>
+  </section>
 
+  <!-- FAQ도 card로 통일 -->
+  <section class="card">
+    ... FAQ ...
+  </section>
+
+</div>
   <hr>
 
   <h3>관련 운세 더 보기</h3>
@@ -143,8 +155,8 @@ li{ margin:8px 0; opacity:.92; }
     <li><a href="/pages/star/star.html">별자리 운세</a></li>
     <li><a href="/pages/tarot/tarot.html">타로 운세</a></li>
   </ul>
-
-  <button onclick="Common.goHome()">홈으로</button>
+    <!-- ✅ 항상 보이는 홈 버튼 -->
+    <button class="btn btn-ghost" style="margin-top:14px;" onclick="Common.goHome()">홈으로</button>
 </section>
 
 <hr>
