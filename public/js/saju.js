@@ -1,4 +1,4 @@
-// /pages/saju/saju.js
+// //js/saju.js
 // (원본 saju.html 인라인 스크립트에서 이전 + 필수 버그 수정 포함)
 // ✅ YYYY-MM-DD 는 무조건 로컬(Date(y,m,d))로 파싱 (UTC 밀림 방지)
 function parseYmdLocal(ymd){
