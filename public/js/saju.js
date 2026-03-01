@@ -287,7 +287,7 @@ function calculateSaju(){
     return;
   }
 
-  const birthDate = parseYmdKST(birth);
+  const birthDate = parseYmdLocal(birth);
   if(!birthDate){
     alert("생년월일 형식이 이상합니다. 다시 로그인/저장 후 시도해주세요.");
     return;
