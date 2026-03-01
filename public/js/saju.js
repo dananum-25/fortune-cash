@@ -839,4 +839,187 @@ document.addEventListener("DOMContentLoaded", () => {
   // debug.style.cssText="background:#300;padding:10px;margin-top:10px;font-size:12px;";
   // debug.innerHTML = "birth raw: " + birthRaw + "<br>birth normalized: " + birth;
   // document.body.appendChild(debug);
+// =========================================
+// EXPERT SAJU ENGINE (B)
+// - Hidden stems (지장간)
+// - Season weight (월령)
+// - Rooting (통근)
+// - DM strength (신강/신약)
+// - Yongshin heuristic (용신/희신) 1차 자동 추정
+// =========================================
+
+// 1) 오행 매핑 (천간/지지 기본)
+const STEM_ELEMENT = {
+  "갑":"목","을":"목",
+  "병":"화","정":"화",
+  "무":"토","기":"토",
+  "경":"금","신":"금",
+  "임":"수","계":"수",
+};
+
+const BRANCH_ELEMENT = {
+  "자":"수","축":"토","인":"목","묘":"목","진":"토","사":"화",
+  "오":"화","미":"토","신":"금","유":"금","술":"토","해":"수"
+};
+
+// 2) 지장간(藏干) 테이블 (전문가 필수)
+// (표준 지장간)
+const HIDDEN_STEMS = {
+  "자":["계"],
+  "축":["기","계","신"],
+  "인":["갑","병","무"],
+  "묘":["을"],
+  "진":["무","을","계"],
+  "사":["병","무","경"],
+  "오":["정","기"],
+  "미":["기","정","을"],
+  "신":["경","임","무"],
+  "유":["신"],
+  "술":["무","신","정"],
+  "해":["임","갑"],
+};
+
+// 3) 월령(계절) 가중치: "월지" 기준으로 일간을 얼마나 도와주는가
+// - 여기서부터가 “카운트”가 아닌 명리학.
+// - 정답 하나가 있는 건 아니라, 실전에서는 여러 파를 쓰는데
+//   서비스용으로는 “표준적인 가중치”로 시작하면 됨.
+const SEASON_WEIGHT = {
+  // 봄(寅卯辰): 목 왕
+  "인": { "목": 1.35, "화": 1.10, "수": 1.05, "금": 0.75, "토": 0.95 },
+  "묘": { "목": 1.40, "화": 1.10, "수": 1.00, "금": 0.70, "토": 0.95 },
+  "진": { "목": 1.15, "화": 1.05, "수": 1.00, "금": 0.85, "토": 1.10 },
+
+  // 여름(巳午未): 화 왕
+  "사": { "화": 1.35, "토": 1.15, "목": 1.05, "수": 0.70, "금": 0.85 },
+  "오": { "화": 1.45, "토": 1.15, "목": 1.00, "수": 0.65, "금": 0.80 },
+  "미": { "화": 1.15, "토": 1.25, "목": 1.00, "수": 0.75, "금": 0.90 },
+
+  // 가을(申酉戌): 금 왕
+  "신": { "금": 1.35, "수": 1.10, "토": 1.05, "화": 0.80, "목": 0.80 },
+  "유": { "금": 1.45, "수": 1.05, "토": 1.00, "화": 0.75, "목": 0.75 },
+  "술": { "금": 1.10, "토": 1.25, "화": 1.00, "수": 0.90, "목": 0.85 },
+
+  // 겨울(亥子丑): 수 왕
+  "해": { "수": 1.35, "목": 1.10, "금": 1.00, "화": 0.75, "토": 0.85 },
+  "자": { "수": 1.45, "목": 1.05, "금": 1.00, "화": 0.70, "토": 0.80 },
+  "축": { "수": 1.10, "토": 1.25, "금": 1.05, "화": 0.80, "목": 0.85 },
+};
+
+// 4) 통근(근 찾기): 일간이 지지(특히 월지/일지/시지)에 뿌리가 있냐
+function hasRoot(dayStem, branches){
+  const dmEl = STEM_ELEMENT[dayStem];
+  if(!dmEl) return false;
+
+  // 뿌리의 정의(서비스용 단순화):
+  // 지장간에 일간과 같은 오행 천간이 있으면 통근으로 본다.
+  for(const br of branches){
+    const hidden = HIDDEN_STEMS[br] || [];
+    for(const hs of hidden){
+      if(STEM_ELEMENT[hs] === dmEl) return true;
+    }
+  }
+  return false;
+}
+
+// 5) 신강/신약 점수 계산
+// - 입력: 4기둥(연/월/일/시) 천간/지지
+// - 출력: strengthScore + 판정 + 요소별 기여도
+function calcDayMasterStrength(pillars){
+  // pillars: [{stem:"갑", branch:"자"}, ...] 4개
+  const dayStem = pillars[2].stem;         // 일간
+  const monthBranch = pillars[1].branch;   // 월지
+  const dmEl = STEM_ELEMENT[dayStem];
+
+  const season = SEASON_WEIGHT[monthBranch] || {};
+  const seasonMul = season[dmEl] || 1.0;
+
+  // 기본 점수 50에서 시작 (중화 근처)
+  let score = 50;
+
+  // (a) 월령 가중치: 일간이 계절에 힘을 받으면 +, 불리하면 -
+  // 1.0을 기준으로 편차를 점수로
+  score += (seasonMul - 1.0) * 30; // 1.35면 +10.5점 정도
+
+  // (b) 통근
+  const branches = pillars.map(p=>p.branch);
+  if(hasRoot(dayStem, branches)) score += 10;
+
+  // (c) 일간 도와주는 오행(인성=생, 비겁=동일) / 누르는 오행(관살=극, 식상=설)
+  // 서비스용으로 “오행 관계”로 근사
+  const SUPPORT = { // dmEl 기준으로 도움되는 오행(같음/생해줌)
+    "목": ["목","수"],
+    "화": ["화","목"],
+    "토": ["토","화"],
+    "금": ["금","토"],
+    "수": ["수","금"],
+  };
+  const DRAIN = { // dmEl 기준으로 소모/압박(설기/극)
+    "목": ["화","금"],
+    "화": ["토","수"],
+    "토": ["금","목"],
+    "금": ["수","화"],
+    "수": ["목","토"],
+  };
+
+  // 천간/지지(지지의 오행)에서 가점/감점
+  let supportCnt = 0;
+  let drainCnt = 0;
+
+  for(const p of pillars){
+    const se = STEM_ELEMENT[p.stem];
+    const be = BRANCH_ELEMENT[p.branch];
+
+    if(SUPPORT[dmEl].includes(se)) supportCnt++;
+    if(SUPPORT[dmEl].includes(be)) supportCnt++;
+
+    if(DRAIN[dmEl].includes(se)) drainCnt++;
+    if(DRAIN[dmEl].includes(be)) drainCnt++;
+  }
+
+  score += supportCnt * 2.5; // 도움 요소는 조금씩 누적
+  score -= drainCnt * 2.5;
+
+  // 정규화
+  if(score > 95) score = 95;
+  if(score < 5) score = 5;
+
+  let verdict = "중화";
+  if(score >= 65) verdict = "신강";
+  else if(score <= 35) verdict = "신약";
+
+  return {
+    dayStem,
+    dmEl,
+    monthBranch,
+    seasonMul,
+    hasRoot: hasRoot(dayStem, branches),
+    supportCnt,
+    drainCnt,
+    score: Math.round(score),
+    verdict
+  };
+}
+
+// 6) 용신/희신(1차 자동 추정, 서비스형)
+// - 신강: 설기(식상) + 극제(재/관) 쪽을 선호
+// - 신약: 생조(인성) + 비겁 쪽을 선호
+function pickYongShin(dmEl, verdict){
+  // 오행 관계(생/극)
+  const PRODUCE = { "목":"화","화":"토","토":"금","금":"수","수":"목" };
+  const PRODUCED_BY = { "목":"수","화":"목","토":"화","금":"토","수":"금" };
+  const CONTROL = { "목":"토","화":"금","토":"수","금":"목","수":"화" }; // 내가 극하는 것(재)
+  const CONTROLLED_BY = { "목":"금","화":"수","토":"목","금":"화","수":"토" }; // 나를 극하는 것(관)
+
+  if(verdict === "신약"){
+    // 나를 생해주는 오행 + 나와 같은 오행
+    return { yong: PRODUCED_BY[dmEl], hee: dmEl };
+  }
+  if(verdict === "신강"){
+    // 내가 생하는 오행(식상) + 나를 극하는 오행(관) (상황에 따라 바뀌지만 서비스용으로 1차)
+    return { yong: PRODUCE[dmEl], hee: CONTROLLED_BY[dmEl] };
+  }
+  // 중화
+  return { yong: PRODUCE[dmEl], hee: PRODUCED_BY[dmEl] };
+}
+
 });
