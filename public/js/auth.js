@@ -110,7 +110,16 @@ async function syncUserFromServer(){
       localStorage.setItem("name", String(res.name || ""));
 
       // 서버에는 solarBirth가 저장될 예정이라 여기서도 그대로 저장
-      const birthYMD = toKoreanYMD(res.birth);
+      let birthYMD = "";
+
+if(typeof res.birth === "string"){
+  const m = res.birth.match(/^(\d{4}-\d{2}-\d{2})/);
+  if(m) birthYMD = m[1];
+}
+
+if(birthYMD){
+  localStorage.setItem("birth", birthYMD);
+}
       if(birthYMD) localStorage.setItem("birth", birthYMD);
 
       // 서버는 birthType=solar로 통일할 것 (아래 register 참고)
