@@ -38,9 +38,14 @@ function getYearPillar(year){
   return heavenly[normalized % 10] + earthly[normalized % 12];
 }
 
+function toLocalNoon(d){
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0);
+}
+
 function getDayPillar(date){
-  const baseDate = new Date(1900,0,1); // 1900-01-01 갑자일 (앵커)
-  const diff = Math.floor((date - baseDate) / (1000*60*60*24));
+  const baseDate = new Date(1900,0,1,12,0,0);   // 기준일도 정오로
+  const target = toLocalNoon(date);             // 입력일도 정오로
+  const diff = Math.floor((target - baseDate) / (1000*60*60*24));
   const normalized = (diff % 60 + 60) % 60;
   return heavenly[normalized % 10] + earthly[normalized % 12];
 }
