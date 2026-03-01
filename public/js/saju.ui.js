@@ -846,8 +846,8 @@ function calculateSaju(){
 
   const yearPillar  = getYearPillar(year);
   const monthPillar = getMonthPillar(birthDate);
-  const dayPillar = getDayPillar(birth);  // birth는 YYYY-MM-DD 문자열
-const hourPillar = getHourPillar(dayPillar, hour);
+  const dayPillar = window.SajuCore.getDayPillar(birth);
+const hourPillar = window.SajuCore.getHourPillar(dayPillar, hour);
   const hourPillar  = getHourPillar(dayPillar, hour);
 
   const pillars = [yearPillar, monthPillar, dayPillar, hourPillar];
