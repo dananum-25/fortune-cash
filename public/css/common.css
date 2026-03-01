@@ -1,0 +1,102 @@
+/* /css/common.css */
+
+:root{
+  --bg:#111;
+  --card:#1a1a1a;
+  --card2:#151515;
+  --text:#fff;
+  --muted:rgba(255,255,255,.75);
+  --accent:#ffd56b;
+  --line:#222;
+}
+
+body{ margin:0; background:var(--bg); color:var(--text); font-family:Arial; }
+.wrap{ max-width:820px; margin:auto; padding:20px; }
+.container{ max-width:820px; margin:auto; padding:20px; } /* 기존 period.html 호환 */
+
+.card{ background:var(--card); border-radius:16px; padding:18px; margin:16px 0; }
+.cardTitle{ font-weight:700; }
+
+h1{ font-size:26px; margin:0 0 10px; color:var(--accent); }
+h2{ margin:18px 0 10px; }
+h3{ margin:14px 0 8px; }
+p{ line-height:1.8; margin:8px 0; color:rgba(255,255,255,.92); }
+
+.small{ font-size:12px; opacity:.8; }
+.hr{ height:1px; background:var(--line); margin:14px 0; }
+a{ color:var(--accent); text-decoration:none; }
+
+.badge{
+  display:inline-block;
+  background:#222;
+  color:var(--accent);
+  padding:6px 10px;
+  border-radius:12px;
+  margin:4px 6px 4px 0;
+}
+
+/* inputs */
+input, select{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #1f1f1f;
+  margin-top:8px;
+  background:#0f0f0f;
+  color:#fff;
+  box-sizing:border-box;
+  outline:none;
+}
+
+/* buttons */
+.btn{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  background:var(--accent);
+  font-weight:bold;
+  margin-top:10px;
+  cursor:pointer;
+  color:#111;
+}
+.btn:active{ transform:translateY(1px); }
+
+.btn-row{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap:10px;
+}
+
+@media (min-width: 520px){
+  .btn-row{
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+.btn-ghost{
+  background:#2a2a2a;
+  color:#fff;
+}
+
+.section-title{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.kv{
+  display:grid;
+  grid-template-columns: 110px 1fr;
+  gap:8px 10px;
+  margin-top:8px;
+}
+.kv .k{ opacity:.75; }
+.kv .v{ font-weight:700; }
+
+@media print{
+  body{ background:#fff !important; color:#000 !important; }
+  .no-print{ display:none !important; }
+  a{ color:#000 !important; text-decoration:none !important; }
+  .card{ box-shadow:none !important; border:1px solid #ddd !important; }
+}
