@@ -105,4 +105,14 @@ footer{
     z-index: 9999;
     white-space: nowrap;
   }
+  /* 공통 버튼 변형 */
+.btn-dark{
+  background:#2a2a2a;
+  color:#fff;
+}
+
+.btn-gray{
+  background:#444;
+  color:#fff;
+}
 }
