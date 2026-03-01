@@ -381,14 +381,16 @@ function calculateSaju(){
 
   document.getElementById("analysisBox").innerHTML = analysis;
 
-  saveReport({
-    name,
-    birth,
-    hour,
-    pillars,
-    scores,
-    createdAt: new Date().toISOString()
-  });
+// calculateSaju() 안 saveReport 호출부를 이렇게 변경
+saveReport({
+  name,
+  birth,
+  hour,
+  pillars,
+  elementCounts: elementResult,   // ✅ 추가
+  scores,
+  createdAt: new Date().toISOString()
+});
 
   setupPdfButtons(name, pillars, scores);
 
