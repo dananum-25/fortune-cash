@@ -13,15 +13,18 @@ function normalizePhone(phone){
 }
 
 // ✅ YYYY-MM-DD 문자열 유지(UTC 파싱 금지)
+
 function toKoreanYMD(v){
   if(!v) return "";
   const s = String(v).trim();
 
-  if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  // YYYY-MM-DD
+  let m = s.match(/^(\d{4}-\d{2}-\d{2})/);
+  if(m) return m[1];
 
-  // 혹시 "2026-02-17T..." 들어오면 앞 10자리만
-  const m = s.match(/^(\d{4}-\d{2}-\d{2})/);
-  if(m && m[1]) return m[1];
+  // YYYY/MM/DD → YYYY-MM-DD로 변환
+  m = s.match(/^(\d{4})\/(\d{2})\/(\d{2})/);
+  if(m) return `${m[1]}-${m[2]}-${m[3]}`;
 
   return "";
 }
@@ -331,7 +334,7 @@ async function handleSubmitLogin(){
     // ✅ 로컬 저장도 solar 기준으로 통일 (사주/다른 페이지에서 UTC/음력 문제 예방)
     localStorage.setItem("name", name);
     localStorage.setItem("phone", phone);
-    localStorage.setItem("birth", solarBirth);
+    localStorage.setItem("birth", toKoreanYMD(solarBirth));
     localStorage.setItem("birthType", "solar"); // 앱 전체 기준
 
     // ✅ 사용자 입력 원본도 보관(표시용)
