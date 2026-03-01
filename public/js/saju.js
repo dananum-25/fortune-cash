@@ -44,16 +44,6 @@ function getYearPillar(year){
   return heavenly[n % 10] + earthly[n % 12];
 }
 
-// ⚠️ 주의: 이 "일주 앵커"는 서비스용 간이 버전.
-// 실제 만세력과 100% 일치 보장하려면 천문/역법 기반 DB 필요.
-function getDayPillar(date){
-  const baseDate = new Date(1900, 0, 1, 12, 0, 0); // 기준일도 정오
-  const target = toLocalNoon(date);               // 입력일도 정오
-  const diffDays = Math.floor((target - baseDate) / (1000*60*60*24));
-  const n = (diffDays % 60 + 60) % 60;
-  return heavenly[n % 10] + earthly[n % 12];
-}
-
 // ===============================
 // 3) Month pillar (절기 간이)
 // ===============================
