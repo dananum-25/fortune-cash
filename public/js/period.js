@@ -122,12 +122,17 @@ function showYear(){
 document.addEventListener("DOMContentLoaded", async ()=>{
   await loadDB();
 
-  if(window.loadMyPoint){
-    await window.loadMyPoint();
+  // ✅ 나의 기본 정보 카드
+  if(window.Common?.renderMyInfo){
+    Common.renderMyInfo("myInfoBox");
   }
 
+  // ✅ 포인트
+  if(window.loadMyPoint){
+    await loadMyPoint();
+  }
   if(window.Common?.renderPoint){
-    window.Common.renderPoint();
+    Common.renderPoint();
   }
 });
 
