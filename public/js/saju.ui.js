@@ -711,12 +711,36 @@ function calcDayMasterStrength(pillarsObj){
     verdict
   };
 }
+// ===============================
+// 10-4) 격국 추정
+// ===============================
+function estimateStructure(pillarsObj){
+  const monthBranch = pillarsObj[1].branch;
+  const dayStem = pillarsObj[2].stem;
+  const dmEl = STEM_ELEMENT[dayStem];
 
+  const monthEl = BRANCH_ELEMENT[monthBranch];
+
+  if(dmEl === monthEl){
+    return "건록격(월령득지)";
+  }
+
+  if(
+    (dmEl === "화" && monthEl === "목") ||
+    (dmEl === "목" && monthEl === "수") ||
+    (dmEl === "금" && monthEl === "토") ||
+    (dmEl === "수" && monthEl === "금")
+  ){
+    return "통근·생조격";
+  }
+
+  return "평격(특수격 아님)";
+}
 function pickYongShin(dmEl, verdict){
   const PRODUCE = { "목":"화","화":"토","토":"금","금":"수","수":"목" };
   const PRODUCED_BY = { "목":"수","화":"목","토":"화","금":"토","수":"금" };
   const CONTROLLED_BY = { "목":"금","화":"수","토":"목","금":"화","수":"토" };
-
+  
   if(verdict === "신약"){
     return { yong: PRODUCED_BY[dmEl], hee: dmEl };
   }
@@ -735,7 +759,8 @@ function calculateSaju(){
 
   const hourEl = document.getElementById("birthHour");
   const hour = parseInt(hourEl?.value, 10);
-
+  
+  
   if(!birth){
     alert("로그인이 필요합니다. (생년월일 정보가 없습니다)");
     return;
@@ -800,6 +825,8 @@ function calculateSaju(){
   const pillarsObj = pillars.map(p => ({ stem: p[0], branch: p[1] }));
   const st = calcDayMasterStrength(pillarsObj);
   const ys = pickYongShin(st.dmEl, st.verdict);
+  const structure = estimateStructure(pillarsObj);
+  const climate = analyzeClimate(pillarsObj);
 
   const expertHtml = `
     <div class="card">
@@ -812,6 +839,8 @@ function calculateSaju(){
         / 생조 ${st.supportCnt} / 설·극 ${st.drainCnt}
       </p>
       <p><b>용신:</b> ${ys.yong} / <b>희신:</b> ${ys.hee}</p>
+      <p><b>격국 추정:</b> ${structure}</p>
+      <p><b>조후 분석:</b> ${climate}</p>
       <p class="small">※ 서비스 자동 추정(1차)입니다. 실제 용신은 격국/용희/조후 등으로 추가 정밀화 가능합니다.</p>
     </div>
   `;
@@ -859,7 +888,22 @@ function calculateSaju(){
     });
   }, 200);
 }
+function analyzeClimate(pillarsObj){
+  const monthBranch = pillarsObj[1].branch;
 
+  const coldMonths = ["해","자","축"];
+  const hotMonths = ["사","오","미"];
+
+  if(coldMonths.includes(monthBranch)){
+    return "한기 존재 → 화(火) 필요";
+  }
+
+  if(hotMonths.includes(monthBranch)){
+    return "열기 강 → 수(水) 필요";
+  }
+
+  return "한열 균형";
+}
 // ===============================
 // 12) Globals for safety (if HTML uses onclick anywhere)
 // ===============================
