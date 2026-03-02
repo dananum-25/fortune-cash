@@ -256,8 +256,8 @@ function generateScoreGraph(scores){
   `;
 }
 
-function generateMonthlyGraph(scores){
-  return generateMonthlyGraphAll(scores);
+function generateMonthlyGraph(scores, rand){
+  return generateMonthlyGraphAll(scores, rand);
 }
 
 function generateMonthlyGraphAll(scores){
