@@ -966,7 +966,7 @@ const expertHtml = `
   const scores = calculateFortuneScores(elementResult, currentDaewoon);
   analysis += generateScoreGraph(scores);
   analysis += generateScoreInterpretation(scores);
-  analysis += generateMonthlyGraph(scores);
+  analysis += generateMonthlyGraph(scores, rand);
   analysis += generateYearSummary(scores);
   analysis += generateFullReport(name, pillars, elementResult, scores);
 
