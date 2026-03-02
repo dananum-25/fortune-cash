@@ -595,7 +595,51 @@ const STEM_ELEMENT = {
   "경":"금","신":"금",
   "임":"수","계":"수",
 };
+// ===============================
+// 10-x) 십성(10 Gods) 계산
+// ===============================
 
+// 오행 생/극
+const PRODUCE = { "목":"화","화":"토","토":"금","금":"수","수":"목" };
+const PRODUCED_BY = { "목":"수","화":"목","토":"화","금":"토","수":"금" };
+const CONTROL = { "목":"토","토":"수","수":"화","화":"금","금":"목" };       // 내가 극함(재)
+const CONTROLLED_BY = { "목":"금","금":"화","화":"수","수":"토","토":"목" }; // 나를 극함(관)
+
+// 음양 (갑/병/무/경/임 = 양, 을/정/기/신/계 = 음)
+const YINYANG = {
+  "갑":"양","을":"음","병":"양","정":"음","무":"양","기":"음","경":"양","신":"음","임":"양","계":"음"
+};
+
+function tenGod(dmStem, otherStem){
+  const dmEl = STEM_ELEMENT[dmStem];
+  const otEl = STEM_ELEMENT[otherStem];
+  if(!dmEl || !otEl) return "";
+
+  const samePol = (YINYANG[dmStem] === YINYANG[otherStem]);
+
+  // 비견/겁재
+  if(dmEl === otEl) return samePol ? "비견" : "겁재";
+
+  // 인성 (나를 생)
+  if(PRODUCED_BY[dmEl] === otEl) return samePol ? "편인" : "정인";
+
+  // 식상 (내가 생)
+  if(PRODUCE[dmEl] === otEl) return samePol ? "식신" : "상관";
+
+  // 재성 (내가 극)
+  if(CONTROL[dmEl] === otEl) return samePol ? "편재" : "정재";
+
+  // 관성 (나를 극)
+  if(CONTROLLED_BY[dmEl] === otEl) return samePol ? "편관" : "정관";
+
+  return "";
+}
+
+// 지장간 십성 요약
+function hiddenTenGods(dmStem, branch){
+  const hs = HIDDEN_STEMS[branch] || [];
+  return hs.map(s => `${s}(${tenGod(dmStem, s)})`);
+}
 const BRANCH_ELEMENT = {
   "자":"수","축":"토","인":"목","묘":"목","진":"토","사":"화",
   "오":"화","미":"토","신":"금","유":"금","술":"토","해":"수"
@@ -837,22 +881,51 @@ function calculateSaju(){
   const structure = estimateStructure(pillarsObj);
   const climate = analyzeClimate(pillarsObj);
 
-  const expertHtml = `
-    <div class="card">
-      <h2>🧠 명리학 전문가 분석</h2>
-      <p><b>일간(내 오행):</b> ${st.dayStem} (${st.dmEl})</p>
-      <p><b>신강/신약:</b> ${st.verdict} (점수 ${st.score})</p>
-      <p class="small">
-        월지 ${st.monthBranch} / 월령가중치 ${st.seasonMul.toFixed(2)}
-        / 통근 ${st.hasRoot ? "있음" : "없음"}
-        / 생조 ${st.supportCnt} / 설·극 ${st.drainCnt}
-      </p>
-      <p><b>용신:</b> ${ys.yong} / <b>희신:</b> ${ys.hee}</p>
-      <p><b>격국 추정:</b> ${structure}</p>
-      <p><b>조후 분석:</b> ${climate}</p>
-      <p class="small">※ 서비스 자동 추정(1차)입니다. 실제 용신은 격국/용희/조후 등으로 추가 정밀화 가능합니다.</p>
-    </div>
-  `;
+  const dmStem = st.dayStem;
+
+// 천간 십성(연/월/시 기준)
+const tgYear = tenGod(dmStem, pillarsObj[0].stem);
+const tgMonth = tenGod(dmStem, pillarsObj[1].stem);
+const tgHour = tenGod(dmStem, pillarsObj[3].stem);
+
+// 지지 지장간 십성(연/월/일/시)
+const hYear = hiddenTenGods(dmStem, pillarsObj[0].branch).join(", ");
+const hMonth = hiddenTenGods(dmStem, pillarsObj[1].branch).join(", ");
+const hDay = hiddenTenGods(dmStem, pillarsObj[2].branch).join(", ");
+const hHour = hiddenTenGods(dmStem, pillarsObj[3].branch).join(", ");
+
+const expertHtml = `
+  <div class="card">
+    <h2>🧠 명리학 전문가 분석</h2>
+
+    <h3>① 일간/신강약</h3>
+    <p><b>일간:</b> ${st.dayStem} (${st.dmEl})</p>
+    <p><b>신강/신약:</b> ${st.verdict} (점수 ${st.score})</p>
+    <p class="small">
+      월지 ${st.monthBranch} / 월령가중치 ${st.seasonMul.toFixed(2)}
+      / 통근 ${st.hasRoot ? "있음" : "없음"}
+      / 생조 ${st.supportCnt} / 설·극 ${st.drainCnt}
+    </p>
+
+    <h3>② 십성(천간)</h3>
+    <p>연간 ${pillarsObj[0].stem} = <b>${tgYear}</b> / 월간 ${pillarsObj[1].stem} = <b>${tgMonth}</b> / 시간 ${pillarsObj[3].stem} = <b>${tgHour}</b></p>
+
+    <h3>③ 지장간(지지)</h3>
+    <p class="small">
+      연지 ${pillarsObj[0].branch}: ${hYear}<br/>
+      월지 ${pillarsObj[1].branch}: ${hMonth}<br/>
+      일지 ${pillarsObj[2].branch}: ${hDay}<br/>
+      시지 ${pillarsObj[3].branch}: ${hHour}
+    </p>
+
+    <h3>④ 용희/격국/조후</h3>
+    <p><b>용신:</b> ${ys.yong} / <b>희신:</b> ${ys.hee}</p>
+    <p><b>격국 추정:</b> ${structure}</p>
+    <p><b>조후 분석:</b> ${climate}</p>
+
+    <p class="small">※ 서비스 자동 추정(1차)입니다. 다음 단계에서 절기/격국/조후를 더 정밀화합니다.</p>
+  </div>
+`;
 
   // 종합
   let analysis = "";
