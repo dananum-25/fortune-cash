@@ -1,10 +1,4 @@
-// /js/saju.core.js  (type="module")
-
-// ===============================
-// SAJU CORE ENGINE (1940~2040)
-// - UTC 밀림 방지: 로컬 정오 기준
-// - 기준일 1개 방식 일주 계산
-// ===============================
+// /js/saju.core.js  (ESM only)
 
 export const YEAR_MIN = 1940;
 export const YEAR_MAX = 2040;
@@ -12,18 +6,29 @@ export const YEAR_MAX = 2040;
 export const heavenly = ["갑","을","병","정","무","기","경","신","임","계"];
 export const earthly  = ["자","축","인","묘","진","사","오","미","신","유","술","해"];
 
-// -------------------------------
-// 1) 범위 체크
-// -------------------------------
+// 1) range
 export function assertYearRange(y){
   if(y < YEAR_MIN || y > YEAR_MAX){
     throw new Error(`지원 범위는 ${YEAR_MIN}~${YEAR_MAX}년입니다.`);
   }
 }
 
-// -------------------------------
-// 2) birth 값 정규화
-// -------------------------------
+// 2) YYYY-MM-DD (local)
+export function parseYmdLocal(ymd){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(ymd||"").trim());
+  if(!m) return null;
+  const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
+  assertYearRange(y);
+  return new Date(y, mo-1, d);
+}
+
+// ✅ ui.js가 쓰는 이름 그대로 제공
+export function parseYMDLocalNoon(ymd){
+  const d = parseYmdLocal(ymd);
+  if(!d) return null;
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0);
+}
+
 export function normalizeBirthYMD(v){
   if(!v) return "";
   const s = String(v).trim();
@@ -31,44 +36,20 @@ export function normalizeBirthYMD(v){
   return m ? m[1] : "";
 }
 
-// -------------------------------
-// 3) YYYY-MM-DD → 로컬 정오(Date)
-// -------------------------------
-export function parseYMDLocalNoon(ymd){
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(ymd||"").trim());
-  if(!m) return null;
-
-  const y = +m[1];
-  const mo = +m[2];
-  const d = +m[3];
-
-  assertYearRange(y);
-  return new Date(y, mo-1, d, 12, 0, 0); // ✅ 로컬 정오 고정
-}
-
-// (호환용) 기존 parseYmdLocal을 쓰는 코드가 있으면 이걸로 유지 가능
-export function parseYmdLocal(ymd){
-  // midnight 대신 noon으로 통일해도 됨
-  return parseYMDLocalNoon(ymd);
-}
-
-// -------------------------------
-// 4) 연주 / 월주 (간이)
-// -------------------------------
+// 3) Year pillar
 export function getYearPillar(year){
   assertYearRange(year);
   const baseYear = 1984; // 갑자년
-  const idx = (year - baseYear) % 60;
-  const n = (idx + 60) % 60;
+  const n = ((year - baseYear) % 60 + 60) % 60;
   return heavenly[n % 10] + earthly[n % 12];
 }
 
+// 4) Month pillar (간이)
 export function getMonthBranch(date){
   const month = date.getMonth() + 1;
   const day = date.getDate();
-
   if(month === 1) return "축";
-  if(month === 2) return day < 4 ? "축" : "인"; // 입춘 간이
+  if(month === 2) return day < 4 ? "축" : "인";
   if(month === 3) return "묘";
   if(month === 4) return "진";
   if(month === 5) return "사";
@@ -84,7 +65,6 @@ export function getMonthBranch(date){
 
 export function getMonthPillar(date){
   const monthBranch = getMonthBranch(date);
-
   const year = date.getFullYear();
   assertYearRange(year);
 
@@ -97,26 +77,19 @@ export function getMonthPillar(date){
   return heavenly[monthStemIndex] + monthBranch;
 }
 
-// -------------------------------
-// 5) 일주 (기준일 1개 방식)
-// 기준: 1984-02-02(로컬정오) = 丙寅  → index = 2
-// -------------------------------
+// 5) Day pillar (anchor: 1984-02-02 = 병인, index=2)
 const DAY_BASE_DATE  = new Date(1984, 1, 2, 12, 0, 0);
 const DAY_BASE_INDEX = 2;
 
 export function getDayPillar(ymd){
   const d = parseYMDLocalNoon(ymd);
   if(!d) return "";
-
   const diffDays = Math.floor((d - DAY_BASE_DATE) / 86400000);
   const idx = ((DAY_BASE_INDEX + diffDays) % 60 + 60) % 60;
-
   return heavenly[idx % 10] + earthly[idx % 12];
 }
 
-// -------------------------------
-// 6) 시주
-// -------------------------------
+// 6) Hour pillar
 function getHourBranch(hour){
   return earthly[Math.floor(((hour + 1) % 24) / 2)];
 }
