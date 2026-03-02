@@ -503,6 +503,16 @@ function showSavedReports(){
   html += "</div>";
 
   document.getElementById("analysisBox").innerHTML = html;
+  // ✅ inline onclick 대신, 클릭 이벤트 위임 추가
+document.getElementById("analysisBox").addEventListener("click", (e)=>{
+  const btn = e.target.closest(".btn-load-report");
+  if(!btn) return;
+
+  const i = Number(btn.dataset.index);
+  if(!Number.isFinite(i)) return;
+
+  loadReport(i);
+});
 }
 
 function loadReport(index){
@@ -532,7 +542,7 @@ function generateDaewoon(_startYearPillar, birthYear){
     const branch = earthly[pillarIndex % 12];
     html += `<p><b>${ageStart}세 ~ ${ageStart+9}세</b> : <span class="badge">${stem}${branch}</span></p>`;
   }
-  html += `<p class="small">※ 간이 대운 계산 버전입니다. (절기·순행·역행 미적용)</p>`;
+  html += `<p class="small">※ 참고용 간이 흐름입니다. (절기/순행·역행/대운 시작나이 미적용)</p>`;
   return html;
 }
 
@@ -555,7 +565,7 @@ function analyzeDaewoonVsSeowoon(currentDaewoon){
   const sBranch = seowoon[1];
   const dBranch = currentDaewoon[1];
 
-  let html = "<h3>🔥 현재 대운 × 2026 세운</h3>";
+  let html = "<h3>🔥 (참고) 대운 × 2026 세운</h3>";
 
   if(BRANCH_CLASH[dBranch] === sBranch){
     html += `
