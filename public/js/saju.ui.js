@@ -1,10 +1,8 @@
 // /js/saju.ui.js  (type="module")
 
 import {
-  YEAR_MIN, YEAR_MAX,
   normalizeBirthYMD,
   parseYMDLocalNoon,
-  parseYmdLocal,
   getYearPillar, getMonthPillar, getDayPillar, getHourPillar,
   heavenly, earthly
 } from "/js/saju.core.js";
