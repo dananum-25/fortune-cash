@@ -295,7 +295,7 @@ function generateMonthlyGraphAll(scores, rand){
   function genMonthly(baseScore){
     const arr = [];
     for(let i=0;i<12;i++){
-      const variance = Math.floor(Math.random()*15) - 7;
+      const variance = Math.floor(rand() * 15) - 7;
       let value = baseScore + variance;
       if(value > 95) value = 95;
       if(value < 30) value = 30;
