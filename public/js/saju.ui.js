@@ -260,7 +260,7 @@ function generateMonthlyGraph(scores, rand){
   return generateMonthlyGraphAll(scores, rand);
 }
 
-function generateMonthlyGraphAll(scores){
+function generateMonthlyGraphAll(scores, rand){
   const categories = [
     {key:"wealth", label:"💰 재물운"},
     {key:"love", label:"💖 연애운"},
@@ -946,7 +946,7 @@ const expertHtml = `
     <p><b>격국 추정:</b> ${structure}</p>
     <p><b>조후 분석:</b> ${climate}</p>
 
-    <p class="small">※ 서비스 자동 추정(1차)입니다. 다음 단계에서 절기/격국/조후를 더 정밀화합니다.</p>
+    <p class="small">월주 산출: 현재 간이 절기(입춘 기준) 적용. 다음 업데이트에서 1940~2040 절기 테이블 기반 만세력 방식으로 정밀화됩니다.</p>
   </div>
 `;
 
