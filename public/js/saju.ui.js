@@ -522,17 +522,20 @@ function showSavedReports(){
   });
   html += "</div>";
 
-  document.getElementById("analysisBox").innerHTML = html;
-  // ✅ inline onclick 대신, 클릭 이벤트 위임 추가
-document.getElementById("analysisBox").addEventListener("click", (e)=>{
-  const btn = e.target.closest(".btn-load-report");
-  if(!btn) return;
+  const box = document.getElementById("analysisBox");
+box.innerHTML = html;
 
-  const i = Number(btn.dataset.index);
-  if(!Number.isFinite(i)) return;
+if(!box.dataset.loadBound){
+  box.addEventListener("click", (e)=>{
+    const btn = e.target.closest(".btn-load-report");
+    if(!btn) return;
 
-  loadReport(i);
-});
+    const i = Number(btn.dataset.index);
+    if(!Number.isFinite(i)) return;
+
+    loadReport(i);
+  });
+  box.dataset.loadBound = "1";
 }
 
 function loadReport(index){
