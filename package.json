@@ -1,0 +1,12 @@
+{
+  "name": "fortune-cash",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:solar": "node scripts/build-solar-terms-db.mjs"
+  },
+  "dependencies": {
+    "astronomy-engine": "^2.1.19"
+  }
+}
