@@ -231,19 +231,37 @@ function calculateFortuneScores(elementCounts, currentDaewoon){
 }
 
 function generateScoreInterpretation(scores){
-  function interpret(score){
-    if(score >= 80) return "매우 강한 흐름. 적극적으로 움직이면 성과가 큽니다.";
-    if(score >= 65) return "좋은 흐름. 준비한 만큼 결과가 나옵니다.";
-    if(score >= 50) return "평균 흐름. 무리하지 않는 운영이 중요합니다.";
-    return "주의 필요. 보수적 운영이 유리합니다.";
+  function band(score){
+    if(score >= 80) return { label:"상승 강", tone:"공격적으로 확장해도 되는 구간(단, 리스크 한도는 정해두기)" };
+    if(score >= 65) return { label:"상승", tone:"준비한 만큼 성과가 나는 구간(실행/반복이 핵심)" };
+    if(score >= 50) return { label:"보통", tone:"유지·관리 구간(무리한 베팅보다 최적화가 유리)" };
+    return { label:"주의", tone:"방어 구간(손실 최소화/체력·현금흐름 관리 우선)" };
   }
 
+  const w = band(scores.wealth);
+  const l = band(scores.love);
+  const c = band(scores.career);
+  const h = band(scores.health);
+
   return `
-    <h3>🧠 2026년 종합 해석</h3>
-    <p><b>💰 재물운:</b> ${interpret(scores.wealth)}</p>
-    <p><b>💖 연애운:</b> ${interpret(scores.love)}</p>
-    <p><b>🏢 직장/사업운:</b> ${interpret(scores.career)}</p>
-    <p><b>💪 건강운:</b> ${interpret(scores.health)}</p>
+    <div class="card">
+      <h2>🧠 2026 종합 코멘트</h2>
+
+      <h3>핵심 요약</h3>
+      <p class="small">점수는 ‘방향성/체감’ 참고용입니다. 최종 판단은 현실 조건(돈/시간/관계)에 맞춰 조정하세요.</p>
+
+      <h3>영역별</h3>
+      <p><b>💰 재물운 (${scores.wealth} / ${w.label})</b> — ${w.tone}</p>
+      <p><b>💖 관계운 (${scores.love} / ${l.label})</b> — ${l.tone}</p>
+      <p><b>🏢 커리어운 (${scores.career} / ${c.label})</b> — ${c.tone}</p>
+      <p><b>💪 건강운 (${scores.health} / ${h.label})</b> — ${h.tone}</p>
+
+      <div class="hr"></div>
+      <h3>이번 해 운영법(3줄)</h3>
+      <p>① 좋은 점수 영역은 “실행량”을 늘리고,</p>
+      <p>② 낮은 점수 영역은 “손실 방지 규칙”부터 세우고,</p>
+      <p>③ 월별 변동(그래프)에서 피크/바닥 구간만 전략적으로 쓰면 됩니다.</p>
+    </div>
   `;
 }
 
@@ -366,17 +384,29 @@ function generateMonthlyTextAll(monthlyData){
 
 function generateYearSummary(scores){
   const avg = Math.round((scores.wealth + scores.love + scores.career + scores.health) / 4);
-  let comment = "";
 
-  if(avg >= 80) comment = "🔥 2026년은 인생 흐름이 강하게 상승. 확장과 도전이 성과로 이어질 가능성 큼.";
-  else if(avg >= 65) comment = "✨ 2026년은 안정적 성장 흐름. 준비된 영역에서 결과 가능성 큼.";
-  else if(avg >= 50) comment = "⚖ 2026년은 유지/관리의 해. 큰 모험보다 전략적 운영이 유리.";
-  else comment = "⚠ 2026년은 리스크 관리가 핵심. 보수적 판단과 체력 관리에 집중.";
+  let headline = "";
+  let strategy = "";
+
+  if(avg >= 80){
+    headline = "확장에 유리한 해 — 속도를 성과로 바꾸기 좋습니다.";
+    strategy = "단, 과열/과투자만 피하면 상승폭이 큽니다. ‘한도(시간·돈·체력)’를 먼저 정하고 확장하세요.";
+  } else if(avg >= 65){
+    headline = "안정 성장의 해 — 실행하면 결과가 따라옵니다.";
+    strategy = "가장 강한 영역(점수 높은 것) 1~2개에 집중 투자하고, 나머지는 유지·정리 전략이 효율적입니다.";
+  } else if(avg >= 50){
+    headline = "관리의 해 — 크게 벌기보다 덜 새는 게 이깁니다.";
+    strategy = "루틴/지출/관계의 ‘구멍’을 메우면 체감이 빠르게 좋아집니다. 최적화와 재정비에 강점.";
+  } else{
+    headline = "방어의 해 — 무리한 확장보다 안정이 우선입니다.";
+    strategy = "건강·현금흐름·관계 갈등 같은 리스크부터 줄이면, 하반기에 다시 기회가 들어옵니다.";
+  }
 
   return `
     <div class="card">
-      <h2>📌 2026년 한 줄 총평</h2>
-      <p style="font-size:16px;line-height:1.8;">${comment}</p>
+      <h2>📌 2026 총평</h2>
+      <p style="font-size:16px;line-height:1.8;"><b>${headline}</b></p>
+      <p class="small">${strategy}</p>
     </div>
   `;
 }
@@ -391,37 +421,50 @@ function getTodayString(){
 
 function generateFullReport(name, pillars, elementCounts, scores){
   const strongest = Object.keys(elementCounts).reduce((a,b)=> elementCounts[a] > elementCounts[b] ? a : b);
+  const weakest = Object.keys(elementCounts).reduce((a,b)=> elementCounts[a] < elementCounts[b] ? a : b);
   const avg = Math.round((scores.wealth + scores.love + scores.career + scores.health) / 4);
 
-  let text = `
+  const focus = (()=>{
+    const arr = [
+      {k:"재물", v:scores.wealth},
+      {k:"관계", v:scores.love},
+      {k:"커리어", v:scores.career},
+      {k:"건강", v:scores.health},
+    ].sort((x,y)=>y.v-x.v);
+    return { top: arr[0], low: arr[arr.length-1] };
+  })();
+
+  return `
     <div class="card">
-      <h2>🧾 2026년 AI 종합 리포트</h2>
-      <p style="font-size:12px;opacity:.6;">생성일: ${getTodayString()} | 발행: fortune-cash.vercel.app</p>
+      <h2>🧾 2026 종합 리포트(상세)</h2>
+      <p style="font-size:12px;opacity:.6;">생성일: ${getTodayString()} | fortune-cash.vercel.app</p>
 
-      <p><b>${name}</b>님의 사주 구조는 <b>${pillars.join(" / ")}</b> 흐름으로 구성되어 있습니다.</p>
+      <h3>1) 핵심 요약</h3>
+      <p><b>${name}</b>님의 4기둥: <b>${pillars.join(" / ")}</b></p>
+      <p>오행 분포(참고): <b>${strongest}</b>가 강하고 <b>${weakest}</b>가 약한 편입니다.</p>
+      <p>2026 평균 흐름: <b>${avg}점</b> — ${avg >= 70 ? "상승 구간" : avg >= 50 ? "관리 구간" : "방어 구간"}</p>
 
-      <p>오행 분포(참고) 기준으로 <b>${strongest}</b> 기운이 상대적으로 두드러집니다.</p>
+      <div class="hr"></div>
 
-      <p>2026년은 병오년(丙午)으로 화(火)의 기운이 강하게 작용합니다.
-      평균 운세 점수는 <b>${avg}점</b>이며, ${avg >= 70 ? "상승 기류가 감지되는 해" : "관리 중심 전략이 필요한 해"}입니다.</p>
-  `;
+      <h3>2) 올해의 포커스</h3>
+      <p><b>가장 유리한 영역:</b> ${focus.top.k} (${focus.top.v}점)</p>
+      <p><b>가장 신경쓸 영역:</b> ${focus.low.k} (${focus.low.v}점)</p>
+      <p class="small">전략: 유리한 영역은 실행량↑ / 약한 영역은 규칙·한도 설정으로 손실↓</p>
 
-  if(scores.wealth >= 75) text += `<p>재물운: 확장 가능성이 높습니다. 수익 모델 확장/투자 검토에 적합.</p>`;
-  else if(scores.wealth < 55) text += `<p>재물운: 방어 전략 필요. 현금흐름/지출 통제가 핵심.</p>`;
+      <div class="hr"></div>
 
-  if(scores.love >= 75) text += `<p>연애·관계: 발전 가능성 높음. 적극적 표현이 유리.</p>`;
-  else if(scores.love < 55) text += `<p>연애·관계: 갈등 관리 중요. 감정 기복 조절이 관건.</p>`;
+      <h3>3) 실행 체크리스트(현실용)</h3>
+      <p>• 돈: “월 고정지출 점검 + 지출 상한선”을 먼저 확정</p>
+      <p>• 커리어: “노출/발표/제안”을 주 1회 이상 루틴화</p>
+      <p>• 관계: 감정 올라올 때는 “결정은 24시간 후” 룰 적용</p>
+      <p>• 건강: 수면/운동 중 1개만이라도 ‘최소 루틴’ 고정</p>
 
-  if(scores.career >= 75) text += `<p>직장·사업: 성과 창출 가능성 높음. 브랜딩/노출 활동 유리.</p>`;
-  if(scores.health < 55) text += `<p>건강: 체력 관리 필요. 과로/수면부족 경계.</p>`;
+      <div class="hr"></div>
 
-  text += `
-      <p style="margin-top:15px;">
-        종합적으로 2026년은 “강한 것(확장) + 약한 것(관리)” 균형이 성과를 만듭니다.
-      </p>
+      <h3>4) 참고 문구</h3>
+      <p class="small">※ 본 리포트는 간이 만세력 기반 자동 생성 자료입니다. 중요한 의사결정은 현실 조건과 함께 판단하세요.</p>
     </div>
   `;
-  return text;
 }
 
 function generateSummaryContent(name, pillars, scores){
@@ -922,34 +965,52 @@ const hHour = hiddenTenGods(dmStem, pillarsObj[3].branch).join(", ");
 
 const expertHtml = `
   <div class="card">
-    <h2>🧠 명리학 전문가 분석</h2>
+    <h2>🧠 명리 핵심 분석</h2>
 
-    <h3>① 일간/신강약</h3>
+    <h3>1) 일간 & 밸런스</h3>
     <p><b>일간:</b> ${st.dayStem} (${st.dmEl})</p>
-    <p><b>신강/신약:</b> ${st.verdict} (점수 ${st.score})</p>
+    <p><b>강약:</b> ${st.verdict} <span class="small">(추정 점수 ${st.score})</span></p>
     <p class="small">
-      월지 ${st.monthBranch} / 월령가중치 ${st.seasonMul.toFixed(2)}
-      / 통근 ${st.hasRoot ? "있음" : "없음"}
-      / 생조 ${st.supportCnt} / 설·극 ${st.drainCnt}
+      기준: 월지 ${st.monthBranch} / 월령 ${st.seasonMul.toFixed(2)} /
+      통근 ${st.hasRoot ? "있음" : "없음"} /
+      생조 ${st.supportCnt} / 설·극 ${st.drainCnt}
     </p>
 
-    <h3>② 십성(천간)</h3>
-    <p>연간 ${pillarsObj[0].stem} = <b>${tgYear}</b> / 월간 ${pillarsObj[1].stem} = <b>${tgMonth}</b> / 시간 ${pillarsObj[3].stem} = <b>${tgHour}</b></p>
+    <div class="hr"></div>
 
-    <h3>③ 지장간(지지)</h3>
+    <h3>2) 십성 포지션</h3>
+    <p class="small">천간 기준(연/월/시)으로 ‘내가 세상과 만나는 방식’을 요약합니다.</p>
+    <p>연간 ${pillarsObj[0].stem}: <b>${tgYear || "—"}</b> /
+       월간 ${pillarsObj[1].stem}: <b>${tgMonth || "—"}</b> /
+       시간 ${pillarsObj[3].stem}: <b>${tgHour || "—"}</b></p>
+
+    <h3>3) 지장간(속성/내면)</h3>
     <p class="small">
-      연지 ${pillarsObj[0].branch}: ${hYear}<br/>
-      월지 ${pillarsObj[1].branch}: ${hMonth}<br/>
-      일지 ${pillarsObj[2].branch}: ${hDay}<br/>
-      시지 ${pillarsObj[3].branch}: ${hHour}
+      연지 ${pillarsObj[0].branch}: ${hYear || "—"}<br/>
+      월지 ${pillarsObj[1].branch}: ${hMonth || "—"}<br/>
+      일지 ${pillarsObj[2].branch}: ${hDay || "—"}<br/>
+      시지 ${pillarsObj[3].branch}: ${hHour || "—"}
     </p>
 
-    <h3>④ 용희/격국/조후</h3>
+    <div class="hr"></div>
+
+    <h3>4) 용신·희신 & 운영 포인트</h3>
     <p><b>용신:</b> ${ys.yong} / <b>희신:</b> ${ys.hee}</p>
-    <p><b>격국 추정:</b> ${structure}</p>
-    <p><b>조후 분석:</b> ${climate}</p>
+    <p class="small">
+      ${st.verdict === "신약"
+        ? "신약은 ‘보강(생조)’이 핵심입니다. 무리한 확장보다 기반(체력/학습/자원)을 먼저 채우면 운이 잘 받습니다."
+        : st.verdict === "신강"
+          ? "신강은 ‘배출/균형’이 핵심입니다. 성과를 밖으로 내고(식상), 과한 고집을 조절하면 흐름이 좋아집니다."
+          : "중화는 ‘선택과 집중’이 핵심입니다. 강점 영역을 1~2개로 좁혀 실행하면 결과가 빠릅니다."
+      }
+    </p>
 
-    <p class="small">월주 산출: 현재 간이 절기(입춘 기준) 적용. 다음 업데이트에서 1940~2040 절기 테이블 기반 만세력 방식으로 정밀화됩니다.</p>
+    <p><b>격국 추정:</b> ${structure}</p>
+    <p><b>조후:</b> ${climate}</p>
+
+    <p class="small">
+      ※ 본 페이지는 간이 만세력 기반 자동 해석입니다. (절기/대운 시작/순역행 정밀화는 다음 단계에서 반영 가능)
+    </p>
   </div>
 `;
 
