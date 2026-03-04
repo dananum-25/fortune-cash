@@ -537,6 +537,7 @@ if(!box.dataset.loadBound){
   });
   box.dataset.loadBound = "1";
 }
+}
 
 function loadReport(index){
   const list = JSON.parse(localStorage.getItem("myReports") || "[]");
@@ -835,10 +836,7 @@ function calculateSaju(){
 
   const hourEl = document.getElementById("birthHour");
   const hour = parseInt(hourEl?.value, 10);
-  const seedFn = xmur3(`${birth}|${hour}`);
-const rand = mulberry32(seedFn());
-  
-  if(!birth){
+ if(!birth){
     alert("로그인이 필요합니다. (생년월일 정보가 없습니다)");
     return;
   }
@@ -846,6 +844,10 @@ const rand = mulberry32(seedFn());
     alert("출생 시간을 0~23 사이로 입력해주세요.");
     return;
   }
+  const seedFn = xmur3(`${birth}|${hour}`);
+const rand = mulberry32(seedFn());
+  
+  
 
   // ✅ 검증 통과 후 저장
   localStorage.setItem("birthHour", String(hour));
