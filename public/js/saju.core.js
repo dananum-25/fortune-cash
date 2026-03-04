@@ -1,4 +1,3 @@
-import { SOLAR_TERMS } from "/js/solarTerms.db.js";
 // /js/saju.core.js  (ESM)
 
 // ===============================
@@ -6,6 +5,9 @@ import { SOLAR_TERMS } from "/js/solarTerms.db.js";
 // ===============================
 export const YEAR_MIN = 1940;
 export const YEAR_MAX = 2040;
+
+// /js/saju.core.js 상단
+import { SOLAR_TERMS } from "/js/solarTerms.db.js";
 
 export const heavenly = ["갑","을","병","정","무","기","경","신","임","계"];
 export const earthly  = ["자","축","인","묘","진","사","오","미","신","유","술","해"];
@@ -117,7 +119,7 @@ export function getMonthBranch(date){
 
   // 4) 대설 이후는 해월로 들어가고, 그 다음 소한 전까지 자월
   // 대설 이후는 일단 해월로 리턴 (연말 출생의 월지)
-  if(t("대설") && md >= t("대설")) return "해";
+  if(t("대설") && md >= t("대설")) return "자";
 
   // 혹시 term 누락이면 fallback
   return getMonthBranchSimple(date);
