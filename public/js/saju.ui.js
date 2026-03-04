@@ -516,7 +516,7 @@ function showSavedReports(){
       <p style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         ${i+1}. ${r.name} / ${r.birth} / ${r.hour}시
         <button class="btn-load-report"
-        data-index="${i}"style="width:auto;padding:8px 10px;border-radius:10px;">불러오기</button>
+        data-index="${i}" style="width:auto;padding:8px 10px;border-radius:10px;">불러오기</button>
       </p>
     `;
   });
