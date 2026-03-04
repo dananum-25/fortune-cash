@@ -79,7 +79,22 @@ function getMonthPillar(date){
 
   return heavenly[monthStemIndex] + monthBranch;
 }
+// ===============================
+// 3.5) Day pillar (검증된 기준일)
+// 기준: 1984-02-02 = 丙寅 (index 2)
+// ===============================
+const DAY_BASE_DATE = new Date(1984, 1, 2, 12, 0, 0); // local noon
+const DAY_BASE_INDEX = 2;
 
+// ymd: "YYYY-MM-DD"
+function getDayPillar(ymd){
+  const d0 = parseYmdLocal(ymd);
+  if(!d0) return "";
+  const d = toLocalNoon(d0); // 정오 고정 (UTC/DST 밀림 방지)
+  const diffDays = Math.floor((d - DAY_BASE_DATE) / 86400000);
+  const idx = ((DAY_BASE_INDEX + diffDays) % 60 + 60) % 60;
+  return heavenly[idx % 10] + earthly[idx % 12];
+}
 // ===============================
 // 4) Hour pillar
 // ===============================
