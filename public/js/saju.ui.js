@@ -700,7 +700,24 @@ function tenGod(dmStem, otherStem){
   if(CONTROLLED_BY[dmEl] === otEl) return samePol ? "편관" : "정관";
 
   return "";
+ const TEN_GOD_DESC = {
+  "비견":"자기주도/독립 성향. 동료·경쟁과 동시에 성장.",
+  "겁재":"경쟁/속도/승부욕. 성과는 크지만 과열·충돌 주의.",
+  "식신":"꾸준함/생산/실력. 루틴 만들면 강해짐.",
+  "상관":"표현/기획/돌파. 말/태도 관리하면 레벨업.",
+  "정재":"현실/저축/안정 수익. 월급형·고정수익과 궁합.",
+  "편재":"확장/영업/기회 포착. 투자·사업 운용에 강점(리스크 한도 필수).",
+  "정관":"규칙/신뢰/직장운. 조직·자격·평판 관리가 핵심.",
+  "편관":"압박/책임/승부. 강하게 밀면 성과, 과부하 주의.",
+  "정인":"학습/보호/문서. 자격·공부·컨텐츠 축적에 유리.",
+  "편인":"아이디어/직관/변화. 독특한 방식으로 풀어내는 재능."
 }
+}
+function tenGodLine(label, tg){
+  if(!tg) return `<p>${label}: <b>—</b></p>`;
+  return `<p>${label}: <b>${tg}</b> <span class="small">(${TEN_GOD_DESC[tg] || ""})</span></p>`;
+}
+
 
 // 지장간 십성 요약
 function hiddenTenGods(dmStem, branch){
