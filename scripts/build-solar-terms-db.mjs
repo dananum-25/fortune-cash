@@ -43,8 +43,7 @@ function isValidMD(s){
 
 function validateAll(data){
   // 연도 범위
-  for(let y=YEAR_MIN; y<=YEAR_MAX; y++){
-    const yy = String(y);
+  for(const yy of Object.keys(data)){
     const terms = data[yy];
     if(!terms) fail(`Missing year: ${y} in JSON`);
 
