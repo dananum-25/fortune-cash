@@ -590,13 +590,26 @@ function showSavedReports(){
     html += `
       <p style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         ${i+1}. ${r.name} / ${r.birth} / ${r.hour}시
-        <button onclick="loadReport(${i})" style="width:auto;padding:8px 10px;border-radius:10px;">불러오기</button>
+        <button class="btn-load-report" data-index="${i}"
+          style="width:auto;padding:8px 10px;border-radius:10px;">불러오기</button>
       </p>
     `;
   });
   html += "</div>";
 
-  document.getElementById("analysisBox").innerHTML = html;
+  const box = document.getElementById("analysisBox");
+  box.innerHTML = html;
+
+  if(!box.dataset.loadBound){
+    box.addEventListener("click", (e)=>{
+      const btn = e.target.closest(".btn-load-report");
+      if(!btn) return;
+      const i = Number(btn.dataset.index);
+      if(!Number.isFinite(i)) return;
+      loadReport(i);
+    });
+    box.dataset.loadBound = "1";
+  }
 }
 
 function loadReport(index){
