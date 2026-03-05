@@ -61,46 +61,39 @@ export function getYearPillar(year){
 // 월지 (절기 DB 기반: 12절기 경계로 월지 산정)
 export function getMonthBranch(date){
   const y = date.getFullYear();
-  const terms = SOLAR_TERMS[y];
+  const terms = SOLAR_TERMS?.[y];
   if(!terms){
     // DB 없으면 기존 간이로 fallback (서비스 안죽게)
     return getMonthBranchSimple(date);
   }
 
-  // 날짜를 YYYY-MM-DD 비교용 문자열로 만들기
+  // "MM-DD" 비교용
   const mm = String(date.getMonth()+1).padStart(2,"0");
   const dd = String(date.getDate()).padStart(2,"0");
   const md = `${mm}-${dd}`;
 
-  // 절기 기준 경계 (월지 매핑)
-  // 자: 대설 ~ (다음) 소한
-  // 축: 소한 ~ 입춘
-  // 인: 입춘 ~ 경칩
-  // 묘: 경칩 ~ 청명
-  // 진: 청명 ~ 입하
-  // 사: 입하 ~ 망종
-  // 오: 망종 ~ 소서
-  // 미: 소서 ~ 입추
-  // 신: 입추 ~ 백로
-  // 유: 백로 ~ 한로
-  // 술: 한로 ~ 입동
-  // 해: 입동 ~ 대설
-
   const t = (name)=> terms[name]; // "MM-DD"
 
-  // 1) 소한 이전(1/1~1/4 같은) 처리: 전년도 대설~올해 소한 사이 = 자월
-  // 전년도 대설이 DB에 있으면 그걸 쓰고, 없으면 안전 fallback
-  const prev = SOLAR_TERMS[y-1];
+  // 1) 소한 이전(1월 초) = 자월 (전년도 대설~올해 소한)
+  // (전년도 대설 데이터가 없어도 1월 초는 자월로 두는게 안전)
   if(t("소한") && md < t("소한")){
-    if(prev?.["대설"]) return "자";
-    // 전년도 대설이 없어도 대체로 1월 초는 자월로 처리하는게 간이보다 안전
     return "자";
   }
 
-  // 2) 올해 소한~입춘: 축월
+  // 2) 소한 ~ 입춘 = 축월
   if(t("입춘") && md < t("입춘")) return "축";
 
-  // 3) 입춘 이후는 아래 순서대로 경계 비교
+  // 3) 입춘 이후 경계 비교
+  // 인: 입춘~경칩
+  // 묘: 경칩~청명
+  // 진: 청명~입하
+  // 사: 입하~망종
+  // 오: 망종~소서
+  // 미: 소서~입추
+  // 신: 입추~백로
+  // 유: 백로~한로
+  // 술: 한로~입동
+  // 해: 입동~대설
   const borders = [
     { term:"경칩", branch:"인" },
     { term:"청명", branch:"묘" },
@@ -111,7 +104,7 @@ export function getMonthBranch(date){
     { term:"백로", branch:"신" },
     { term:"한로", branch:"유" },
     { term:"입동", branch:"술" },
-    { term:"대설", branch:"해" },
+    { term:"대설", branch:"해" }, // 대설 전까지는 해월로 들어가기 직전 = 술/해 처리 흐름상 OK
   ];
 
   for(const b of borders){
@@ -119,9 +112,8 @@ export function getMonthBranch(date){
     if(bd && md < bd) return b.branch;
   }
 
-  // 4) 대설 이후는 해월로 들어가고, 그 다음 소한 전까지 자월
-  // 대설 이후는 일단 해월로 리턴 (연말 출생의 월지)
-  if(t("대설") && md >= t("대설")) return "자";
+  // 4) 대설 이후(연말) = 해월
+  if(t("대설") && md >= t("대설")) return "해";
 
   // 혹시 term 누락이면 fallback
   return getMonthBranchSimple(date);
