@@ -1,10 +1,12 @@
 // /js/saju.core.js  (ESM)
 
 // ===============================
-// SAJU CORE ENGINE (1940~2040)
+// SAJU CORE ENGINE (1940~2030)
 // ===============================
+import { SOLAR_TERMS } from "/js/solarTerms.db.js";
+
 export const YEAR_MIN = 1940;
-export const YEAR_MAX = 2040;
+export const YEAR_MAX = 2030;
 
 // /js/saju.core.js 상단
 import { SOLAR_TERMS } from "/js/solarTerms.db.js";
