@@ -67,6 +67,9 @@ function analyzeElements(pillars){
   });
   return counts;
 }
+function elKoToKey(elKo){
+  return ({ "목":"wood", "화":"fire", "토":"earth", "금":"metal", "수":"water" })[elKo] || null;
+}
 
 function generateElementInterpretation(counts){
   let text = "";
