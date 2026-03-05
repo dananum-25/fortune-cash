@@ -913,8 +913,6 @@ function calculateSaju(){
   const seedFn = xmur3(`${birth}|${hour}`);
 const rand = mulberry32(seedFn());
   
-  
-
   // ✅ 검증 통과 후 저장
   localStorage.setItem("birthHour", String(hour));
 
@@ -1080,6 +1078,23 @@ const expertHtml = `
     });
   }, 200);
 }
+function pickOne(arr, rand){
+  if(!Array.isArray(arr) || arr.length === 0) return "";
+  const i = Math.floor(rand() * arr.length);
+  return arr[i] || "";
+}
+
+function pickFromSajuDB(elKo, section, rand){
+  // section: "overall" | "love" | "money" | "health" | "advice"
+  if(!SAJU_TEXT_DB?.elements) return "";
+  const key = elKoToKey(elKo);
+  if(!key) return "";
+
+  const row = SAJU_TEXT_DB.elements.find(x => x.key === key);
+  const pool = row?.pools?.[section];
+  return pickOne(pool, rand);
+}  
+
 function analyzeClimate(pillarsObj){
   const monthBranch = pillarsObj[1].branch;
 
