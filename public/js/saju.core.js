@@ -8,9 +8,6 @@ import { SOLAR_TERMS } from "/js/solarTerms.db.js";
 export const YEAR_MIN = 1940;
 export const YEAR_MAX = 2030;
 
-// /js/saju.core.js 상단
-import { SOLAR_TERMS } from "/js/solarTerms.db.js";
-
 export const heavenly = ["갑","을","병","정","무","기","경","신","임","계"];
 export const earthly  = ["자","축","인","묘","진","사","오","미","신","유","술","해"];
 
@@ -95,26 +92,26 @@ export function getMonthBranch(date){
   // 술: 한로~입동
   // 해: 입동~대설
   const borders = [
-    { term:"경칩", branch:"인" },
-    { term:"청명", branch:"묘" },
-    { term:"입하", branch:"진" },
-    { term:"망종", branch:"사" },
-    { term:"소서", branch:"오" },
-    { term:"입추", branch:"미" },
-    { term:"백로", branch:"신" },
-    { term:"한로", branch:"유" },
-    { term:"입동", branch:"술" },
-    { term:"대설", branch:"해" }, // 대설 전까지는 해월로 들어가기 직전 = 술/해 처리 흐름상 OK
-  ];
+  { term:"경칩", branch:"인" },
+  { term:"청명", branch:"묘" },
+  { term:"입하", branch:"진" },
+  { term:"망종", branch:"사" },
+  { term:"소서", branch:"오" },
+  { term:"입추", branch:"미" },
+  { term:"백로", branch:"신" },
+  { term:"한로", branch:"유" },
+  { term:"입동", branch:"술" },
+  { term:"대설", branch:"해" }, // 입동~대설은 해월
+];
 
   for(const b of borders){
     const bd = t(b.term);
     if(bd && md < bd) return b.branch;
   }
 
-  // 4) 대설 이후(연말) = 해월
-  if(t("대설") && md >= t("대설")) return "해";
-
+  // 4) 대설 이후(연말) = 자월
+if(t("대설") && md >= t("대설")) return "자";
+  
   // 혹시 term 누락이면 fallback
   return getMonthBranchSimple(date);
 }
