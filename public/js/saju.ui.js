@@ -522,6 +522,11 @@ function getTodayString(){
 
 function generateFullReport(name, pillars, elementCounts, scores){
   const strongest = Object.keys(elementCounts).reduce((a,b)=> elementCounts[a] > elementCounts[b] ? a : b);
+  const overallText = pickFromSajuDB(st.dmEl, "overall", rand);
+const loveText = pickFromSajuDB(st.dmEl, "love", rand);
+const moneyText = pickFromSajuDB(st.dmEl, "money", rand);
+const healthText = pickFromSajuDB(st.dmEl, "health", rand);
+const adviceText = pickFromSajuDB(st.dmEl, "advice", rand);
   const weakest = Object.keys(elementCounts).reduce((a,b)=> elementCounts[a] < elementCounts[b] ? a : b);
   const avg = Math.round((scores.wealth + scores.love + scores.career + scores.health) / 4);
 
@@ -1157,10 +1162,12 @@ const rand = mulberry32(seedFn());
 
   // ✅ 전문가(B) 분석: 내 오행(일간), 신강/신약, 용신/희신
   const pillarsObj = pillars.map(p => ({ stem: p[0], branch: p[1] }));
-  const st = calcDayMasterStrength(pillarsObj);
-  const ys = pickYongShin(st.dmEl, st.verdict);
-  const structure = estimateStructure(pillarsObj);
-  const climate = analyzeClimate(pillarsObj);
+  const profile = buildSajuProfile(pillarsObj);
+const st = profile.strength;
+const ys = profile.yongshin;
+const structure = profile.structure;
+const climate = profile.climate;
+const yongText = buildYongshinInterpretation(profile);
 
   const dmStem = st.dayStem;
 
@@ -1232,6 +1239,19 @@ const expertHtml = `
   // 종합
   let analysis = "";
   analysis += expertHtml; // ✅ 전문가 카드 맨 위
+  if(overallText || loveText || moneyText || healthText || adviceText){
+  analysis += `
+    <div class="card">
+      <h2>🌿 일간 오행 해설(DB)</h2>
+      <p class="small">기준 오행: <b>${st.dmEl}</b> (일간 기준)</p>
+      ${overallText ? `<p><b>전체</b><br>${overallText}</p>` : ""}
+      ${moneyText ? `<p><b>재물</b><br>${moneyText}</p>` : ""}
+      ${loveText ? `<p><b>연애</b><br>${loveText}</p>` : ""}
+      ${healthText ? `<p><b>건강</b><br>${healthText}</p>` : ""}
+      ${adviceText ? `<p><b>조언</b><br>${adviceText}</p>` : ""}
+    </div>
+  `;
+  }
   // ===== 십성 DB 해설 카드 =====
 try{
   const db = await loadSipseongDB();
