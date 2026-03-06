@@ -7,6 +7,8 @@ import {
   heavenly, earthly
 } from "/js/saju.core.js";
 let SIPSEONG_DB = null;
+let SIPSEONG_DB = null;
+let SAJU_TEXT_DB = null;
 
 async function loadSipseongDB(){
   if(SIPSEONG_DB) return SIPSEONG_DB;
@@ -14,6 +16,12 @@ async function loadSipseongDB(){
   if(!res.ok) throw new Error("sipseong DB load failed");
   SIPSEONG_DB = await res.json();
   return SIPSEONG_DB;
+}
+
+async function loadSajuKoDB(){
+  const res = await fetch("/data/saju_ko.json", { cache: "no-store" });
+  if(!res.ok) throw new Error("saju_ko.json 로드 실패");
+  return res.json();
 }
 
 function pickOne(arr, rand){
