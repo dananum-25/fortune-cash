@@ -911,7 +911,7 @@ function pickYongShin(dmEl, verdict){
 // ===============================
 // 11) Main calculate
 // ===============================
-function calculateSaju(){
+async function calculateSaju(){
   const name = localStorage.getItem("name") || "회원";
   const birth = normalizeBirthYMD(localStorage.getItem("birth"));
 
@@ -1053,6 +1053,52 @@ const expertHtml = `
   // 종합
   let analysis = "";
   analysis += expertHtml; // ✅ 전문가 카드 맨 위
+  // ===== 십성 DB 해설 카드 =====
+try{
+  const db = await loadSipseongDB();
+
+  // 너가 이미 계산해둔 값 그대로 사용
+  // tgYear, tgMonth, tgHour 는 위에서 이미 만들었지
+  // (없으면 아래 3줄을 너 코드에서 가져오면 됨)
+  // const tgYear = tenGod(dmStem, pillarsObj[0].stem);
+  // const tgMonth = tenGod(dmStem, pillarsObj[1].stem);
+  // const tgHour = tenGod(dmStem, pillarsObj[3].stem);
+
+  const main = tgMonth || tgYear || tgHour; // 우선순위: 월간 십성 > 연간 > 시간
+  const item = db?.items?.[main];
+
+  if(item){
+    const overall = pickOne(item.overall, rand);
+    const money   = pickOne(item.money, rand);
+    const love    = pickOne(item.love, rand);
+    const career  = pickOne(item.career, rand);
+    const advice  = pickOne(item.advice, rand);
+
+    analysis += `
+      <div class="card">
+        <h2>🧩 십성 해설(DB)</h2>
+        <p class="small">기준 십성: <b>${main}</b> (월간 우선)</p>
+
+        <p><b>전체</b><br>${overall}</p>
+        <p><b>재물</b><br>${money}</p>
+        <p><b>연애</b><br>${love}</p>
+        <p><b>커리어</b><br>${career}</p>
+        <p><b>조언</b><br>${advice}</p>
+      </div>
+    `;
+  } else{
+    analysis += `
+      <div class="card">
+        <h2>🧩 십성 해설(DB)</h2>
+        <p class="small">기준 십성: <b>${main || "없음"}</b></p>
+        <p>DB에 해당 십성 문구가 아직 없습니다. (sipseong_ko.json에 추가하면 바로 반영됩니다)</p>
+      </div>
+    `;
+  }
+}catch(e){
+  // DB 실패해도 서비스 안죽게
+  console.warn(e);
+}
   analysis += `<p>당신의 4기둥은 <b>${yearPillar} / ${monthPillar} / ${dayPillar} / ${hourPillar}</b> 흐름입니다.</p>`;
   analysis += `<p>오행 분포(참고)에서는 <b>${strongest}</b> 기운이 상대적으로 두드러집니다.</p>`;
   analysis += `<p class="small">TIP) 이 페이지는 “무료/간편 해석” 버전입니다. (추후 절기/대운 정밀/용신 정교화 가능)</p>`;
