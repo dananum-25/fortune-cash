@@ -2,13 +2,19 @@ async function rewardContent(type){
   const phone = localStorage.getItem("phone");
   if(!phone) return;
 
-  await fetch(API_URL,{
-    method:"POST",
-    body:JSON.stringify({
-      action:"addPoint",
+  const allowedTypes = ["attendance", "fortune_view", "share_event"];
+  const safeType = allowedTypes.includes(type) ? type : "fortune_view";
+
+  await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      action: "addPoint",
       phone,
-      amount:1,
-      type
+      amount: 1,
+      type: safeType
     })
   });
 }
