@@ -17,9 +17,9 @@ async function loadSipseongDB(){
 }
 
 function pickOne(arr, rand){
-  if(!arr || !arr.length) return "";
+  if(!Array.isArray(arr) || arr.length === 0) return "";
   const i = Math.floor(rand() * arr.length);
-  return arr[i];
+  return arr[i] || "";
 }
 // /js/saju.js
 // fortune-cash - saju page engine (clean + fixed)
