@@ -1181,7 +1181,6 @@ const hYear = hiddenTenGods(dmStem, pillarsObj[0].branch).join(", ");
 const hMonth = hiddenTenGods(dmStem, pillarsObj[1].branch).join(", ");
 const hDay = hiddenTenGods(dmStem, pillarsObj[2].branch).join(", ");
 const hHour = hiddenTenGods(dmStem, pillarsObj[3].branch).join(", ");
-const yongText = buildYongshinInterpretation(profile);
 const expertHtml = `
   <div class="card">
     <h2>🧠 명리 핵심 분석</h2>
