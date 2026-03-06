@@ -320,18 +320,97 @@ function generateScoreGraph(scores){
   `;
 }
 
-function generateMonthlyGraph(scores, rand){
-  return generateMonthlyGraphAll(scores, rand);
+function generateMonthlyGraph(scores, rand, profile){
+  return generateMonthlyGraphAll(scores, rand, profile);
 }
 
-function generateMonthlyGraphAll(scores, rand){
+function generateMonthlyGraphAll(scores, rand, profile){
   const categories = [
     {key:"wealth", label:"💰 재물운"},
     {key:"love", label:"💖 연애운"},
     {key:"career", label:"🏢 직장/사업운"},
     {key:"health", label:"💪 건강운"}
   ];
+  const MONTH_ELEMENT_2026 = [
+  "토","목","목","토","화","화","토","금","금","토","수","수"
+];
+// 1~12월 대략적 월 기운용 간이 매핑
 
+function relationToYongshin(monthEl, yongEl){
+  if(monthEl === yongEl) return "용신직접";
+  if(PRODUCE[monthEl] === yongEl) return "용신생조";
+  if(CONTROL[monthEl] === yongEl) return "용신극";
+  return "보통";
+}
+
+function buildMonthlyFortuneLine(score, type, monthEl, profile, rand){
+  const rel = relationToYongshin(monthEl, profile.yongshin.yong);
+
+  const goodPool = {
+    wealth: [
+      "돈 흐름이 비교적 부드럽습니다. 작게 시작해도 결과가 남기 쉽습니다.",
+      "수익 기회를 잡기 좋은 달입니다. 다만 욕심보다 구조를 먼저 보세요."
+    ],
+    love: [
+      "관계가 자연스럽게 풀리기 쉬운 달입니다. 먼저 대화의 문을 여는 게 유리합니다.",
+      "인연운이 살아납니다. 무리한 밀당보다 편안한 진심이 먹힙니다."
+    ],
+    career: [
+      "일이 앞으로 나가기 쉬운 달입니다. 제안·발표·지원에 힘이 실립니다.",
+      "평가와 성과 면에서 좋은 흐름입니다. 보여줄 건 분명하게 보여주세요."
+    ],
+    health: [
+      "컨디션 회복력이 괜찮은 달입니다. 루틴만 지키면 안정적입니다.",
+      "몸 관리의 효율이 좋은 달입니다. 수면/운동 중 하나만 고정해도 체감이 큽니다."
+    ]
+  };
+
+  const midPool = {
+    wealth: [
+      "평균 흐름입니다. 무리한 투자보다 지키는 운영이 유리합니다."
+    ],
+    love: [
+      "관계는 무난하지만 표현이 부족하면 지나갈 수 있습니다."
+    ],
+    career: [
+      "기본기 점검에 좋은 달입니다. 속도보다 완성도를 챙기세요."
+    ],
+    health: [
+      "크게 나쁘진 않지만 피로 누적은 관리가 필요합니다."
+    ]
+  };
+
+  const lowPool = {
+    wealth: [
+      "돈 문제는 보수적으로 보는 편이 좋습니다. 계약·지출 점검이 우선입니다."
+    ],
+    love: [
+      "감정기복이 생기기 쉬운 달입니다. 서운함은 바로 결론내리지 마세요."
+    ],
+    career: [
+      "일이 꼬이는 느낌이 있을 수 있습니다. 일정/우선순위 재정리가 먼저입니다."
+    ],
+    health: [
+      "과로 신호를 무시하지 않는 게 중요합니다. 쉬는 게 오히려 이득입니다."
+    ]
+  };
+
+  let base = "";
+  if(score >= 75) base = pickOne(goodPool[type], rand);
+  else if(score >= 55) base = pickOne(midPool[type], rand);
+  else base = pickOne(lowPool[type], rand);
+
+  let yongComment = "";
+  if(rel === "용신직접"){
+    yongComment = ` 이달 기운이 용신(${profile.yongshin.yong})과 직접 맞닿아 체감이 더 좋을 수 있습니다.`;
+  } else if(rel === "용신생조"){
+    yongComment = ` 이달 기운이 용신(${profile.yongshin.yong})을 도와주는 편이라 흐름이 부드럽습니다.`;
+  } else if(rel === "용신극"){
+    yongComment = ` 이달은 용신(${profile.yongshin.yong}) 활용이 약해질 수 있으니 무리하지 않는 편이 좋습니다.`;
+  }
+
+  return base + yongComment;
+}
   const max = 100;
   const height = 160;
   const widthStep = 100 / 11;
@@ -375,33 +454,29 @@ function generateMonthlyGraphAll(scores, rand){
   });
 
   html += `</div>`;
-  html += generateMonthlyTextAll(monthlyData);
+  html += generateMonthlyTextAll(monthlyData, profile, rand);
   return html;
 }
 
-function generateMonthlyTextAll(monthlyData){
-  function interpret(score, type){
-    if(score >= 80){
-      if(type==="wealth") return "수익 확장 가능성 높음. 투자·사업 기회 검토 가능.";
-      if(type==="love") return "연애/관계 진전 가능성 매우 높음.";
-      if(type==="career") return "성과·승진·평가 상승 가능성.";
-      if(type==="health") return "컨디션 양호. 활동량 늘리기 좋음.";
-    }
-    if(score >= 65) return "안정적 상승 흐름. 무리하지 않으면 성과 가능.";
-    if(score >= 50) return "평균 흐름. 리스크 관리 중요.";
-    return "주의 필요. 휴식·보수적 운영 추천.";
-  }
-
+function generateMonthlyTextAll(monthlyData, profile, rand){
   const monthNames = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
-  const types = { wealth:"💰 재물운", love:"💖 연애운", career:"🏢 직장/사업운", health:"💪 건강운" };
+  const types = {
+    wealth:"💰 재물운",
+    love:"💖 연애운",
+    career:"🏢 직장/사업운",
+    health:"💪 건강운"
+  };
 
   let html = "<h3>🗓 2026 월별 종합 해석</h3>";
 
   monthNames.forEach((month,i)=>{
-    html += `<h4 style="margin-top:14px">${month}</h4>`;
+    const monthEl = MONTH_ELEMENT_2026[i];
+    html += `<h4 style="margin-top:14px">${month} <span class="small">(${monthEl} 기운)</span></h4>`;
+
     Object.keys(types).forEach(type=>{
       const score = monthlyData[type][i];
-      html += `<p>${types[type]}: ${interpret(score,type)}</p>`;
+      const line = buildMonthlyFortuneLine(score, type, monthEl, profile, rand);
+      html += `<p>${types[type]}: ${line}</p>`;
     });
   });
 
@@ -970,6 +1045,45 @@ function buildSajuProfile(pillarsObj){
     topTenGods
   };
 }
+function getElementRoleText(el){
+  const map = {
+    "목": "성장·확장·기획·관계",
+    "화": "표현·실행·주목·속도",
+    "토": "안정·관리·기반·지속",
+    "금": "결단·규칙·정리·정확성",
+    "수": "정보·회복·유연성·학습"
+  };
+  return map[el] || "";
+}
+
+function buildYongshinInterpretation(profile){
+  const { strength, yongshin, climate } = profile;
+
+  let summary = "";
+  let action = "";
+  let caution = "";
+
+  if(strength.verdict === "신약"){
+    summary = `사주의 중심 기운이 약한 편이라, ${yongshin.yong} 기운으로 보강될 때 흐름이 안정됩니다.`;
+    action = `${yongshin.yong} 성향( ${getElementRoleText(yongshin.yong)} )을 생활/일 선택에 붙이면 좋습니다.`;
+    caution = "무리한 확장, 과한 책임, 체력 소모형 운영은 불리할 수 있습니다.";
+  } else if(strength.verdict === "신강"){
+    summary = `사주의 중심 기운이 강한 편이라, ${yongshin.yong} 기운으로 힘을 적절히 배출할수록 운이 잘 풀립니다.`;
+    action = `${yongshin.yong} 성향( ${getElementRoleText(yongshin.yong)} )을 통해 결과물을 밖으로 내는 방식이 유리합니다.`;
+    caution = "고집·과속·혼자 결정하는 패턴이 강해지면 기회를 놓칠 수 있습니다.";
+  } else {
+    summary = `사주의 균형이 비교적 무난하여, ${yongshin.yong} 기운을 살릴 때 체감 성과가 더 빨라집니다.`;
+    action = `${yongshin.yong} 성향( ${getElementRoleText(yongshin.yong)} )을 올해의 핵심 운영 키워드로 삼아보세요.`;
+    caution = "여러 방향으로 힘을 분산하기보다, 강점 1~2개에 집중하는 편이 좋습니다.";
+  }
+
+  return {
+    summary,
+    action,
+    caution,
+    climate
+  };
+}
 // ===============================
 // 11) Main calculate
 // ===============================
@@ -1060,7 +1174,7 @@ const hYear = hiddenTenGods(dmStem, pillarsObj[0].branch).join(", ");
 const hMonth = hiddenTenGods(dmStem, pillarsObj[1].branch).join(", ");
 const hDay = hiddenTenGods(dmStem, pillarsObj[2].branch).join(", ");
 const hHour = hiddenTenGods(dmStem, pillarsObj[3].branch).join(", ");
-
+const yongText = buildYongshinInterpretation(profile);
 const expertHtml = `
   <div class="card">
     <h2>🧠 명리 핵심 분석</h2>
@@ -1077,10 +1191,18 @@ const expertHtml = `
     <div class="hr"></div>
 
     <h3>2) 십성 포지션</h3>
-    <p class="small">천간 기준(연/월/시)으로 ‘내가 세상과 만나는 방식’을 요약합니다.</p>
-    <p>연간 ${pillarsObj[0].stem}: <b>${tgYear || "—"}</b> /
-       월간 ${pillarsObj[1].stem}: <b>${tgMonth || "—"}</b> /
-       시간 ${pillarsObj[3].stem}: <b>${tgHour || "—"}</b></p>
+<p class="small">천간 기준(연/월/시)으로 ‘내가 세상과 만나는 방식’을 요약합니다.</p>
+<p>연간 ${pillarsObj[0].stem}: <b>${tgYear || "—"}</b> /
+   월간 ${pillarsObj[1].stem}: <b>${tgMonth || "—"}</b> /
+   시간 ${pillarsObj[3].stem}: <b>${tgHour || "—"}</b></p>
+<p class="small">
+  우세 십성:
+  ${
+    profile.topTenGods.length
+      ? profile.topTenGods.map(x => `${x.name}(${x.count})`).join(" / ")
+      : "뚜렷한 편중 없음"
+  }
+</p>
 
     <h3>3) 지장간(속성/내면)</h3>
     <p class="small">
@@ -1169,7 +1291,7 @@ try{
   const scores = calculateFortuneScores(elementResult, currentDaewoon);
   analysis += generateScoreGraph(scores);
   analysis += generateScoreInterpretation(scores);
-  analysis += generateMonthlyGraph(scores, rand);
+  analysis += generateMonthlyGraph(scores, rand, profile);
   analysis += generateYearSummary(scores);
   analysis += generateFullReport(name, pillars, elementResult, scores);
 
