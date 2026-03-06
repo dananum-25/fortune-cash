@@ -6,6 +6,21 @@ import {
   getYearPillar, getMonthPillar, getDayPillar, getHourPillar,
   heavenly, earthly
 } from "/js/saju.core.js";
+let SIPSEONG_DB = null;
+
+async function loadSipseongDB(){
+  if(SIPSEONG_DB) return SIPSEONG_DB;
+  const res = await fetch("/data/sipseong_ko.json", { cache: "no-store" });
+  if(!res.ok) throw new Error("sipseong DB load failed");
+  SIPSEONG_DB = await res.json();
+  return SIPSEONG_DB;
+}
+
+function pickOne(arr, rand){
+  if(!arr || !arr.length) return "";
+  const i = Math.floor(rand() * arr.length);
+  return arr[i];
+}
 // /js/saju.js
 // fortune-cash - saju page engine (clean + fixed)
 // - Local date parsing (UTC 밀림 방지)
