@@ -1,44 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
-  <url>
-    <loc>https://fortune-cash.vercel.app/</loc>
-    <priority>1.0</priority>
-  </url>
-
-  <url>
-    <loc>https://fortune-cash.vercel.app/pages/period/period.html</loc>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://fortune-cash.vercel.app/pages/zodiac/zodiac.html</loc>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://fortune-cash.vercel.app/pages/star/star.html</loc>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://fortune-cash.vercel.app/pages/saju/saju.html</loc>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fortune-cash.vercel.app/pages/tarot/tarot.html</loc>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fortune-cash.vercel.app/pages/tojung/tojung.html</loc>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fortune-cash.vercel.app/pages/palm/palm.html</loc>
-    <priority>0.7</priority>
-  </url>
-
+  <url><loc>https://fortune-cash.vercel.app/</loc></url>
+  <url><loc>https://fortune-cash.vercel.app/privacy.html</loc></url>
+  <url><loc>https://fortune-cash.vercel.app/terms.html</loc></url>
+  <url><loc>https://fortune-cash.vercel.app/pages/saju/saju.html</loc></url>
+  <url><loc>https://fortune-cash.vercel.app/pages/tarot/tarot.html</loc></url>
+  <url><loc>https://fortune-cash.vercel.app/pages/period/period.html</loc></url>
+  <url><loc>https://fortune-cash.vercel.app/pages/tojung/tojung.html</loc></url>
+  <url><loc>https://fortune-cash.vercel.app/pages/zodiac/zodiac.html</loc></url>
+  <url><loc>https://fortune-cash.vercel.app/pages/star/index.html</loc></url>
+  <url><loc>https://fortune-cash.vercel.app/pages/cookie/cookie.html</loc></url>
 </urlset>
