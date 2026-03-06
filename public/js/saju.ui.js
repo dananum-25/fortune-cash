@@ -916,6 +916,60 @@ function pickYongShin(dmEl, verdict){
   return { yong: PRODUCE[dmEl], hee: PRODUCED_BY[dmEl] };
 }
 
+// =============================== 
+// 10-5) 해석용 구조 분석 
+// ===============================
+function countTenGodsAll(pillarsObj){
+  const dmStem = pillarsObj[2].stem;
+  const counts = {
+    비견:0, 겁재:0, 식신:0, 상관:0, 정재:0, 편재:0, 정관:0, 편관:0, 정인:0, 편인:0
+  };
+
+  // 천간(연/월/시)
+  [0,1,3].forEach(idx=>{
+    const tg = tenGod(dmStem, pillarsObj[idx].stem);
+    if(tg) counts[tg]++;
+  });
+
+  // 지장간(연/월/일/시)
+  pillarsObj.forEach(p=>{
+    const hs = HIDDEN_STEMS[p.branch] || [];
+    hs.forEach(stem=>{
+      const tg = tenGod(dmStem, stem);
+      if(tg) counts[tg]++;
+    });
+  });
+
+  return counts;
+}
+
+function getTopTenGods(counts, topN = 3){
+  return Object.entries(counts)
+    .sort((a,b)=> b[1] - a[1])
+    .filter(([,v])=> v > 0)
+    .slice(0, topN)
+    .map(([k,v])=> ({ name:k, count:v }));
+}
+
+function buildSajuProfile(pillarsObj){
+  const strength = calcDayMasterStrength(pillarsObj);
+  const yongshin = pickYongShin(strength.dmEl, strength.verdict);
+  const structure = estimateStructure(pillarsObj);
+  const climate = analyzeClimate(pillarsObj);
+  const tenGodCounts = countTenGodsAll(pillarsObj);
+  const topTenGods = getTopTenGods(tenGodCounts, 3);
+
+  return {
+    dayMaster: strength.dayStem,
+    dayMasterElement: strength.dmEl,
+    strength,
+    yongshin,
+    structure,
+    climate,
+    tenGodCounts,
+    topTenGods
+  };
+}
 // ===============================
 // 11) Main calculate
 // ===============================
@@ -1039,18 +1093,13 @@ const expertHtml = `
     <div class="hr"></div>
 
     <h3>4) 용신·희신 & 운영 포인트</h3>
-    <p><b>용신:</b> ${ys.yong} / <b>희신:</b> ${ys.hee}</p>
-    <p class="small">
-      ${st.verdict === "신약"
-        ? "신약은 ‘보강(생조)’이 핵심입니다. 무리한 확장보다 기반(체력/학습/자원)을 먼저 채우면 운이 잘 받습니다."
-        : st.verdict === "신강"
-          ? "신강은 ‘배출/균형’이 핵심입니다. 성과를 밖으로 내고(식상), 과한 고집을 조절하면 흐름이 좋아집니다."
-          : "중화는 ‘선택과 집중’이 핵심입니다. 강점 영역을 1~2개로 좁혀 실행하면 결과가 빠릅니다."
-      }
-    </p>
+<p><b>용신:</b> ${ys.yong} / <b>희신:</b> ${ys.hee}</p>
+<p>${yongText.summary}</p>
+<p>${yongText.action}</p>
+<p class="small">주의: ${yongText.caution}</p>
 
-    <p><b>격국 추정:</b> ${structure}</p>
-    <p><b>조후:</b> ${climate}</p>
+<p><b>격국 추정:</b> ${structure}</p>
+<p><b>조후:</b> ${climate}</p>
 
     <p class="small">
       ※ 본 페이지는 간이 만세력 기반 자동 해석입니다. (절기/대운 시작/순역행 정밀화는 다음 단계에서 반영 가능)
