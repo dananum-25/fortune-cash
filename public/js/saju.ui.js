@@ -6,7 +6,7 @@ import {
   getYearPillar, getMonthPillar, getDayPillar, getHourPillar,
   heavenly, earthly
 } from "/js/saju.core.js";
-let SIPSEONG_DB = null;
+
 let SIPSEONG_DB = null;
 let SAJU_TEXT_DB = null;
 
