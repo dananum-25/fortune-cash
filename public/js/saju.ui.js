@@ -1182,8 +1182,6 @@ window.calculateSaju = calculateSaju;
 window.showSavedReports = showSavedReports;
 window.loadReport = loadReport;
 
-let SAJU_TEXT_DB = null;
-
 async function loadSajuKoDB(){
   const res = await fetch("/data/saju_ko.json", { cache: "no-store" });
   if(!res.ok) throw new Error("saju_ko.json 로드 실패");
