@@ -1139,11 +1139,6 @@ try{
     });
   }, 200);
 }
-function pickOne(arr, rand){
-  if(!Array.isArray(arr) || arr.length === 0) return "";
-  const i = Math.floor(rand() * arr.length);
-  return arr[i] || "";
-}
 
 function pickFromSajuDB(elKo, section, rand){
   // section: "overall" | "love" | "money" | "health" | "advice"
