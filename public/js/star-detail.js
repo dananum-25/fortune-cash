@@ -233,16 +233,16 @@ function renderDetail(sign){
   title.innerText=`2026년 ${item.name} 연간 운세`;
 
   document.title=`2026년 ${item.name} 운세 총정리`;
+updateSeoMeta(sign, item);
+injectStructuredData(sign, item);
 
-  intro.innerHTML=`
+titleEl.textContent = `2026년 ${item.name} 연간 운세`;
 
-  <p class="info-text">${item.intro}</p>
-
-  <p class="info-text">${item.notice}</p>
-
-  ${renderKeywords(item.keywords)}
-
-  `;
+introEl.innerHTML = `
+  <p class="info-text">${escapeHtml(item.intro || "")}</p>
+  <p class="info-text">${escapeHtml(item.notice || "별자리 운세는 참고용 콘텐츠입니다.")}</p>
+  ${renderBadges(item.keywords)}
+`;
 
   detail.innerHTML=`
 
