@@ -183,7 +183,21 @@ document.addEventListener("DOMContentLoaded", async ()=>{
     if(window.DB?.loadJSON){
       db = await window.DB.loadJSON("/data/tojung_2026.json");
     }else{
-      db = await fetch("/data/tojung_2026.json").then(r=>r.json());
+      const res = await fetch("/data/tojung_2026.json", { cache: "no-store" });
+
+      if(!res.ok){
+        throw new Error(`HTTP ${res.status} ${res.statusText}`);
+      }
+
+      const text = await res.text();
+
+      try{
+        db = JSON.parse(text);
+      }catch(parseErr){
+        console.error("[tojung.js] JSON parse error", parseErr);
+        console.error("[tojung.js] invalid json preview:", text.slice(0, 300));
+        throw new Error("JSON_PARSE_ERROR");
+      }
     }
   }catch(e){
     console.warn("tojung db load failed", e);
@@ -192,7 +206,7 @@ document.addEventListener("DOMContentLoaded", async ()=>{
 
   if(!db){
     document.getElementById("loginCheck").innerHTML =
-      "<h2>⚠ 데이터 로드 실패</h2><p>tojung_2026.json을 불러오지 못했어요.</p><p class='small'>/data/tojung_2026.json 경로와 JSON 문법을 확인해주세요.</p>";
+      "<h2>⚠ 데이터 로드 실패</h2><p>토정비결 데이터를 불러오지 못했어요.</p><p class='small'>잠시 후 다시 시도해주세요. 문제가 계속되면 운영자에게 문의해주세요.</p>";
     return;
   }
 
