@@ -157,7 +157,66 @@ function renderList(arr,title){
   </div>
   `;
 }
+function escapeHtml(s){
+  return String(s ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
 
+function updateSeoMeta(sign, item){
+  const title = `2026년 ${item.name} 운세 총정리 | 연간운세 · 월별운세 · 재물운 · 애정운`;
+  const desc = `${item.name} 2026년 연간 운세를 참고용으로 확인하세요. 전체 흐름, 직장운, 재물운, 애정운, 건강운, 월별 포인트를 정리했습니다.`;
+  const url = `https://fortune-cash.vercel.app/pages/star/detail.html?sign=${sign}`;
+
+  document.title = title;
+
+  const metaDesc = document.querySelector('meta[name="description"]');
+  if(metaDesc) metaDesc.setAttribute("content", desc);
+
+  const canonical = document.getElementById("canonicalLink");
+  if(canonical) canonical.setAttribute("href", url);
+
+  const ogTitle = document.getElementById("ogTitle");
+  const ogDescription = document.getElementById("ogDescription");
+  const ogUrl = document.getElementById("ogUrl");
+  const twitterTitle = document.getElementById("twitterTitle");
+  const twitterDescription = document.getElementById("twitterDescription");
+
+  if(ogTitle) ogTitle.setAttribute("content", title);
+  if(ogDescription) ogDescription.setAttribute("content", desc);
+  if(ogUrl) ogUrl.setAttribute("content", url);
+  if(twitterTitle) twitterTitle.setAttribute("content", title);
+  if(twitterDescription) twitterDescription.setAttribute("content", desc);
+}
+
+function injectStructuredData(sign, item){
+  const el = document.getElementById("starJsonLd");
+  if(!el || !item) return;
+
+  const pageUrl = `https://fortune-cash.vercel.app/pages/star/detail.html?sign=${sign}`;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": `2026년 ${item.name} 운세 총정리`,
+    "description": `${item.name} 2026년 연간 운세, 월별 흐름, 재물운, 애정운, 직장운, 건강운 요약.`,
+    "url": pageUrl,
+    "inLanguage": "ko-KR",
+    "author": {
+      "@type": "Organization",
+      "name": "무료 운세 플랫폼"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "무료 운세 플랫폼"
+    },
+    "mainEntityOfPage": pageUrl
+  };
+
+  el.textContent = JSON.stringify(jsonLd);
+}
 /* -----------------------
 상세 렌더
 ----------------------- */
