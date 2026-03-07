@@ -1,0 +1,164 @@
+body{
+  margin:0;
+  background:#111;
+  color:#fff;
+  font-family:Arial, sans-serif;
+}
+
+.wrap{
+  max-width:860px;
+  margin:auto;
+  padding:20px;
+}
+
+.page-title{
+  text-align:center;
+  margin:0 0 18px;
+  font-size:30px;
+  line-height:1.35;
+}
+
+.page-subtitle{
+  text-align:center;
+  color:#ccc;
+  line-height:1.7;
+  margin:0 0 18px;
+}
+
+.card{
+  background:#1a1a1a;
+  border-radius:16px;
+  padding:18px;
+  margin:14px 0;
+  box-shadow:0 2px 8px rgba(0,0,0,0.18);
+}
+
+.card h2,
+.card h3{
+  margin-top:0;
+  color:#ffd56b;
+}
+
+.info-text{
+  line-height:1.85;
+  margin:0;
+}
+
+.info-text + .info-text{
+  margin-top:10px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.card-link{
+  display:block;
+  background:#1a1a1a;
+  padding:16px;
+  border-radius:14px;
+  text-align:center;
+  color:#ffd56b;
+  text-decoration:none;
+  font-weight:bold;
+  transition:.2s;
+}
+
+.card-link:hover{
+  background:#222;
+}
+
+.month-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.month{
+  background:#151515;
+  border-radius:12px;
+  padding:12px;
+  line-height:1.75;
+}
+
+.badge-wrap{
+  margin-top:10px;
+}
+
+.badge{
+  display:inline-block;
+  background:#222;
+  color:#ffd56b;
+  padding:6px 10px;
+  border-radius:12px;
+  margin:4px 6px 4px 0;
+  font-size:13px;
+}
+
+.list{
+  margin:10px 0 0 18px;
+  padding:0;
+  line-height:1.9;
+}
+
+.action-link,
+.action-btn{
+  display:block;
+  width:100%;
+  box-sizing:border-box;
+  background:#222;
+  color:#ffd56b;
+  text-decoration:none;
+  font-weight:bold;
+  text-align:center;
+  padding:14px;
+  border-radius:12px;
+  margin-top:12px;
+  border:none;
+  cursor:pointer;
+  font-size:15px;
+}
+
+.action-link:hover,
+.action-btn:hover{
+  background:#2a2a2a;
+}
+
+.footer-links{
+  margin-top:8px;
+}
+
+footer{
+  opacity:.78;
+  font-size:12px;
+  margin-top:40px;
+  text-align:center;
+  line-height:1.8;
+  padding-bottom:24px;
+}
+
+footer a{
+  color:#aaa;
+  text-decoration:none;
+}
+
+footer a:hover{
+  color:#ffd56b;
+}
+
+.notice-box{
+  border:1px solid rgba(255,213,107,0.18);
+}
+
+@media (max-width:640px){
+  .grid,
+  .month-grid{
+    grid-template-columns:1fr;
+  }
+
+  .page-title{
+    font-size:24px;
+  }
+}
