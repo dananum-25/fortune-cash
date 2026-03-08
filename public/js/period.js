@@ -56,6 +56,31 @@ async function loadDB(){
   }
 }
 
+let yearDB = {};
+
+async function loadYearDB(){
+
+  const year = new Date().getFullYear();
+
+  try{
+
+    const r = await fetch(`/data/fortunes_ko_${year}.json`);
+
+    if(!r.ok) throw "no file";
+
+    yearDB = await r.json();
+
+  }catch(e){
+
+    console.warn("연간 운세 DB 없음 → 기본 2026 사용");
+
+    const r = await fetch(`/data/fortunes_ko_2026.json`);
+    yearDB = await r.json();
+
+  }
+
+}
+
 function getPeriodBirth(){
   return (window.getActiveBirth && window.getActiveBirth())
     || localStorage.getItem("birth")
