@@ -103,19 +103,21 @@ async function givePoint(){
 
 async function rewardContent(type){
   const phone = localStorage.getItem("phone");
-  if(!phone) return;
+  if(!phone) return null;
 
   const API_URL = getApiUrlSafe();
-  if(!API_URL) return;
+  if(!API_URL) return null;
 
-  await postJSON(API_URL, {
+  const res = await postJSON(API_URL, {
     action:"addPoint",
     phone,
     amount: 1,
-    type: String(type || "")
+    type: String(type || ""),
+    memo: "content reward"
   });
 
   await loadMyPoint();
+  return res;
 }
 
 // 다른 페이지에서도 쓰게 노출
