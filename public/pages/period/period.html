@@ -10,12 +10,14 @@
 
   <style>
     .helper-box p{ margin:6px 0; }
+
     .birth-form{
       display:flex;
       flex-direction:column;
       gap:10px;
       margin-top:12px;
     }
+
     .birth-form input,
     .birth-form select{
       padding:12px;
@@ -25,10 +27,51 @@
       width:100%;
       box-sizing:border-box;
     }
+
+    .fortune-block{
+      margin-top:14px;
+    }
+
+    .fortune-block .btn{
+      width:100%;
+    }
+
+    .fortune-panel{
+      margin-top:12px;
+      padding:14px;
+      border-radius:12px;
+      background:#fafafa;
+      border:1px solid #eee;
+    }
+
+    .fortune-panel h3{
+      margin-top:0;
+      margin-bottom:10px;
+    }
+
+    .recommend-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .recommend-actions a{
+      display:block;
+      text-align:center;
+      text-decoration:none;
+    }
+
     .footer-links a{
       color:#fff !important;
       font-size:13px;
       text-decoration:none;
+    }
+
+    @media (max-width:640px){
+      .recommend-actions{
+        grid-template-columns:1fr;
+      }
     }
   </style>
 </head>
@@ -38,7 +81,7 @@
 
     <h1 id="pageTitle">📆 오늘 운세 · 내일 운세 · 연간운세 무료 보기</h1>
 
-    <!-- 나의 기준 정보 -->
+    <!-- 기준 정보 -->
     <div id="myInfoBox" class="card"></div>
 
     <!-- 포인트 박스 -->
@@ -47,15 +90,15 @@
     <!-- 게스트 생년월일 입력 -->
     <section id="guestBirthCard" class="card helper-box">
       <h2>내 기준으로 다시 보기</h2>
-      <p>지금은 기본 기준값 또는 저장된 정보로 결과를 볼 수 있어요.</p>
-      <p>생년월일을 입력하면 게스트도 본인 기준으로 다시 확인할 수 있습니다.</p>
+      <p>회원은 저장된 생년월일이 자동 적용됩니다.</p>
+      <p>게스트는 생년월일을 입력하면 본인 기준으로 다시 확인할 수 있습니다.</p>
 
       <div class="birth-form">
         <input id="guestBirthInline" type="date">
 
         <select id="guestBirthTypeInline">
           <option value="solar">양력</option>
-          <option value="lunar" disabled>음력(준비중)</option>
+          <option value="lunar">음력</option>
         </select>
 
         <label style="font-size:13px;">
@@ -65,6 +108,10 @@
 
         <button class="btn" type="button" id="applyGuestBirthBtn">내 생년월일 적용</button>
       </div>
+
+      <p class="small" style="margin-top:10px;">
+        게스트는 포인트 적립 없이 콘텐츠만 이용할 수 있습니다.
+      </p>
     </section>
 
     <!-- 설명 콘텐츠 -->
@@ -92,34 +139,37 @@
       </p>
     </section>
 
-    <!-- 버튼 영역 -->
-    <section id="actionSection" class="card">
-      <div class="btn-row">
-        <button class="btn" onclick="showToday()">오늘 운세</button>
-        <button class="btn" onclick="showTomorrow()">내일 운세</button>
-        <button class="btn" id="yearBtn" onclick="showYear()">연간운세</button>
+    <!-- 오늘 운세 -->
+    <section class="card fortune-block">
+      <button class="btn" type="button" onclick="showToday(true)">오늘 운세</button>
+
+      <div id="todayPanel" class="fortune-panel">
+        <div id="todayResult"></div>
+        <div class="hr"></div>
+        <div id="todayGuide"></div>
       </div>
-
-      <p style="margin-top:14px;" class="small">
-        회원은 결과 보기 시 콘텐츠별 1일 1회 포인트가 적립됩니다.
-      </p>
     </section>
 
-    <!-- 결과 영역 -->
-    <section id="resultSection" class="card" style="display:none;">
-      <div id="resultBox" class="result-box"></div>
-      <div class="hr"></div>
-      <div id="guideBox" class="result-box"></div>
+    <!-- 내일 운세 -->
+    <section class="card fortune-block">
+      <button class="btn" type="button" onclick="showTomorrow(true)">내일 운세</button>
+
+      <div id="tomorrowPanel" class="fortune-panel">
+        <div id="tomorrowResult"></div>
+        <div class="hr"></div>
+        <div id="tomorrowGuide"></div>
+      </div>
     </section>
 
-    <!-- 관련 운세 -->
-    <section class="card">
-      <h3>관련 운세 더 보기</h3>
-      <ul>
-        <li><a href="/pages/zodiac/zodiac.html">띠별 운세</a></li>
-        <li><a href="/pages/star/index.html">별자리 운세</a></li>
-        <li><a href="/pages/tarot/tarot.html">타로 운세</a></li>
-      </ul>
+    <!-- 연간 운세 -->
+    <section class="card fortune-block">
+      <button class="btn" id="yearBtn" type="button" onclick="showYear(true)">연간운세</button>
+
+      <div id="yearPanel" class="fortune-panel">
+        <div id="yearResult"></div>
+        <div class="hr"></div>
+        <div id="yearGuide"></div>
+      </div>
     </section>
 
     <!-- FAQ -->
@@ -154,16 +204,18 @@
       </p>
     </section>
 
-    <div class="card">
+    <!-- 추천 콘텐츠 -->
+    <section class="card">
       <h2>추천 운세 콘텐츠</h2>
-      <ul>
-        <li><a href="/pages/saju/saju.html">사주 분석</a></li>
-        <li><a href="/pages/star/index.html">별자리 운세</a></li>
-        <li><a href="/pages/zodiac/zodiac.html">띠별 운세</a></li>
-        <li><a href="/pages/tojung/tojung.html">토정비결</a></li>
-        <li><a href="/fortune-guide.html">운세 가이드</a></li>
-      </ul>
-    </div>
+      <div class="recommend-actions">
+        <a class="secondaryBtn" href="/pages/saju/saju.html">사주 분석</a>
+        <a class="secondaryBtn" href="/pages/star/index.html">별자리 운세</a>
+        <a class="secondaryBtn" href="/pages/zodiac/zodiac.html">띠별 운세</a>
+        <a class="secondaryBtn" href="/pages/tojung/tojung.html">토정비결</a>
+        <a class="secondaryBtn" href="/pages/tarot/tarot.html">타로</a>
+        <a class="secondaryBtn" href="/fortune-guide.html">운세 가이드</a>
+      </div>
+    </section>
 
     <button class="secondaryBtn" id="shareBtn" type="button">공유하기</button>
     <button class="secondaryBtn" type="button" onclick="Common.goHome()">홈으로</button>
