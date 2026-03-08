@@ -1089,13 +1089,19 @@ function buildYongshinInterpretation(profile){
 // 11) Main calculate
 // ===============================
 async function calculateSaju(){
-  const name = localStorage.getItem("name") || "회원";
-  const birth = normalizeBirthYMD(localStorage.getItem("birth"));
+  const mode = getSajuMode();
+  const name = mode === "member"
+    ? (localStorage.getItem("name") || "회원")
+    : "게스트";
+
+  const birth = normalizeBirthYMD(getActiveBirthForSaju());
 
   const hourEl = document.getElementById("birthHour");
   const hour = parseInt(hourEl?.value, 10);
- if(!birth){
-    alert("로그인이 필요합니다. (생년월일 정보가 없습니다)");
+
+  if(!birth){
+    alert("생년월일 정보가 없습니다. 게스트는 생년월일을 먼저 입력해주세요.");
+    renderSajuEntryState();
     return;
   }
   if(Number.isNaN(hour) || hour < 0 || hour > 23){
