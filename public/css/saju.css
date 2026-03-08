@@ -1,7 +1,106 @@
 /* /css/saju.css */
-/* saju.html 인라인 중 "사주 전용 컴포넌트"만 분리 */
 
-.bar-wrap{ margin:14px 0; }
+.saju-wrap{
+  width:min(100% - 24px, 960px);
+  margin:0 auto;
+  padding:20px 0 40px;
+}
+
+.page-desc{
+  margin-bottom:14px;
+}
+
+.fortune-title{
+  margin:0 0 14px;
+  font-size:28px;
+  font-weight:800;
+  line-height:1.25;
+  letter-spacing:-0.3px;
+}
+
+.accent-main{
+  color:#ffd56b;
+}
+
+.helper-box p{
+  margin:6px 0;
+}
+
+.birth-form{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:12px;
+}
+
+.birth-form input,
+.birth-form select{
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #ddd;
+  font-size:14px;
+  width:100%;
+  box-sizing:border-box;
+  background:#fff;
+  color:#111;
+}
+
+.inline-check{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:14px;
+}
+
+.recommend-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:14px;
+}
+
+.recommend-actions a,
+.white-action-btn{
+  display:block;
+  text-align:center;
+  text-decoration:none;
+  border:2px solid #ffffff;
+  border-radius:12px;
+  background:#ffffff;
+  color:#111 !important;
+  font-weight:700;
+  padding:14px 10px;
+  box-sizing:border-box;
+}
+
+.white-action-btn{
+  cursor:pointer;
+}
+
+.recommend-actions a:hover,
+.white-action-btn:hover{
+  background:#f3f3f3;
+}
+
+.footer-links{
+  margin-top:10px;
+  display:grid;
+  grid-template-columns:repeat(3, auto);
+  justify-content:center;
+  gap:8px 14px;
+  line-height:1.8;
+}
+
+.footer-links a{
+  color:#fff !important;
+  font-size:13px;
+  text-decoration:none;
+  white-space:nowrap;
+}
+
+.bar-wrap{
+  margin:14px 0;
+}
 
 .bar-label{
   display:flex;
@@ -9,12 +108,14 @@
   font-size:14px;
   margin-bottom:6px;
 }
+
 .bar{
   height:14px;
   background:#222;
   border-radius:10px;
   overflow:hidden;
 }
+
 .bar-fill{
   height:100%;
   width:0%;
@@ -33,6 +134,37 @@
   padding:16px;
   border-radius:14px;
 }
-svg{ width:100%; height:200px; }
-.graph-line{ fill:none; stroke:#ffd56b; stroke-width:3; }
-.graph-dot{ fill:#ff9f1a; }
+
+svg{
+  width:100%;
+  height:200px;
+}
+
+.graph-line{
+  fill:none;
+  stroke:#ffd56b;
+  stroke-width:3;
+}
+
+.graph-dot{
+  fill:#ff9f1a;
+}
+
+@media (max-width: 767px){
+  .saju-wrap{
+    width:min(100% - 24px, 420px);
+  }
+
+  .recommend-actions{
+    grid-template-columns:1fr;
+  }
+
+  .footer-links{
+    grid-template-columns:repeat(2, auto);
+    gap:6px 12px;
+  }
+
+  .fortune-title{
+    font-size:22px;
+  }
+}
