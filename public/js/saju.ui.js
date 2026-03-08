@@ -1376,15 +1376,26 @@ async function rewardSajuResultOnce(){
   if(localStorage.getItem(key) === "1") return;
 
   if(window.rewardContent){
-    const res = await window.rewardContent("saju_result");
+    try{
+      const res = await window.rewardContent("saju_result");
 
-    if(res?.status === "ok"){
-      localStorage.setItem(key, "1");
-      if(window.loadMyPoint) await window.loadMyPoint();
-      renderPointBoxSaju();
-      alert("포인트가 적립되었습니다 ✅");
-    }else if(res?.status === "already"){
-      localStorage.setItem(key, "1");
+      if(res?.status === "ok"){
+        localStorage.setItem(key, "1");
+
+        if(window.loadMyPoint){
+          await window.loadMyPoint();
+        }
+
+        if(typeof renderPointBoxSaju === "function"){
+          renderPointBoxSaju();
+        }
+
+        alert("포인트가 적립되었습니다 ✅");
+      }else if(res?.status === "already"){
+        localStorage.setItem(key, "1");
+      }
+    }catch(e){
+      console.warn("[saju.ui.js] reward failed", e);
     }
   }
 }
