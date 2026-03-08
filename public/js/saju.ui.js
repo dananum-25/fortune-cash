@@ -1411,51 +1411,207 @@ window.calculateSaju = calculateSaju;
 window.showSavedReports = showSavedReports;
 window.loadReport = loadReport;
 
-// ===============================
-// 13) INIT
-// ===============================
-document.addEventListener("DOMContentLoaded", async () => {
-  // ✅ (추가) 문구 DB 로드
-  try{
-    SAJU_TEXT_DB = await loadSajuKoDB();
-  }catch(e){
-    console.warn("saju_ko.json 로드 실패:", e);
-    SAJU_TEXT_DB = null; // DB 없어도 서비스는 돌아가게
+function getActiveBirthForSaju(){
+  return localStorage.getItem("birth")
+    || localStorage.getItem("guest_birth")
+    || "";
+}
+
+function getSajuMode(){
+  const phone = localStorage.getItem("phone");
+  const guestBirth = localStorage.getItem("guest_birth");
+  if(phone) return "member";
+  if(guestBirth) return "guest";
+  return "default";
+}
+
+function renderPointBoxSaju(){
+  const box = document.getElementById("pointBox");
+  if(!box) return;
+
+  const phone = localStorage.getItem("phone");
+
+  if(phone){
+    const point = Number(localStorage.getItem("point") || localStorage.getItem("points") || 0);
+    box.innerHTML = `
+      <h2>🎁 포인트 안내</h2>
+      <p>현재 포인트: <b>${point}P</b></p>
+      <p class="small">회원은 사주 결과를 확인하면 1일 1회 1포인트가 적립됩니다.</p>
+    `;
+    return;
   }
 
+  box.innerHTML = `
+    <h2>🎁 포인트 안내</h2>
+    <p>게스트는 포인트 적립 없이 콘텐츠를 이용할 수 있습니다.</p>
+    <p class="small">포인트 적립과 생년월일 자동 저장을 원하면 회원가입 후 이용해주세요.</p>
+  `;
+}
+
+function renderSajuEntryState(){
   const loginCheck = document.getElementById("loginCheck");
   const timeInputBox = document.getElementById("timeInputBox");
+  const guestBirthCard = document.getElementById("guestBirthCard");
 
-  // birth 체크: raw가 ISO여도 normalize로 판단
-  const birthRaw = localStorage.getItem("birth");
-  const birth = normalizeBirthYMD(birthRaw);
+  const mode = getSajuMode();
+  const birth = normalizeBirthYMD(getActiveBirthForSaju());
+  const name = localStorage.getItem("name") || "회원";
+
+  if(guestBirthCard){
+    guestBirthCard.style.display = (mode === "guest" || mode === "default") ? "block" : "none";
+  }
 
   if(!birth){
     if(loginCheck){
-      loginCheck.innerHTML =
-        "<h2>⚠ 로그인 필요</h2><p>사주 계산은 로그인 후 생년월일이 저장되어야 가능합니다.</p><p class='small'>메인으로 가서 로그인(회원가입) 후 다시 들어와주세요.</p>";
+      loginCheck.innerHTML = `
+        <h2>📌 사주 계산 준비</h2>
+        <p>회원은 저장된 생년월일이 자동 적용됩니다.</p>
+        <p>게스트는 아래에서 생년월일을 입력한 뒤 사주 계산을 진행할 수 있습니다.</p>
+      `;
     }
     if(timeInputBox) timeInputBox.style.display = "none";
     return;
   }
 
-  // ISO가 들어있어도 YYYY-MM-DD로 고정 저장 (다른 페이지 꼬임 방지)
-  localStorage.setItem("birth", birth);
-
   if(loginCheck){
-    loginCheck.innerHTML =
-      "<h2>✅ 준비 완료</h2><p>출생 시간을 입력하면 4기둥 + 오행 + 2026 세운 분석을 보여줄게요.</p>";
+    if(mode === "member"){
+      loginCheck.innerHTML = `
+        <h2>✅ 준비 완료</h2>
+        <p><b>${name}</b>님 생년월일이 자동 적용되었습니다.</p>
+        <p class="small">출생 시간을 입력하면 사주 분석을 시작할 수 있습니다.</p>
+      `;
+    }else{
+      loginCheck.innerHTML = `
+        <h2>✅ 게스트 기준 적용 완료</h2>
+        <p>생년월일: <b>${birth}</b></p>
+        <p class="small">출생 시간을 입력하면 사주 분석을 시작할 수 있습니다.</p>
+      `;
+    }
   }
-  if(timeInputBox) timeInputBox.style.display = "block";
 
-  // 저장된 출생시간 자동 복원
+  if(timeInputBox) timeInputBox.style.display = "block";
+}
+
+async function applyGuestBirthForSaju(){
+  const birthEl = document.getElementById("guestBirthInline");
+  const birthTypeEl = document.getElementById("guestBirthTypeInline");
+  const leapEl = document.getElementById("guestIsLeapInline");
+
+  const rawBirth = (birthEl?.value || "").trim();
+  const birthTypeInput = (birthTypeEl?.value || "solar").trim();
+  const isLeap = !!(leapEl && leapEl.checked);
+
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(rawBirth)){
+    alert("생년월일을 입력해주세요.");
+    return;
+  }
+
+  try{
+    await window.BirthUtil?.loadIpchunDB?.();
+  }catch(e){}
+
+  let solarBirth = rawBirth;
+
+  if(birthTypeInput === "lunar"){
+    if(typeof window.BirthUtil?.lunarToSolar !== "function"){
+      alert("음력 변환 기능을 불러오지 못했어요.");
+      return;
+    }
+
+    try{
+      solarBirth = await window.BirthUtil.lunarToSolar(rawBirth, isLeap);
+    }catch(e){
+      alert("음력→양력 변환 실패: " + String(e));
+      return;
+    }
+
+    if(!solarBirth || !/^\d{4}-\d{2}-\d{2}$/.test(solarBirth)){
+      alert("음력 생년월일을 양력으로 변환하지 못했어요.");
+      return;
+    }
+  }
+
+  localStorage.setItem("guestMode", "true");
+  localStorage.setItem("guest_birth", solarBirth);
+  localStorage.setItem("guest_birthType", "solar");
+  localStorage.setItem("guest_birth_input", rawBirth);
+  localStorage.setItem("guest_birth_input_type", birthTypeInput);
+  localStorage.setItem("guest_birth_input_isLeap", isLeap ? "1" : "0");
+
+  const zodiac = window.BirthUtil?.calcZodiacByIpchun ? window.BirthUtil.calcZodiacByIpchun(solarBirth) : "";
+  const gapja = window.BirthUtil?.calcGapjaByIpchun ? window.BirthUtil.calcGapjaByIpchun(solarBirth) : "";
+
+  if(zodiac) localStorage.setItem("guest_zodiac", zodiac);
+  if(gapja) localStorage.setItem("guest_gapja", gapja);
+
+  renderSajuEntryState();
+  renderPointBoxSaju();
+
+  alert("게스트 기준 생년월일이 적용되었습니다 ✅");
+}
+
+function bindSajuShare(){
+  const btn = document.getElementById("shareBtn");
+  if(!btn) return;
+
+  btn.addEventListener("click", async ()=>{
+    const shareData = {
+      title: document.title,
+      text: "무료 사주 계산 결과를 확인해보세요.",
+      url: window.location.href
+    };
+
+    try{
+      if(navigator.share){
+        await navigator.share(shareData);
+      }else if(navigator.clipboard){
+        await navigator.clipboard.writeText(window.location.href);
+        alert("현재 페이지 주소를 복사했어요.");
+      }else{
+        alert("공유 기능을 사용할 수 없는 환경입니다.");
+      }
+    }catch(e){
+      console.warn("[saju.ui.js] share cancelled", e);
+    }
+  });
+}
+// ===============================
+// 13) INIT
+// ===============================
+document.addEventListener("DOMContentLoaded", async () => {
+  try{
+    SAJU_TEXT_DB = await loadSajuKoDB();
+  }catch(e){
+    console.warn("saju_ko.json 로드 실패:", e);
+    SAJU_TEXT_DB = null;
+  }
+
+  try{
+    await loadSipseongDB();
+  }catch(e){
+    console.warn("sipseong_ko.json 로드 실패:", e);
+  }
+
+  const activeBirth = normalizeBirthYMD(getActiveBirthForSaju());
+  if(localStorage.getItem("phone") && activeBirth){
+    localStorage.setItem("birth", activeBirth);
+  }
+
+  if(window.loadMyPoint){
+    await window.loadMyPoint();
+  }
+
+  renderSajuEntryState();
+  renderPointBoxSaju();
+  bindSajuShare();
+
   const savedHour = localStorage.getItem("birthHour");
   const hourEl = document.getElementById("birthHour");
   if(hourEl && savedHour !== null && savedHour !== ""){
     hourEl.value = savedHour;
   }
 
-  // 버튼 바인딩
   document.getElementById("calcBtn")?.addEventListener("click", calculateSaju);
   document.getElementById("reportBtn")?.addEventListener("click", showSavedReports);
+  document.getElementById("applyGuestBirthBtn")?.addEventListener("click", applyGuestBirthForSaju);
 });
