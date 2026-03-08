@@ -1,6 +1,15 @@
 console.log("[tojung.js] loaded ✅");
 
 // -----------------------------
+// config
+// -----------------------------
+const TOJUNG_FALLBACK_YEAR = 2026;
+const TOJUNG_ACTIVE_YEAR =
+  window.FortuneConfig?.year ||
+  window.APP_CONFIG?.fortuneYear ||
+  new Date().getFullYear();
+
+// -----------------------------
 // utils
 // -----------------------------
 function escapeHtml(s){
@@ -19,43 +28,32 @@ function ymdToSeed(ymd){
   return (y * 10000) + (mo * 100) + d;
 }
 
-// 같은 사람은 같은 결과
 function seededPick(arr, seed, offset){
   if(!Array.isArray(arr) || arr.length === 0) return "";
-  const idx = Math.abs((seed + (offset||0)) % arr.length);
+  const idx = Math.abs((seed + (offset || 0)) % arr.length);
   return arr[idx];
 }
 
-// 하루 1번만 +1 (중복방지)
-async function rewardOncePerDay(key){
+function getTodayStamp(){
   const today = new Date();
   const y = today.getFullYear();
   const m = String(today.getMonth()+1).padStart(2,"0");
   const d = String(today.getDate()).padStart(2,"0");
-  const stamp = `${y}${m}${d}`;
-
-  const k = `${key}_${stamp}`;
-  if(localStorage.getItem(k) === "1") return;
-  localStorage.setItem(k, "1");
-
-  if(localStorage.getItem("phone")){
-    await window.rewardContent?.(key);
-  }
+  return `${y}${m}${d}`;
 }
 
-// score band 찾기
-function findBand(scoreGuide, score){
-  const bands = scoreGuide?.bands;
-  if(!Array.isArray(bands) || bands.length === 0){
-    return { title:"보통", text:"기본기 관리가 핵심입니다." };
-  }
-  // min 내림차순이 아닐 수도 있으니 정렬해서 안전하게
-  const sorted = [...bands].sort((a,b)=>(b.min??0)-(a.min??0));
-  const hit = sorted.find(b => Number(score) >= Number(b.min ?? 0)) || sorted[sorted.length-1];
-  return {
-    title: hit?.title || "보통",
-    text: hit?.text || ""
-  };
+function getActiveBirthForTojung(){
+  return localStorage.getItem("birth")
+    || localStorage.getItem("guest_birth")
+    || "";
+}
+
+function getTojungMode(){
+  const phone = localStorage.getItem("phone");
+  const guestBirth = localStorage.getItem("guest_birth");
+  if(phone) return "member";
+  if(guestBirth) return "guest";
+  return "default";
 }
 
 function barColorClass(score){
@@ -63,6 +61,19 @@ function barColorClass(score){
   if(score >= 70) return "bar-good";
   if(score >= 55) return "bar-mid";
   return "bar-low";
+}
+
+function findBand(scoreGuide, score){
+  const bands = scoreGuide?.bands;
+  if(!Array.isArray(bands) || bands.length === 0){
+    return { title:"보통", text:"기본기 관리가 핵심입니다." };
+  }
+  const sorted = [...bands].sort((a,b)=>(b.min ?? 0) - (a.min ?? 0));
+  const hit = sorted.find(b => Number(score) >= Number(b.min ?? 0)) || sorted[sorted.length - 1];
+  return {
+    title: hit?.title || "보통",
+    text: hit?.text || ""
+  };
 }
 
 function renderBars(categories){
@@ -73,30 +84,28 @@ function renderBars(categories){
     {k:"health", label:"💪 건강운"},
   ];
 
-  const html = rows.map(r=>{
-    const v = Number(categories?.[r.k] ?? 0);
-    return `
-      <div style="margin:12px 0;">
-        <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;">
-          <span>${r.label}</span>
-          <span><b>${escapeHtml(v)}점</b></span>
-        </div>
-        <div style="height:12px;background:#222;border-radius:10px;overflow:hidden;">
-          <div class="${barColorClass(v)}" style="height:100%;width:${Math.max(0,Math.min(100,v))}%;border-radius:10px;"></div>
-        </div>
-      </div>
-    `;
-  }).join("");
-
   return `
     <div style="margin-top:10px;">
-      ${html}
+      ${rows.map(r=>{
+        const v = Number(categories?.[r.k] ?? 0);
+        return `
+          <div class="score-row">
+            <div class="score-head">
+              <span>${r.label}</span>
+              <span><b>${escapeHtml(v)}점</b></span>
+            </div>
+            <div class="score-bar">
+              <div class="score-fill ${barColorClass(v)}" style="width:${Math.max(0, Math.min(100, v))}%;"></div>
+            </div>
+          </div>
+        `;
+      }).join("")}
     </div>
   `;
 }
 
 function getThisMonth(){
-  return new Date().getMonth() + 1; // 1~12
+  return new Date().getMonth() + 1;
 }
 
 function renderList(title, arr, seed, baseOffset, limit){
@@ -104,10 +113,9 @@ function renderList(title, arr, seed, baseOffset, limit){
   const n = Math.min(limit || 5, list.length);
   if(n <= 0) return "";
 
-  // seed 기반으로 “고정된 랜덤 선택”
   const picked = [];
-  for(let i=0;i<n;i++){
-    const t = seededPick(list, seed, (baseOffset||0) + i*7);
+  for(let i = 0; i < n; i++){
+    const t = seededPick(list, seed, (baseOffset || 0) + i * 7);
     if(t && !picked.includes(t)) picked.push(t);
   }
 
@@ -127,7 +135,7 @@ function renderKeywords(keywords){
 
 function renderLucky(lucky, seed){
   const pick = (arr, off)=>{
-    const v = seededPick(Array.isArray(arr)?arr:[], seed, off);
+    const v = seededPick(Array.isArray(arr) ? arr : [], seed, off);
     return v ? escapeHtml(v) : "-";
   };
 
@@ -145,6 +153,7 @@ function renderThisMonthFortune(monthsObj, seed){
   const m = String(getThisMonth());
   const arr = monthsObj?.[m];
   if(!Array.isArray(arr) || arr.length === 0) return "";
+
   const a = seededPick(arr, seed, 101);
   const b = seededPick(arr, seed, 102);
   const c = seededPick(arr, seed, 103);
@@ -158,61 +167,258 @@ function renderThisMonthFortune(monthsObj, seed){
 }
 
 // -----------------------------
-// main
+// UI helpers
 // -----------------------------
-document.addEventListener("DOMContentLoaded", async ()=>{
-  const birth = localStorage.getItem("birth");
-  const name  = localStorage.getItem("name") || "회원";
+function renderPointBoxTojung(){
+  const box = document.getElementById("pointBox");
+  if(!box) return;
 
-  // 로그인 필요(생년월일 기반)
-  if(!birth){
-    const el = document.getElementById("loginCheck");
-    if(el){
-      el.innerHTML =
-        "<h2>⚠ 로그인 필요</h2><p>토정비결은 로그인 후 생년월일이 저장되어야 볼 수 있어요.</p><p class='small'>메인에서 로그인 후 다시 들어와주세요.</p>";
-    }
+  const phone = localStorage.getItem("phone");
+
+  if(phone){
+    const point = Number(localStorage.getItem("point") || localStorage.getItem("points") || 0);
+    box.innerHTML = `
+      <h2>🎁 포인트 안내</h2>
+      <p>현재 포인트: <b>${point}P</b></p>
+      <p class="small">회원은 토정비결 결과를 확인하면 1일 1회 1포인트가 적립됩니다.</p>
+    `;
     return;
   }
 
-  document.getElementById("loginCheck").innerHTML =
-    "<h2>✅ 준비 완료</h2><p>2026년 토정비결 리포트를 불러오는 중…</p>";
+  box.innerHTML = `
+    <h2>🎁 포인트 안내</h2>
+    <p>게스트는 포인트 적립 없이 콘텐츠를 이용할 수 있습니다.</p>
+    <p class="small">포인트 적립과 생년월일 자동 저장을 원하면 회원가입 후 이용해주세요.</p>
+  `;
+}
 
-  // JSON 로드 (DB.loadJSON이 없을 수도 있으니 fetch fallback)
-  let db = null;
+function renderTojungEntryState(){
+  const loginCheck = document.getElementById("loginCheck");
+  const guestBirthCard = document.getElementById("guestBirthCard");
+
+  const mode = getTojungMode();
+  const birth = getActiveBirthForTojung();
+  const name = localStorage.getItem("name") || "회원";
+
+  if(guestBirthCard){
+    guestBirthCard.style.display = (mode === "guest" || mode === "default") ? "block" : "none";
+  }
+
+  if(!birth){
+    if(loginCheck){
+      loginCheck.innerHTML = `
+        <h2>📌 토정비결 준비</h2>
+        <p>회원은 저장된 생년월일이 자동 적용됩니다.</p>
+        <p>게스트는 아래에서 생년월일을 입력한 뒤 본인 기준으로 결과를 볼 수 있습니다.</p>
+      `;
+    }
+    return false;
+  }
+
+  if(loginCheck){
+    if(mode === "member"){
+      loginCheck.innerHTML = `
+        <h2>✅ 준비 완료</h2>
+        <p><b>${escapeHtml(name)}</b>님 생년월일이 자동 적용되었습니다.</p>
+        <p class="small">${TOJUNG_ACTIVE_YEAR}년 토정비결 리포트를 불러오는 중입니다.</p>
+      `;
+    }else{
+      loginCheck.innerHTML = `
+        <h2>✅ 게스트 기준 적용 완료</h2>
+        <p>생년월일: <b>${escapeHtml(birth)}</b></p>
+        <p class="small">${TOJUNG_ACTIVE_YEAR}년 토정비결 리포트를 불러오는 중입니다.</p>
+      `;
+    }
+  }
+
+  return true;
+}
+
+async function applyGuestBirthForTojung(){
+  const birthEl = document.getElementById("guestBirthInline");
+  const birthTypeEl = document.getElementById("guestBirthTypeInline");
+  const leapEl = document.getElementById("guestIsLeapInline");
+
+  const rawBirth = (birthEl?.value || "").trim();
+  const birthTypeInput = (birthTypeEl?.value || "solar").trim();
+  const isLeap = !!(leapEl && leapEl.checked);
+
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(rawBirth)){
+    alert("생년월일을 입력해주세요.");
+    return;
+  }
+
+  try{
+    await window.BirthUtil?.loadIpchunDB?.();
+  }catch(e){}
+
+  let solarBirth = rawBirth;
+
+  if(birthTypeInput === "lunar"){
+    if(typeof window.BirthUtil?.lunarToSolar !== "function"){
+      alert("음력 변환 기능을 불러오지 못했어요.");
+      return;
+    }
+
+    try{
+      solarBirth = await window.BirthUtil.lunarToSolar(rawBirth, isLeap);
+    }catch(e){
+      alert("음력→양력 변환 실패: " + String(e));
+      return;
+    }
+
+    if(!solarBirth || !/^\d{4}-\d{2}-\d{2}$/.test(solarBirth)){
+      alert("음력 생년월일을 양력으로 변환하지 못했어요.");
+      return;
+    }
+  }
+
+  localStorage.setItem("guestMode", "true");
+  localStorage.setItem("guest_birth", solarBirth);
+  localStorage.setItem("guest_birthType", "solar");
+  localStorage.setItem("guest_birth_input", rawBirth);
+  localStorage.setItem("guest_birth_input_type", birthTypeInput);
+  localStorage.setItem("guest_birth_input_isLeap", isLeap ? "1" : "0");
+
+  const zodiac = window.BirthUtil?.calcZodiacByIpchun ? window.BirthUtil.calcZodiacByIpchun(solarBirth) : "";
+  const gapja = window.BirthUtil?.calcGapjaByIpchun ? window.BirthUtil.calcGapjaByIpchun(solarBirth) : "";
+
+  if(zodiac) localStorage.setItem("guest_zodiac", zodiac);
+  if(gapja) localStorage.setItem("guest_gapja", gapja);
+
+  renderTojungEntryState();
+  renderPointBoxTojung();
+
+  await loadTojungResult();
+
+  alert("게스트 기준 생년월일이 적용되었습니다 ✅");
+}
+
+function bindTojungShare(){
+  const btn = document.getElementById("shareBtn");
+  if(!btn) return;
+
+  btn.addEventListener("click", async ()=>{
+    const shareData = {
+      title: document.title,
+      text: `${TOJUNG_ACTIVE_YEAR}년 토정비결 결과를 확인해보세요.`,
+      url: window.location.href
+    };
+
+    try{
+      if(navigator.share){
+        await navigator.share(shareData);
+      }else if(navigator.clipboard){
+        await navigator.clipboard.writeText(window.location.href);
+        alert("현재 페이지 주소를 복사했어요.");
+      }else{
+        alert("공유 기능을 사용할 수 없는 환경입니다.");
+      }
+    }catch(e){
+      console.warn("[tojung.js] share cancelled", e);
+    }
+  });
+}
+
+// -----------------------------
+// reward
+// -----------------------------
+async function rewardTojungOncePerDay(){
+  const phone = localStorage.getItem("phone");
+  if(!phone) return;
+
+  const key = `tojung_${getTodayStamp()}`;
+  if(localStorage.getItem(key) === "1") return;
+
+  if(window.rewardContent){
+    try{
+      const res = await window.rewardContent("tojung");
+
+      if(res?.status === "ok"){
+        localStorage.setItem(key, "1");
+
+        if(window.loadMyPoint){
+          await window.loadMyPoint();
+        }
+
+        renderPointBoxTojung();
+        alert("포인트가 적립되었습니다 ✅");
+      }else if(res?.status === "already"){
+        localStorage.setItem(key, "1");
+      }
+    }catch(e){
+      console.warn("[tojung.js] reward failed", e);
+    }
+  }
+}
+
+// -----------------------------
+// data load
+// -----------------------------
+async function loadTojungDB(){
+  const currentPath = `/data/tojung_${TOJUNG_ACTIVE_YEAR}.json`;
+  const fallbackPath = `/data/tojung_${TOJUNG_FALLBACK_YEAR}.json`;
+
   try{
     if(window.DB?.loadJSON){
-      db = await window.DB.loadJSON("/data/tojung_2026.json");
+      return await window.DB.loadJSON(currentPath);
     }else{
-      const res = await fetch("/data/tojung_2026.json", { cache: "no-store" });
-
-      if(!res.ok){
-        throw new Error(`HTTP ${res.status} ${res.statusText}`);
-      }
-
-      const text = await res.text();
-
-      try{
-        db = JSON.parse(text);
-      }catch(parseErr){
-        console.error("[tojung.js] JSON parse error", parseErr);
-        console.error("[tojung.js] invalid json preview:", text.slice(0, 300));
-        throw new Error("JSON_PARSE_ERROR");
-      }
+      const res = await fetch(currentPath, { cache: "no-store" });
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
     }
   }catch(e){
-    console.warn("tojung db load failed", e);
-    db = null;
+    console.warn("[tojung.js] current year db load failed -> fallback", e);
+
+    try{
+      if(window.DB?.loadJSON){
+        return await window.DB.loadJSON(fallbackPath);
+      }else{
+        const res = await fetch(fallbackPath, { cache: "no-store" });
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        return await res.json();
+      }
+    }catch(e2){
+      console.warn("[tojung.js] fallback db load failed", e2);
+      return null;
+    }
   }
+}
+
+// -----------------------------
+// render
+// -----------------------------
+async function loadTojungResult(){
+  const birth = getActiveBirthForTojung();
+  const mode = getTojungMode();
+  const name = mode === "member" ? (localStorage.getItem("name") || "회원") : "게스트";
+
+  if(!birth){
+    document.getElementById("result").style.display = "none";
+    return;
+  }
+
+  const pageTitle = document.getElementById("pageTitle");
+  const yearTitle = document.getElementById("yearTitle");
+
+  if(pageTitle){
+    pageTitle.textContent = `📜 ${TOJUNG_ACTIVE_YEAR} 토정비결`;
+  }
+  if(yearTitle){
+    yearTitle.textContent = `🔮 ${TOJUNG_ACTIVE_YEAR}년 토정비결 요약`;
+  }
+
+  const db = await loadTojungDB();
 
   if(!db){
     document.getElementById("loginCheck").innerHTML =
-      "<h2>⚠ 데이터 로드 실패</h2><p>토정비결 데이터를 불러오지 못했어요.</p><p class='small'>잠시 후 다시 시도해주세요. 문제가 계속되면 운영자에게 문의해주세요.</p>";
+      "<h2>⚠ 데이터 로드 실패</h2><p>토정비결 데이터를 불러오지 못했어요.</p><p class='small'>잠시 후 다시 시도해주세요.</p>";
+    document.getElementById("result").style.display = "none";
     return;
   }
 
   const seed = ymdToSeed(birth);
 
-  // 데이터 꺼내기 (너 JSON 구조 그대로)
   const summaryArr   = db.summary || [];
   const checklistArr = db.checklist || [];
   const scores       = db.scores || {};
@@ -228,73 +434,74 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   const totalScore = Number(scores?.total ?? 0);
   const cats = scores?.categories || {};
 
-  // 1) 기본정보
   document.getElementById("basicInfo").innerHTML = `
     <p><b>${escapeHtml(name)}</b></p>
     <p>생년월일: ${escapeHtml(birth)}</p>
     <p class="small">※ 같은 생년월일이면 같은 리포트가 나오도록 고정되어 있어요.</p>
   `;
 
-  // 2) 한줄 총평 + 키워드 + 밴드 해석
-  const oneLine = scores?.oneLine || seededPick(summaryArr, seed, 1) || "2026년은 정리와 선택이 중요한 해입니다.";
+  const oneLine = scores?.oneLine || seededPick(summaryArr, seed, 1) || "올해는 정리와 선택이 중요한 해입니다.";
   const band = findBand(scoreGuide, totalScore);
 
-  const keywordsHtml = renderKeywords(scores?.keywords || []);
-  const summaryHtml = `
+  document.getElementById("summaryBox").innerHTML = `
     <div>
       <span class="badge">총점 ${escapeHtml(totalScore)}점 · ${escapeHtml(band.title)}</span>
       <p style="margin-top:10px;"><b>${escapeHtml(oneLine)}</b></p>
       <p class="small">${escapeHtml(band.text)}</p>
-      ${keywordsHtml}
+      ${renderKeywords(scores?.keywords || [])}
     </div>
   `;
-  document.getElementById("summaryBox").innerHTML = summaryHtml;
 
-  // 3) 디테일(자동해석 본문)
+  const catTips = scoreGuide?.categoryTips || {};
   const detailParts = [];
 
-  // (a) 점수 바
   detailParts.push(`
-    <h3 style="margin:16px 0 8px;">📊 2026 점수 리포트</h3>
+    <h3 style="margin:16px 0 8px;">📊 ${TOJUNG_ACTIVE_YEAR} 점수 리포트</h3>
     ${renderBars(cats)}
   `);
 
-  // (b) 카테고리 팁(있으면 사용)
-  const catTips = scoreGuide?.categoryTips || {};
-  const tipsBlock = `
+  detailParts.push(`
     <h3 style="margin:16px 0 8px;">🧭 자동 해석 포인트</h3>
     <p><b>💰 재물운:</b> ${(catTips.wealth?.[0] ? escapeHtml(catTips.wealth[0]) : "지출 통제와 조건 확인이 핵심입니다.")}</p>
     <p><b>💖 연애운:</b> ${(catTips.love?.[0] ? escapeHtml(catTips.love[0]) : "말과 타이밍이 관계 흐름을 좌우합니다.")}</p>
     <p><b>🏢 직장/사업운:</b> ${(catTips.career?.[0] ? escapeHtml(catTips.career[0]) : "상반기 정비, 하반기 확장이 유리합니다.")}</p>
     <p><b>💪 건강운:</b> ${(catTips.health?.[0] ? escapeHtml(catTips.health[0]) : "수면과 과로 관리가 전체 흐름을 받칩니다.")}</p>
-  `;
-  detailParts.push(tipsBlock);
+  `);
 
-  // (c) 영역별 상세 문장(각 3개씩, seed 고정)
   detailParts.push(renderList("💰 재물운 자세히", wealthArr, seed, 200, 3));
   detailParts.push(renderList("💖 연애운 자세히", loveArr, seed, 300, 3));
   detailParts.push(renderList("🏢 직장/사업운 자세히", careerArr, seed, 400, 3));
   detailParts.push(renderList("💪 건강운 자세히", healthArr, seed, 500, 3));
-
-  // (d) 이번 달 운
   detailParts.push(renderThisMonthFortune(monthsObj, seed));
-
-  // (e) 체크리스트(5개 추천)
   detailParts.push(renderList("✅ 올해 체크리스트(추천 5개)", checklistArr, seed, 600, 5));
-
-  // (f) 럭키 + 주의사항(주의 5개)
   detailParts.push(renderLucky(lucky, seed));
   detailParts.push(renderList("⚠️ 올해 주의사항(추천 5개)", cautionArr, seed, 700, 5));
 
   document.getElementById("detailBox").innerHTML = detailParts.join("");
-
-  // 결과 표시
   document.getElementById("result").style.display = "block";
 
-  // 포인트 +1 (하루 1회)
-  await rewardOncePerDay("tojung");
+  await rewardTojungOncePerDay();
 
-  // loginCheck 문구 교체
   document.getElementById("loginCheck").innerHTML =
-    "<h2>✅ 리포트 생성 완료</h2><p class='small'>점수 기반 자동 해석으로 구성된 2026 토정비결입니다.</p>";
+    `<h2>✅ 리포트 생성 완료</h2><p class='small'>점수 기반 자동 해석으로 구성된 ${TOJUNG_ACTIVE_YEAR}년 토정비결입니다.</p>`;
+}
+
+// -----------------------------
+// init
+// -----------------------------
+document.addEventListener("DOMContentLoaded", async ()=>{
+  if(window.loadMyPoint){
+    await window.loadMyPoint();
+  }
+
+  renderTojungEntryState();
+  renderPointBoxTojung();
+  bindTojungShare();
+
+  document.getElementById("applyGuestBirthBtn")?.addEventListener("click", applyGuestBirthForTojung);
+
+  const canLoad = renderTojungEntryState();
+  if(canLoad){
+    await loadTojungResult();
+  }
 });
