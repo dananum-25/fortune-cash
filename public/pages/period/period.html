@@ -8,72 +8,114 @@
   <link rel="canonical" href="https://fortune-cash.vercel.app/pages/period/period.html">
   <link rel="stylesheet" href="/css/common.css">
 
-  <style>
-    .helper-box p{ margin:6px 0; }
+ <style>
+  .helper-box p{ margin:6px 0; }
 
-    .birth-form{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      margin-top:12px;
-    }
+  .birth-form{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-top:12px;
+  }
 
-    .birth-form input,
-    .birth-form select{
-      padding:12px;
-      border-radius:10px;
-      border:1px solid #ddd;
-      font-size:14px;
-      width:100%;
-      box-sizing:border-box;
-    }
+  .birth-form input,
+  .birth-form select{
+    padding:12px;
+    border-radius:10px;
+    border:1px solid #ddd;
+    font-size:14px;
+    width:100%;
+    box-sizing:border-box;
+  }
 
-    .fortune-block{
-      margin-top:14px;
-    }
+  .fortune-block{
+    margin-top:14px;
+  }
 
-    .fortune-block .btn{
-      width:100%;
-    }
+  .fortune-block .btn{
+    width:100%;
+  }
 
-    .fortune-panel{
-      margin-top:12px;
-      padding:14px;
-      border-radius:12px;
-      background:#fafafa;
-      border:1px solid #eee;
-    }
+  .fortune-panel{
+    margin-top:12px;
+    padding:16px;
+    border-radius:16px;
+    background:#111;
+    border:1px solid #333;
+    color:#fff;
+  }
 
-    .fortune-panel h3{
-      margin-top:0;
-      margin-bottom:10px;
-    }
+  .fortune-panel h3,
+  .fortune-panel p,
+  .fortune-panel .small,
+  .fortune-panel div,
+  .fortune-panel span{
+    color:#fff !important;
+  }
 
+  .fortune-panel .hr{
+    height:1px;
+    background:#444;
+    margin:14px 0;
+  }
+
+  .fortune-panel h3{
+    margin-top:0;
+    margin-bottom:10px;
+  }
+
+  .recommend-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:12px;
+  }
+
+  .recommend-actions a{
+    display:block;
+    text-align:center;
+    text-decoration:none;
+    border:2px solid #f2cf66;
+    border-radius:12px;
+    background:#1a1a1a;
+    color:#f2cf66 !important;
+    font-weight:700;
+    padding:14px 10px;
+    box-sizing:border-box;
+  }
+
+  .recommend-actions a:hover{
+    background:#222;
+  }
+
+  .footer-links{
+    margin-top:10px;
+    display:grid;
+    grid-template-columns:repeat(3, auto);
+    justify-content:center;
+    gap:8px 14px;
+    line-height:1.8;
+  }
+
+  .footer-links a{
+    color:#fff !important;
+    font-size:13px;
+    text-decoration:none;
+    white-space:nowrap;
+  }
+
+  @media (max-width:640px){
     .recommend-actions{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-      margin-top:12px;
+      grid-template-columns:1fr;
     }
 
-    .recommend-actions a{
-      display:block;
-      text-align:center;
-      text-decoration:none;
+    .footer-links{
+      grid-template-columns:repeat(2, auto);
+      gap:6px 12px;
     }
-
-    .footer-links a{
-      color:#fff !important;
-      font-size:13px;
-      text-decoration:none;
-    }
-
-    @media (max-width:640px){
-      .recommend-actions{
-        grid-template-columns:1fr;
-      }
-    }
-  </style>
+  }
+</style> 
+    
 </head>
 
 <body>
@@ -206,31 +248,31 @@
 
     <!-- 추천 콘텐츠 -->
     <section class="card">
-      <h2>추천 운세 콘텐츠</h2>
-      <div class="recommend-actions">
-        <a class="secondaryBtn" href="/pages/saju/saju.html">사주 분석</a>
-        <a class="secondaryBtn" href="/pages/star/index.html">별자리 운세</a>
-        <a class="secondaryBtn" href="/pages/zodiac/zodiac.html">띠별 운세</a>
-        <a class="secondaryBtn" href="/pages/tojung/tojung.html">토정비결</a>
-        <a class="secondaryBtn" href="/pages/tarot/tarot.html">타로</a>
-        <a class="secondaryBtn" href="/fortune-guide.html">운세 가이드</a>
-      </div>
+  <h2>추천 운세 콘텐츠</h2>
+  <div class="recommend-actions">
+    <a href="/pages/saju/saju.html">사주 분석</a>
+    <a href="/pages/star/index.html">별자리 운세</a>
+    <a href="/pages/zodiac/zodiac.html">띠별 운세</a>
+    <a href="/pages/tojung/tojung.html">토정비결</a>
+    <a href="/pages/tarot/tarot.html">타로</a>
+    <a href="/fortune-guide.html">운세 가이드</a>
+  </div>
     </section>
 
     <button class="secondaryBtn" id="shareBtn" type="button">공유하기</button>
     <button class="secondaryBtn" type="button" onclick="Common.goHome()">홈으로</button>
 
-    <footer>
-      <div>무료 운세 플랫폼</div>
-      <div style="margin-top:6px;">문의: daekoju@naver.com</div>
-      <div class="footer-links" style="margin-top:8px;">
-        <a href="/privacy.html">개인정보처리방침</a> |
-        <a href="/terms.html">이용약관</a> |
-        <a href="/about.html">사이트 소개</a> |
-        <a href="/contact.html">문의</a> |
-        <a href="/fortune-guide.html">운세 가이드</a>
-      </div>
-    </footer>
+  <footer>
+  <div>무료 운세 플랫폼</div>
+  <div style="margin-top:6px;">문의: daekoju@naver.com</div>
+  <div class="footer-links">
+    <a href="/privacy.html">개인정보처리방침</a>
+    <a href="/terms.html">이용약관</a>
+    <a href="/about.html">사이트 소개</a>
+    <a href="/contact.html">문의</a>
+    <a href="/fortune-guide.html">운세 가이드</a>
+  </div>
+</footer>  
 
   </div>
 
