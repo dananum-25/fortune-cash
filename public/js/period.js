@@ -96,6 +96,11 @@ function renderMyInfoBox(){
   const mode = getPeriodMode();
   const birth = getPeriodBirth();
   const name = localStorage.getItem("name") || "회원";
+  const guestBirthCard = document.getElementById("guestBirthCard");
+
+  if(guestBirthCard){
+    guestBirthCard.style.display = mode === "guest" ? "block" : "none";
+  }
 
   if(mode === "member"){
     el.innerHTML = `
@@ -119,7 +124,7 @@ function renderMyInfoBox(){
   el.innerHTML = `
     <h2>📌 기본 기준 정보</h2>
     <p>기본 예시 생년월일: ${PERIOD_DEFAULT_BIRTH}</p>
-    <p class="small">지금은 기본 예시 기준으로 결과가 보이고 있어요. 생년월일을 입력하면 본인 기준으로 다시 확인할 수 있습니다.</p>
+    <p class="small">지금은 기본 예시 기준으로 결과가 보이고 있어요.</p>
   `;
 }
 
@@ -547,9 +552,9 @@ function applyDynamicYearText(){
     pageTitle.textContent = `📆 오늘 운세 · 내일 운세 · ${ACTIVE_YEAR}년 연간운세 무료 보기`;
   }
 
-  const yearBtn = document.getElementById("yearBtn");
-  if(yearBtn){
-    yearBtn.innerText = `${ACTIVE_YEAR} 연간운세`;
+  const yearTitle = document.getElementById("yearTitle");
+  if(yearTitle){
+    yearTitle.innerText = `📅 ${ACTIVE_YEAR}년 연간운세`;
   }
 }
 
