@@ -81,6 +81,14 @@ async function loadYearDB(){
 
 }
 
+function pickAdvice(seed){
+
+  const idx = hashString(seed) % adviceDB.length;
+  const advice = pickAdvice(seed);
+  return adviceDB[idx];
+
+}
+
 function getPeriodBirth(){
   return (window.getActiveBirth && window.getActiveBirth())
     || localStorage.getItem("birth")
