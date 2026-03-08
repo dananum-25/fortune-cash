@@ -9,7 +9,6 @@ const FORTUNE_YEAR =
   window.APP_CONFIG?.fortuneYear ||
   2026;
 
-// 오늘/내일/연간 버튼 직접 클릭 여부
 const clickedState = {
   today: false,
   tomorrow: false,
@@ -50,11 +49,6 @@ async function loadDB(){
   }
 }
 
-function randomPick(arr){
-  if(!arr || arr.length === 0) return "운세 데이터가 준비되지 않았습니다.";
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
 function getPeriodBirth(){
   return (window.getActiveBirth && window.getActiveBirth())
     || localStorage.getItem("birth")
@@ -75,6 +69,44 @@ function hasPersonalBirthSelected(){
   const memberBirth = localStorage.getItem("birth");
   const guestBirth = localStorage.getItem("guest_birth");
   return !!(memberBirth || guestBirth);
+}
+
+function formatDateLocal(date){
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function getTodayTargetDate(){
+  return new Date();
+}
+
+function getTomorrowTargetDate(){
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  return d;
+}
+
+function hashString(str){
+  let h = 2166136261;
+  for(let i = 0; i < str.length; i++){
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+function seededPick(arr, seed){
+  if(!Array.isArray(arr) || arr.length === 0){
+    return "운세 데이터가 준비되지 않았습니다.";
+  }
+  const idx = hashString(seed) % arr.length;
+  return arr[idx];
+}
+
+function buildSeed(birth, targetKey, scope){
+  return `${birth}|${targetKey}|${scope}`;
 }
 
 function renderMyInfoBox(){
@@ -138,7 +170,7 @@ function renderGuide(type){
   if(type === "today"){
     return `
       <h3>🔎 오늘 운세 해설</h3>
-      <p>오늘은 작은 기회가 큰 전환점이 될 수 있습니다. 중요한 결정을 내릴 때는 한 번 더 점검하는 태도가 도움이 됩니다.</p>
+      <p>오늘은 현재 리듬과 감정 흐름을 점검하는 데 의미가 있습니다. 작은 선택 하나가 하루 분위기를 바꿀 수 있으니 급한 판단보다 균형감을 우선해보세요.</p>
       <p>운세는 참고용입니다. 좋은 흐름은 적극 활용하고, 조심해야 할 시기는 신중하게 대응하세요.</p>
     `;
   }
@@ -146,19 +178,56 @@ function renderGuide(type){
   if(type === "tomorrow"){
     return `
       <h3>🔎 내일 운세 해설</h3>
-      <p>내일은 준비가 중요한 날입니다. 미리 일정과 감정 흐름을 정리해두면 더 부드럽게 지나갈 수 있습니다.</p>
+      <p>내일 운세는 미리 준비하고 대비하는 데 도움이 됩니다. 감정, 일정, 지출 계획을 가볍게 정리하면 더 안정적으로 흐름을 탈 수 있습니다.</p>
       <p>운세는 참고용입니다. 좋은 흐름은 적극 활용하고, 조심해야 할 시기는 신중하게 대응하세요.</p>
     `;
   }
 
   return `
     <h3>🔎 ${FORTUNE_YEAR}년 연간운세 해설</h3>
-    <p>${FORTUNE_YEAR}년은 변화와 성장의 흐름이 함께 나타나는 해입니다. 단기 판단보다 긴 호흡의 계획이 더 중요합니다.</p>
-    <p>연간운세는 한 해의 큰 방향을 참고하는 자료로 가볍게 활용하세요.</p>
+    <p>${FORTUNE_YEAR}년 연간운세는 한 해의 큰 흐름을 참고하는 자료입니다. 단기적인 하루 운보다 긴 호흡의 방향과 생활 리듬을 점검하는 데 적합합니다.</p>
+    <p>연간운세는 절대적인 미래 예언이 아니라 참고용 콘텐츠입니다.</p>
   `;
 }
 
-function renderResultBlock(type, title, content){
+function renderMethod(type, birth, targetDateText){
+  let title = "🔎 운세 참고 기준";
+  let bullets = [];
+
+  if(type === "today"){
+    bullets = [
+      `기준 생년월일: ${birth}`,
+      `운세 대상 날짜: ${targetDateText}`,
+      "출생 정보와 대상 날짜를 조합한 고정 결과",
+      "일반 운세 해석 데이터 기반 참고형 콘텐츠"
+    ];
+  }else if(type === "tomorrow"){
+    bullets = [
+      `기준 생년월일: ${birth}`,
+      `운세 대상 날짜: ${targetDateText}`,
+      "내일 날짜 기준 고정 결과",
+      "오늘이 아니라 대상 날짜를 기준으로 동일 결과 제공"
+    ];
+  }else{
+    bullets = [
+      `기준 생년월일: ${birth}`,
+      `운세 대상 연도: ${FORTUNE_YEAR}`,
+      "연도 기준 고정 결과",
+      "한 해의 큰 흐름을 참고하는 연간 해석"
+    ];
+  }
+
+  return `
+    <h4>${title}</h4>
+    <p>이 운세는 아래 기준을 참고해 같은 조건에서는 같은 결과가 나오도록 구성되어 있습니다.</p>
+    <ul>
+      ${bullets.map(v => `<li>${v}</li>`).join("")}
+    </ul>
+    <p class="small">운세는 참고 자료이며 절대적인 미래 예언이 아닙니다.</p>
+  `;
+}
+
+function renderResultBlock(type, title, content, targetDateText){
   const birth = getPeriodBirth();
   const mode = getPeriodMode();
 
@@ -168,31 +237,41 @@ function renderResultBlock(type, title, content){
 
   let resultId = "";
   let guideId = "";
+  let methodId = "";
 
   if(type === "today"){
     resultId = "todayResult";
     guideId = "todayGuide";
+    methodId = "todayMethod";
   }else if(type === "tomorrow"){
     resultId = "tomorrowResult";
     guideId = "tomorrowGuide";
+    methodId = "tomorrowMethod";
   }else{
     resultId = "yearResult";
     guideId = "yearGuide";
+    methodId = "yearMethod";
   }
 
   const resultEl = document.getElementById(resultId);
   const guideEl = document.getElementById(guideId);
+  const methodEl = document.getElementById(methodId);
 
   if(resultEl){
     resultEl.innerHTML = `
       <h3>${title}</h3>
-      <p class="small">${modeText} · 생년월일 ${birth}</p>
+      <p class="small">${modeText} · 기준 생년월일 ${birth}</p>
+      <p class="small">${type === "year" ? `기준 연도 ${FORTUNE_YEAR}` : `운세 대상 날짜 ${targetDateText}`}</p>
       <p>${content}</p>
     `;
   }
 
   if(guideEl){
     guideEl.innerHTML = renderGuide(type);
+  }
+
+  if(methodEl){
+    methodEl.innerHTML = renderMethod(type, birth, targetDateText);
   }
 }
 
@@ -230,8 +309,14 @@ async function rewardAfterAllViewed(){
 
 function showToday(fromClick = false){
   if(!dbReady) return alert("운세 데이터를 불러오는 중입니다. 잠시 후 다시 눌러주세요.");
+
+  const birth = getPeriodBirth();
+  const targetDate = getTodayTargetDate();
+  const targetKey = formatDateLocal(targetDate);
   const arr = todayDB?.pools?.today || [];
-  renderResultBlock("today", "오늘의 운세", randomPick(arr));
+  const content = seededPick(arr, buildSeed(birth, targetKey, "today"));
+
+  renderResultBlock("today", "오늘의 운세", content, targetKey);
 
   if(fromClick){
     clickedState.today = true;
@@ -241,8 +326,14 @@ function showToday(fromClick = false){
 
 function showTomorrow(fromClick = false){
   if(!dbReady) return alert("운세 데이터를 불러오는 중입니다. 잠시 후 다시 눌러주세요.");
+
+  const birth = getPeriodBirth();
+  const targetDate = getTomorrowTargetDate();
+  const targetKey = formatDateLocal(targetDate);
   const arr = tomorrowDB?.pools?.tomorrow || [];
-  renderResultBlock("tomorrow", "내일의 운세", randomPick(arr));
+  const content = seededPick(arr, buildSeed(birth, targetKey, "tomorrow"));
+
+  renderResultBlock("tomorrow", "내일의 운세", content, targetKey);
 
   if(fromClick){
     clickedState.tomorrow = true;
@@ -252,8 +343,13 @@ function showTomorrow(fromClick = false){
 
 function showYear(fromClick = false){
   if(!dbReady) return alert("운세 데이터를 불러오는 중입니다. 잠시 후 다시 눌러주세요.");
+
+  const birth = getPeriodBirth();
+  const targetKey = String(FORTUNE_YEAR);
   const arr = yearDB?.pools?.year_all || [];
-  renderResultBlock("year", `${FORTUNE_YEAR}년 연간운세`, randomPick(arr));
+  const content = seededPick(arr, buildSeed(birth, targetKey, "year"));
+
+  renderResultBlock("year", `${FORTUNE_YEAR}년 연간운세`, content, targetKey);
 
   if(fromClick){
     clickedState.year = true;
@@ -384,7 +480,7 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   document.getElementById("applyGuestBirthBtn")?.addEventListener("click", applyGuestBirthInline);
   bindShare();
 
-  // 버튼 안 눌러도 기본값/저장값 기준으로 3개 모두 표시
+  // 기본값/저장값 기준으로 3개 모두 즉시 표시
   showToday(false);
   showTomorrow(false);
   showYear(false);
