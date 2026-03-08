@@ -194,7 +194,7 @@ function sewoonAnalyze(pillars){
   return html;
 }
 
-function analyzeSeowoonWithElements(elementCounts){
+function analyzeSewoonWithElements(elementCounts){
   const fireCount = elementCounts["화"] || 0;
   let text = `<h3>🔥 2026년(병오) 화(火) 영향</h3>`;
 
@@ -729,9 +729,9 @@ function getCurrentDaewoonPillar(birthYear){
   return stem + branch;
 }
 
-function analyzeDaewoonVsSeowoon(currentDaewoon){
-  const seowoon = "병오";
-  const sBranch = seowoon[1];
+function analyzeDaewoonVsSewoon(currentDaewoon){
+  const sewoon = "병오";
+  const sBranch = sewoon[1];
   const dBranch = currentDaewoon[1];
 
   let html = "<h3>🔥 (참고) 대운 × 2026 세운</h3>";
@@ -739,7 +739,7 @@ function analyzeDaewoonVsSeowoon(currentDaewoon){
   if(BRANCH_CLASH[dBranch] === sBranch){
     html += `
       <p><b>⚠ 변화 운</b></p>
-      <p>대운(${currentDaewoon})과 세운(${seowoon})이 충 → 이직/이사/관계 재정렬 가능</p>
+      <p>대운(${currentDaewoon})과 세운(${sewoon})이 충 → 이직/이사/관계 재정렬 가능</p>
     `;
   } else if(BRANCH_COMBO[dBranch] === sBranch){
     html += `
@@ -1162,9 +1162,9 @@ const rand = mulberry32(seedFn());
     yearFortuneTitle.textContent = `📈 ${activeYear}년 세운 분석`;
   }
 
-  let seowoonHtml = sewoonAnalyze(pillars);
-  seowoonHtml += analyzeSeowoonWithElements(elementResult);
-  document.getElementById("sewoonBox").innerHTML = seowoonHtml;
+  let sewoonHtml = sewoonAnalyze(pillars);
+  sewoonHtml += analyzeSewoonWithElements(elementResult);
+  document.getElementById("sewoonBox").innerHTML = sewoonHtml;
 
   // ✅ 전문가(B) 분석: 내 오행(일간), 신강/신약, 용신/희신
   const pillarsObj = pillars.map(p => ({ stem: p[0], branch: p[1] }));
