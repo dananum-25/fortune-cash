@@ -1,6 +1,7 @@
 let todayDB = {};
 let tomorrowDB = {};
 let yearDB = {};
+let adviceDB = [];
 let dbReady = false;
 
 const PERIOD_DEFAULT_BIRTH = "1940-01-01";
@@ -17,7 +18,7 @@ const clickedState = {
 
 async function loadDB(){
   try{
-    const [t1, t2, t3] = await Promise.all([
+    const [t1, t2, t3, t4] = await Promise.all([
       fetch("/data/fortunes_ko_today.json", { cache: "no-store" }).then(r=>{
         if(!r.ok) throw new Error("today json load failed: " + r.status);
         return r.json();
@@ -30,18 +31,24 @@ async function loadDB(){
         if(!r.ok) throw new Error(`year json load failed: ${r.status} (${FORTUNE_YEAR})`);
         return r.json();
       }),
+      fetch("/data/daily_advice_ko.json", { cache: "no-store" }).then(r=>{
+        if(!r.ok) throw new Error("daily advice json load failed: " + r.status);
+        return r.json();
+      })
     ]);
 
     todayDB = t1;
     tomorrowDB = t2;
     yearDB = t3;
+    adviceDB = Array.isArray(t4?.advice) ? t4.advice : [];
     dbReady = true;
 
     console.log("[period.js] DB loaded ✅", {
       year: FORTUNE_YEAR,
       today: !!todayDB?.pools?.today?.length,
       tomorrow: !!tomorrowDB?.pools?.tomorrow?.length,
-      yearPool: !!yearDB?.pools?.year_all?.length
+      yearPool: !!yearDB?.pools?.year_all?.length,
+      advice: adviceDB.length
     });
   }catch(e){
     dbReady = false;
@@ -95,6 +102,19 @@ function hashString(str){
     h = Math.imul(h, 16777619);
   }
   return h >>> 0;
+}
+
+function seededPick(arr, seed){
+  if(!Array.isArray(arr) || arr.length === 0){
+    return "운세 데이터가 준비되지 않았습니다.";
+  }
+  const idx = hashString(seed) % arr.length;
+  return arr[idx];
+}
+
+function seededNumber(seed, min, max){
+  const range = max - min + 1;
+  return min + (hashString(seed) % range);
 }
 
 function seededPick(arr, seed){
@@ -199,7 +219,7 @@ function renderMethod(type, birth, targetDateText){
       `기준 생년월일: ${birth}`,
       `운세 대상 날짜: ${targetDateText}`,
       "출생 정보와 대상 날짜를 조합한 고정 결과",
-      "일반 운세 해석 데이터 기반 참고형 콘텐츠"
+      "일반 운세 해석 데이터와 조언 DB를 함께 반영"
     ];
   }else if(type === "tomorrow"){
     bullets = [
@@ -213,7 +233,7 @@ function renderMethod(type, birth, targetDateText){
       `기준 생년월일: ${birth}`,
       `운세 대상 연도: ${FORTUNE_YEAR}`,
       "연도 기준 고정 결과",
-      "한 해의 큰 흐름을 참고하는 연간 해석"
+      "한 해의 큰 흐름을 참고하는 연간 해석과 조언 반영"
     ];
   }
 
@@ -267,12 +287,86 @@ function renderResultBlock(type, title, content, targetDateText){
   }
 
   if(guideEl){
-    guideEl.innerHTML = renderGuide(type);
+    guideEl.innerHTML = `
+      ${renderGuide(type)}
+      <div id="${type}DeepWrap" style="margin-top:14px;">
+        <button class="btn" type="button" onclick="openDeepFortune('${type}')">
+          ${type === "today" ? "오늘 운세 심층 해석 보기" : type === "tomorrow" ? "내일 운세 심층 해석 보기" : `${FORTUNE_YEAR}년 연간운세 심층 해석 보기`}
+        </button>
+        <div id="${type}Deep" style="margin-top:12px;"></div>
+      </div>
+    `;
   }
 
   if(methodEl){
     methodEl.innerHTML = renderMethod(type, birth, targetDateText);
   }
+}
+
+function generateDeepFortune(seed, type){
+  const lovePool = [
+    "가까운 사람과의 대화가 관계 흐름을 좋게 만듭니다.",
+    "감정 표현을 너무 미루지 말고 자연스럽게 전하는 것이 좋습니다.",
+    "작은 오해가 생길 수 있으니 표현을 부드럽게 하면 도움이 됩니다.",
+    "익숙한 관계 속에서 안정감을 찾기 쉬운 흐름입니다.",
+    "지금은 상대를 바꾸기보다 내 태도를 점검하는 편이 좋습니다."
+  ];
+
+  const moneyPool = [
+    "지출을 점검하면 생각보다 빠르게 흐름이 안정될 수 있습니다.",
+    "작은 절약과 정리가 재물운을 좋게 만드는 날입니다.",
+    "급한 소비보다 필요한 지출만 남기는 운영이 중요합니다.",
+    "당장 큰 이익보다 새는 구멍을 막는 것이 더 유리합니다.",
+    "금전 관련 약속은 조건을 한 번 더 확인하는 것이 좋습니다."
+  ];
+
+  const healthPool = [
+    "수면 리듬을 지키는 것이 전체 컨디션에 가장 중요합니다.",
+    "과한 일정은 피하고 체력을 남겨두는 운영이 좋습니다.",
+    "가벼운 산책이나 스트레칭이 컨디션 회복에 도움이 됩니다.",
+    "스트레스를 오래 끌지 말고 중간중간 쉬어가는 것이 좋습니다.",
+    "몸이 보내는 작은 피로 신호를 무시하지 않는 것이 중요합니다."
+  ];
+
+  const colorPool = ["빨강", "파랑", "노랑", "초록", "보라", "검정", "흰색", "금색", "은색", "네이비"];
+  const extraAdvicePool = adviceDB.length ? adviceDB : [
+    "오늘은 한 번 더 확인하는 습관이 흐름을 안정시킵니다."
+  ];
+
+  return {
+    love: seededPick(lovePool, seed + "|love"),
+    money: seededPick(moneyPool, seed + "|money"),
+    health: seededPick(healthPool, seed + "|health"),
+    color: seededPick(colorPool, seed + "|color"),
+    number: seededNumber(seed + "|number", 1, 33),
+    advice: seededPick(extraAdvicePool, seed + "|advice")
+  };
+}
+
+function renderDeepFortuneHtml(type, seed){
+  const deep = generateDeepFortune(seed, type);
+
+  return `
+    <div class="fortune-method">
+      <h4>💘 연애운</h4>
+      <p>${deep.love}</p>
+
+      <h4>💰 재물운</h4>
+      <p>${deep.money}</p>
+
+      <h4>🩺 건강운</h4>
+      <p>${deep.health}</p>
+
+      <h4>🔢 행운 숫자</h4>
+      <p>${deep.number}</p>
+
+      <h4>🎨 행운 색</h4>
+      <p>${deep.color}</p>
+
+      <h4>💡 오늘의 조언</h4>
+      <p>${deep.advice}</p>
+    </div>
+  `;
 }
 
 function getRewardStorageKey(){
@@ -301,6 +395,7 @@ async function rewardAfterAllViewed(){
       await window.rewardContent("fortune_view");
       if(window.loadMyPoint) await window.loadMyPoint();
       renderPointBoxCustom();
+      alert("포인트가 적립되었습니다 ✅");
     }catch(e){
       console.warn("[period.js] rewardContent failed", e);
     }
@@ -322,6 +417,34 @@ function showToday(fromClick = false){
     clickedState.today = true;
     rewardAfterAllViewed();
   }
+}
+
+function getDeepSeed(type){
+  const birth = getPeriodBirth();
+
+  if(type === "today"){
+    return buildSeed(birth, formatDateLocal(getTodayTargetDate()), "today-deep");
+  }
+
+  if(type === "tomorrow"){
+    return buildSeed(birth, formatDateLocal(getTomorrowTargetDate()), "tomorrow-deep");
+  }
+
+  return buildSeed(birth, String(FORTUNE_YEAR), "year-deep");
+}
+
+async function openDeepFortune(type){
+  const target = document.getElementById(`${type}Deep`);
+  if(!target) return;
+
+  if(target.innerHTML.trim() !== ""){
+    return;
+  }
+
+  const seed = getDeepSeed(type);
+  target.innerHTML = renderDeepFortuneHtml(type, seed);
+
+  await rewardAfterAllViewed();
 }
 
 function showTomorrow(fromClick = false){
@@ -421,10 +544,11 @@ async function applyGuestBirthInline(){
   renderMyInfoBox();
   renderPointBoxCustom();
 
-  showToday(false);
-  showTomorrow(false);
-  showYear(false);
-
+  window.showToday = showToday;
+  window.showTomorrow = showTomorrow;
+  window.showYear = showYear;
+  window.openDeepFortune = openDeepFortune;
+  
   alert("게스트 기준 생년월일이 적용되었습니다 ✅");
 }
 
