@@ -609,9 +609,10 @@ function applyDynamicYearText(){
     pageTitle.textContent = `📆 오늘 운세 · 내일 운세 · ${FORTUNE_YEAR}년 연간운세 무료 보기`;
   }
 
-  const yearBtn = document.getElementById("yearBtn");
-  if(yearBtn){
-    yearBtn.textContent = `${FORTUNE_YEAR} 연간운세`;
+  const year = new Date().getFullYear();
+
+document.getElementById("yearBtn").innerText =
+`${year} 연간운세`;
   }
 }
 
