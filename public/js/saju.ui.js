@@ -1311,7 +1311,7 @@ try{
   analysis += daewoonHtml;
 
   const currentDaewoon = getCurrentDaewoonPillar(year);
-  analysis += analyzeDaewoonVsSeowoon(currentDaewoon);
+  analysis += analyzeDaewoonVsSewoon(currentDaewoon);
 
   const scores = calculateFortuneScores(elementResult, currentDaewoon);
   analysis += generateScoreGraph(scores);
