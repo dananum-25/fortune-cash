@@ -5,30 +5,24 @@ let adviceDB = [];
 let dbReady = false;
 
 const PERIOD_DEFAULT_BIRTH = "1940-01-01";
-const FORTUNE_YEAR =
+const PERIOD_FALLBACK_YEAR = 2026;
+
+const REQUESTED_YEAR =
   window.FortuneConfig?.year ||
   window.APP_CONFIG?.fortuneYear ||
-  2026;
+  new Date().getFullYear();
 
-const clickedState = {
-  today: false,
-  tomorrow: false,
-  year: false
-};
+let ACTIVE_YEAR = REQUESTED_YEAR;
 
 async function loadDB(){
   try{
-    const [t1, t2, t3, t4] = await Promise.all([
+    const [t1, t2, t4] = await Promise.all([
       fetch("/data/fortunes_ko_today.json", { cache: "no-store" }).then(r=>{
         if(!r.ok) throw new Error("today json load failed: " + r.status);
         return r.json();
       }),
       fetch("/data/fortunes_ko_tomorrow.json", { cache: "no-store" }).then(r=>{
         if(!r.ok) throw new Error("tomorrow json load failed: " + r.status);
-        return r.json();
-      }),
-      fetch(`/data/fortunes_ko_${FORTUNE_YEAR}.json`, { cache: "no-store" }).then(r=>{
-        if(!r.ok) throw new Error(`year json load failed: ${r.status} (${FORTUNE_YEAR})`);
         return r.json();
       }),
       fetch("/data/daily_advice_ko.json", { cache: "no-store" }).then(r=>{
@@ -39,12 +33,28 @@ async function loadDB(){
 
     todayDB = t1;
     tomorrowDB = t2;
-    yearDB = t3;
     adviceDB = Array.isArray(t4?.advice) ? t4.advice : [];
+
+    try{
+      const yr = await fetch(`/data/fortunes_ko_${REQUESTED_YEAR}.json`, { cache: "no-store" });
+      if(!yr.ok) throw new Error(`year json load failed: ${yr.status} (${REQUESTED_YEAR})`);
+      yearDB = await yr.json();
+      ACTIVE_YEAR = REQUESTED_YEAR;
+    }catch(e){
+      console.warn(`[period.js] ${REQUESTED_YEAR} 연간 DB 없음 → ${PERIOD_FALLBACK_YEAR} 사용`);
+      const fallback = await fetch(`/data/fortunes_ko_${PERIOD_FALLBACK_YEAR}.json`, { cache: "no-store" });
+      if(!fallback.ok){
+        throw new Error(`fallback year json load failed: ${fallback.status} (${PERIOD_FALLBACK_YEAR})`);
+      }
+      yearDB = await fallback.json();
+      ACTIVE_YEAR = PERIOD_FALLBACK_YEAR;
+    }
+
     dbReady = true;
 
     console.log("[period.js] DB loaded ✅", {
-      year: FORTUNE_YEAR,
+      requestedYear: REQUESTED_YEAR,
+      activeYear: ACTIVE_YEAR,
       today: !!todayDB?.pools?.today?.length,
       tomorrow: !!tomorrowDB?.pools?.tomorrow?.length,
       yearPool: !!yearDB?.pools?.year_all?.length,
@@ -54,78 +64,6 @@ async function loadDB(){
     dbReady = false;
     console.error("[period.js] loadDB error ❌", e);
   }
-}
-
-let yearDB = {};
-
-async function loadYearDB(){
-
-  const year = new Date().getFullYear();
-
-  try{
-
-    const r = await fetch(`/data/fortunes_ko_${year}.json`);
-
-    if(!r.ok) throw "no file";
-
-    yearDB = await r.json();
-
-  }catch(e){
-
-    console.warn("연간 운세 DB 없음 → 기본 2026 사용");
-
-    const r = await fetch(`/data/fortunes_ko_2026.json`);
-    yearDB = await r.json();
-
-  }
-
-}
-
-function pickAdvice(seed){
-
-  const idx = hashString(seed) % adviceDB.length;
-  const advice = pickAdvice(seed);
-  return adviceDB[idx];
-
-}
-
-function getPeriodBirth(){
-  return (window.getActiveBirth && window.getActiveBirth())
-    || localStorage.getItem("birth")
-    || localStorage.getItem("guest_birth")
-    || PERIOD_DEFAULT_BIRTH;
-}
-
-function getPeriodMode(){
-  const phone = localStorage.getItem("phone");
-  const guestBirth = localStorage.getItem("guest_birth");
-
-  if(phone) return "member";
-  if(guestBirth) return "guest";
-  return "default";
-}
-
-function hasPersonalBirthSelected(){
-  const memberBirth = localStorage.getItem("birth");
-  const guestBirth = localStorage.getItem("guest_birth");
-  return !!(memberBirth || guestBirth);
-}
-
-function formatDateLocal(date){
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-}
-
-function getTodayTargetDate(){
-  return new Date();
-}
-
-function getTomorrowTargetDate(){
-  const d = new Date();
-  d.setDate(d.getDate() + 1);
-  return d;
 }
 
 function hashString(str){
@@ -150,16 +88,52 @@ function seededNumber(seed, min, max){
   return min + (hashString(seed) % range);
 }
 
-function seededPick(arr, seed){
-  if(!Array.isArray(arr) || arr.length === 0){
-    return "운세 데이터가 준비되지 않았습니다.";
-  }
-  const idx = hashString(seed) % arr.length;
-  return arr[idx];
-}
-
 function buildSeed(birth, targetKey, scope){
   return `${birth}|${targetKey}|${scope}`;
+}
+
+function formatDateLocal(date){
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function getTodayTargetDate(){
+  return new Date();
+}
+
+function getTomorrowTargetDate(){
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  return d;
+}
+
+function getPeriodBirth(){
+  return localStorage.getItem("birth")
+    || localStorage.getItem("guest_birth")
+    || PERIOD_DEFAULT_BIRTH;
+}
+
+function getPeriodMode(){
+  const phone = localStorage.getItem("phone");
+  const guestBirth = localStorage.getItem("guest_birth");
+
+  if(phone) return "member";
+  if(guestBirth) return "guest";
+  return "default";
+}
+
+function hasPersonalBirthSelected(){
+  return !!(localStorage.getItem("birth") || localStorage.getItem("guest_birth"));
+}
+
+function pickAdvice(seed){
+  if(!Array.isArray(adviceDB) || adviceDB.length === 0){
+    return "오늘은 한 번 더 확인하는 습관이 흐름을 안정시킵니다.";
+  }
+  const idx = hashString(seed) % adviceDB.length;
+  return adviceDB[idx];
 }
 
 function renderMyInfoBox(){
@@ -207,7 +181,7 @@ function renderPointBoxCustom(){
     box.innerHTML = `
       <h2>🎁 포인트 안내</h2>
       <p>현재 포인트: <b>${point}P</b></p>
-      <p class="small">회원은 생년월일이 적용된 상태에서 오늘/내일/${FORTUNE_YEAR} 연간운세 버튼을 모두 직접 눌러 확인하면 1일 1회 1포인트가 적립됩니다.</p>
+      <p class="small">회원은 심층 해석 버튼을 눌러 상세 운세를 확인하면 1일 1회 1포인트가 적립됩니다.</p>
     `;
     return;
   }
@@ -237,14 +211,13 @@ function renderGuide(type){
   }
 
   return `
-    <h3>🔎 ${FORTUNE_YEAR}년 연간운세 해설</h3>
-    <p>${FORTUNE_YEAR}년 연간운세는 한 해의 큰 흐름을 참고하는 자료입니다. 단기적인 하루 운보다 긴 호흡의 방향과 생활 리듬을 점검하는 데 적합합니다.</p>
+    <h3>🔎 ${ACTIVE_YEAR}년 연간운세 해설</h3>
+    <p>${ACTIVE_YEAR}년 연간운세는 한 해의 큰 흐름을 참고하는 자료입니다. 단기적인 하루 운보다 긴 호흡의 방향과 생활 리듬을 점검하는 데 적합합니다.</p>
     <p>연간운세는 절대적인 미래 예언이 아니라 참고용 콘텐츠입니다.</p>
   `;
 }
 
 function renderMethod(type, birth, targetDateText){
-  let title = "🔎 운세 참고 기준";
   let bullets = [];
 
   if(type === "today"){
@@ -264,14 +237,14 @@ function renderMethod(type, birth, targetDateText){
   }else{
     bullets = [
       `기준 생년월일: ${birth}`,
-      `운세 대상 연도: ${FORTUNE_YEAR}`,
+      `운세 대상 연도: ${ACTIVE_YEAR}`,
       "연도 기준 고정 결과",
       "한 해의 큰 흐름을 참고하는 연간 해석과 조언 반영"
     ];
   }
 
   return `
-    <h4>${title}</h4>
+    <h4>🔎 운세 참고 기준</h4>
     <p>이 운세는 아래 기준을 참고해 같은 조건에서는 같은 결과가 나오도록 구성되어 있습니다.</p>
     <ul>
       ${bullets.map(v => `<li>${v}</li>`).join("")}
@@ -314,7 +287,7 @@ function renderResultBlock(type, title, content, targetDateText){
     resultEl.innerHTML = `
       <h3>${title}</h3>
       <p class="small">${modeText} · 기준 생년월일 ${birth}</p>
-      <p class="small">${type === "year" ? `기준 연도 ${FORTUNE_YEAR}` : `운세 대상 날짜 ${targetDateText}`}</p>
+      <p class="small">${type === "year" ? `기준 연도 ${ACTIVE_YEAR}` : `운세 대상 날짜 ${targetDateText}`}</p>
       <p>${content}</p>
     `;
   }
@@ -324,7 +297,11 @@ function renderResultBlock(type, title, content, targetDateText){
       ${renderGuide(type)}
       <div id="${type}DeepWrap" style="margin-top:14px;">
         <button class="btn" type="button" onclick="openDeepFortune('${type}')">
-          ${type === "today" ? "오늘 운세 심층 해석 보기" : type === "tomorrow" ? "내일 운세 심층 해석 보기" : `${FORTUNE_YEAR}년 연간운세 심층 해석 보기`}
+          ${type === "today"
+            ? "오늘 운세 심층 해석 보기"
+            : type === "tomorrow"
+              ? "내일 운세 심층 해석 보기"
+              : `${ACTIVE_YEAR}년 연간운세 심층 해석 보기`}
         </button>
         <div id="${type}Deep" style="margin-top:12px;"></div>
       </div>
@@ -336,7 +313,7 @@ function renderResultBlock(type, title, content, targetDateText){
   }
 }
 
-function generateDeepFortune(seed, type){
+function generateDeepFortune(seed){
   const lovePool = [
     "가까운 사람과의 대화가 관계 흐름을 좋게 만듭니다.",
     "감정 표현을 너무 미루지 말고 자연스럽게 전하는 것이 좋습니다.",
@@ -362,9 +339,6 @@ function generateDeepFortune(seed, type){
   ];
 
   const colorPool = ["빨강", "파랑", "노랑", "초록", "보라", "검정", "흰색", "금색", "은색", "네이비"];
-  const extraAdvicePool = adviceDB.length ? adviceDB : [
-    "오늘은 한 번 더 확인하는 습관이 흐름을 안정시킵니다."
-  ];
 
   return {
     love: seededPick(lovePool, seed + "|love"),
@@ -372,12 +346,12 @@ function generateDeepFortune(seed, type){
     health: seededPick(healthPool, seed + "|health"),
     color: seededPick(colorPool, seed + "|color"),
     number: seededNumber(seed + "|number", 1, 33),
-    advice: seededPick(extraAdvicePool, seed + "|advice")
+    advice: pickAdvice(seed + "|advice")
   };
 }
 
-function renderDeepFortuneHtml(type, seed){
-  const deep = generateDeepFortune(seed, type);
+function renderDeepFortuneHtml(seed){
+  const deep = generateDeepFortune(seed);
 
   return `
     <div class="fortune-method">
@@ -402,23 +376,34 @@ function renderDeepFortuneHtml(type, seed){
   `;
 }
 
-function getRewardStorageKey(){
+function getDeepSeed(type){
+  const birth = getPeriodBirth();
+
+  if(type === "today"){
+    return buildSeed(birth, formatDateLocal(getTodayTargetDate()), "today-deep");
+  }
+
+  if(type === "tomorrow"){
+    return buildSeed(birth, formatDateLocal(getTomorrowTargetDate()), "tomorrow-deep");
+  }
+
+  return buildSeed(birth, String(ACTIVE_YEAR), "year-deep");
+}
+
+function getDeepRewardStorageKey(){
   const d = new Date();
   const yyyy = d.getFullYear();
   const mm = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
-  return `period_all_reward_${yyyy}${mm}${dd}`;
+  return `period_deep_reward_${yyyy}${mm}${dd}`;
 }
 
-async function rewardAfterAllViewed(){
+async function rewardDeepFortuneOnce(){
   const phone = localStorage.getItem("phone");
   if(!phone) return;
   if(!hasPersonalBirthSelected()) return;
 
-  const allViewed = clickedState.today && clickedState.tomorrow && clickedState.year;
-  if(!allViewed) return;
-
-  const key = getRewardStorageKey();
+  const key = getDeepRewardStorageKey();
   if(localStorage.getItem(key) === "1") return;
 
   localStorage.setItem(key, "1");
@@ -435,8 +420,11 @@ async function rewardAfterAllViewed(){
   }
 }
 
-function showToday(fromClick = false){
-  if(!dbReady) return alert("운세 데이터를 불러오는 중입니다. 잠시 후 다시 눌러주세요.");
+function showToday(_fromClick = false){
+  if(!dbReady){
+    alert("운세 데이터를 불러오는 중입니다. 잠시 후 다시 눌러주세요.");
+    return;
+  }
 
   const birth = getPeriodBirth();
   const targetDate = getTodayTargetDate();
@@ -445,25 +433,35 @@ function showToday(fromClick = false){
   const content = seededPick(arr, buildSeed(birth, targetKey, "today"));
 
   renderResultBlock("today", "오늘의 운세", content, targetKey);
-
-  if(fromClick){
-    clickedState.today = true;
-    rewardAfterAllViewed();
-  }
 }
 
-function getDeepSeed(type){
+function showTomorrow(_fromClick = false){
+  if(!dbReady){
+    alert("운세 데이터를 불러오는 중입니다. 잠시 후 다시 눌러주세요.");
+    return;
+  }
+
   const birth = getPeriodBirth();
+  const targetDate = getTomorrowTargetDate();
+  const targetKey = formatDateLocal(targetDate);
+  const arr = tomorrowDB?.pools?.tomorrow || [];
+  const content = seededPick(arr, buildSeed(birth, targetKey, "tomorrow"));
 
-  if(type === "today"){
-    return buildSeed(birth, formatDateLocal(getTodayTargetDate()), "today-deep");
+  renderResultBlock("tomorrow", "내일의 운세", content, targetKey);
+}
+
+function showYear(_fromClick = false){
+  if(!dbReady){
+    alert("운세 데이터를 불러오는 중입니다. 잠시 후 다시 눌러주세요.");
+    return;
   }
 
-  if(type === "tomorrow"){
-    return buildSeed(birth, formatDateLocal(getTomorrowTargetDate()), "tomorrow-deep");
-  }
+  const birth = getPeriodBirth();
+  const targetKey = String(ACTIVE_YEAR);
+  const arr = yearDB?.pools?.year_all || [];
+  const content = seededPick(arr, buildSeed(birth, targetKey, "year"));
 
-  return buildSeed(birth, String(FORTUNE_YEAR), "year-deep");
+  renderResultBlock("year", `${ACTIVE_YEAR}년 연간운세`, content, targetKey);
 }
 
 async function openDeepFortune(type){
@@ -475,48 +473,9 @@ async function openDeepFortune(type){
   }
 
   const seed = getDeepSeed(type);
-  target.innerHTML = renderDeepFortuneHtml(type, seed);
+  target.innerHTML = renderDeepFortuneHtml(seed);
 
-  await rewardAfterAllViewed();
-}
-
-function showTomorrow(fromClick = false){
-  if(!dbReady) return alert("운세 데이터를 불러오는 중입니다. 잠시 후 다시 눌러주세요.");
-
-  const birth = getPeriodBirth();
-  const targetDate = getTomorrowTargetDate();
-  const targetKey = formatDateLocal(targetDate);
-  const arr = tomorrowDB?.pools?.tomorrow || [];
-  const content = seededPick(arr, buildSeed(birth, targetKey, "tomorrow"));
-
-  renderResultBlock("tomorrow", "내일의 운세", content, targetKey);
-
-  if(fromClick){
-    clickedState.tomorrow = true;
-    rewardAfterAllViewed();
-  }
-}
-
-function showYear(fromClick = false){
-  if(!dbReady) return alert("운세 데이터를 불러오는 중입니다. 잠시 후 다시 눌러주세요.");
-
-  const birth = getPeriodBirth();
-  const targetKey = String(FORTUNE_YEAR);
-  const arr = yearDB?.pools?.year_all || [];
-  const content = seededPick(arr, buildSeed(birth, targetKey, "year"));
-
-  renderResultBlock("year", `${FORTUNE_YEAR}년 연간운세`, content, targetKey);
-
-  if(fromClick){
-    clickedState.year = true;
-    rewardAfterAllViewed();
-  }
-}
-
-function resetDailyClickState(){
-  clickedState.today = false;
-  clickedState.tomorrow = false;
-  clickedState.year = false;
+  await rewardDeepFortuneOnce();
 }
 
 async function applyGuestBirthInline(){
@@ -571,17 +530,13 @@ async function applyGuestBirthInline(){
   if(zodiac) localStorage.setItem("guest_zodiac", zodiac);
   if(gapja) localStorage.setItem("guest_gapja", gapja);
 
-  resetDailyClickState();
-
-  if(window.refreshTopBar) window.refreshTopBar();
   renderMyInfoBox();
   renderPointBoxCustom();
 
-  window.showToday = showToday;
-  window.showTomorrow = showTomorrow;
-  window.showYear = showYear;
-  window.openDeepFortune = openDeepFortune;
-  
+  showToday(false);
+  showTomorrow(false);
+  showYear(false);
+
   alert("게스트 기준 생년월일이 적용되었습니다 ✅");
 }
 
@@ -592,7 +547,7 @@ function bindShare(){
   btn.addEventListener("click", async ()=>{
     const shareData = {
       title: document.title,
-      text: `오늘 운세 · 내일 운세 · ${FORTUNE_YEAR}년 연간운세를 확인해보세요.`,
+      text: `오늘 운세 · 내일 운세 · ${ACTIVE_YEAR}년 연간운세를 확인해보세요.`,
       url: window.location.href
     };
 
@@ -614,19 +569,18 @@ function bindShare(){
 function applyDynamicYearText(){
   const pageTitle = document.getElementById("pageTitle");
   if(pageTitle){
-    pageTitle.textContent = `📆 오늘 운세 · 내일 운세 · ${FORTUNE_YEAR}년 연간운세 무료 보기`;
+    pageTitle.textContent = `📆 오늘 운세 · 내일 운세 · ${ACTIVE_YEAR}년 연간운세 무료 보기`;
   }
 
-  const year = new Date().getFullYear();
-
-document.getElementById("yearBtn").innerText =
-`${year} 연간운세`;
+  const yearBtn = document.getElementById("yearBtn");
+  if(yearBtn){
+    yearBtn.innerText = `${ACTIVE_YEAR} 연간운세`;
   }
 }
 
 document.addEventListener("DOMContentLoaded", async ()=>{
-  applyDynamicYearText();
   await loadDB();
+  applyDynamicYearText();
 
   renderMyInfoBox();
 
@@ -638,7 +592,6 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   document.getElementById("applyGuestBirthBtn")?.addEventListener("click", applyGuestBirthInline);
   bindShare();
 
-  // 기본값/저장값 기준으로 3개 모두 즉시 표시
   showToday(false);
   showTomorrow(false);
   showYear(false);
@@ -647,3 +600,4 @@ document.addEventListener("DOMContentLoaded", async ()=>{
 window.showToday = showToday;
 window.showTomorrow = showTomorrow;
 window.showYear = showYear;
+window.openDeepFortune = openDeepFortune;
