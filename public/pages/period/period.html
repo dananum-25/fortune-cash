@@ -3,26 +3,71 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>오늘 운세 · 내일 운세 · 2026년 연간운세 무료 보기</title>
-
-  <meta name="description" content="오늘 운세, 내일 운세, 2026년 연간운세를 무료로 확인하세요. 기간운세 해석 방법과 활용법까지 함께 제공합니다.">
-
-  <!-- ✅ 공통 CSS (saju 톤 포함) -->
+  <title>오늘 운세 · 내일 운세 · 연간운세 무료 보기</title>
+  <meta name="description" content="오늘 운세, 내일 운세, 연간운세를 무료로 확인하세요. 기간운세 해석 방법과 활용법까지 함께 제공합니다.">
+  <link rel="canonical" href="https://fortune-cash.vercel.app/pages/period/period.html">
   <link rel="stylesheet" href="/css/common.css">
+
+  <style>
+    .helper-box p{ margin:6px 0; }
+    .birth-form{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top:12px;
+    }
+    .birth-form input,
+    .birth-form select{
+      padding:12px;
+      border-radius:10px;
+      border:1px solid #ddd;
+      font-size:14px;
+      width:100%;
+      box-sizing:border-box;
+    }
+    .footer-links a{
+      color:#fff !important;
+      font-size:13px;
+      text-decoration:none;
+    }
+  </style>
 </head>
 
 <body>
   <div class="container">
 
-<h1>📆 오늘 운세 · 내일 운세 · 2026년 연간운세 무료 보기</h1>
+    <h1 id="pageTitle">📆 오늘 운세 · 내일 운세 · 연간운세 무료 보기</h1>
 
-<!-- ✅ 나의 기본 정보 카드 -->
-<div id="myInfoBox" class="card"></div>
+    <!-- 나의 기준 정보 -->
+    <div id="myInfoBox" class="card"></div>
 
-<!-- ✅ 포인트 박스 -->
-<div id="pointBox" class="card"></div>
+    <!-- 포인트 박스 -->
+    <div id="pointBox" class="card"></div>
 
-    <!-- 🔹 설명 콘텐츠 (SEO 핵심) -->
+    <!-- 게스트 생년월일 입력 -->
+    <section id="guestBirthCard" class="card helper-box">
+      <h2>내 기준으로 다시 보기</h2>
+      <p>지금은 기본 기준값 또는 저장된 정보로 결과를 볼 수 있어요.</p>
+      <p>생년월일을 입력하면 게스트도 본인 기준으로 다시 확인할 수 있습니다.</p>
+
+      <div class="birth-form">
+        <input id="guestBirthInline" type="date">
+
+        <select id="guestBirthTypeInline">
+          <option value="solar">양력</option>
+          <option value="lunar" disabled>음력(준비중)</option>
+        </select>
+
+        <label style="font-size:13px;">
+          <input type="checkbox" id="guestIsLeapInline">
+          윤달(윤월) 입니다
+        </label>
+
+        <button class="btn" type="button" id="applyGuestBirthBtn">내 생년월일 적용</button>
+      </div>
+    </section>
+
+    <!-- 설명 콘텐츠 -->
     <section id="seoContent" class="card">
       <h2>기간운세란 무엇인가요?</h2>
       <p>
@@ -47,35 +92,37 @@
       </p>
     </section>
 
-    <!-- ✅ 버튼 영역: 결과 봐도 사라지지 않음 -->
+    <!-- 버튼 영역 -->
     <section id="actionSection" class="card">
-  <div class="btn-row">
-    <button class="btn" onclick="showToday()">오늘 운세</button>
-    <button class="btn" onclick="showTomorrow()">내일 운세</button>
-    <button class="btn" onclick="showYear()">2026 연간운세</button>
-  </div>
+      <div class="btn-row">
+        <button class="btn" onclick="showToday()">오늘 운세</button>
+        <button class="btn" onclick="showTomorrow()">내일 운세</button>
+        <button class="btn" id="yearBtn" onclick="showYear()">연간운세</button>
+      </div>
 
-  <p style="margin-top:14px;"><a href="/">홈으로</a></p>
+      <p style="margin-top:14px;" class="small">
+        회원은 결과 보기 시 콘텐츠별 1일 1회 포인트가 적립됩니다.
+      </p>
     </section>
 
-    <!-- ✅ 결과 영역 -->
+    <!-- 결과 영역 -->
     <section id="resultSection" class="card" style="display:none;">
       <div id="resultBox" class="result-box"></div>
       <div class="hr"></div>
       <div id="guideBox" class="result-box"></div>
     </section>
 
-    <!-- 🔹 관련 운세 더 보기 -->
+    <!-- 관련 운세 -->
     <section class="card">
       <h3>관련 운세 더 보기</h3>
       <ul>
         <li><a href="/pages/zodiac/zodiac.html">띠별 운세</a></li>
-        <li><a href="/pages/star/star.html">별자리 운세</a></li>
+        <li><a href="/pages/star/index.html">별자리 운세</a></li>
         <li><a href="/pages/tarot/tarot.html">타로 운세</a></li>
       </ul>
     </section>
 
-    <!-- 🔹 FAQ (승인에 매우 중요) -->
+    <!-- FAQ -->
     <section class="card">
       <h2>자주 묻는 질문 (FAQ)</h2>
 
@@ -91,37 +138,52 @@
         하지만 개인의 노력과 선택이 가장 중요합니다.
       </p>
     </section>
-<section class="card">
-  <h2>기간운세 상세 안내</h2>
-  <p>
-    오늘 운세는 하루의 감정, 인간관계, 일정 흐름을 가볍게 점검하는 데 적합합니다.
-    내일 운세는 미리 준비할 일을 생각해 보는 데 도움이 됩니다.
-  </p>
-  <p>
-    연간운세는 한 해의 큰 방향을 참고하는 콘텐츠로,
-    재물운, 애정운, 건강운, 일과 관련된 흐름을 넓게 이해하는 데 활용할 수 있습니다.
-  </p>
-  <p>
-    운세는 참고 자료일 뿐이며, 최종 판단은 본인의 선택과 현실 조건을 우선해야 합니다.
-  </p>
-</section>
-    <button class="secondaryBtn" id="shareBtn">공유하기</button>
-    <button class="secondaryBtn" onclick="Common.goHome()">홈으로</button>
+
+    <section class="card">
+      <h2>기간운세 상세 안내</h2>
+      <p>
+        오늘 운세는 하루의 감정, 인간관계, 일정 흐름을 가볍게 점검하는 데 적합합니다.
+        내일 운세는 미리 준비할 일을 생각해 보는 데 도움이 됩니다.
+      </p>
+      <p>
+        연간운세는 한 해의 큰 방향을 참고하는 콘텐츠로,
+        재물운, 애정운, 건강운, 일과 관련된 흐름을 넓게 이해하는 데 활용할 수 있습니다.
+      </p>
+      <p>
+        운세는 참고 자료일 뿐이며, 최종 판단은 본인의 선택과 현실 조건을 우선해야 합니다.
+      </p>
+    </section>
+
+    <div class="card">
+      <h2>추천 운세 콘텐츠</h2>
+      <ul>
+        <li><a href="/pages/saju/saju.html">사주 분석</a></li>
+        <li><a href="/pages/star/index.html">별자리 운세</a></li>
+        <li><a href="/pages/zodiac/zodiac.html">띠별 운세</a></li>
+        <li><a href="/pages/tojung/tojung.html">토정비결</a></li>
+        <li><a href="/fortune-guide.html">운세 가이드</a></li>
+      </ul>
+    </div>
+
+    <button class="secondaryBtn" id="shareBtn" type="button">공유하기</button>
+    <button class="secondaryBtn" type="button" onclick="Common.goHome()">홈으로</button>
 
     <footer>
-    <div>무료 운세 플랫폼</div>
-    <div style="margin-top:8px;">
-<a href="/privacy.html">개인정보처리방침</a> |
-<a href="/terms.html">이용약관</a> |
-<a href="/about.html">사이트 소개</a> |
-<a href="/contact.html">문의</a>
-    </div>
-  </footer>
+      <div>무료 운세 플랫폼</div>
+      <div style="margin-top:6px;">문의: daekoju@naver.com</div>
+      <div class="footer-links" style="margin-top:8px;">
+        <a href="/privacy.html">개인정보처리방침</a> |
+        <a href="/terms.html">이용약관</a> |
+        <a href="/about.html">사이트 소개</a> |
+        <a href="/contact.html">문의</a> |
+        <a href="/fortune-guide.html">운세 가이드</a>
+      </div>
+    </footer>
 
   </div>
 
-  <!-- ✅ 기능 스크립트 -->
   <script src="/js/config.js"></script>
+  <script src="/js/birth.js"></script>
   <script src="/js/auth.js"></script>
   <script src="/js/points.js"></script>
   <script src="/js/common.js"></script>
