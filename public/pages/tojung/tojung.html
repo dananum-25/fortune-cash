@@ -3,32 +3,181 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>토정비결 | 2026년 운세</title>
-  <meta name="description" content="로그인 정보 기반 2026 토정비결 요약. 재물운/연애운/직장운/건강운을 간단히 확인하세요.">
+  <title>토정비결 | 올해 운세</title>
+  <meta name="description" content="생년월일 기준 올해 토정비결 요약. 재물운, 연애운, 직장운, 건강운을 참고용으로 확인하세요. 회원은 자동 적용, 게스트도 입력 후 이용할 수 있습니다.">
   <link rel="canonical" href="https://fortune-cash.vercel.app/pages/tojung/tojung.html">
+  <link rel="stylesheet" href="/css/common.css">
 
   <style>
-    body{margin:0;background:#111;color:#fff;font-family:Arial;}
-    .wrap{max-width:820px;margin:auto;padding:20px;}
-    .card{background:#1a1a1a;border-radius:16px;padding:18px;margin:16px 0;}
-    h1{font-size:26px;margin:0 0 10px;}
-    h2{margin:18px 0 10px;}
-    p{line-height:1.8;margin:8px 0;}
-    .small{font-size:12px;opacity:.8}
-    .badge{display:inline-block;background:#222;color:#ffd56b;padding:6px 10px;border-radius:12px;margin:4px 6px 4px 0;}
-    button{width:100%;padding:14px;border:none;border-radius:12px;background:#ffd56b;font-weight:bold;margin-top:10px;cursor:pointer;}
-    a{color:#ffd56b;text-decoration:none;}
-    .hr{height:1px;background:#222;margin:14px 0;}
-.bar-high{ background:linear-gradient(90deg,#00c853,#69f0ae); }
-.bar-good{ background:linear-gradient(90deg,#ffd600,#ffea00); }
-.bar-mid { background:linear-gradient(90deg,#ff9100,#ffab40); }
-.bar-low { background:linear-gradient(90deg,#d50000,#ff5252); }
+    .tojung-wrap{
+      width:min(100% - 24px, 960px);
+      margin:0 auto;
+      padding:20px 0 40px;
+    }
+
+    .page-desc{
+      margin-bottom:14px;
+    }
+
+    .helper-box p{
+      margin:6px 0;
+    }
+
+    .birth-form{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .birth-form input,
+    .birth-form select{
+      padding:12px;
+      border-radius:10px;
+      border:1px solid #ddd;
+      font-size:14px;
+      width:100%;
+      box-sizing:border-box;
+      background:#fff;
+      color:#111;
+    }
+
+    .inline-check{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:14px;
+    }
+
+    .fortune-title{
+      margin:0 0 14px;
+      font-size:28px;
+      font-weight:800;
+      line-height:1.25;
+      letter-spacing:-0.3px;
+      color:#ffd56b;
+    }
+
+    .recommend-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:14px;
+    }
+
+    .recommend-actions a{
+      display:block;
+      text-align:center;
+      text-decoration:none;
+      border:2px solid #ffffff;
+      border-radius:12px;
+      background:#ffffff;
+      color:#111 !important;
+      font-weight:700;
+      padding:14px 10px;
+      box-sizing:border-box;
+    }
+
+    .recommend-actions a:hover{
+      background:#f3f3f3;
+    }
+
+    .footer-links{
+      margin-top:10px;
+      display:grid;
+      grid-template-columns:repeat(3, auto);
+      justify-content:center;
+      gap:8px 14px;
+      line-height:1.8;
+    }
+
+    .footer-links a{
+      color:#fff !important;
+      font-size:13px;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+
+    .score-row{
+      margin:12px 0;
+    }
+
+    .score-head{
+      display:flex;
+      justify-content:space-between;
+      font-size:14px;
+      margin-bottom:6px;
+    }
+
+    .score-bar{
+      height:12px;
+      background:#222;
+      border-radius:10px;
+      overflow:hidden;
+    }
+
+    .score-fill{
+      height:100%;
+      border-radius:10px;
+    }
+
+    .bar-high{ background:linear-gradient(90deg,#00c853,#69f0ae); }
+    .bar-good{ background:linear-gradient(90deg,#ffd600,#ffea00); }
+    .bar-mid { background:linear-gradient(90deg,#ff9100,#ffab40); }
+    .bar-low { background:linear-gradient(90deg,#d50000,#ff5252); }
+
+    @media (max-width: 767px){
+      .tojung-wrap{
+        width:min(100% - 24px, 420px);
+      }
+
+      .recommend-actions{
+        grid-template-columns:1fr;
+      }
+
+      .footer-links{
+        grid-template-columns:repeat(2, auto);
+        gap:6px 12px;
+      }
+
+      .fortune-title{
+        font-size:22px;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-<h1>📜 2026 토정비결</h1>
-    <div class="small">※ 토정비결은 참고용입니다. 흐름을 읽고 선택에 도움 받는 용도로 활용하세요.</div>
+  <div class="wrap tojung-wrap">
+
+    <h1 id="pageTitle">📜 올해 토정비결</h1>
+    <div class="small page-desc">※ 토정비결은 참고용입니다. 흐름을 읽고 선택에 도움 받는 용도로 활용하세요.</div>
+
+    <div id="loginCheck" class="card"></div>
+    <div id="pointBox" class="card"></div>
+
+    <section id="guestBirthCard" class="card helper-box" style="display:none;">
+      <h2>내 기준으로 다시 보기</h2>
+      <p>회원은 저장된 생년월일이 자동 적용됩니다.</p>
+      <p>게스트는 생년월일을 입력하면 본인 기준으로 다시 확인할 수 있습니다.</p>
+
+      <div class="birth-form">
+        <input id="guestBirthInline" type="date">
+
+        <select id="guestBirthTypeInline">
+          <option value="solar">양력</option>
+          <option value="lunar">음력</option>
+        </select>
+
+        <label class="inline-check">
+          <input type="checkbox" id="guestIsLeapInline">
+          윤달(윤월) 입니다
+        </label>
+
+        <button class="btn" type="button" id="applyGuestBirthBtn">내 생년월일 적용</button>
+      </div>
+
+      <p class="small" style="margin-top:10px;">게스트는 포인트 적립 없이 콘텐츠만 이용할 수 있습니다.</p>
+    </section>
 
     <div class="card">
       <h2>토정비결 안내</h2>
@@ -37,51 +186,77 @@
         재물운, 애정운, 일과 관련된 흐름, 건강운 등을 참고용으로 확인할 수 있습니다.
       </p>
       <p>
-        본 서비스의 토정비결은 자동 생성형 해설로 제공되며,
-        절대적인 미래 예언이 아니라 현재의 방향을 점검하는 참고 자료입니다.
+        본 서비스의 토정비결은 자동 생성형 해설로 제공되며, 절대적인 미래 예언이 아니라 현재의 방향을 점검하는 참고 자료입니다.
       </p>
     </div>
 
-    <div id="loginCheck" class="card"></div>
-
     <div id="result" style="display:none;">
-      <div class="card">
-        <h2>👤 기본 정보</h2>
+      <section class="card">
+        <h2 class="fortune-title">👤 기본 정보</h2>
         <div id="basicInfo"></div>
-      </div>
+      </section>
 
-      <div class="card">
-        <h2>🔮 2026년 토정비결 요약</h2>
+      <section class="card">
+        <h2 class="fortune-title" id="yearTitle">🔮 올해 토정비결 요약</h2>
         <div id="summaryBox"></div>
         <div class="hr"></div>
         <div id="detailBox"></div>
-      </div>
+      </section>
 
-<div class="card">
-        <h2>다른 콘텐츠 함께 보기</h2>
-        <p><a href="/pages/period/period.html">오늘/내일/연간 운세</a></p>
-        <p><a href="/pages/star/index.html">별자리 운세</a></p>
-        <p><a href="/point.html">포인트</a></p>
-        <p><a href="/">홈으로</a></p>
-      </div>
+      <section class="card">
+        <h2>토정비결 해석 안내</h2>
+        <p>
+          토정비결은 한 해의 큰 흐름을 점검하는 콘텐츠입니다. 세부적인 하루 운세보다 방향성과 생활 리듬을 참고하는 데 더 적합합니다.
+        </p>
+        <p>
+          점수, 요약 문장, 체크리스트는 참고 자료이며, 실제 판단은 현재 상황과 함께 종합적으로 보는 것이 좋습니다.
+        </p>
+      </section>
+
+      <section class="card">
+        <h2>추천 운세 콘텐츠</h2>
+        <div class="recommend-actions">
+          <a href="/pages/period/period.html">오늘/내일/연간 운세</a>
+          <a href="/pages/saju/saju.html">사주 분석</a>
+          <a href="/pages/star/index.html">별자리 운세</a>
+          <a href="/pages/zodiac/zodiac.html">띠별 운세</a>
+          <a href="/pages/tarot/tarot.html">타로</a>
+          <a href="/fortune-guide.html">운세 가이드</a>
+        </div>
+      </section>
     </div>
-<div class="card">
-      <h2>자주 묻는 질문</h2>
 
+    <section class="card">
+      <h2>자주 묻는 질문</h2>
       <p><strong>Q. 토정비결은 정확한가요?</strong><br>
       토정비결은 참고용 콘텐츠이며, 한 해의 흐름을 가볍게 살펴보는 데 적합합니다.</p>
 
       <p><strong>Q. 결과가 안 좋게 나오면 어떻게 봐야 하나요?</strong><br>
       결과를 절대적인 예언으로 보기보다, 조심해야 할 시기와 생활 관리 포인트를 점검하는 자료로 활용하는 것이 좋습니다.</p>
-</div>
-    <footer class="small" style="margin-top:40px;text-align:center;opacity:.7;">
-      무료 운세 플랫폼 | <a href="/">홈으로</a>
+    </section>
+
+    <button class="secondaryBtn" id="shareBtn" type="button">공유하기</button>
+    <button class="secondaryBtn" type="button" onclick="Common.goHome()">홈으로</button>
+
+    <footer>
+      <div>무료 운세 플랫폼</div>
+      <div style="margin-top:6px;">문의: daekoju@naver.com</div>
+      <div class="footer-links">
+        <a href="/privacy.html">개인정보처리방침</a>
+        <a href="/terms.html">이용약관</a>
+        <a href="/about.html">사이트 소개</a>
+        <a href="/contact.html">문의</a>
+        <a href="/fortune-guide.html">운세 가이드</a>
+      </div>
     </footer>
+
   </div>
 
   <script src="/js/config.js"></script>
+  <script src="/js/birth.js"></script>
   <script src="/js/auth.js"></script>
   <script src="/js/points.js"></script>
+  <script src="/js/common.js"></script>
   <script src="/js/db.js"></script>
   <script src="/js/tojung.js"></script>
 </body>
