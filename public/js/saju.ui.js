@@ -510,10 +510,15 @@ function generateMonthlyTextAll(monthlyData, profile, rand){
     health:"💪 건강운"
   };
 
-  let html = "<h3>🗓 2026 월별 종합 해석</h3>";
+  const activeYear =
+    window.FortuneConfig?.year ||
+    window.APP_CONFIG?.fortuneYear ||
+    new Date().getFullYear();
+
+  let html = `<h3>🗓 ${activeYear} 월별 종합 해석</h3>`;
 
   monthNames.forEach((month,i)=>{
-    const monthEl = MONTH_ELEMENT_2026[i];
+    const monthEl = MONTH_ELEMENT[i];
     html += `<h4 style="margin-top:14px">${month} <span class="small">(${monthEl} 기운)</span></h4>`;
 
     Object.keys(types).forEach(type=>{
