@@ -9,11 +9,31 @@
   <link rel="stylesheet" href="/css/common.css">
 
   <style>
-    .period-wrap{
-      width:min(100% - 24px, 960px);
-      margin:0 auto;
-      padding:20px 0 40px;
-    }
+  .period-wrap{
+    width:min(100% - 24px, 960px);
+    margin:0 auto;
+    padding:20px 0 40px;
+  }
+
+  .fortune-title{
+    margin:0 0 14px;
+    font-size:28px;
+    font-weight:800;
+    line-height:1.25;
+    letter-spacing:-0.3px;
+  }
+
+  .accent-today{
+    color:#ffd56b;
+  }
+
+  .accent-tomorrow{
+    color:#8ec5ff;
+  }
+
+  .accent-year{
+    color:#9df0b8;
+  }
 
     .helper-box p{ margin:6px 0; }
 
@@ -208,37 +228,37 @@
     </section>
 
     <section class="card fortune-block">
-      <button class="btn" type="button" onclick="showToday(true)">오늘 운세</button>
-      <div id="todayPanel" class="fortune-panel">
-        <div id="todayResult"></div>
-        <div class="hr"></div>
-        <div id="todayGuide"></div>
-        <div class="hr"></div>
-        <div id="todayMethod" class="fortune-method"></div>
-      </div>
-    </section>
+  <h2 class="fortune-title accent-today">☀ 오늘 운세</h2>
+  <div id="todayPanel" class="fortune-panel">
+    <div id="todayResult"></div>
+    <div class="hr"></div>
+    <div id="todayGuide"></div>
+    <div class="hr"></div>
+    <div id="todayMethod" class="fortune-method"></div>
+  </div>
+</section>
 
-    <section class="card fortune-block">
-      <button class="btn" type="button" onclick="showTomorrow(true)">내일 운세</button>
-      <div id="tomorrowPanel" class="fortune-panel">
-        <div id="tomorrowResult"></div>
-        <div class="hr"></div>
-        <div id="tomorrowGuide"></div>
-        <div class="hr"></div>
-        <div id="tomorrowMethod" class="fortune-method"></div>
-      </div>
-    </section>
+<section class="card fortune-block">
+  <h2 class="fortune-title accent-tomorrow">🌙 내일 운세</h2>
+  <div id="tomorrowPanel" class="fortune-panel">
+    <div id="tomorrowResult"></div>
+    <div class="hr"></div>
+    <div id="tomorrowGuide"></div>
+    <div class="hr"></div>
+    <div id="tomorrowMethod" class="fortune-method"></div>
+  </div>
+</section>
 
-    <section class="card fortune-block">
-      <button class="btn" id="yearBtn" type="button" onclick="showYear(true)">연간운세</button>
-      <div id="yearPanel" class="fortune-panel">
-        <div id="yearResult"></div>
-        <div class="hr"></div>
-        <div id="yearGuide"></div>
-        <div class="hr"></div>
-        <div id="yearMethod" class="fortune-method"></div>
-      </div>
-    </section>
+<section class="card fortune-block">
+  <h2 class="fortune-title accent-year" id="yearTitle">📅 올해 연간운세</h2>
+  <div id="yearPanel" class="fortune-panel">
+    <div id="yearResult"></div>
+    <div class="hr"></div>
+    <div id="yearGuide"></div>
+    <div class="hr"></div>
+    <div id="yearMethod" class="fortune-method"></div>
+  </div>
+</section>
 
     <section class="card">
       <h2>자주 묻는 질문 (FAQ)</h2>
