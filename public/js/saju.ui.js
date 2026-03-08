@@ -1264,10 +1264,17 @@ const expertHtml = `
   </div>
 `;
 
-  // 종합
-  let analysis = "";
-  analysis += expertHtml; // ✅ 전문가 카드 맨 위
-  if(overallText || loveText || moneyText || healthText || adviceText){
+// 종합
+let analysis = "";
+analysis += expertHtml; // ✅ 전문가 카드 맨 위
+
+const overallText = pickFromSajuDB(st.dmEl, "overall", rand);
+const loveText = pickFromSajuDB(st.dmEl, "love", rand);
+const moneyText = pickFromSajuDB(st.dmEl, "money", rand);
+const healthText = pickFromSajuDB(st.dmEl, "health", rand);
+const adviceText = pickFromSajuDB(st.dmEl, "advice", rand);
+
+if(overallText || loveText || moneyText || healthText || adviceText){
   analysis += `
     <div class="card">
       <h2>🌿 일간 오행 해설(DB)</h2>
@@ -1279,7 +1286,7 @@ const expertHtml = `
       ${adviceText ? `<p><b>조언</b><br>${adviceText}</p>` : ""}
     </div>
   `;
-  }
+}
   // ===== 십성 DB 해설 카드 =====
 try{
   const db = await loadSipseongDB();
