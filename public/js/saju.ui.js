@@ -522,11 +522,6 @@ function getTodayString(){
 
 function generateFullReport(name, pillars, elementCounts, scores){
   const strongest = Object.keys(elementCounts).reduce((a,b)=> elementCounts[a] > elementCounts[b] ? a : b);
-  const overallText = pickFromSajuDB(st.dmEl, "overall", rand);
-const loveText = pickFromSajuDB(st.dmEl, "love", rand);
-const moneyText = pickFromSajuDB(st.dmEl, "money", rand);
-const healthText = pickFromSajuDB(st.dmEl, "health", rand);
-const adviceText = pickFromSajuDB(st.dmEl, "advice", rand);
   const weakest = Object.keys(elementCounts).reduce((a,b)=> elementCounts[a] < elementCounts[b] ? a : b);
   const avg = Math.round((scores.wealth + scores.love + scores.career + scores.health) / 4);
 
@@ -542,13 +537,13 @@ const adviceText = pickFromSajuDB(st.dmEl, "advice", rand);
 
   return `
     <div class="card">
-      <h2>🧾 2026 종합 리포트(상세)</h2>
+      <h2>🧾 종합 리포트(상세)</h2>
       <p style="font-size:12px;opacity:.6;">생성일: ${getTodayString()} | fortune-cash.vercel.app</p>
 
       <h3>1) 핵심 요약</h3>
       <p><b>${name}</b>님의 4기둥: <b>${pillars.join(" / ")}</b></p>
       <p>오행 분포(참고): <b>${strongest}</b>가 강하고 <b>${weakest}</b>가 약한 편입니다.</p>
-      <p>2026 평균 흐름: <b>${avg}점</b> — ${avg >= 70 ? "상승 구간" : avg >= 50 ? "관리 구간" : "방어 구간"}</p>
+      <p>올해 평균 흐름: <b>${avg}점</b> — ${avg >= 70 ? "상승 구간" : avg >= 50 ? "관리 구간" : "방어 구간"}</p>
 
       <div class="hr"></div>
 
@@ -560,10 +555,10 @@ const adviceText = pickFromSajuDB(st.dmEl, "advice", rand);
       <div class="hr"></div>
 
       <h3>3) 실행 체크리스트(현실용)</h3>
-      <p>• 돈: “월 고정지출 점검 + 지출 상한선”을 먼저 확정</p>
-      <p>• 커리어: “노출/발표/제안”을 주 1회 이상 루틴화</p>
-      <p>• 관계: 감정 올라올 때는 “결정은 24시간 후” 룰 적용</p>
-      <p>• 건강: 수면/운동 중 1개만이라도 ‘최소 루틴’ 고정</p>
+      <p>• 돈: 월 고정지출과 소비 상한선 먼저 점검</p>
+      <p>• 커리어: 보여줄 수 있는 결과를 기록하고 정리</p>
+      <p>• 관계: 감정이 올라올 때는 결론보다 대화 순서 우선</p>
+      <p>• 건강: 수면/운동 중 최소 하나는 고정 루틴 만들기</p>
 
       <div class="hr"></div>
 
@@ -572,6 +567,7 @@ const adviceText = pickFromSajuDB(st.dmEl, "advice", rand);
     </div>
   `;
 }
+      
 
 function generateSummaryContent(name, pillars, scores){
   return `
@@ -1156,6 +1152,16 @@ const rand = mulberry32(seedFn());
   document.getElementById("elementInterpretation").innerHTML = generateElementInterpretation(elementResult);
 
   // 세운
+  const activeYear =
+    window.FortuneConfig?.year ||
+    window.APP_CONFIG?.fortuneYear ||
+    new Date().getFullYear();
+
+  const yearFortuneTitle = document.getElementById("yearFortuneTitle");
+  if(yearFortuneTitle){
+    yearFortuneTitle.textContent = `📈 ${activeYear}년 세운 분석`;
+  }
+
   let seowoonHtml = sewoonAnalyze(pillars);
   seowoonHtml += analyzeSeowoonWithElements(elementResult);
   document.getElementById("sewoonBox").innerHTML = seowoonHtml;
@@ -1329,7 +1335,12 @@ try{
 
   setupPdfButtons(name, pillars, scores);
 
-  // bar 애니메이션
+  try{
+    await rewardSajuResultOnce();
+  }catch(e){
+    console.warn("[saju.ui.js] reward failed", e);
+  }
+
   setTimeout(()=>{
     Object.keys(scores).forEach(key=>{
       const el = document.getElementById("bar-"+key);
@@ -1364,6 +1375,34 @@ function analyzeClimate(pillarsObj){
   }
 
   return "한열 균형";
+}
+function getSajuRewardStorageKey(){
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `saju_result_reward_${yyyy}${mm}${dd}`;
+}
+
+async function rewardSajuResultOnce(){
+  const phone = localStorage.getItem("phone");
+  if(!phone) return;
+
+  const key = getSajuRewardStorageKey();
+  if(localStorage.getItem(key) === "1") return;
+
+  if(window.rewardContent){
+    const res = await window.rewardContent("saju_result");
+
+    if(res?.status === "ok"){
+      localStorage.setItem(key, "1");
+      if(window.loadMyPoint) await window.loadMyPoint();
+      renderPointBoxSaju();
+      alert("포인트가 적립되었습니다 ✅");
+    }else if(res?.status === "already"){
+      localStorage.setItem(key, "1");
+    }
+  }
 }
 // ===============================
 // 12) Globals for safety (if HTML uses onclick anywhere)
