@@ -1,18 +1,7 @@
 // /js/saju.ui.js  (type="module")
-const MONTH_ELEMENT_2026 = {
-  1:"수",
-  2:"목",
-  3:"목",
-  4:"화",
-  5:"화",
-  6:"토",
-  7:"금",
-  8:"금",
-  9:"토",
-  10:"수",
-  11:"수",
-  12:"토"
-};
+const MONTH_ELEMENT = [
+  "수","목","목","화","화","토","금","금","토","수","수","토"
+];
 
 import {
   normalizeBirthYMD,
@@ -338,18 +327,6 @@ function generateMonthlyGraph(scores, rand, profile){
   return generateMonthlyGraphAll(scores, rand, profile);
 }
 
-function generateMonthlyGraphAll(scores, rand, profile){
-  const categories = [
-    {key:"wealth", label:"💰 재물운"},
-    {key:"love", label:"💖 연애운"},
-    {key:"career", label:"🏢 직장/사업운"},
-    {key:"health", label:"💪 건강운"}
-  ];
-  const MONTH_ELEMENT_2026 = [
-  "토","목","목","토","화","화","토","금","금","토","수","수"
-];
-// 1~12월 대략적 월 기운용 간이 매핑
-
 function relationToYongshin(monthEl, yongEl){
   if(monthEl === yongEl) return "용신직접";
   if(PRODUCE[monthEl] === yongEl) return "용신생조";
@@ -425,9 +402,61 @@ function buildMonthlyFortuneLine(score, type, monthEl, profile, rand){
 
   return base + yongComment;
 }
+
+function generateMonthlyGraphAll(scores, rand, profile){
+  const categories = [
+    {key:"wealth", label:"💰 재물운"},
+    {key:"love", label:"💖 연애운"},
+    {key:"career", label:"🏢 직장/사업운"},
+    {key:"health", label:"💪 건강운"}
+  ];
+
   const max = 100;
   const height = 160;
   const widthStep = 100 / 11;
+
+  function genMonthly(baseScore){
+    const arr = [];
+    for(let i=0;i<12;i++){
+      const variance = Math.floor(rand() * 15) - 7;
+      let value = baseScore + variance;
+      if(value > 95) value = 95;
+      if(value < 30) value = 30;
+      arr.push(value);
+    }
+    return arr;
+  }
+
+  let html = `<div class="month-graph"><h3>📅 ${new Date().getFullYear()} 월별 운세 변화</h3>`;
+  const monthlyData = {};
+
+  categories.forEach(cat=>{
+    const monthly = genMonthly(scores[cat.key]);
+    monthlyData[cat.key] = monthly;
+
+    let points = "";
+    let dots = "";
+
+    monthly.forEach((score,i)=>{
+      const x = i * widthStep;
+      const y = height - (score / max * height);
+      points += `${x},${y} `;
+      dots += `<circle cx="${x}" cy="${y}" r="2" class="graph-dot"></circle>`;
+    });
+
+    html += `
+      <h4 style="margin-top:18px">${cat.label}</h4>
+      <svg viewBox="0 0 100 ${height}">
+        <polyline points="${points}" class="graph-line"></polyline>
+        ${dots}
+      </svg>
+    `;
+  });
+
+  html += `</div>`;
+  html += generateMonthlyTextAll(monthlyData, profile, rand);
+  return html;
+}
   
   function genMonthly(baseScore){
     const arr = [];
