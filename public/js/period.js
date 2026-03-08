@@ -16,27 +16,28 @@ let ACTIVE_YEAR = REQUESTED_YEAR;
 
 async function loadDB(){
   try{
-    const [t1, t2, t4] = await Promise.all([
-      fetch("/data/fortunes_ko_today.json", { cache: "no-store" }).then(r=>{
-        if(!r.ok) throw new Error("today json load failed: " + r.status);
-        return r.json();
-      }),
-      fetch("/data/fortunes_ko_tomorrow.json", { cache: "no-store" }).then(r=>{
-        if(!r.ok) throw new Error("tomorrow json load failed: " + r.status);
-        return r.json();
-      }),
-      fetch("/data/daily_advice_ko.json", { cache: "no-store" }).then(r=>{
-        if(!r.ok) throw new Error("daily advice json load failed: " + r.status);
-        return r.json();
-      })
-    ]);
+const [db, t4] = await Promise.all([
+  fetch("/data/fortunes_ko.json", { cache: "no-store" }).then(r=>{
+    if(!r.ok) throw new Error("fortune json load failed");
+    return r.json();
+  }),
+  fetch("/data/daily_advice_ko.json", { cache: "no-store" }).then(r=>{
+    if(!r.ok) throw new Error("daily advice json load failed");
+    return r.json();
+  })
+]);
+
+todayDB = { pools:{ today: db.pools.today } };
+tomorrowDB = { pools:{ tomorrow: db.pools.tomorrow } };
+yearDB = { pools:{ year_all: db.pools.year_all } };
+
+adviceDB = Array.isArray(t4?.advice) ? t4.advice : [];
 
     todayDB = t1;
     tomorrowDB = t2;
     adviceDB = Array.isArray(t4?.advice) ? t4.advice : [];
 
-    try{
-      const yr = await fetch(`/data/fortunes_ko_${REQUESTED_YEAR}.json`, { cache: "no-store" });
+{ cache: "no-store" });
       if(!yr.ok) throw new Error(`year json load failed: ${yr.status} (${REQUESTED_YEAR})`);
       yearDB = await yr.json();
       ACTIVE_YEAR = REQUESTED_YEAR;
