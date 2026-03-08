@@ -9,7 +9,7 @@ const FORTUNE_YEAR =
   window.APP_CONFIG?.fortuneYear ||
   2026;
 
-// 오늘/내일/연간 버튼을 직접 눌렀는지 추적
+// 오늘/내일/연간 버튼 직접 클릭 여부
 const clickedState = {
   today: false,
   tomorrow: false,
@@ -19,15 +19,15 @@ const clickedState = {
 async function loadDB(){
   try{
     const [t1, t2, t3] = await Promise.all([
-      fetch("/data/fortunes_ko_today.json", { cache:"no-store" }).then(r=>{
+      fetch("/data/fortunes_ko_today.json", { cache: "no-store" }).then(r=>{
         if(!r.ok) throw new Error("today json load failed: " + r.status);
         return r.json();
       }),
-      fetch("/data/fortunes_ko_tomorrow.json", { cache:"no-store" }).then(r=>{
+      fetch("/data/fortunes_ko_tomorrow.json", { cache: "no-store" }).then(r=>{
         if(!r.ok) throw new Error("tomorrow json load failed: " + r.status);
         return r.json();
       }),
-      fetch(`/data/fortunes_ko_${FORTUNE_YEAR}.json`, { cache:"no-store" }).then(r=>{
+      fetch(`/data/fortunes_ko_${FORTUNE_YEAR}.json`, { cache: "no-store" }).then(r=>{
         if(!r.ok) throw new Error(`year json load failed: ${r.status} (${FORTUNE_YEAR})`);
         return r.json();
       }),
@@ -325,7 +325,6 @@ async function applyGuestBirthInline(){
   renderMyInfoBox();
   renderPointBoxCustom();
 
-  // 새 기준으로 기본 결과 다시 뿌리기
   showToday(false);
   showTomorrow(false);
   showYear(false);
@@ -385,7 +384,7 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   document.getElementById("applyGuestBirthBtn")?.addEventListener("click", applyGuestBirthInline);
   bindShare();
 
-  // 기본값 또는 저장값 기준으로 버튼 안 눌러도 3개 모두 표시
+  // 버튼 안 눌러도 기본값/저장값 기준으로 3개 모두 표시
   showToday(false);
   showTomorrow(false);
   showYear(false);
