@@ -573,8 +573,12 @@ function generateFullReport(name, pillars, elementCounts, scores){
   `;
 }
       
-
 function generateSummaryContent(name, pillars, scores){
+  const activeYear =
+    window.FortuneConfig?.year ||
+    window.APP_CONFIG?.fortuneYear ||
+    new Date().getFullYear();
+
   return `
 <div id="summaryPrintArea" style="position:relative;">
   <div style="
@@ -588,7 +592,7 @@ function generateSummaryContent(name, pillars, scores){
     white-space:nowrap;
   ">fortune-cash.vercel.app</div>
 
-  <h1>${name}님 2026 사주 요약 리포트</h1>
+  <h1>${name}님 ${activeYear} 사주 요약 리포트</h1>
   <p style="font-size:12px;opacity:.6;">생성일: ${getTodayString()} | 발행: fortune-cash.vercel.app</p>
 
   <p><b>이름:</b> ${name}</p>
@@ -608,17 +612,25 @@ function generateSummaryContent(name, pillars, scores){
 function setupPdfButtons(name, pillars, scores){
   const fullBtn = document.getElementById("pdfFullBtn");
   const summaryBtn = document.getElementById("pdfSummaryBtn");
+  const activeYear =
+    window.FortuneConfig?.year ||
+    window.APP_CONFIG?.fortuneYear ||
+    new Date().getFullYear();
 
   if(fullBtn){
     fullBtn.onclick = ()=>{
-      const birth = localStorage.getItem("birth") || "";
+      const birth = getActiveBirthForSaju() || localStorage.getItem("birth") || "";
       const safeName = String(name || "회원").replace(/\s+/g,"");
       const safeBirth = String(birth).replace(/[^0-9\-]/g,"");
 
       const originalTitle = document.title;
-      document.title = `${safeName}_${safeBirth}_2026사주리포트(전체)`;
+      document.title = `${safeName}_${safeBirth}_${activeYear}사주리포트(전체)`;
+
       window.print();
-      setTimeout(()=>{ document.title = originalTitle; }, 300);
+
+      setTimeout(()=>{
+        document.title = originalTitle;
+      }, 300);
     };
   }
 
@@ -628,12 +640,12 @@ function setupPdfButtons(name, pillars, scores){
 
       document.body.innerHTML = generateSummaryContent(name, pillars, scores);
 
-      const birth = localStorage.getItem("birth") || "";
+      const birth = getActiveBirthForSaju() || localStorage.getItem("birth") || "";
       const safeName = String(name || "회원").replace(/\s+/g,"");
       const safeBirth = String(birth).replace(/[^0-9\-]/g,"");
 
       const originalTitle = document.title;
-      document.title = `${safeName}_${safeBirth}_2026사주리포트(요약)`;
+      document.title = `${safeName}_${safeBirth}_${activeYear}사주리포트(요약)`;
 
       window.print();
 
