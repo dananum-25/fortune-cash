@@ -1439,34 +1439,7 @@ function analyzeClimate(pillarsObj){
 
   return "한열 균형";
 }
-function getSajuRewardStorageKey(){
-  const d = new Date();
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  return `saju_result_reward_${yyyy}${mm}${dd}`;
-}
 
-async function rewardSajuResultOnce(){
-  const phone = localStorage.getItem("phone");
-  if(!phone) return;
-
-  const key = getSajuRewardStorageKey();
-  if(localStorage.getItem(key) === "1") return;
-
-  if(window.rewardContent){
-    const res = await window.rewardContent("saju_result");
-
-    if(res?.status === "ok"){
-      localStorage.setItem(key, "1");
-      if(window.loadMyPoint) await window.loadMyPoint();
-      renderPointBoxSaju();
-      alert("포인트가 적립되었습니다 ✅");
-    }else if(res?.status === "already"){
-      localStorage.setItem(key, "1");
-    }
-  }
-}
 // ===============================
 // 12) Globals for safety (if HTML uses onclick anywhere)
 // ===============================
