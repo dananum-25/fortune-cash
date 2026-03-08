@@ -1,5 +1,19 @@
 // /js/saju.ui.js  (type="module")
-  
+const MONTH_ELEMENT_2026 = {
+  1:"수",
+  2:"목",
+  3:"목",
+  4:"화",
+  5:"화",
+  6:"토",
+  7:"금",
+  8:"금",
+  9:"토",
+  10:"수",
+  11:"수",
+  12:"토"
+};
+
 import {
   normalizeBirthYMD,
   parseYMDLocalNoon,
