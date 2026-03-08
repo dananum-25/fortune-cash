@@ -8,128 +8,154 @@
   <link rel="canonical" href="https://fortune-cash.vercel.app/pages/period/period.html">
   <link rel="stylesheet" href="/css/common.css">
 
- <style>
-  .helper-box p{ margin:6px 0; }
+  <style>
+    .period-wrap{
+      width:min(100% - 24px, 960px);
+      margin:0 auto;
+      padding:20px 0 40px;
+    }
 
-  .birth-form{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    margin-top:12px;
-  }
+    .helper-box p{ margin:6px 0; }
 
-  .birth-form input,
-  .birth-form select{
-    padding:12px;
-    border-radius:10px;
-    border:1px solid #ddd;
-    font-size:14px;
-    width:100%;
-    box-sizing:border-box;
-  }
+    .birth-form{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top:12px;
+    }
 
-  .fortune-block{
-    margin-top:14px;
-  }
+    .birth-form input,
+    .birth-form select{
+      padding:12px;
+      border-radius:10px;
+      border:1px solid #ddd;
+      font-size:14px;
+      width:100%;
+      box-sizing:border-box;
+      background:#fff;
+      color:#111;
+    }
 
-  .fortune-block .btn{
-    width:100%;
-  }
+    .fortune-block{ margin-top:14px; }
 
-  .fortune-panel{
-    margin-top:12px;
-    padding:16px;
-    border-radius:16px;
-    background:#111;
-    border:1px solid #333;
-    color:#fff;
-  }
+    .fortune-block .btn{ width:100%; }
 
-  .fortune-panel h3,
-  .fortune-panel p,
-  .fortune-panel .small,
-  .fortune-panel div,
-  .fortune-panel span{
-    color:#fff !important;
-  }
+    .fortune-panel{
+      margin-top:12px;
+      padding:16px;
+      border-radius:16px;
+      background:#111;
+      border:1px solid #333;
+      color:#fff;
+    }
 
-  .fortune-panel .hr{
-    height:1px;
-    background:#444;
-    margin:14px 0;
-  }
+    .fortune-panel h3,
+    .fortune-panel h4,
+    .fortune-panel p,
+    .fortune-panel li,
+    .fortune-panel .small,
+    .fortune-panel div,
+    .fortune-panel span{
+      color:#fff !important;
+    }
 
-  .fortune-panel h3{
-    margin-top:0;
-    margin-bottom:10px;
-  }
+    .fortune-panel .hr{
+      height:1px;
+      background:#444;
+      margin:14px 0;
+    }
 
-  .recommend-actions{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-    margin-top:12px;
-  }
+    .fortune-panel h3{
+      margin-top:0;
+      margin-bottom:10px;
+    }
 
-  .recommend-actions a{
-    display:block;
-    text-align:center;
-    text-decoration:none;
-    border:2px solid #f2cf66;
-    border-radius:12px;
-    background:#1a1a1a;
-    color:#f2cf66 !important;
-    font-weight:700;
-    padding:14px 10px;
-    box-sizing:border-box;
-  }
+    .fortune-method{
+      margin-top:12px;
+      padding:14px;
+      border-radius:12px;
+      background:#1a1a1a;
+      border:1px solid #333;
+    }
 
-  .recommend-actions a:hover{
-    background:#222;
-  }
+    .fortune-method h4{
+      margin:0 0 8px;
+    }
 
-  .footer-links{
-    margin-top:10px;
-    display:grid;
-    grid-template-columns:repeat(3, auto);
-    justify-content:center;
-    gap:8px 14px;
-    line-height:1.8;
-  }
+    .fortune-method ul{
+      margin:8px 0 0;
+      padding-left:18px;
+    }
 
-  .footer-links a{
-    color:#fff !important;
-    font-size:13px;
-    text-decoration:none;
-    white-space:nowrap;
-  }
+    .fortune-method li{
+      margin:4px 0;
+    }
 
-  @media (max-width:640px){
     .recommend-actions{
-      grid-template-columns:1fr;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:14px;
+    }
+
+    .recommend-actions a{
+      display:block;
+      text-align:center;
+      text-decoration:none;
+      border:2px solid #ffffff;
+      border-radius:12px;
+      background:#ffffff;
+      color:#111 !important;
+      font-weight:700;
+      padding:14px 10px;
+      box-sizing:border-box;
+    }
+
+    .recommend-actions a:hover{
+      background:#f3f3f3;
     }
 
     .footer-links{
-      grid-template-columns:repeat(2, auto);
-      gap:6px 12px;
+      margin-top:10px;
+      display:grid;
+      grid-template-columns:repeat(3, auto);
+      justify-content:center;
+      gap:8px 14px;
+      line-height:1.8;
     }
-  }
-</style> 
-    
+
+    .footer-links a{
+      color:#fff !important;
+      font-size:13px;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+
+    @media (max-width: 767px){
+      .period-wrap{
+        width:min(100% - 24px, 420px);
+      }
+
+      .recommend-actions{
+        grid-template-columns:1fr;
+      }
+
+      .footer-links{
+        grid-template-columns:repeat(2, auto);
+        gap:6px 12px;
+      }
+    }
+  </style>
 </head>
 
 <body>
-  <div class="container">
+  <div class="period-wrap">
 
     <h1 id="pageTitle">📆 오늘 운세 · 내일 운세 · 연간운세 무료 보기</h1>
 
-    <!-- 기준 정보 -->
     <div id="myInfoBox" class="card"></div>
-
-    <!-- 포인트 박스 -->
     <div id="pointBox" class="card"></div>
 
-    <!-- 게스트 생년월일 입력 -->
     <section id="guestBirthCard" class="card helper-box">
       <h2>내 기준으로 다시 보기</h2>
       <p>회원은 저장된 생년월일이 자동 적용됩니다.</p>
@@ -156,65 +182,60 @@
       </p>
     </section>
 
-    <!-- 설명 콘텐츠 -->
     <section id="seoContent" class="card">
       <h2>기간운세란 무엇인가요?</h2>
       <p>
         기간운세는 특정 날짜나 일정 기간을 기준으로 운의 흐름을 살펴보는 운세입니다.
         오늘의 운세, 내일의 운세, 연간운세는 각각 짧은 흐름과 긴 흐름을 함께 파악할 수 있도록 도와줍니다.
-        무료 운세는 참고 자료로 활용하는 것이 가장 좋으며,
-        현재 상황을 객관적으로 돌아보는 계기가 될 수 있습니다.
+        무료 운세는 참고 자료로 활용하는 것이 가장 좋으며, 현재 상황을 객관적으로 돌아보는 계기가 될 수 있습니다.
       </p>
       <p>
         오늘 운세는 하루의 전체적인 기운을 알려줍니다.
         내일 운세는 미리 준비할 수 있도록 방향을 제시합니다.
-        연간운세는 한 해 전체의 재물운, 애정운, 직장운, 건강운 등
-        큰 흐름을 이해하는 데 도움을 줍니다.
+        연간운세는 한 해 전체의 재물운, 애정운, 직장운, 건강운 등 큰 흐름을 이해하는 데 도움을 줍니다.
       </p>
 
       <h2>운세를 현명하게 활용하는 방법</h2>
       <p>
         운세는 절대적인 미래 예언이 아닙니다.
-        좋은 흐름이 보이면 적극적으로 활용하고,
-        조심해야 할 시기라면 신중하게 행동하는 것이 중요합니다.
+        좋은 흐름이 보이면 적극적으로 활용하고, 조심해야 할 시기라면 신중하게 행동하는 것이 중요합니다.
         운세를 참고하되, 최종 결정은 자신의 판단으로 하세요.
       </p>
     </section>
 
-    <!-- 오늘 운세 -->
     <section class="card fortune-block">
       <button class="btn" type="button" onclick="showToday(true)">오늘 운세</button>
-
       <div id="todayPanel" class="fortune-panel">
         <div id="todayResult"></div>
         <div class="hr"></div>
         <div id="todayGuide"></div>
+        <div class="hr"></div>
+        <div id="todayMethod" class="fortune-method"></div>
       </div>
     </section>
 
-    <!-- 내일 운세 -->
     <section class="card fortune-block">
       <button class="btn" type="button" onclick="showTomorrow(true)">내일 운세</button>
-
       <div id="tomorrowPanel" class="fortune-panel">
         <div id="tomorrowResult"></div>
         <div class="hr"></div>
         <div id="tomorrowGuide"></div>
+        <div class="hr"></div>
+        <div id="tomorrowMethod" class="fortune-method"></div>
       </div>
     </section>
 
-    <!-- 연간 운세 -->
     <section class="card fortune-block">
       <button class="btn" id="yearBtn" type="button" onclick="showYear(true)">연간운세</button>
-
       <div id="yearPanel" class="fortune-panel">
         <div id="yearResult"></div>
         <div class="hr"></div>
         <div id="yearGuide"></div>
+        <div class="hr"></div>
+        <div id="yearMethod" class="fortune-method"></div>
       </div>
     </section>
 
-    <!-- FAQ -->
     <section class="card">
       <h2>자주 묻는 질문 (FAQ)</h2>
 
@@ -238,41 +259,39 @@
         내일 운세는 미리 준비할 일을 생각해 보는 데 도움이 됩니다.
       </p>
       <p>
-        연간운세는 한 해의 큰 방향을 참고하는 콘텐츠로,
-        재물운, 애정운, 건강운, 일과 관련된 흐름을 넓게 이해하는 데 활용할 수 있습니다.
+        연간운세는 한 해의 큰 방향을 참고하는 콘텐츠로, 재물운, 애정운, 건강운, 일과 관련된 흐름을 넓게 이해하는 데 활용할 수 있습니다.
       </p>
       <p>
         운세는 참고 자료일 뿐이며, 최종 판단은 본인의 선택과 현실 조건을 우선해야 합니다.
       </p>
     </section>
 
-    <!-- 추천 콘텐츠 -->
     <section class="card">
-  <h2>추천 운세 콘텐츠</h2>
-  <div class="recommend-actions">
-    <a href="/pages/saju/saju.html">사주 분석</a>
-    <a href="/pages/star/index.html">별자리 운세</a>
-    <a href="/pages/zodiac/zodiac.html">띠별 운세</a>
-    <a href="/pages/tojung/tojung.html">토정비결</a>
-    <a href="/pages/tarot/tarot.html">타로</a>
-    <a href="/fortune-guide.html">운세 가이드</a>
-  </div>
+      <h2>추천 운세 콘텐츠</h2>
+      <div class="recommend-actions">
+        <a href="/pages/saju/saju.html">사주 분석</a>
+        <a href="/pages/star/index.html">별자리 운세</a>
+        <a href="/pages/zodiac/zodiac.html">띠별 운세</a>
+        <a href="/pages/tojung/tojung.html">토정비결</a>
+        <a href="/pages/tarot/tarot.html">타로</a>
+        <a href="/fortune-guide.html">운세 가이드</a>
+      </div>
     </section>
 
     <button class="secondaryBtn" id="shareBtn" type="button">공유하기</button>
     <button class="secondaryBtn" type="button" onclick="Common.goHome()">홈으로</button>
 
-  <footer>
-  <div>무료 운세 플랫폼</div>
-  <div style="margin-top:6px;">문의: daekoju@naver.com</div>
-  <div class="footer-links">
-    <a href="/privacy.html">개인정보처리방침</a>
-    <a href="/terms.html">이용약관</a>
-    <a href="/about.html">사이트 소개</a>
-    <a href="/contact.html">문의</a>
-    <a href="/fortune-guide.html">운세 가이드</a>
-  </div>
-</footer>  
+    <footer>
+      <div>무료 운세 플랫폼</div>
+      <div style="margin-top:6px;">문의: daekoju@naver.com</div>
+      <div class="footer-links">
+        <a href="/privacy.html">개인정보처리방침</a>
+        <a href="/terms.html">이용약관</a>
+        <a href="/about.html">사이트 소개</a>
+        <a href="/contact.html">문의</a>
+        <a href="/fortune-guide.html">운세 가이드</a>
+      </div>
+    </footer>
 
   </div>
 
