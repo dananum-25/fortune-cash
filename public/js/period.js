@@ -366,14 +366,18 @@ async function rewardDeepFortuneOnce(){
   const key = getDeepRewardStorageKey();
   if(localStorage.getItem(key) === "1") return;
 
-  localStorage.setItem(key, "1");
-
   if(window.rewardContent){
     try{
-      await window.rewardContent("fortune_view");
-      if(window.loadMyPoint) await window.loadMyPoint();
-      renderPointBoxCustom();
-      alert("포인트가 적립되었습니다 ✅");
+      const res = await window.rewardContent("period_deep");
+
+      if(res?.status === "ok"){
+        localStorage.setItem(key, "1");
+        if(window.loadMyPoint) await window.loadMyPoint();
+        renderPointBoxCustom();
+        alert("포인트가 적립되었습니다 ✅");
+      }else if(res?.status === "already"){
+        localStorage.setItem(key, "1");
+      }
     }catch(e){
       console.warn("[period.js] rewardContent failed", e);
     }
