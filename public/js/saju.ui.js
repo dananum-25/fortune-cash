@@ -535,15 +535,20 @@ function generateFullReport(name, pillars, elementCounts, scores){
     return { top: arr[0], low: arr[arr.length-1] };
   })();
 
+  const activeYear =
+    window.FortuneConfig?.year ||
+    window.APP_CONFIG?.fortuneYear ||
+    new Date().getFullYear();
+
   return `
     <div class="card">
-      <h2>🧾 종합 리포트(상세)</h2>
+      <h2>🧾 ${activeYear} 종합 리포트(상세)</h2>
       <p style="font-size:12px;opacity:.6;">생성일: ${getTodayString()} | fortune-cash.vercel.app</p>
 
       <h3>1) 핵심 요약</h3>
       <p><b>${name}</b>님의 4기둥: <b>${pillars.join(" / ")}</b></p>
       <p>오행 분포(참고): <b>${strongest}</b>가 강하고 <b>${weakest}</b>가 약한 편입니다.</p>
-      <p>올해 평균 흐름: <b>${avg}점</b> — ${avg >= 70 ? "상승 구간" : avg >= 50 ? "관리 구간" : "방어 구간"}</p>
+      <p>${activeYear} 평균 흐름: <b>${avg}점</b> — ${avg >= 70 ? "상승 구간" : avg >= 50 ? "관리 구간" : "방어 구간"}</p>
 
       <div class="hr"></div>
 
@@ -556,8 +561,8 @@ function generateFullReport(name, pillars, elementCounts, scores){
 
       <h3>3) 실행 체크리스트(현실용)</h3>
       <p>• 돈: 월 고정지출과 소비 상한선 먼저 점검</p>
-      <p>• 커리어: 보여줄 수 있는 결과를 기록하고 정리</p>
-      <p>• 관계: 감정이 올라올 때는 결론보다 대화 순서 우선</p>
+      <p>• 커리어: 결과물 기록과 정리 습관 만들기</p>
+      <p>• 관계: 감정보다 대화 순서와 표현 방식 점검</p>
       <p>• 건강: 수면/운동 중 최소 하나는 고정 루틴 만들기</p>
 
       <div class="hr"></div>
