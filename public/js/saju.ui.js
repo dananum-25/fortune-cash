@@ -1418,7 +1418,7 @@ try{
   }catch(e){
     console.warn("[saju.ui.js] reward failed", e);
   }
-await rewardSajuResultOnce();
+
   setTimeout(()=>{
     Object.keys(scores).forEach(key=>{
       const el = document.getElementById("bar-"+key);
