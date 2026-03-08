@@ -16,8 +16,11 @@
     <loc>https://fortune-cash.vercel.app/about.html</loc></url>
     <lastmod>2026-03-07</lastmod>
   <url>
-    <loc>https://fortune-cash.vercel.app/contact.html</loc></url>
-    <lastmod>2026-03-07</lastmod>
+  <loc>https://fortune-cash.vercel.app/contact.html</loc>
+</url>
+<url>
+  <loc>https://fortune-cash.vercel.app/fortune-guide.html</loc>
+</url>
   <url>
     <loc>https://fortune-cash.vercel.app/pages/saju/saju.html</loc>
     <lastmod>2026-03-07</lastmod>
