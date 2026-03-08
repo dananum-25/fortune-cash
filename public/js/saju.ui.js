@@ -1,7 +1,4 @@
 // /js/saju.ui.js  (type="module")
-const MONTH_ELEMENT = [
-  "수","목","목","화","화","토","금","금","토","수","수","토"
-];
 
 import {
   normalizeBirthYMD,
@@ -323,9 +320,9 @@ function generateScoreGraph(scores){
   `;
 }
 
-function generateMonthlyGraph(scores, rand, profile){
-  return generateMonthlyGraphAll(scores, rand, profile);
-}
+const MONTH_ELEMENT = [
+  "수","목","목","화","화","토","금","금","토","수","수","토"
+];
 
 function relationToYongshin(monthEl, yongEl){
   if(monthEl === yongEl) return "용신직접";
@@ -403,13 +400,22 @@ function buildMonthlyFortuneLine(score, type, monthEl, profile, rand){
   return base + yongComment;
 }
 
+function generateMonthlyGraph(scores, rand, profile){
+  return generateMonthlyGraphAll(scores, rand, profile);
+}
+
 function generateMonthlyGraphAll(scores, rand, profile){
   const categories = [
-    {key:"wealth", label:"💰 재물운"},
-    {key:"love", label:"💖 연애운"},
-    {key:"career", label:"🏢 직장/사업운"},
-    {key:"health", label:"💪 건강운"}
+    { key:"wealth", label:"💰 재물운" },
+    { key:"love", label:"💖 연애운" },
+    { key:"career", label:"🏢 직장/사업운" },
+    { key:"health", label:"💪 건강운" }
   ];
+
+  const activeYear =
+    window.FortuneConfig?.year ||
+    window.APP_CONFIG?.fortuneYear ||
+    new Date().getFullYear();
 
   const max = 100;
   const height = 160;
@@ -417,7 +423,7 @@ function generateMonthlyGraphAll(scores, rand, profile){
 
   function genMonthly(baseScore){
     const arr = [];
-    for(let i=0;i<12;i++){
+    for(let i = 0; i < 12; i++){
       const variance = Math.floor(rand() * 15) - 7;
       let value = baseScore + variance;
       if(value > 95) value = 95;
@@ -427,7 +433,7 @@ function generateMonthlyGraphAll(scores, rand, profile){
     return arr;
   }
 
-  let html = `<div class="month-graph"><h3>📅 ${new Date().getFullYear()} 월별 운세 변화</h3>`;
+  let html = `<div class="month-graph"><h3>📅 ${activeYear} 월별 운세 변화</h3>`;
   const monthlyData = {};
 
   categories.forEach(cat=>{
@@ -437,7 +443,7 @@ function generateMonthlyGraphAll(scores, rand, profile){
     let points = "";
     let dots = "";
 
-    monthly.forEach((score,i)=>{
+    monthly.forEach((score, i)=>{
       const x = i * widthStep;
       const y = height - (score / max * height);
       points += `${x},${y} `;
@@ -455,59 +461,17 @@ function generateMonthlyGraphAll(scores, rand, profile){
 
   html += `</div>`;
   html += generateMonthlyTextAll(monthlyData, profile, rand);
-  return html;
-}
-  
-  function genMonthly(baseScore){
-    const arr = [];
-    for(let i=0;i<12;i++){
-      const variance = Math.floor(rand() * 15) - 7;
-      let value = baseScore + variance;
-      if(value > 95) value = 95;
-      if(value < 30) value = 30;
-      arr.push(value);
-    }
-    return arr;
-  }
 
-  let html = `<div class="month-graph"><h3>📅 2026 월별 운세 변화</h3>`;
-  const monthlyData = {};
-
-  categories.forEach(cat=>{
-    const monthly = genMonthly(scores[cat.key]);
-    monthlyData[cat.key] = monthly;
-
-    let points = "";
-    let dots = "";
-
-    monthly.forEach((score,i)=>{
-      const x = i * widthStep;
-      const y = height - (score / max * height);
-      points += `${x},${y} `;
-      dots += `<circle cx="${x}" cy="${y}" r="2" class="graph-dot"></circle>`;
-    });
-
-    html += `
-      <h4 style="margin-top:18px">${cat.label}</h4>
-      <svg viewBox="0 0 100 ${height}">
-        <polyline points="${points}" class="graph-line"></polyline>
-        ${dots}
-      </svg>
-    `;
-  });
-
-  html += `</div>`;
-  html += generateMonthlyTextAll(monthlyData, profile, rand);
   return html;
 }
 
 function generateMonthlyTextAll(monthlyData, profile, rand){
   const monthNames = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
   const types = {
-    wealth:"💰 재물운",
-    love:"💖 연애운",
-    career:"🏢 직장/사업운",
-    health:"💪 건강운"
+    wealth: "💰 재물운",
+    love: "💖 연애운",
+    career: "🏢 직장/사업운",
+    health: "💪 건강운"
   };
 
   const activeYear =
@@ -517,7 +481,7 @@ function generateMonthlyTextAll(monthlyData, profile, rand){
 
   let html = `<h3>🗓 ${activeYear} 월별 종합 해석</h3>`;
 
-  monthNames.forEach((month,i)=>{
+  monthNames.forEach((month, i)=>{
     const monthEl = MONTH_ELEMENT[i];
     html += `<h4 style="margin-top:14px">${month} <span class="small">(${monthEl} 기운)</span></h4>`;
 
