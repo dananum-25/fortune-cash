@@ -1675,12 +1675,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   bindSajuShare();
 
   const savedHour = localStorage.getItem("birthHour");
-const hourEl = document.getElementById("birthHour");
-if(hourEl){
-  hourEl.value = (savedHour !== null && savedHour !== "") ? savedHour : "12";
-}
+  const hourEl = document.getElementById("birthHour");
+  if(hourEl){
+    hourEl.value = (savedHour !== null && savedHour !== "") ? savedHour : "12";
+  }
 
   document.getElementById("calcBtn")?.addEventListener("click", calculateSaju);
   document.getElementById("reportBtn")?.addEventListener("click", showSavedReports);
   document.getElementById("applyGuestBirthBtn")?.addEventListener("click", applyGuestBirthForSaju);
+
+  // 기본값/회원값/게스트값이 있으면 자동 계산
+  if(activeBirth){
+    await calculateSaju();
+  }
 });
