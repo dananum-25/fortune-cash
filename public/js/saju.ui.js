@@ -320,6 +320,9 @@ function generateScoreGraph(scores){
   `;
 }
 
+// /js/saju.ui.js  (type="module")
+const DEFAULT_BIRTH_YMD = "1940-01-01";
+
 const MONTH_ELEMENT = [
   "수","목","목","화","화","토","금","금","토","수","수","토"
 ];
@@ -1121,12 +1124,17 @@ async function calculateSaju(){
   const mode = getSajuMode();
   const name = mode === "member"
     ? (localStorage.getItem("name") || "회원")
-    : "게스트";
+    : (mode === "guest" ? "게스트" : "기본 기준");
 
   const birth = normalizeBirthYMD(getActiveBirthForSaju());
 
   const hourEl = document.getElementById("birthHour");
-  const hour = parseInt(hourEl?.value, 10);
+  const rawHour = String(hourEl?.value || "").trim();
+
+  let hour = 12; // 기본값: 정오
+
+  if(rawHour !== ""){
+    hour = parseInt(rawHour, 10);
 
   if(!birth){
     alert("생년월일 정보가 없습니다. 게스트는 생년월일을 먼저 입력해주세요.");
@@ -1135,6 +1143,13 @@ async function calculateSaju(){
   }
   if(Number.isNaN(hour) || hour < 0 || hour > 23){
     alert("출생 시간을 0~23 사이로 입력해주세요.");
+    return;
+  }
+}
+
+  if(!birth){
+    alert("생년월일 정보가 없습니다.");
+    renderSajuEntryState();
     return;
   }
   const seedFn = xmur3(`${birth}|${hour}`);
@@ -1469,7 +1484,7 @@ window.loadReport = loadReport;
 function getActiveBirthForSaju(){
   return localStorage.getItem("birth")
     || localStorage.getItem("guest_birth")
-    || "";
+    || DEFAULT_BIRTH_YMD;
 }
 
 function getSajuMode(){
@@ -1516,30 +1531,24 @@ function renderSajuEntryState(){
     guestBirthCard.style.display = (mode === "guest" || mode === "default") ? "block" : "none";
   }
 
-  if(!birth){
-    if(loginCheck){
-      loginCheck.innerHTML = `
-        <h2>📌 사주 계산 준비</h2>
-        <p>회원은 저장된 생년월일이 자동 적용됩니다.</p>
-        <p>게스트는 아래에서 생년월일을 입력한 뒤 사주 계산을 진행할 수 있습니다.</p>
-      `;
-    }
-    if(timeInputBox) timeInputBox.style.display = "none";
-    return;
-  }
-
   if(loginCheck){
     if(mode === "member"){
       loginCheck.innerHTML = `
         <h2>✅ 준비 완료</h2>
         <p><b>${name}</b>님 생년월일이 자동 적용되었습니다.</p>
-        <p class="small">출생 시간을 입력하면 사주 분석을 시작할 수 있습니다.</p>
+        <p class="small">출생 시간을 입력하지 않으면 정오(12시) 기준으로 사주 분석을 시작합니다.</p>
       `;
-    }else{
+    }else if(mode === "guest"){
       loginCheck.innerHTML = `
         <h2>✅ 게스트 기준 적용 완료</h2>
         <p>생년월일: <b>${birth}</b></p>
-        <p class="small">출생 시간을 입력하면 사주 분석을 시작할 수 있습니다.</p>
+        <p class="small">출생 시간을 입력하지 않으면 정오(12시) 기준으로 사주 분석을 시작합니다.</p>
+      `;
+    }else{
+      loginCheck.innerHTML = `
+        <h2>✅ 기본 기준으로 바로 보기</h2>
+        <p>현재는 <b>${DEFAULT_BIRTH_YMD}</b> 기준으로 결과를 볼 수 있습니다.</p>
+        <p class="small">출생 시간을 입력하지 않으면 정오(12시) 기준으로 진행됩니다. 게스트는 아래에서 생년월일을 입력해 본인 기준으로 다시 볼 수 있습니다.</p>
       `;
     }
   }
