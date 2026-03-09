@@ -1174,8 +1174,8 @@ const rand = mulberry32(seedFn());
   const pillars = [yearPillar, monthPillar, dayPillar, hourPillar];
 
   // UI
-  document.getElementById("timeInputBox").style.display="none";
-  document.getElementById("sajuResult").style.display="block";
+  document.getElementById("timeInputBox").style.display = "block";
+  document.getElementById("sajuResult").style.display = "block";
 
   const hourNotice = rawHour === ""
   ? "<p class='small'>※ 출생시간 미입력으로 정오(12시) 기준 결과가 표시됩니다.</p>"
