@@ -1177,10 +1177,15 @@ const rand = mulberry32(seedFn());
   document.getElementById("timeInputBox").style.display="none";
   document.getElementById("sajuResult").style.display="block";
 
-  document.getElementById("basicInfo").innerHTML =
-    `<p><b>${name}</b></p>
-     <p>생년월일: ${birth}</p>
-     <p>출생시간: ${hour}시</p>`;
+  const hourNotice = rawHour === ""
+  ? "<p class='small'>※ 출생시간 미입력으로 정오(12시) 기준 결과가 표시됩니다.</p>"
+  : "";
+
+document.getElementById("basicInfo").innerHTML =
+  `<p><b>${name}</b></p>
+   <p>생년월일: ${birth}</p>
+   <p>출생시간: ${hour}시</p>
+   ${hourNotice}`;
 
   document.getElementById("sajuBox").innerHTML =
     `<span class="badge">연주: ${yearPillar}</span>
