@@ -29,7 +29,6 @@ function pickOne(arr, rand){
   const i = Math.floor(rand() * arr.length);
   return arr[i] || "";
 }
-// /js/saju.js
 // fortune-cash - saju page engine (clean + fixed)
 // - Local date parsing (UTC 밀림 방지)
 // - Button binding (no inline onclick needed)
