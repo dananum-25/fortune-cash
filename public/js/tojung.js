@@ -42,10 +42,12 @@ function getTodayStamp(){
   return `${y}${m}${d}`;
 }
 
+const DEFAULT_BIRTH_YMD = "1940-01-01";
+
 function getActiveBirthForTojung(){
   return localStorage.getItem("birth")
     || localStorage.getItem("guest_birth")
-    || "";
+    || DEFAULT_BIRTH_YMD;
 }
 
 function getTojungMode(){
@@ -204,16 +206,29 @@ function renderTojungEntryState(){
     guestBirthCard.style.display = (mode === "guest" || mode === "default") ? "block" : "none";
   }
 
-  if(!birth){
-    if(loginCheck){
-      loginCheck.innerHTML = `
-        <h2>📌 토정비결 준비</h2>
-        <p>회원은 저장된 생년월일이 자동 적용됩니다.</p>
-        <p>게스트는 아래에서 생년월일을 입력한 뒤 본인 기준으로 결과를 볼 수 있습니다.</p>
-      `;
-    }
-    return false;
+  if(loginCheck){
+  if(mode === "member"){
+    loginCheck.innerHTML = `
+      <h2>✅ 준비 완료</h2>
+      <p><b>${escapeHtml(name)}</b>님 생년월일이 자동 적용되었습니다.</p>
+      <p class="small">${TOJUNG_ACTIVE_YEAR}년 토정비결 리포트를 불러오는 중입니다.</p>
+    `;
+  }else if(mode === "guest"){
+    loginCheck.innerHTML = `
+      <h2>✅ 게스트 기준 적용 완료</h2>
+      <p>생년월일: <b>${escapeHtml(birth)}</b></p>
+      <p class="small">${TOJUNG_ACTIVE_YEAR}년 토정비결 리포트를 불러오는 중입니다.</p>
+    `;
+  }else{
+    loginCheck.innerHTML = `
+      <h2>✅ 기본 기준으로 바로 보기</h2>
+      <p>현재는 <b>${escapeHtml(DEFAULT_BIRTH_YMD)}</b> 기준으로 결과를 볼 수 있습니다.</p>
+      <p class="small">게스트는 아래에서 생년월일을 입력해 본인 기준으로 다시 볼 수 있습니다.</p>
+    `;
   }
+}
+
+return true;
 
   if(loginCheck){
     if(mode === "member"){
