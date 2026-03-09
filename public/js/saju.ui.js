@@ -1678,6 +1678,7 @@ try{
   analysis += generateScoreGraph(scores);
   analysis += generateScoreInterpretation(scores);
   analysis += generateMonthlyGraph(scores, rand, profile);
+  analysis += buildCurrentMonthFocus(scores);
   analysis += generateYearSummary(scores);
   analysis += generateFullReport(name, pillars, elementResult, scores);
 
