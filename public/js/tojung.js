@@ -406,8 +406,9 @@ async function loadTojungDB(){
 async function loadTojungResult(){
   const birth = getActiveBirthForTojung();
   const mode = getTojungMode();
-  const name = mode === "member" ? (localStorage.getItem("name") || "회원") : "게스트";
-
+  const name = mode === "member"
+  ? (localStorage.getItem("name") || "회원")
+  : (mode === "guest" ? "게스트" : "기본 기준");
   if(!birth){
     document.getElementById("result").style.display = "none";
     return;
