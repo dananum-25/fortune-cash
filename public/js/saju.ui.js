@@ -521,6 +521,80 @@ function buildMonthlyAnalysis(catKey, monthly){
   </div>
   `;
 }
+function buildCurrentMonthFocus(scores){
+  const monthlyTrend = scores?.monthlyTrend || {};
+  const monthIndex = new Date().getMonth();
+  const monthLabel = `${monthIndex + 1}월`;
+
+  const safeScore = (arr) => {
+    if(!Array.isArray(arr) || arr.length !== 12) return 60;
+    return Number(arr[monthIndex] || 60);
+  };
+
+  const wealth = safeScore(monthlyTrend.wealth);
+  const love = safeScore(monthlyTrend.love);
+  const career = safeScore(monthlyTrend.career);
+  const health = safeScore(monthlyTrend.health);
+
+  function scoreComment(type, score){
+    if(type === "wealth"){
+      if(score >= 80) return "수익 흐름이 강한 편입니다. 큰 욕심보다 구조 있는 선택이 유리합니다.";
+      if(score >= 65) return "무난하게 흐름이 이어집니다. 지출 통제만 잘해도 체감이 좋아집니다.";
+      return "소비와 계약 조건을 한 번 더 확인하는 편이 좋습니다.";
+    }
+
+    if(type === "love"){
+      if(score >= 80) return "관계운이 부드럽습니다. 먼저 표현하면 좋은 흐름이 이어질 수 있습니다.";
+      if(score >= 65) return "무난한 흐름입니다. 작은 오해만 조심하면 안정적으로 갑니다.";
+      return "감정기복이 생기기 쉬우니 말보다 태도를 부드럽게 가져가세요.";
+    }
+
+    if(type === "career"){
+      if(score >= 80) return "일의 추진력이 강합니다. 제안, 발표, 실행에 힘이 실리는 구간입니다.";
+      if(score >= 65) return "기본기와 마무리에 강점이 생깁니다. 차분히 밀고 가면 좋습니다.";
+      return "속도보다 정리와 우선순위 점검이 먼저입니다.";
+    }
+
+    if(type === "health"){
+      if(score >= 80) return "컨디션 흐름이 좋은 편입니다. 루틴을 유지하면 안정감이 커집니다.";
+      if(score >= 65) return "무난한 흐름입니다. 수면과 식사만 흔들리지 않게 관리하세요.";
+      return "피로가 쌓이기 쉬운 시기입니다. 과로와 수면 부족을 조심하세요.";
+    }
+
+    return "";
+  }
+
+  const top = [
+    { key:"wealth", label:"재물운", score: wealth },
+    { key:"love", label:"연애운", score: love },
+    { key:"career", label:"직장/사업운", score: career },
+    { key:"health", label:"건강운", score: health }
+  ].sort((a,b)=> b.score - a.score);
+
+  const best = top[0];
+  const weak = top[top.length - 1];
+
+  return `
+    <div class="card">
+      <h3>📅 이번 달(${monthLabel}) 집중 해석</h3>
+
+      <p><b>가장 강한 흐름:</b> ${best.label} (${best.score}점)</p>
+      <p class="small">${scoreComment(best.key, best.score)}</p>
+
+      <div class="hr"></div>
+
+      <p><b>가장 조심할 흐름:</b> ${weak.label} (${weak.score}점)</p>
+      <p class="small">${scoreComment(weak.key, weak.score)}</p>
+
+      <div class="hr"></div>
+
+      <p><b>💰 재물운</b> ${wealth}점 — ${scoreComment("wealth", wealth)}</p>
+      <p><b>💖 연애운</b> ${love}점 — ${scoreComment("love", love)}</p>
+      <p><b>🏢 직장/사업운</b> ${career}점 — ${scoreComment("career", career)}</p>
+      <p><b>💪 건강운</b> ${health}점 — ${scoreComment("health", health)}</p>
+    </div>
+  `;
+}
 function generateMonthlyGraph(scores, rand, profile){
   return generateMonthlyGraphAll(scores, rand, profile);
 }
