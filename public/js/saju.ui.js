@@ -480,6 +480,47 @@ function generateMonthlySummaryText(scores){
 
   return html;
 }
+function buildMonthlyAnalysis(catKey, monthly){
+
+  const labels = {
+    wealth:"재물운",
+    love:"연애운",
+    career:"직장/사업운",
+    health:"건강운"
+  };
+
+  const maxScore = Math.max(...monthly);
+  const minScore = Math.min(...monthly);
+
+  const maxIndex = monthly.indexOf(maxScore);
+  const minIndex = monthly.indexOf(minScore);
+
+  const firstHalf = monthly.slice(0,6);
+  const secondHalf = monthly.slice(6,12);
+
+  const avg = arr => Math.round(arr.reduce((a,b)=>a+b,0)/arr.length);
+
+  const firstAvg = avg(firstHalf);
+  const secondAvg = avg(secondHalf);
+
+  let flowText="";
+
+  if(secondAvg > firstAvg + 5){
+    flowText="하반기로 갈수록 흐름이 좋아집니다.";
+  }else if(firstAvg > secondAvg + 5){
+    flowText="상반기에 운의 체감이 더 강합니다.";
+  }else{
+    flowText="연중 비교적 안정적인 흐름입니다.";
+  }
+
+  return `
+  <div class="small" style="margin-top:8px;line-height:1.6;">
+    ${labels[catKey]}은 <b>${maxIndex+1}월</b>에 가장 좋고
+    <b>${minIndex+1}월</b>은 조금 주의가 필요합니다.
+    ${flowText}
+  </div>
+  `;
+}
 function generateMonthlyGraph(scores, rand, profile){
   return generateMonthlyGraphAll(scores, rand, profile);
 }
