@@ -408,6 +408,7 @@ function generateMonthlyGraph(scores, rand, profile){
 }
 
 function generateMonthlyGraphAll(scores, rand, profile){
+
   const categories = [
     { key:"wealth", label:"💰 재물운" },
     { key:"love", label:"💖 연애운" },
@@ -420,9 +421,115 @@ function generateMonthlyGraphAll(scores, rand, profile){
     window.APP_CONFIG?.fortuneYear ||
     new Date().getFullYear();
 
-  const max = 100;
+  const GRAPH_WIDTH = 140;
   const height = 160;
-  const widthStep = 100 / 11;
+  const max = 100;
+
+  const widthStep = GRAPH_WIDTH / 11;
+
+  const thisMonth = new Date().getMonth();
+
+  let html = "";
+
+  categories.forEach(cat=>{
+
+    const monthly = scores?.monthlyTrend?.[cat.key] || [];
+
+    if(monthly.length !== 12) return;
+
+    const maxScore = Math.max(...monthly);
+    const minScore = Math.min(...monthly);
+
+    const maxIndex = monthly.indexOf(maxScore);
+    const minIndex = monthly.indexOf(minScore);
+
+    let points = "";
+    let dots = "";
+    let months = "";
+
+    monthly.forEach((score,i)=>{
+
+      const x = i * widthStep;
+      const y = height - (score / max * height);
+
+      points += `${x},${y} `;
+
+      const isCurrent = i === thisMonth;
+      const isMax = i === maxIndex;
+      const isMin = i === minIndex;
+
+      let r = 2.5;
+
+      if(isCurrent) r = 4;
+      if(isMax || isMin) r = 4.5;
+
+      dots += `<circle cx="${x}" cy="${y}" r="${r}" fill="#ffd56b"></circle>`;
+
+      if(isMax){
+        dots += `
+        <text x="${x}" y="${y - 8}" text-anchor="middle" font-size="3.2" fill="#ffd56b">
+        최고
+        </text>
+        `;
+      }
+
+      if(isMin){
+        dots += `
+        <text x="${x}" y="${y + 10}" text-anchor="middle" font-size="3.2" fill="#ff8a80">
+        주의
+        </text>
+        `;
+      }
+
+      months += `
+      <text x="${x}" y="${height + 10}" text-anchor="middle"
+      font-size="3.2"
+      fill="${isCurrent ? "#ffd56b" : "#888"}">
+      ${i+1}월
+      </text>
+      `;
+    });
+
+    const line40 = height - (40 / max * height);
+    const line60 = height - (60 / max * height);
+    const line80 = height - (80 / max * height);
+
+    html += `
+    <div class="card">
+
+      <h3 style="margin-bottom:8px">${cat.label} (${activeYear})</h3>
+
+      <svg viewBox="0 0 ${GRAPH_WIDTH} ${height + 18}">
+
+        <line x1="0" y1="${line80}" x2="${GRAPH_WIDTH}" y2="${line80}"
+        stroke="#333" stroke-dasharray="2,2"></line>
+
+        <line x1="0" y1="${line60}" x2="${GRAPH_WIDTH}" y2="${line60}"
+        stroke="#333" stroke-dasharray="2,2"></line>
+
+        <line x1="0" y1="${line40}" x2="${GRAPH_WIDTH}" y2="${line40}"
+        stroke="#333" stroke-dasharray="2,2"></line>
+
+        <polyline
+          points="${points}"
+          fill="none"
+          stroke="#ffd56b"
+          stroke-width="1.8"
+        ></polyline>
+
+        ${dots}
+
+        ${months}
+
+      </svg>
+
+    </div>
+    `;
+
+  });
+
+  return html;
+}
 
   function genMonthly(baseScore){
     const arr = [];
