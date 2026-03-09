@@ -1616,6 +1616,7 @@ async function applyGuestBirthForSaju(){
   renderSajuEntryState();
   renderPointBoxSaju();
 
+  await calculateSaju();
   alert("게스트 기준 생년월일이 적용되었습니다 ✅");
 }
 
