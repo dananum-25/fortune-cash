@@ -631,7 +631,7 @@ function generateMonthlyGraphAll(scores, rand, profile){
     new Date().getFullYear();
 
   const GRAPH_WIDTH = 140;
-  const height = 160;
+  const height = 200;
   const max = 100;
   const widthStep = GRAPH_WIDTH / 11;
   const thisMonth = new Date().getMonth();
@@ -669,7 +669,7 @@ function generateMonthlyGraphAll(scores, rand, profile){
 
       if(isMax){
         dots += `
-          <text x="${x}" y="${y - 8}" text-anchor="middle" font-size="3.2" fill="#ffd56b">
+          <text x="${x}" y="${y - 10}" text-anchor="middle" font-size="6" fill="#ffd56b">
             최고
           </text>
         `;
@@ -677,7 +677,7 @@ function generateMonthlyGraphAll(scores, rand, profile){
 
       if(isMin){
         dots += `
-          <text x="${x}" y="${y + 10}" text-anchor="middle" font-size="3.2" fill="#ff8a80">
+          <text x="${x}" y="${y + 12}" text-anchor="middle" font-size="6" fill="#ff8a80">
             주의
           </text>
         `;
