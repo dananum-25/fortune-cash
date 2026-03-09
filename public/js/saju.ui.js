@@ -253,9 +253,27 @@ function calculateFortuneScores(elementCounts, currentDaewoon){
     if(scores[k] < 30) scores[k] = 30;
   });
 
+  function makeMonthly(base){
+    const arr = [];
+    for(let i = 0; i < 12; i++){
+      const variance = ((i * 7 + base) % 11) - 5;
+      let value = base + variance;
+      if(value > 95) value = 95;
+      if(value < 30) value = 30;
+      arr.push(value);
+    }
+    return arr;
+  }
+
+  scores.monthlyTrend = {
+    wealth: makeMonthly(scores.wealth),
+    love: makeMonthly(scores.love),
+    career: makeMonthly(scores.career),
+    health: makeMonthly(scores.health)
+  };
+
   return scores;
 }
-
 function generateScoreInterpretation(scores){
   function band(score){
     if(score >= 80) return { label:"상승 강", tone:"공격적으로 확장해도 되는 구간(단, 리스크 한도는 정해두기)" };
