@@ -402,7 +402,84 @@ function buildMonthlyFortuneLine(score, type, monthEl, profile, rand){
 
   return base + yongComment;
 }
+function getHalfAverage(arr, start, end){
+  const slice = arr.slice(start, end);
+  if(!slice.length) return 0;
+  const sum = slice.reduce((acc, v)=> acc + Number(v || 0), 0);
+  return Math.round(sum / slice.length);
+}
 
+function getFortuneFlowComment(type, monthly){
+  const labels = {
+    wealth: "재물운",
+    love: "연애운",
+    career: "직장/사업운",
+    health: "건강운"
+  };
+
+  const maxScore = Math.max(...monthly);
+  const minScore = Math.min(...monthly);
+
+  const maxIndex = monthly.indexOf(maxScore);
+  const minIndex = monthly.indexOf(minScore);
+
+  const firstHalf = getHalfAverage(monthly, 0, 6);
+  const secondHalf = getHalfAverage(monthly, 6, 12);
+
+  let flowText = "";
+  if(secondHalf >= firstHalf + 5){
+    flowText = `하반기로 갈수록 ${labels[type]} 흐름이 좋아집니다.`;
+  }else if(firstHalf >= secondHalf + 5){
+    flowText = `상반기에 ${labels[type]} 흐름이 더 강하게 들어오는 편입니다.`;
+  }else{
+    flowText = `${labels[type]} 흐름은 연중 비교적 고르게 유지되는 편입니다.`;
+  }
+
+  let cautionText = "";
+  if(minScore <= 55){
+    cautionText = `${minIndex + 1}월은 ${labels[type]} 관리에 조금 더 신경 쓰는 것이 좋습니다.`;
+  }else{
+    cautionText = `${minIndex + 1}월도 큰 하락보다는 조정 구간으로 보면 됩니다.`;
+  }
+
+  let bestText = `${maxIndex + 1}월은 ${labels[type]} 체감이 가장 좋은 시기입니다.`;
+
+  return `
+    <p><b>${labels[type]}</b> — ${bestText} ${cautionText} ${flowText}</p>
+  `;
+}
+
+function generateMonthlySummaryText(scores){
+  const monthlyTrend = scores?.monthlyTrend || {};
+  const activeYear =
+    window.FortuneConfig?.year ||
+    window.APP_CONFIG?.fortuneYear ||
+    new Date().getFullYear();
+
+  let html = `<div class="card">`;
+  html += `<h3>🧠 ${activeYear} 월별 그래프 자동 해석</h3>`;
+
+  if(Array.isArray(monthlyTrend.wealth) && monthlyTrend.wealth.length === 12){
+    html += getFortuneFlowComment("wealth", monthlyTrend.wealth);
+  }
+
+  if(Array.isArray(monthlyTrend.love) && monthlyTrend.love.length === 12){
+    html += getFortuneFlowComment("love", monthlyTrend.love);
+  }
+
+  if(Array.isArray(monthlyTrend.career) && monthlyTrend.career.length === 12){
+    html += getFortuneFlowComment("career", monthlyTrend.career);
+  }
+
+  if(Array.isArray(monthlyTrend.health) && monthlyTrend.health.length === 12){
+    html += getFortuneFlowComment("health", monthlyTrend.health);
+  }
+
+  html += `<p class="small">※ 월별 흐름은 자동 해석 기반 참고용입니다. 실제 일정과 체력, 인간관계 상황을 함께 고려해 보는 것이 좋습니다.</p>`;
+  html += `</div>`;
+
+  return html;
+}
 function generateMonthlyGraph(scores, rand, profile){
   return generateMonthlyGraphAll(scores, rand, profile);
 }
