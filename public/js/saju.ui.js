@@ -1675,10 +1675,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   bindSajuShare();
 
   const savedHour = localStorage.getItem("birthHour");
-  const hourEl = document.getElementById("birthHour");
-  if(hourEl && savedHour !== null && savedHour !== ""){
-    hourEl.value = savedHour;
-  }
+const hourEl = document.getElementById("birthHour");
+if(hourEl){
+  hourEl.value = (savedHour !== null && savedHour !== "") ? savedHour : "12";
+}
 
   document.getElementById("calcBtn")?.addEventListener("click", calculateSaju);
   document.getElementById("reportBtn")?.addEventListener("click", showSavedReports);
