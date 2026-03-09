@@ -640,7 +640,7 @@ function generateMonthlyGraphAll(scores, rand, profile){
         ${months}
 
       </svg>
-
+  ${buildMonthlyAnalysis(cat.key, monthly)}
     </div>
     `;
 
