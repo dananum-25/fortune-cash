@@ -684,10 +684,12 @@ function generateMonthlyGraphAll(scores, rand, profile){
       }
 
       months += `
-        <text x="${x}" y="${height + 10}" text-anchor="middle" font-size="3.2" fill="${isCurrent ? "#ffd56b" : "#888"}">
-          ${i + 1}월
-        </text>
-      `;
+<text x="${x}" y="${height + 14}" text-anchor="middle"
+font-size="6"
+fill="${isCurrent ? "#ffd56b" : "#aaa"}">
+${i+1}월
+</text>
+`;
     });
 
     const line40 = height - (40 / max * height);
