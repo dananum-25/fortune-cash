@@ -1,5 +1,22 @@
 console.log("[tojung.js] loaded ✅");
 
+const TOJUNG_DEFAULT_BIRTH = "1940-01-01";
+
+function getActiveBirthForTojung(){
+  return localStorage.getItem("birth")
+    || localStorage.getItem("guest_birth")
+    || TOJUNG_DEFAULT_BIRTH;
+}
+
+function getTojungMode(){
+  const phone = localStorage.getItem("phone");
+  const guestBirth = localStorage.getItem("guest_birth");
+
+  if(phone) return "member";
+  if(guestBirth) return "guest";
+  return "default";
+}
+
 // -----------------------------
 // config
 // -----------------------------
