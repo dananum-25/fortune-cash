@@ -433,11 +433,16 @@ async function loadTojungResult(){
   const totalScore = Number(scores?.total ?? 0);
   const cats = scores?.categories || {};
 
-  document.getElementById("basicInfo").innerHTML = `
-    <p><b>${escapeHtml(name)}</b></p>
-    <p>생년월일: ${escapeHtml(birth)}</p>
-    <p class="small">※ 같은 생년월일이면 같은 리포트가 나오도록 고정되어 있어요.</p>
-  `;
+  const modeLabel =
+  mode === "member" ? "회원 기준"
+  : mode === "guest" ? "게스트 기준"
+  : "기본 기준";
+
+document.getElementById("basicInfo").innerHTML = `
+  <p><b>${escapeHtml(name)}</b></p>
+  <p>생년월일: ${escapeHtml(birth)}</p>
+  <p class="small">※ ${modeLabel} · 같은 생년월일이면 같은 리포트가 나오도록 고정되어 있어요.</p>
+`;
 
   const oneLine = scores?.oneLine || seededPick(summaryArr, seed, 1) || "올해는 정리와 선택이 중요한 해입니다.";
   const band = findBand(scoreGuide, totalScore);
@@ -482,7 +487,11 @@ async function loadTojungResult(){
   await rewardTojungOncePerDay();
 
   document.getElementById("loginCheck").innerHTML =
-    `<h2>✅ 리포트 생성 완료</h2><p class='small'>점수 기반 자동 해석으로 구성된 ${TOJUNG_ACTIVE_YEAR}년 토정비결입니다.</p>`;
+  mode === "member"
+    ? `<h2>✅ 리포트 생성 완료</h2><p class='small'>회원 생년월일 기준 ${TOJUNG_ACTIVE_YEAR}년 토정비결입니다.</p>`
+    : mode === "guest"
+      ? `<h2>✅ 리포트 생성 완료</h2><p class='small'>게스트 생년월일 기준 ${TOJUNG_ACTIVE_YEAR}년 토정비결입니다.</p>`
+      : `<h2>✅ 리포트 생성 완료</h2><p class='small'>기본 기준(${TOJUNG_DEFAULT_BIRTH}) ${TOJUNG_ACTIVE_YEAR}년 토정비결입니다.</p>`;
 }
 
 // -----------------------------
