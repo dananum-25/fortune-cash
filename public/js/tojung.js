@@ -1,7 +1,15 @@
 console.log("[tojung.js] loaded ✅");
 
 const TOJUNG_DEFAULT_BIRTH = "1940-01-01";
+const TOJUNG_FALLBACK_YEAR = 2026;
+const TOJUNG_ACTIVE_YEAR =
+  window.FortuneConfig?.year ||
+  window.APP_CONFIG?.fortuneYear ||
+  new Date().getFullYear();
 
+// -----------------------------
+// birth / mode
+// -----------------------------
 function getActiveBirthForTojung(){
   return localStorage.getItem("birth")
     || localStorage.getItem("guest_birth")
@@ -18,15 +26,6 @@ function getTojungMode(){
 }
 
 // -----------------------------
-// config
-// -----------------------------
-const TOJUNG_FALLBACK_YEAR = 2026;
-const TOJUNG_ACTIVE_YEAR =
-  window.FortuneConfig?.year ||
-  window.APP_CONFIG?.fortuneYear ||
-  new Date().getFullYear();
-
-// -----------------------------
 // utils
 // -----------------------------
 function escapeHtml(s){
@@ -41,7 +40,9 @@ function escapeHtml(s){
 function ymdToSeed(ymd){
   const m = String(ymd || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if(!m) return 12345;
-  const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
+  const y = Number(m[1]);
+  const mo = Number(m[2]);
+  const d = Number(m[3]);
   return (y * 10000) + (mo * 100) + d;
 }
 
@@ -54,8 +55,8 @@ function seededPick(arr, seed, offset){
 function getTodayStamp(){
   const today = new Date();
   const y = today.getFullYear();
-  const m = String(today.getMonth()+1).padStart(2,"0");
-  const d = String(today.getDate()).padStart(2,"0");
+  const m = String(today.getMonth() + 1).padStart(2, "0");
+  const d = String(today.getDate()).padStart(2, "0");
   return `${y}${m}${d}`;
 }
 
@@ -71,8 +72,10 @@ function findBand(scoreGuide, score){
   if(!Array.isArray(bands) || bands.length === 0){
     return { title:"보통", text:"기본기 관리가 핵심입니다." };
   }
-  const sorted = [...bands].sort((a,b)=>(b.min ?? 0) - (a.min ?? 0));
+
+  const sorted = [...bands].sort((a, b)=>(b.min ?? 0) - (a.min ?? 0));
   const hit = sorted.find(b => Number(score) >= Number(b.min ?? 0)) || sorted[sorted.length - 1];
+
   return {
     title: hit?.title || "보통",
     text: hit?.text || ""
@@ -81,10 +84,10 @@ function findBand(scoreGuide, score){
 
 function renderBars(categories){
   const rows = [
-    {k:"wealth", label:"💰 재물운"},
-    {k:"love", label:"💖 연애운"},
-    {k:"career", label:"🏢 직장/사업운"},
-    {k:"health", label:"💪 건강운"},
+    { k:"wealth", label:"💰 재물운" },
+    { k:"love", label:"💖 연애운" },
+    { k:"career", label:"🏢 직장/사업운" },
+    { k:"health", label:"💪 건강운" }
   ];
 
   return `
@@ -132,7 +135,7 @@ function renderList(title, arr, seed, baseOffset, limit){
 function renderKeywords(keywords){
   const arr = Array.isArray(keywords) ? keywords : [];
   if(arr.length === 0) return "";
-  const badges = arr.slice(0,8).map(k=>`<span class="badge">${escapeHtml(k)}</span>`).join("");
+  const badges = arr.slice(0, 8).map(k=>`<span class="badge">${escapeHtml(k)}</span>`).join("");
   return `<div style="margin-top:6px;">${badges}</div>`;
 }
 
@@ -389,9 +392,11 @@ async function loadTojungDB(){
 async function loadTojungResult(){
   const birth = getActiveBirthForTojung();
   const mode = getTojungMode();
-  const name = mode === "member"
-  ? (localStorage.getItem("name") || "회원")
-  : (mode === "guest" ? "게스트" : "기본 기준");
+  const name =
+    mode === "member"
+      ? (localStorage.getItem("name") || "회원")
+      : (mode === "guest" ? "게스트" : "기본 기준");
+
   if(!birth){
     document.getElementById("result").style.display = "none";
     return;
@@ -418,31 +423,31 @@ async function loadTojungResult(){
 
   const seed = ymdToSeed(birth);
 
-  const summaryArr   = db.summary || [];
+  const summaryArr = db.summary || [];
   const checklistArr = db.checklist || [];
-  const scores       = db.scores || {};
-  const scoreGuide   = db.scoreGuide || {};
-  const wealthArr    = db.wealth || [];
-  const loveArr      = db.love || [];
-  const careerArr    = db.career || [];
-  const healthArr    = db.health || [];
-  const monthsObj    = db.months || {};
-  const lucky        = db.lucky || {};
-  const cautionArr   = db.caution || [];
+  const scores = db.scores || {};
+  const scoreGuide = db.scoreGuide || {};
+  const wealthArr = db.wealth || [];
+  const loveArr = db.love || [];
+  const careerArr = db.career || [];
+  const healthArr = db.health || [];
+  const monthsObj = db.months || {};
+  const lucky = db.lucky || {};
+  const cautionArr = db.caution || [];
 
   const totalScore = Number(scores?.total ?? 0);
   const cats = scores?.categories || {};
 
   const modeLabel =
-  mode === "member" ? "회원 기준"
-  : mode === "guest" ? "게스트 기준"
-  : "기본 기준";
+    mode === "member" ? "회원 기준"
+    : mode === "guest" ? "게스트 기준"
+    : "기본 기준";
 
-document.getElementById("basicInfo").innerHTML = `
-  <p><b>${escapeHtml(name)}</b></p>
-  <p>생년월일: ${escapeHtml(birth)}</p>
-  <p class="small">※ ${modeLabel} · 같은 생년월일이면 같은 리포트가 나오도록 고정되어 있어요.</p>
-`;
+  document.getElementById("basicInfo").innerHTML = `
+    <p><b>${escapeHtml(name)}</b></p>
+    <p>생년월일: ${escapeHtml(birth)}</p>
+    <p class="small">※ ${modeLabel} · 같은 생년월일이면 같은 리포트가 나오도록 고정되어 있어요.</p>
+  `;
 
   const oneLine = scores?.oneLine || seededPick(summaryArr, seed, 1) || "올해는 정리와 선택이 중요한 해입니다.";
   const band = findBand(scoreGuide, totalScore);
@@ -487,11 +492,11 @@ document.getElementById("basicInfo").innerHTML = `
   await rewardTojungOncePerDay();
 
   document.getElementById("loginCheck").innerHTML =
-  mode === "member"
-    ? `<h2>✅ 리포트 생성 완료</h2><p class='small'>회원 생년월일 기준 ${TOJUNG_ACTIVE_YEAR}년 토정비결입니다.</p>`
-    : mode === "guest"
-      ? `<h2>✅ 리포트 생성 완료</h2><p class='small'>게스트 생년월일 기준 ${TOJUNG_ACTIVE_YEAR}년 토정비결입니다.</p>`
-      : `<h2>✅ 리포트 생성 완료</h2><p class='small'>기본 기준(${TOJUNG_DEFAULT_BIRTH}) ${TOJUNG_ACTIVE_YEAR}년 토정비결입니다.</p>`;
+    mode === "member"
+      ? `<h2>✅ 리포트 생성 완료</h2><p class='small'>회원 생년월일 기준 ${TOJUNG_ACTIVE_YEAR}년 토정비결입니다.</p>`
+      : mode === "guest"
+        ? `<h2>✅ 리포트 생성 완료</h2><p class='small'>게스트 생년월일 기준 ${TOJUNG_ACTIVE_YEAR}년 토정비결입니다.</p>`
+        : `<h2>✅ 리포트 생성 완료</h2><p class='small'>기본 기준(${TOJUNG_DEFAULT_BIRTH}) ${TOJUNG_ACTIVE_YEAR}년 토정비결입니다.</p>`;
 }
 
 // -----------------------------
