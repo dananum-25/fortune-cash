@@ -22,6 +22,10 @@ import {
   buildAstroScores
 } from "/js/astro/interpreter/astro.score.js";
 
+import {
+  buildAstroSummary
+} from "/js/astro/interpreter/astro.summary.js";
+
 export function buildAstroBaseProfile(input = {}){
   const birthDate = input.birthDate || ASTRO_DEFAULT_BIRTH;
   const birthTime = input.birthTime || ASTRO_DEFAULT_TIME;
@@ -51,11 +55,19 @@ export function buildAstroBaseProfile(input = {}){
     natalAspects
   });
 
+  const summary = buildAstroSummary({
+    natal,
+    personality,
+    scores,
+    natalAspects
+  });
+
   return {
     birth: natal.birth,
     natal,
     personality,
     natalAspects,
-    scores
+    scores,
+    summary
   };
 }
