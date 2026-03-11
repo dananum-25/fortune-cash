@@ -1,7 +1,6 @@
 console.log("[tojung.js] loaded ✅");
 
 const TOJUNG_DEFAULT_BIRTH = "1940-01-01";
-const TOJUNG_FALLBACK_YEAR = 2026;
 const TOJUNG_ACTIVE_YEAR =
   window.FortuneConfig?.year ||
   window.APP_CONFIG?.fortuneYear ||
@@ -37,13 +36,15 @@ function escapeHtml(s){
     .replace(/'/g,"&#039;");
 }
 
-function ymdToSeed(ymd){
+function ymdToSeed(ymd, year = TOJUNG_ACTIVE_YEAR){
   const m = String(ymd || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if(!m) return 12345;
+  if(!m) return Number(year) || 12345;
+
   const y = Number(m[1]);
   const mo = Number(m[2]);
   const d = Number(m[3]);
-  return (y * 10000) + (mo * 100) + d;
+
+  return (y * 10000) + (mo * 100) + d + (Number(year) * 13);
 }
 
 function seededPick(arr, seed, offset){
@@ -79,6 +80,34 @@ function findBand(scoreGuide, score){
   return {
     title: hit?.title || "보통",
     text: hit?.text || ""
+  };
+}
+function clamp(n, min, max){
+  return Math.max(min, Math.min(max, n));
+}
+
+function buildDynamicScores(baseScores, seed){
+  const baseTotal = Number(baseScores?.total ?? 72);
+  const baseCats = baseScores?.categories || {};
+
+  const wealth = clamp(Number(baseCats.wealth ?? 70) + ((seed + 11) % 9) - 4, 45, 95);
+  const love = clamp(Number(baseCats.love ?? 68) + ((seed + 22) % 9) - 4, 45, 95);
+  const career = clamp(Number(baseCats.career ?? 74) + ((seed + 33) % 9) - 4, 45, 95);
+  const health = clamp(Number(baseCats.health ?? 67) + ((seed + 44) % 9) - 4, 45, 95);
+
+  const total = Math.round((wealth + love + career + health) / 4);
+
+  return {
+    year: TOJUNG_ACTIVE_YEAR,
+    total: clamp(total || baseTotal, 45, 95),
+    categories: {
+      wealth,
+      love,
+      career,
+      health
+    },
+    oneLine: baseScores?.oneLine || "",
+    keywords: Array.isArray(baseScores?.keywords) ? baseScores.keywords : []
   };
 }
 
@@ -357,32 +386,19 @@ async function rewardTojungOncePerDay(){
 // data load
 // -----------------------------
 async function loadTojungDB(){
-  const currentPath = `/data/tojung_${TOJUNG_ACTIVE_YEAR}.json`;
-  const fallbackPath = `/data/tojung_${TOJUNG_FALLBACK_YEAR}.json`;
+  const poolPath = "/data/tojung_pool.json";
 
   try{
     if(window.DB?.loadJSON){
-      return await window.DB.loadJSON(currentPath);
+      return await window.DB.loadJSON(poolPath);
     }else{
-      const res = await fetch(currentPath, { cache: "no-store" });
+      const res = await fetch(poolPath, { cache: "no-store" });
       if(!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
     }
   }catch(e){
-    console.warn("[tojung.js] current year db load failed -> fallback", e);
-
-    try{
-      if(window.DB?.loadJSON){
-        return await window.DB.loadJSON(fallbackPath);
-      }else{
-        const res = await fetch(fallbackPath, { cache: "no-store" });
-        if(!res.ok) throw new Error(`HTTP ${res.status}`);
-        return await res.json();
-      }
-    }catch(e2){
-      console.warn("[tojung.js] fallback db load failed", e2);
-      return null;
-    }
+    console.warn("[tojung.js] pool db load failed", e);
+    return null;
   }
 }
 
@@ -421,22 +437,22 @@ async function loadTojungResult(){
     return;
   }
 
-  const seed = ymdToSeed(birth);
-
+  const seed = ymdToSeed(birth, TOJUNG_ACTIVE_YEAR);
   const summaryArr = db.summary || [];
   const checklistArr = db.checklist || [];
-  const scores = db.scores || {};
-  const scoreGuide = db.scoreGuide || {};
-  const wealthArr = db.wealth || [];
-  const loveArr = db.love || [];
-  const careerArr = db.career || [];
-  const healthArr = db.health || [];
-  const monthsObj = db.months || {};
-  const lucky = db.lucky || {};
-  const cautionArr = db.caution || [];
+const baseScores = db.scores || {};
+const scoreGuide = db.scoreGuide || {};
+const wealthArr = db.wealth || [];
+const loveArr = db.love || [];
+const careerArr = db.career || [];
+const healthArr = db.health || [];
+const monthsObj = db.months || {};
+const lucky = db.lucky || {};
+const cautionArr = db.caution || [];
 
-  const totalScore = Number(scores?.total ?? 0);
-  const cats = scores?.categories || {};
+const scores = buildDynamicScores(baseScores, seed);
+const totalScore = Number(scores?.total ?? 0);
+const cats = scores?.categories || {};
 
   const modeLabel =
     mode === "member" ? "회원 기준"
