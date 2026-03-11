@@ -1,9 +1,9 @@
-let starDB = {};
-let rewarded = false;
+console.log("[star-detail.js] loaded ✅");
 
-/* -----------------------
-공통 유틸
------------------------ */
+let starDB = {};
+
+const STAR_DEFAULT_BIRTH = "1940-01-01";
+
 function escapeHtml(s){
   return String(s ?? "")
     .replace(/&/g, "&amp;")
@@ -18,9 +18,36 @@ function getQueryParam(name){
   return url.searchParams.get(name);
 }
 
-/* -----------------------
-별자리 계산
------------------------ */
+function getActiveBirthForStar(){
+  return localStorage.getItem("birth")
+    || localStorage.getItem("guest_birth")
+    || STAR_DEFAULT_BIRTH;
+}
+
+function getStarMode(){
+  const phone = localStorage.getItem("phone");
+  const guestBirth = localStorage.getItem("guest_birth");
+  if(phone) return "member";
+  if(guestBirth) return "guest";
+  return "default";
+}
+
+function getTodayStamp(){
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}${mm}${dd}`;
+}
+
+function getActiveYear(){
+  return (
+    window.FortuneConfig?.year ||
+    window.APP_CONFIG?.fortuneYear ||
+    new Date().getFullYear()
+  );
+}
+
 function getStarSignFromBirth(birth){
   const m = String(birth || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if(!m) return null;
@@ -44,23 +71,28 @@ function getStarSignFromBirth(birth){
   return null;
 }
 
-/* -----------------------
-DB 로드
------------------------ */
 async function loadDB(){
-  const res = await fetch("/data/star_2026.json", { cache: "no-store" });
-  if(!res.ok){
-    throw new Error(`star_2026.json load failed: ${res.status}`);
+  const activeYear = getActiveYear();
+
+  try{
+    const res = await fetch(`/data/star_${activeYear}.json`, { cache: "no-store" });
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    starDB = await res.json();
+  }catch(e){
+    console.warn("[star-detail.js] active year db load failed -> fallback", e);
+
+    const res = await fetch("/data/star_2026.json", { cache: "no-store" });
+    if(!res.ok){
+      throw new Error(`star db load failed: ${res.status}`);
+    }
+    starDB = await res.json();
   }
-  starDB = await res.json();
 }
 
-/* -----------------------
-SEO / 메타
------------------------ */
 function updateSeoMeta(sign, item){
-  const title = `2026년 ${item.name} 운세 총정리 | 연간운세 · 월별운세 · 재물운 · 애정운`;
-  const desc = `${item.name} 2026년 연간 운세를 참고용으로 확인하세요. 전체 흐름, 직장운, 재물운, 애정운, 건강운, 월별 포인트를 정리했습니다.`;
+  const activeYear = getActiveYear();
+  const title = `${activeYear}년 ${item.name} 운세 총정리 | 연간운세 · 월별운세 · 재물운 · 애정운`;
+  const desc = `${item.name} ${activeYear}년 연간 운세를 참고용으로 확인하세요. 전체 흐름, 직장운, 재물운, 애정운, 건강운, 월별 포인트를 정리했습니다.`;
   const url = `https://fortune-cash.vercel.app/pages/star/detail.html?sign=${sign}`;
 
   document.title = title;
@@ -84,20 +116,18 @@ function updateSeoMeta(sign, item){
   if(twitterDescription) twitterDescription.setAttribute("content", desc);
 }
 
-/* -----------------------
-구조화 데이터
------------------------ */
 function injectStructuredData(sign, item){
   const el = document.getElementById("starJsonLd");
   if(!el || !item) return;
 
+  const activeYear = getActiveYear();
   const pageUrl = `https://fortune-cash.vercel.app/pages/star/detail.html?sign=${sign}`;
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
-    "headline": `2026년 ${item.name} 운세 총정리`,
-    "description": `${item.name} 2026년 연간 운세, 월별 흐름, 재물운, 애정운, 직장운, 건강운 요약.`,
+    "headline": `${activeYear}년 ${item.name} 운세 총정리`,
+    "description": `${item.name} ${activeYear}년 연간 운세, 월별 흐름, 재물운, 애정운, 직장운, 건강운 요약.`,
     "url": pageUrl,
     "inLanguage": "ko-KR",
     "author": {
@@ -114,9 +144,6 @@ function injectStructuredData(sign, item){
   el.textContent = JSON.stringify(jsonLd);
 }
 
-/* -----------------------
-UI 조각 렌더
------------------------ */
 function renderKeywords(arr){
   if(!Array.isArray(arr) || arr.length === 0) return "";
   return `
@@ -155,23 +182,80 @@ function renderMonths(months){
   `;
 }
 
-/* -----------------------
-내 정보
------------------------ */
+function renderPointBoxStar(){
+  const box = document.getElementById("pointBox");
+  if(!box) return;
+
+  const phone = localStorage.getItem("phone");
+
+  if(phone){
+    const point = Number(localStorage.getItem("point") || localStorage.getItem("points") || 0);
+    box.innerHTML = `
+      <h2>🎁 포인트 안내</h2>
+      <p>현재 포인트: <b>${point}P</b></p>
+      <p class="small">회원은 별자리 결과를 확인하면 1일 1회 1포인트가 적립됩니다.</p>
+    `;
+    return;
+  }
+
+  box.innerHTML = `
+    <h2>🎁 포인트 안내</h2>
+    <p>게스트는 포인트 적립 없이 콘텐츠를 이용할 수 있습니다.</p>
+    <p class="small">포인트 적립과 생년월일 자동 저장을 원하면 회원가입 후 이용해주세요.</p>
+  `;
+}
+
+function renderEntryState(currentSign){
+  const loginCheck = document.getElementById("loginCheck");
+  const guestBirthCard = document.getElementById("guestBirthCard");
+  if(!loginCheck) return;
+
+  const mode = getStarMode();
+  const birth = getActiveBirthForStar();
+  const name = localStorage.getItem("name") || "회원";
+  const currentLabel = starDB?.[currentSign]?.name || "별자리";
+
+  if(guestBirthCard){
+    guestBirthCard.style.display = (mode === "guest" || mode === "default") ? "block" : "none";
+  }
+
+  if(mode === "member"){
+    loginCheck.innerHTML = `
+      <h2>✅ 준비 완료</h2>
+      <p><b>${escapeHtml(name)}</b>님 생년월일이 자동 적용되었습니다.</p>
+      <p class="small">${escapeHtml(currentLabel)} 상세 운세를 불러오는 중입니다.</p>
+    `;
+  }else if(mode === "guest"){
+    loginCheck.innerHTML = `
+      <h2>✅ 게스트 기준 적용 완료</h2>
+      <p>생년월일: <b>${escapeHtml(birth)}</b></p>
+      <p class="small">${escapeHtml(currentLabel)} 상세 운세를 불러오는 중입니다.</p>
+    `;
+  }else{
+    loginCheck.innerHTML = `
+      <h2>✅ 기본 기준으로 바로 보기</h2>
+      <p>현재는 <b>${escapeHtml(STAR_DEFAULT_BIRTH)}</b> 기준으로 결과를 볼 수 있습니다.</p>
+      <p class="small">게스트는 아래에서 생년월일을 입력해 본인 기준으로 다시 볼 수 있습니다.</p>
+    `;
+  }
+}
+
 function renderMyInfo(currentSign){
   const box = document.getElementById("myStarInfo");
   if(!box) return;
 
-  const name = localStorage.getItem("name") || "회원";
-  const birth = localStorage.getItem("birth") || "";
+  const mode = getStarMode();
+  const birth = getActiveBirthForStar();
+  const name = mode === "member"
+    ? (localStorage.getItem("name") || "회원")
+    : (mode === "guest" ? "게스트" : "기본 기준");
+
   const mySign = getStarSignFromBirth(birth);
 
   if(!birth || !mySign){
     box.innerHTML = `
-      <p class="info-text"><b>${escapeHtml(name)}</b>님</p>
-      <p class="info-text" style="margin-top:8px;">
-        로그인된 생년월일 정보가 없어 내 별자리를 자동 표시하지 못했어요.
-      </p>
+      <p class="info-text"><b>${escapeHtml(name)}</b></p>
+      <p class="info-text" style="margin-top:8px;">생년월일 정보가 없어 내 별자리를 자동 표시하지 못했어요.</p>
     `;
     return;
   }
@@ -181,46 +265,34 @@ function renderMyInfo(currentSign){
 
   if(mySign === currentSign){
     box.innerHTML = `
-      <p class="info-text"><b>${escapeHtml(name)}</b>님</p>
+      <p class="info-text"><b>${escapeHtml(name)}</b></p>
       <p class="info-text" style="margin-top:8px;">생년월일: ${escapeHtml(birth)}</p>
-      <p class="info-text" style="margin-top:8px;">
-        당신의 별자리는 <b style="color:#ffd56b;">${escapeHtml(myLabel)}</b> 입니다.
-      </p>
-      <p class="info-text" style="margin-top:8px;">
-        이 페이지는 내 별자리 운세를 바로 확인할 수 있도록 보여주고 있어요.
-      </p>
+      <p class="info-text" style="margin-top:8px;">당신의 별자리는 <b style="color:#ffd56b;">${escapeHtml(myLabel)}</b> 입니다.</p>
+      <p class="info-text" style="margin-top:8px;">이 페이지는 내 별자리 운세를 바로 보여주고 있어요.</p>
     `;
     return;
   }
 
   box.innerHTML = `
-    <p class="info-text"><b>${escapeHtml(name)}</b>님</p>
+    <p class="info-text"><b>${escapeHtml(name)}</b></p>
     <p class="info-text" style="margin-top:8px;">생년월일: ${escapeHtml(birth)}</p>
-    <p class="info-text" style="margin-top:8px;">
-      당신의 별자리는 <b style="color:#ffd56b;">${escapeHtml(myLabel)}</b> 입니다.
-    </p>
-    <p class="info-text" style="margin-top:8px;">
-      지금 보고 있는 페이지는 <b style="color:#ffd56b;">${escapeHtml(currentLabel)}</b> 운세예요.
-    </p>
+    <p class="info-text" style="margin-top:8px;">당신의 별자리는 <b style="color:#ffd56b;">${escapeHtml(myLabel)}</b> 입니다.</p>
+    <p class="info-text" style="margin-top:8px;">지금 보고 있는 페이지는 <b style="color:#ffd56b;">${escapeHtml(currentLabel)}</b> 운세예요.</p>
     <p style="margin-top:12px;">
-      <a class="action-link" href="/pages/star/detail.html?sign=${encodeURIComponent(mySign)}">
-        ${escapeHtml(myLabel)} 운세 바로 보기
-      </a>
+      <a class="action-link" href="/pages/star/detail.html?sign=${encodeURIComponent(mySign)}">${escapeHtml(myLabel)} 운세 바로 보기</a>
     </p>
   `;
 }
 
-/* -----------------------
-상세 본문
------------------------ */
 function renderDetail(sign){
   const item = starDB?.[sign];
   const titleEl = document.getElementById("pageTitle");
   const introEl = document.getElementById("introBox");
   const detailEl = document.getElementById("detailBox");
+  const activeYear = getActiveYear();
 
   if(!item){
-    if(titleEl) titleEl.textContent = "2026년 별자리 운세";
+    if(titleEl) titleEl.textContent = `${activeYear}년 별자리 운세`;
     if(introEl){
       introEl.innerHTML = `<p class="info-text">해당 별자리 데이터가 아직 준비되지 않았습니다.</p>`;
     }
@@ -232,7 +304,7 @@ function renderDetail(sign){
   injectStructuredData(sign, item);
 
   if(titleEl){
-    titleEl.textContent = `2026년 ${item.name} 연간 운세`;
+    titleEl.textContent = `${activeYear}년 ${item.name} 연간 운세`;
   }
 
   if(introEl){
@@ -277,20 +349,18 @@ function renderDetail(sign){
   }
 }
 
-/* -----------------------
-공유하기
------------------------ */
 function bindShare(sign){
   const btn = document.getElementById("shareBtn");
   if(!btn) return;
 
   const item = starDB?.[sign];
   const starName = item?.name || "별자리";
+  const activeYear = getActiveYear();
 
-  btn.onclick = async () => {
+  btn.onclick = async ()=>{
     const data = {
       title: document.title,
-      text: `2026년 ${starName} 운세를 확인해보세요.`,
+      text: `${activeYear}년 ${starName} 운세를 확인해보세요.`,
       url: location.href
     };
 
@@ -304,35 +374,91 @@ function bindShare(sign){
         alert("공유 기능을 사용할 수 없는 환경입니다.");
       }
     }catch(e){
-      console.warn("share cancelled or failed", e);
+      console.warn("[star-detail.js] share cancelled", e);
     }
   };
 }
 
-/* -----------------------
-포인트 1회 지급
------------------------ */
-async function rewardOnce(){
-  if(rewarded) return;
-  rewarded = true;
+async function rewardStarDetailOncePerDay(){
+  const phone = localStorage.getItem("phone");
+  if(!phone) return;
+
+  const key = `star_detail_${getTodayStamp()}`;
+  if(localStorage.getItem(key) === "1") return;
 
   if(window.rewardContent){
-    await rewardContent("fortune_view");
+    try{
+      const res = await window.rewardContent("star");
+
+      if(res?.status === "ok"){
+        localStorage.setItem(key, "1");
+
+        if(window.loadMyPoint){
+          await window.loadMyPoint();
+        }
+
+        renderPointBoxStar();
+        alert("포인트가 적립되었습니다 ✅");
+      }else if(res?.status === "already"){
+        localStorage.setItem(key, "1");
+      }
+    }catch(e){
+      console.warn("[star-detail.js] reward failed", e);
+    }
   }
 }
 
-/* -----------------------
-실행
------------------------ */
-document.addEventListener("DOMContentLoaded", async () => {
-  const sign = getQueryParam("sign") || "aquarius";
+async function applyGuestBirthForStarDetail(){
+  const birthEl = document.getElementById("guestBirthInline");
+  const rawBirth = String(birthEl?.value || "").trim();
+
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(rawBirth)){
+    alert("생년월일을 입력해주세요.");
+    return;
+  }
+
+  localStorage.setItem("guestMode", "true");
+  localStorage.setItem("guest_birth", rawBirth);
+
+  const mySign = getStarSignFromBirth(rawBirth);
+  if(mySign){
+    location.href = `/pages/star/detail.html?sign=${encodeURIComponent(mySign)}`;
+    return;
+  }
+
+  alert("별자리 계산에 실패했어요.");
+}
+
+document.addEventListener("DOMContentLoaded", async ()=>{
+  const requestedSign = getQueryParam("sign");
+  const sign = requestedSign || getStarSignFromBirth(getActiveBirthForStar()) || "capricorn";
 
   try{
+    if(window.loadMyPoint){
+      await window.loadMyPoint();
+    }
+
     await loadDB();
+    renderEntryState(sign);
+    renderPointBoxStar();
     renderMyInfo(sign);
     renderDetail(sign);
     bindShare(sign);
-    await rewardOnce();
+
+    document.getElementById("applyGuestBirthBtn")?.addEventListener("click", applyGuestBirthForStarDetail);
+
+    await rewardStarDetailOncePerDay();
+
+    const loginCheck = document.getElementById("loginCheck");
+    const item = starDB?.[sign];
+    const activeYear = getActiveYear();
+
+    if(loginCheck && item){
+      loginCheck.innerHTML = `
+        <h2>✅ 리포트 생성 완료</h2>
+        <p class="small">${activeYear}년 ${escapeHtml(item.name)} 상세 운세입니다.</p>
+      `;
+    }
   }catch(err){
     console.error("[star-detail.js] init failed", err);
 
@@ -340,7 +466,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const introEl = document.getElementById("introBox");
     const detailEl = document.getElementById("detailBox");
 
-    if(titleEl) titleEl.textContent = "2026년 별자리 운세";
+    if(titleEl) titleEl.textContent = `${getActiveYear()}년 별자리 운세`;
     if(introEl){
       introEl.innerHTML = `
         <p class="info-text">별자리 데이터를 불러오지 못했어요. 잠시 후 다시 시도해주세요.</p>
