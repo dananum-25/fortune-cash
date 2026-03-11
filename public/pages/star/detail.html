@@ -3,29 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2026년 별자리 운세 상세</title>
-<meta name="description" content="2026년 별자리 연간 운세 상세 페이지입니다. 재물운, 애정운, 직장운, 건강운, 월별 흐름과 참고 포인트를 확인하세요.">
+<title>별자리 운세 상세 | 올해 운세</title>
+<meta name="description" content="별자리 연간 운세 상세 페이지입니다. 재물운, 애정운, 직장운, 건강운, 월별 흐름과 참고 포인트를 확인하세요.">
 <link rel="canonical" id="canonicalLink" href="https://fortune-cash.vercel.app/pages/star/detail.html">
 
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="무료 운세 플랫폼">
-<meta property="og:title" id="ogTitle" content="2026년 별자리 운세 상세">
-<meta property="og:description" id="ogDescription" content="2026년 별자리 연간 운세 상세 페이지입니다.">
+<meta property="og:title" id="ogTitle" content="별자리 운세 상세 | 올해 운세">
+<meta property="og:description" id="ogDescription" content="별자리 연간 운세 상세 페이지입니다.">
 <meta property="og:url" id="ogUrl" content="https://fortune-cash.vercel.app/pages/star/detail.html">
 <meta property="og:image" content="https://fortune-cash.vercel.app/assets/star_fortune.png">
 
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" id="twitterTitle" content="2026년 별자리 운세 상세">
-<meta name="twitter:description" id="twitterDescription" content="2026년 별자리 연간 운세 상세 페이지입니다.">
+<meta name="twitter:title" id="twitterTitle" content="별자리 운세 상세 | 올해 운세">
+<meta name="twitter:description" id="twitterDescription" content="별자리 연간 운세 상세 페이지입니다.">
 <meta name="twitter:image" content="https://fortune-cash.vercel.app/assets/star_fortune.png">
 
+<link rel="stylesheet" href="/css/common.css">
 <link rel="stylesheet" href="/css/star.css">
 </head>
 <body>
 
 <div class="wrap">
 
-  <h1 class="page-title" id="pageTitle">2026년 별자리 연간 운세</h1>
+  <h1 class="page-title" id="pageTitle">별자리 연간 운세</h1>
+
+  <div id="loginCheck" class="card notice-box">
+    <p class="info-text">별자리 기준 정보를 확인하는 중입니다.</p>
+  </div>
+
+  <div id="pointBox" class="card notice-box"></div>
+
+  <section id="guestBirthCard" class="card" style="display:none;">
+    <h2>내 기준으로 다시 보기</h2>
+    <p class="info-text">회원은 저장된 생년월일이 자동 적용됩니다.</p>
+    <p class="info-text">게스트는 생년월일을 입력하면 본인 별자리 기준으로 다시 확인할 수 있습니다.</p>
+    <input id="guestBirthInline" type="date">
+    <button class="action-btn" id="applyGuestBirthBtn" type="button">내 생년월일 적용</button>
+    <p class="small" style="margin-top:10px;">게스트는 포인트 적립 없이 콘텐츠만 이용할 수 있습니다.</p>
+  </section>
 
   <div id="myStarInfo" class="card notice-box">
     <p class="info-text">로그인 정보가 있으면 내 별자리 정보도 함께 보여줄게요.</p>
@@ -50,26 +66,35 @@
   </div>
 
   <div class="card" id="relatedStarsBox">
-  <h2>다른 별자리도 보기</h2>
-  <div class="grid">
-    <a class="card-link" href="/pages/star/detail.html?sign=aries">양자리</a>
-    <a class="card-link" href="/pages/star/detail.html?sign=taurus">황소자리</a>
-    <a class="card-link" href="/pages/star/detail.html?sign=gemini">쌍둥이자리</a>
-    <a class="card-link" href="/pages/star/detail.html?sign=cancer">게자리</a>
-    <a class="card-link" href="/pages/star/detail.html?sign=leo">사자자리</a>
-    <a class="card-link" href="/pages/star/detail.html?sign=virgo">처녀자리</a>
-    <a class="card-link" href="/pages/star/detail.html?sign=libra">천칭자리</a>
-    <a class="card-link" href="/pages/star/detail.html?sign=scorpio">전갈자리</a>
-    <a class="card-link" href="/pages/star/detail.html?sign=sagittarius">사수자리</a>
-    <a class="card-link" href="/pages/star/detail.html?sign=capricorn">염소자리</a>
-    <a class="card-link" href="/pages/star/detail.html?sign=aquarius">물병자리</a>
-    <a class="card-link" href="/pages/star/detail.html?sign=pisces">물고기자리</a>
+    <h2>다른 별자리도 보기</h2>
+    <div class="grid">
+      <a class="card-link" href="/pages/star/detail.html?sign=aries">양자리</a>
+      <a class="card-link" href="/pages/star/detail.html?sign=taurus">황소자리</a>
+      <a class="card-link" href="/pages/star/detail.html?sign=gemini">쌍둥이자리</a>
+      <a class="card-link" href="/pages/star/detail.html?sign=cancer">게자리</a>
+      <a class="card-link" href="/pages/star/detail.html?sign=leo">사자자리</a>
+      <a class="card-link" href="/pages/star/detail.html?sign=virgo">처녀자리</a>
+      <a class="card-link" href="/pages/star/detail.html?sign=libra">천칭자리</a>
+      <a class="card-link" href="/pages/star/detail.html?sign=scorpio">전갈자리</a>
+      <a class="card-link" href="/pages/star/detail.html?sign=sagittarius">사수자리</a>
+      <a class="card-link" href="/pages/star/detail.html?sign=capricorn">염소자리</a>
+      <a class="card-link" href="/pages/star/detail.html?sign=aquarius">물병자리</a>
+      <a class="card-link" href="/pages/star/detail.html?sign=pisces">물고기자리</a>
+    </div>
   </div>
-</div>
 
-<button class="action-btn" id="shareBtn" type="button">공유하기</button>
-<a class="action-link" href="/pages/star/index.html">별자리 목록으로</a>
-<a class="action-link" href="/">홈으로</a>
+  <div class="card">
+    <h2>추천 운세 콘텐츠</h2>
+    <p><a class="action-link" href="/pages/period/period.html">오늘/내일/연간 운세</a></p>
+    <p><a class="action-link" href="/pages/saju/saju.html">사주 분석</a></p>
+    <p><a class="action-link" href="/pages/tojung/tojung.html">토정비결</a></p>
+    <p><a class="action-link" href="/pages/zodiac/zodiac.html">띠별 운세</a></p>
+    <p><a class="action-link" href="/fortune-guide.html">운세 가이드</a></p>
+  </div>
+
+  <button class="action-btn" id="shareBtn" type="button">공유하기</button>
+  <a class="action-link" href="/pages/star/index.html">별자리 목록으로</a>
+  <button class="action-btn" type="button" onclick="Common.goHome()">홈으로</button>
 
   <footer>
     <div>무료 운세 플랫폼</div>
@@ -78,7 +103,8 @@
       <a href="/privacy.html">개인정보처리방침</a> |
       <a href="/terms.html">이용약관</a> |
       <a href="/about.html">사이트 소개</a> |
-      <a href="/contact.html">문의</a>
+      <a href="/contact.html">문의</a> |
+      <a href="/fortune-guide.html">운세 가이드</a>
     </div>
   </footer>
 
@@ -86,7 +112,10 @@
 
 <script id="starJsonLd" type="application/ld+json"></script>
 <script src="/js/config.js"></script>
-<script src="/js/reward.js"></script>
+<script src="/js/birth.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/points.js"></script>
+<script src="/js/common.js"></script>
 <script src="/js/star-detail.js"></script>
 </body>
 </html>
