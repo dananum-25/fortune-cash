@@ -14,6 +14,14 @@ import {
   buildPersonalityProfile
 } from "/js/astro/profile/astro.personality.js";
 
+import {
+  calculateNatalAspects
+} from "/js/astro/core/astro.aspects.js";
+
+import {
+  buildAstroScores
+} from "/js/astro/interpreter/astro.score.js";
+
 export function buildAstroBaseProfile(input = {}){
   const birthDate = input.birthDate || ASTRO_DEFAULT_BIRTH;
   const birthTime = input.birthTime || ASTRO_DEFAULT_TIME;
@@ -36,10 +44,18 @@ export function buildAstroBaseProfile(input = {}){
   }
 
   const personality = buildPersonalityProfile(natal);
+  const natalAspects = calculateNatalAspects(natal?.planets || {});
+  const scores = buildAstroScores({
+    natal,
+    personality,
+    natalAspects
+  });
 
   return {
     birth: natal.birth,
     natal,
-    personality
+    personality,
+    natalAspects,
+    scores
   };
 }
