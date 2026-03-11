@@ -6,6 +6,32 @@ async function loadDB(){
   starDB = await fetch("/data/star_2026.json").then(r=>r.json());
 }
 
+function getZodiac(month, day){
+
+  const zodiac = [
+    ["capricorn",1,19],
+    ["aquarius",2,18],
+    ["pisces",3,20],
+    ["aries",4,19],
+    ["taurus",5,20],
+    ["gemini",6,21],
+    ["cancer",7,22],
+    ["leo",8,22],
+    ["virgo",9,22],
+    ["libra",10,23],
+    ["scorpio",11,22],
+    ["sagittarius",12,21],
+    ["capricorn",12,31]
+  ];
+
+  for(let i=0;i<zodiac.length;i++){
+    const [sign,m,d] = zodiac[i];
+    if(month===m && day<=d) return sign;
+  }
+
+  return "capricorn";
+}
+
 function ensureLogin(){
   const phone = localStorage.getItem("phone");
   if(!phone){
