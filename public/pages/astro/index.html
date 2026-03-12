@@ -3,14 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>개인 점성술 리포트</title>
-  <meta name="description" content="생년월일, 출생시간, 출생지 기준 개인 점성술 리포트입니다. 오늘 흐름, 이번 달, 올해 운세와 기본 성향을 확인할 수 있습니다.">
+  <title>별자리운세 | 내 기준 분석</title>
+  <meta name="description" content="생년월일, 출생시간, 출생지 기준으로 내 별자리운세를 자세히 확인하세요. 오늘 흐름, 이번 달, 올해 운세와 태양별자리 공통 해석까지 함께 볼 수 있습니다.">
+  <link rel="canonical" href="https://fortune-cash.vercel.app/pages/astro/index.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="무료 운세 플랫폼">
+  <meta property="og:title" content="별자리운세 | 내 기준 분석">
+  <meta property="og:description" content="생년월일, 출생시간, 출생지 기준으로 내 별자리운세를 자세히 확인하세요.">
+  <meta property="og:url" content="https://fortune-cash.vercel.app/pages/astro/index.html">
+  <meta property="og:image" content="https://fortune-cash.vercel.app/assets/star_fortune.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="별자리운세 | 내 기준 분석">
+  <meta name="twitter:description" content="생년월일, 출생시간, 출생지 기준으로 내 별자리운세를 자세히 확인하세요.">
+  <meta name="twitter:image" content="https://fortune-cash.vercel.app/assets/star_fortune.png">
+
   <link rel="stylesheet" href="/css/common.css">
+
   <style>
     .astro-wrap{
-      width:min(100% - 24px, 860px);
+      width:min(100% - 24px, 960px);
       margin:0 auto;
       padding:20px 0 40px;
+    }
+
+    .page-desc{
+      margin-bottom:14px;
+    }
+
+    .helper-box p{
+      margin:6px 0;
     }
 
     .astro-form{
@@ -24,11 +47,60 @@
       width:100%;
       box-sizing:border-box;
       padding:12px;
-      border:1px solid #ddd;
       border-radius:10px;
+      border:1px solid #ddd;
       font-size:14px;
       background:#fff;
       color:#111;
+    }
+
+    .fortune-title{
+      margin:0 0 14px;
+      font-size:28px;
+      font-weight:800;
+      line-height:1.25;
+      letter-spacing:-0.3px;
+      color:#ffd56b;
+    }
+
+    .recommend-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:14px;
+    }
+
+    .recommend-actions a{
+      display:block;
+      text-align:center;
+      text-decoration:none;
+      border:2px solid #ffffff;
+      border-radius:12px;
+      background:#ffffff;
+      color:#111 !important;
+      font-weight:700;
+      padding:14px 10px;
+      box-sizing:border-box;
+    }
+
+    .recommend-actions a:hover{
+      background:#f3f3f3;
+    }
+
+    .footer-links{
+      margin-top:10px;
+      display:grid;
+      grid-template-columns:repeat(3, auto);
+      justify-content:center;
+      gap:8px 14px;
+      line-height:1.8;
+    }
+
+    .footer-links a{
+      color:#fff !important;
+      font-size:13px;
+      text-decoration:none;
+      white-space:nowrap;
     }
 
     .score-row{
@@ -63,31 +135,83 @@
       .astro-wrap{
         width:min(100% - 24px, 420px);
       }
+
+      .fortune-title{
+        font-size:22px;
+      }
+
+      .recommend-actions{
+        grid-template-columns:1fr;
+      }
+
+      .footer-links{
+        grid-template-columns:repeat(2, auto);
+        gap:6px 12px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="wrap astro-wrap">
 
-    <h1>🔭 개인 점성술 리포트</h1>
-    <div class="small">※ 출생지, 생년월일, 출생시간 기준으로 기본 성향과 오늘/이번 달/올해 흐름을 참고용으로 보여줍니다.</div>
+    <h1 class="fortune-title">⭐ 내 별자리운세</h1>
+    <div class="small page-desc">※ 태어난 날짜, 출생시간, 출생지 기준으로 내 흐름을 더 자세히 보는 개인 분석 페이지입니다. 태양별자리 공통 해석도 함께 참고할 수 있어요.</div>
 
-    <div class="card">
-      <h2>입력 정보</h2>
+    <div id="loginCheck" class="card helper-box">
+      <h2>기준 정보 확인</h2>
+      <p>저장된 생년월일이 있으면 자동 적용되고, 없으면 기본 기준으로 바로 볼 수 있습니다.</p>
+    </div>
+
+    <div class="card helper-box">
+      <h2>내 기준으로 다시 보기</h2>
+      <p>회원은 저장된 생년월일이 자동 적용됩니다.</p>
+      <p>게스트나 비회원은 아래 값을 바꿔서 내 기준으로 다시 볼 수 있습니다.</p>
 
       <div class="astro-form">
         <input id="astroBirthDate" type="date">
         <input id="astroBirthTime" type="time">
         <input id="astroBirthPlace" type="text" placeholder="출생지 입력 (예: 서울특별시 종로구)">
-        <button class="btn" id="runAstroBtn" type="button">점성술 리포트 보기</button>
+        <button class="btn" id="runAstroBtn" type="button">내 별자리운세 보기</button>
       </div>
 
       <p class="small" style="margin-top:10px;">
-        출생시간을 모르면 12:00 기준으로 볼 수 있습니다. 출생지는 서울, 부산, 대구, 인천, 수원, 성남, 분당, 창원, 제주 등 주요 지역 입력을 지원합니다.
+        출생시간을 모르면 12:00 기준으로 볼 수 있습니다. 비회원 기본 기준은 1940-01-01이며, 출생지는 서울 기준이 기본값입니다.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>별자리운세 안내</h2>
+      <p>
+        이 페이지는 일반적인 별자리 공통 운세보다 더 자세한 개인 흐름을 보기 위한 페이지입니다.
+        생년월일, 출생시간, 출생지 기준으로 오늘, 이번 달, 올해 흐름을 참고용으로 보여줍니다.
+      </p>
+      <p>
+        아래 리포트에서는 내 기준 개인 흐름과 함께, 태양별자리 공통 해석도 같이 볼 수 있어 더 입체적으로 참고할 수 있습니다.
       </p>
     </div>
 
     <div id="astroResult"></div>
+
+    <section class="card">
+      <h2>추천 운세 콘텐츠</h2>
+      <div class="recommend-actions">
+        <a href="/pages/star/detail.html">다른 별자리 보기</a>
+        <a href="/pages/period/period.html">오늘/내일/연간 운세</a>
+        <a href="/pages/saju/saju.html">사주 분석</a>
+        <a href="/pages/tojung/tojung.html">토정비결</a>
+        <a href="/pages/zodiac/zodiac.html">띠별 운세</a>
+        <a href="/fortune-guide.html">운세 가이드</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>자주 묻는 질문</h2>
+      <p><strong>Q. 일반 별자리운세와 뭐가 다른가요?</strong><br>
+      일반 별자리운세는 태어난 날짜 기준 공통 흐름이고, 이 페이지는 출생시간과 출생지까지 반영한 개인 흐름을 더 자세히 보는 구조입니다.</p>
+
+      <p><strong>Q. 출생시간을 모르면 못 보나요?</strong><br>
+      출생시간을 모르면 12:00 기준으로 확인할 수 있습니다. 정확도는 다소 달라질 수 있지만 흐름 참고용으로는 충분히 볼 수 있습니다.</p>
+    </section>
 
     <button class="secondaryBtn" id="shareBtn" type="button">공유하기</button>
     <button class="secondaryBtn" type="button" onclick="Common.goHome()">홈으로</button>
