@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>개인 점성술 리포트</title>
+  <meta name="description" content="생년월일, 출생시간, 출생지 기준 개인 점성술 리포트입니다. 오늘 흐름, 이번 달, 올해 운세와 기본 성향을 확인할 수 있습니다.">
+  <link rel="stylesheet" href="/css/common.css">
+  <style>
+    .astro-wrap{
+      width:min(100% - 24px, 860px);
+      margin:0 auto;
+      padding:20px 0 40px;
+    }
+
+    .astro-form{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .astro-form input{
+      width:100%;
+      box-sizing:border-box;
+      padding:12px;
+      border:1px solid #ddd;
+      border-radius:10px;
+      font-size:14px;
+      background:#fff;
+      color:#111;
+    }
+
+    .score-row{
+      margin:12px 0;
+    }
+
+    .score-head{
+      display:flex;
+      justify-content:space-between;
+      font-size:14px;
+      margin-bottom:6px;
+    }
+
+    .score-bar{
+      height:12px;
+      background:#222;
+      border-radius:10px;
+      overflow:hidden;
+    }
+
+    .score-fill{
+      height:100%;
+      border-radius:10px;
+    }
+
+    .bar-high{ background:linear-gradient(90deg,#00c853,#69f0ae); }
+    .bar-good{ background:linear-gradient(90deg,#ffd600,#ffea00); }
+    .bar-mid { background:linear-gradient(90deg,#ff9100,#ffab40); }
+    .bar-low { background:linear-gradient(90deg,#d50000,#ff5252); }
+
+    @media (max-width: 767px){
+      .astro-wrap{
+        width:min(100% - 24px, 420px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap astro-wrap">
+
+    <h1>🔭 개인 점성술 리포트</h1>
+    <div class="small">※ 출생지, 생년월일, 출생시간 기준으로 기본 성향과 오늘/이번 달/올해 흐름을 참고용으로 보여줍니다.</div>
+
+    <div class="card">
+      <h2>입력 정보</h2>
+
+      <div class="astro-form">
+        <input id="astroBirthDate" type="date">
+        <input id="astroBirthTime" type="time">
+        <input id="astroBirthPlace" type="text" placeholder="출생지 입력 (예: 서울특별시 종로구)">
+        <button class="btn" id="runAstroBtn" type="button">점성술 리포트 보기</button>
+      </div>
+
+      <p class="small" style="margin-top:10px;">
+        출생시간을 모르면 12:00 기준으로 볼 수 있습니다. 출생지는 서울, 부산, 대구, 인천, 수원, 성남, 분당, 창원, 제주 등 주요 지역 입력을 지원합니다.
+      </p>
+    </div>
+
+    <div id="astroResult"></div>
+
+    <button class="secondaryBtn" id="shareBtn" type="button">공유하기</button>
+    <button class="secondaryBtn" type="button" onclick="Common.goHome()">홈으로</button>
+
+    <footer>
+      <div>무료 운세 플랫폼</div>
+      <div style="margin-top:6px;">문의: daekoju@naver.com</div>
+      <div class="footer-links">
+        <a href="/privacy.html">개인정보처리방침</a>
+        <a href="/terms.html">이용약관</a>
+        <a href="/about.html">사이트 소개</a>
+        <a href="/contact.html">문의</a>
+        <a href="/fortune-guide.html">운세 가이드</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/common.js"></script>
+  <script type="module" src="/js/astro/app.js"></script>
+</body>
+</html>
