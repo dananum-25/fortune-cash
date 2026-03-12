@@ -19,12 +19,21 @@ import {
 } from "/js/astro/core/astro.aspects.js";
 
 import {
+  buildTransitChart,
+  calculateTransitToNatalAspects
+} from "/js/astro/core/astro.transit.js";
+
+import {
   buildAstroScores
 } from "/js/astro/interpreter/astro.score.js";
 
 import {
   buildAstroSummary
 } from "/js/astro/interpreter/astro.summary.js";
+
+import {
+  buildTodaySummary
+} from "/js/astro/interpreter/astro.today.js";
 
 export function buildAstroBaseProfile(input = {}){
   const birthDate = input.birthDate || ASTRO_DEFAULT_BIRTH;
@@ -33,6 +42,7 @@ export function buildAstroBaseProfile(input = {}){
   const birthPlaceText = input.birthPlaceText || "Seoul";
   const lat = Number(input.lat || 37.5665);
   const lng = Number(input.lng || 126.9780);
+  const targetDate = input.targetDate || new Date().toISOString().slice(0, 10);
 
   const natal = buildNatalChart({
     birthDate,
@@ -62,12 +72,31 @@ export function buildAstroBaseProfile(input = {}){
     natalAspects
   });
 
+  const transit = buildTransitChart({
+    targetDate,
+    timezone
+  });
+
+  const transitAspects = calculateTransitToNatalAspects(
+    transit?.planets || {},
+    natal?.planets || {}
+  );
+
+  const today = buildTodaySummary({
+    scores,
+    transitAspects,
+    targetDate
+  });
+
   return {
     birth: natal.birth,
     natal,
     personality,
     natalAspects,
     scores,
-    summary
+    summary,
+    transit,
+    transitAspects,
+    today
   };
 }
