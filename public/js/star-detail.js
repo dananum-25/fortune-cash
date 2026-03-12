@@ -357,14 +357,12 @@ function renderPersonalAstroBox(){
   const box = document.getElementById("astroPersonalBox");
   if(!box) return;
 
-  const birthDate = localStorage.getItem("birth") || localStorage.getItem("guest_birth") || "1940-01-01";
-  const birthTime = localStorage.getItem("birthTime") || "12:00";
-  const birthPlaceText = localStorage.getItem("birthPlaceText") || "서울";
+  const saved = getAstroInput();
 
   const profile = buildAstroBaseProfile({
-    birthDate,
-    birthTime,
-    birthPlaceText,
+    birthDate: saved.birthDate,
+    birthTime: saved.birthTime,
+    birthPlaceText: saved.birthPlaceText,
     targetDate: new Date().toISOString().slice(0, 10)
   });
 
