@@ -1,49 +1,39 @@
 import { buildAstroBaseProfile } from "/js/astro/engine/astro.engine.js";
 import { renderAstroReport } from "/js/astro/interpreter/astro.render.js";
-
-const DEFAULT_BIRTH_YMD = "1940-01-01";
-const DEFAULT_BIRTH_TIME = "12:00";
-const DEFAULT_BIRTH_PLACE = "서울";
-
-function getActiveBirth(){
-  return localStorage.getItem("birth")
-    || localStorage.getItem("guest_birth")
-    || DEFAULT_BIRTH_YMD;
-}
+import { getAstroInput, saveAstroInput } from "/js/astro/astro.storage.js";
 
 function getActiveName(){
   return localStorage.getItem("name") || "기본 기준";
 }
 
 function fillDefaultInputs(){
+  const saved = getAstroInput();
+
   const birthDateEl = document.getElementById("astroBirthDate");
   const birthTimeEl = document.getElementById("astroBirthTime");
   const birthPlaceEl = document.getElementById("astroBirthPlace");
 
   if(birthDateEl && !birthDateEl.value){
-    birthDateEl.value = getActiveBirth();
+    birthDateEl.value = saved.birthDate;
   }
 
   if(birthTimeEl && !birthTimeEl.value){
-    birthTimeEl.value = localStorage.getItem("birthTime") || DEFAULT_BIRTH_TIME;
+    birthTimeEl.value = saved.birthTime;
   }
 
   if(birthPlaceEl && !birthPlaceEl.value){
-    birthPlaceEl.value = localStorage.getItem("birthPlaceText") || DEFAULT_BIRTH_PLACE;
+    birthPlaceEl.value = saved.birthPlaceText;
   }
 }
 
-function saveInputs(birthDate, birthTime, birthPlaceText){
-  localStorage.setItem("birthTime", birthTime || DEFAULT_BIRTH_TIME);
-  localStorage.setItem("birthPlaceText", birthPlaceText || DEFAULT_BIRTH_PLACE);
-}
-
 function renderAstro(){
-  const birthDate = document.getElementById("astroBirthDate")?.value || getActiveBirth();
-  const birthTime = document.getElementById("astroBirthTime")?.value || DEFAULT_BIRTH_TIME;
-  const birthPlaceText = document.getElementById("astroBirthPlace")?.value || DEFAULT_BIRTH_PLACE;
+  const saved = getAstroInput();
 
-  saveInputs(birthDate, birthTime, birthPlaceText);
+  const birthDate = document.getElementById("astroBirthDate")?.value || saved.birthDate;
+  const birthTime = document.getElementById("astroBirthTime")?.value || saved.birthTime;
+  const birthPlaceText = document.getElementById("astroBirthPlace")?.value || saved.birthPlaceText;
+
+  saveAstroInput({ birthDate, birthTime, birthPlaceText });
 
   const profile = buildAstroBaseProfile({
     birthDate,
