@@ -39,6 +39,14 @@ import {
   buildTodaySummary
 } from "/js/astro/interpreter/astro.today.js";
 
+import {
+  buildMonthSummary
+} from "/js/astro/interpreter/astro.month.js";
+
+import {
+  buildYearSummary
+} from "/js/astro/interpreter/astro.year.js";
+
 export function buildAstroBaseProfile(input = {}){
   const birthDate = input.birthDate || ASTRO_DEFAULT_BIRTH;
   const birthTime = input.birthTime || ASTRO_DEFAULT_TIME;
@@ -97,6 +105,16 @@ export function buildAstroBaseProfile(input = {}){
     targetDate
   });
 
+  const month = buildMonthSummary({
+    scores,
+    targetDate
+  });
+
+  const year = buildYearSummary({
+    scores,
+    month
+  });
+
   return {
     birth: natal.birth,
     geo,
@@ -107,6 +125,8 @@ export function buildAstroBaseProfile(input = {}){
     summary,
     transit,
     transitAspects,
-    today
+    today,
+    month,
+    year
   };
 }
