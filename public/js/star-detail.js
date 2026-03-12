@@ -1,6 +1,10 @@
 console.log("[star-detail.js] loaded ✅");
 
+import { buildAstroBaseProfile } from "/js/astro/engine/astro.engine.js";
+import { renderTodayAstro, renderAstroMonth, renderAstroYear } from "/js/astro/interpreter/astro.render.js";
+
 let starDB = {};
+let rewarded = false;
 
 const STAR_DEFAULT_BIRTH = "1940-01-01";
 
@@ -348,6 +352,37 @@ function renderDetail(sign){
     `;
   }
 }
+function renderPersonalAstroBox(){
+  const box = document.getElementById("astroPersonalBox");
+  if(!box) return;
+
+  const birthDate = localStorage.getItem("birth") || localStorage.getItem("guest_birth") || "1940-01-01";
+  const birthTime = localStorage.getItem("birthTime") || "12:00";
+  const birthPlaceText = localStorage.getItem("birthPlaceText") || "서울";
+
+  const profile = buildAstroBaseProfile({
+    birthDate,
+    birthTime,
+    birthPlaceText,
+    targetDate: new Date().toISOString().slice(0, 10)
+  });
+
+  if(!profile){
+    box.innerHTML = "";
+    return;
+  }
+
+  box.innerHTML = `
+    <div class="card">
+      <h2>🪐 내 기준 점성술 흐름</h2>
+      <p class="info-text">저장된 생년월일, 출생시간, 출생지를 기준으로 오늘/이번 달/올해 흐름을 함께 보여줍니다.</p>
+    </div>
+
+    ${renderTodayAstro(profile.today)}
+    ${renderAstroMonth(profile.month)}
+    ${renderAstroYear(profile.year)}
+  `;
+}
 
 function bindShare(sign){
   const btn = document.getElementById("shareBtn");
@@ -443,6 +478,7 @@ document.addEventListener("DOMContentLoaded", async ()=>{
     renderPointBoxStar();
     renderMyInfo(sign);
     renderDetail(sign);
+    renderPersonalAstroBox();
     bindShare(sign);
 
     document.getElementById("applyGuestBirthBtn")?.addEventListener("click", applyGuestBirthForStarDetail);
