@@ -2,6 +2,7 @@ console.log("[star-detail.js] loaded ✅");
 
 import { buildAstroBaseProfile } from "/js/astro/engine/astro.engine.js";
 import { renderTodayAstro, renderAstroMonth, renderAstroYear } from "/js/astro/interpreter/astro.render.js";
+import { getAstroInput } from "/js/astro/astro.storage.js";
 
 let starDB = {};
 let rewarded = false;
