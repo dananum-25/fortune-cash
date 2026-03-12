@@ -85,6 +85,73 @@ export function renderTodayAstro(today){
   `;
 }
 
+export function renderAstroMonth(month){
+  if(!month?.current) return "";
+
+  const current = month.current;
+
+  return `
+  <div class="card">
+    <h2>📅 이번 달 흐름</h2>
+
+    <p class="info-text"><b>${escapeHtml(current.headline || "")}</b></p>
+
+    <div class="hr"></div>
+
+    ${renderScoreRow(`${current.month}월 전체 흐름`, current?.scores?.overall || 60)}
+    ${renderScoreRow(`${current.month}월 직업/일운`, current?.scores?.career || 60)}
+    ${renderScoreRow(`${current.month}월 재물운`, current?.scores?.wealth || 60)}
+    ${renderScoreRow(`${current.month}월 연애/관계운`, current?.scores?.love || 60)}
+    ${renderScoreRow(`${current.month}월 건강운`, current?.scores?.health || 60)}
+
+    <div class="hr"></div>
+
+    <p><b>전체</b><br>${escapeHtml(current.overall || "")}</p>
+    <p><b>직업 / 일</b><br>${escapeHtml(current.career || "")}</p>
+    <p><b>재물</b><br>${escapeHtml(current.wealth || "")}</p>
+    <p><b>연애 / 관계</b><br>${escapeHtml(current.love || "")}</p>
+    <p><b>건강</b><br>${escapeHtml(current.health || "")}</p>
+  </div>
+  `;
+}
+
+export function renderAstroYear(year){
+  if(!year) return "";
+
+  return `
+  <div class="card">
+    <h2>🗓 올해 흐름</h2>
+
+    <p class="info-text"><b>${escapeHtml(year.headline || "")}</b></p>
+
+    <div class="hr"></div>
+
+    ${renderScoreRow("올해 전체 흐름", year?.scores?.overall || 60)}
+    ${renderScoreRow("올해 직업/일운", year?.scores?.career || 60)}
+    ${renderScoreRow("올해 재물운", year?.scores?.wealth || 60)}
+    ${renderScoreRow("올해 연애/관계운", year?.scores?.love || 60)}
+    ${renderScoreRow("올해 건강운", year?.scores?.health || 60)}
+
+    <div class="hr"></div>
+
+    <p><b>가장 강한 영역</b><br>${escapeHtml(year?.strongest?.label || "")} (${year?.strongest?.value || 0}점)</p>
+    <p><b>조금 더 챙길 영역</b><br>${escapeHtml(year?.weakest?.label || "")} (${year?.weakest?.value || 0}점)</p>
+    <p><b>운영 전략</b><br>${escapeHtml(year.strategy || "")}</p>
+
+    ${
+      Array.isArray(year.checklist) && year.checklist.length
+        ? `
+          <div class="hr"></div>
+          <ul class="list">
+            ${year.checklist.map(v => `<li>${escapeHtml(v)}</li>`).join("")}
+          </ul>
+        `
+        : ""
+    }
+  </div>
+  `;
+}
+
 export function renderAstroSummary(summary){
   if(!summary) return "";
 
@@ -143,9 +210,13 @@ export function renderAstroReport(profile){
   const scores = profile?.scores;
   const summary = profile?.summary;
   const today = profile?.today;
+  const month = profile?.month;
+  const year = profile?.year;
 
   return `
     ${renderTodayAstro(today)}
+    ${renderAstroMonth(month)}
+    ${renderAstroYear(year)}
     ${renderAstroSummary(summary)}
     ${renderAstroScores(scores)}
     ${renderAstroDetails(summary)}
