@@ -5,9 +5,9 @@ import { renderTodayAstro, renderAstroMonth, renderAstroYear } from "/js/astro/i
 import { getAstroInput } from "/js/astro/astro.storage.js";
 
 let starDB = {};
-let rewarded = false;
 
 const STAR_DEFAULT_BIRTH = "1940-01-01";
+const STAR_DEFAULT_SIGN = "capricorn";
 
 function escapeHtml(s){
   return String(s ?? "")
@@ -32,6 +32,7 @@ function getActiveBirthForStar(){
 function getStarMode(){
   const phone = localStorage.getItem("phone");
   const guestBirth = localStorage.getItem("guest_birth");
+
   if(phone) return "member";
   if(guestBirth) return "guest";
   return "default";
@@ -74,6 +75,12 @@ function getStarSignFromBirth(birth){
   if((month === 2 && day >= 19) || (month === 3 && day <= 20)) return "pisces";
 
   return null;
+}
+
+function getResolvedSign(){
+  const requestedSign = getQueryParam("sign");
+  const mySign = getStarSignFromBirth(getActiveBirthForStar());
+  return requestedSign || mySign || STAR_DEFAULT_SIGN;
 }
 
 async function loadDB(){
@@ -353,6 +360,7 @@ function renderDetail(sign){
     `;
   }
 }
+
 function renderPersonalAstroBox(){
   const box = document.getElementById("astroPersonalBox");
   if(!box) return;
@@ -464,8 +472,7 @@ async function applyGuestBirthForStarDetail(){
 }
 
 document.addEventListener("DOMContentLoaded", async ()=>{
-  const requestedSign = getQueryParam("sign");
-  const sign = requestedSign || getStarSignFromBirth(getActiveBirthForStar()) || "capricorn";
+  const sign = getResolvedSign();
 
   try{
     if(window.loadMyPoint){
