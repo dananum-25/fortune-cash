@@ -7,6 +7,10 @@ import {
 } from "/js/astro/core/astro.constants.js";
 
 import {
+  enrichBirthplaceInput
+} from "/js/astro/core/astro.geocode.js";
+
+import {
   buildNatalChart
 } from "/js/astro/profile/astro.natal.js";
 
@@ -38,11 +42,16 @@ import {
 export function buildAstroBaseProfile(input = {}){
   const birthDate = input.birthDate || ASTRO_DEFAULT_BIRTH;
   const birthTime = input.birthTime || ASTRO_DEFAULT_TIME;
-  const timezone = input.timezone || ASTRO_DEFAULT_TIMEZONE;
-  const birthPlaceText = input.birthPlaceText || "Seoul";
-  const lat = Number(input.lat || 37.5665);
-  const lng = Number(input.lng || 126.9780);
   const targetDate = input.targetDate || new Date().toISOString().slice(0, 10);
+
+  const geo = enrichBirthplaceInput(
+    input.birthPlaceText || input.birthPlace || ""
+  );
+
+  const timezone = input.timezone || geo.timezone || ASTRO_DEFAULT_TIMEZONE;
+  const birthPlaceText = geo.birthPlaceText || input.birthPlaceText || "Seoul";
+  const lat = Number(input.lat ?? geo.lat ?? 37.5665);
+  const lng = Number(input.lng ?? geo.lng ?? 126.9780);
 
   const natal = buildNatalChart({
     birthDate,
@@ -90,6 +99,7 @@ export function buildAstroBaseProfile(input = {}){
 
   return {
     birth: natal.birth,
+    geo,
     natal,
     personality,
     natalAspects,
