@@ -1,8 +1,8 @@
 // /js/astro/astro.storage.js
 
 const DEFAULT_BIRTH_YMD = "1940-01-01";
-const DEFAULT_BIRTH_TIME = "12:00";
-const DEFAULT_BIRTH_PLACE = "서울";
+const DEFAULT_BIRTH_TIME = "11:00";
+const DEFAULT_BIRTH_PLACE = "서울특별시 종로구";
 
 export function getStoredBirthDate(){
   return localStorage.getItem("birth")
