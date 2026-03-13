@@ -4,19 +4,19 @@ function normalizeDegree(deg){
   return v;
 }
 
-function degreeToSign(lon){
+function degreeToSign(longitude){
   const signs = [
     "양자리","황소자리","쌍둥이자리","게자리",
     "사자자리","처녀자리","천칭자리","전갈자리",
     "사수자리","염소자리","물병자리","물고기자리"
   ];
 
-  const normalized = normalizeDegree(lon);
+  const normalized = normalizeDegree(longitude);
   const signIndex = Math.floor(normalized / 30);
   const degree = normalized % 30;
 
   return {
-    lon: Number(normalized.toFixed(6)),
+    longitude: Number(normalized.toFixed(6)),
     degree: Number(degree.toFixed(2)),
     signIndex,
     signName: signs[signIndex]
@@ -31,7 +31,6 @@ function vectorToEclipticLongitude(vec){
 }
 
 export function buildAstronomySnapshot(date){
-
   if(typeof Astronomy === "undefined"){
     console.warn("[astronomy-engine] library not loaded");
     return null;
@@ -41,8 +40,8 @@ export function buildAstronomySnapshot(date){
 
   function planet(body){
     const vec = Astronomy.GeoVector(body, time, false);
-    const lon = vectorToEclipticLongitude(vec);
-    return degreeToSign(lon);
+    const longitude = vectorToEclipticLongitude(vec);
+    return degreeToSign(longitude);
   }
 
   const planets = {
