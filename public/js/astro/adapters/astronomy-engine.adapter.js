@@ -10,10 +10,10 @@ export function buildAstronomySnapshot(date){
 
   function planet(body){
 
-    const equ = Astronomy.Equator(body, time, observer, true, true);
-    const ecl = Astronomy.Ecliptic(equ);
+  const vec = Astronomy.GeoVector(body, time, false);
+  const ecl = Astronomy.Ecliptic(vec);
 
-    const lon = ecl.elon;
+  const lon = ecl.elon;
     const signIndex = Math.floor(lon / 30);
 
     const signs = [
