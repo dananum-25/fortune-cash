@@ -5,6 +5,8 @@ import { buildAstronomySnapshot } from "/js/astro/adapters/astronomy-engine.adap
 import { buildPlanetAspects, buildAspectNarratives } from "/js/astro/adapters/astronomy-aspect.adapter.js";
 
 const DEFAULT_BIRTH_YMD = "1940-01-01";
+const DEFAULT_BIRTH_TIME = "11:00";
+const DEFAULT_BIRTH_PLACE = "서울특별시 종로구";
 
 function getActiveName(){
   return localStorage.getItem("name") || "기본 기준";
@@ -107,6 +109,8 @@ function renderEntryState(){
     box.innerHTML = `
       <h2>✅ 게스트 기준 적용 완료</h2>
       <p>생년월일: <b>${saved.birthDate}</b></p>
+      <p>출생시간: <b>${saved.birthTime || DEFAULT_BIRTH_TIME}</b></p>
+      <p>출생지: <b>${saved.birthPlaceText || DEFAULT_BIRTH_PLACE}</b></p>
       <p class="small">출생시간과 출생지를 함께 입력하면 더 자세한 내 별자리운세 흐름을 볼 수 있어요.</p>
     `;
     return;
@@ -114,7 +118,7 @@ function renderEntryState(){
 
   box.innerHTML = `
     <h2>✅ 기본 기준으로 바로 보기</h2>
-    <p>현재는 <b>${DEFAULT_BIRTH_YMD}</b> 기준으로 결과를 볼 수 있습니다.</p>
+    <p>현재는 <b>${DEFAULT_BIRTH_YMD}</b> / <b>${DEFAULT_BIRTH_TIME}</b> / <b>${DEFAULT_BIRTH_PLACE}</b> 기준으로 결과를 볼 수 있습니다.</p>
     <p class="small">원하는 값으로 바꿔서 내 기준으로 다시 볼 수 있어요.</p>
   `;
 }
@@ -127,15 +131,15 @@ function fillDefaultInputs(){
   const birthPlaceEl = document.getElementById("astroBirthPlace");
 
   if(birthDateEl && !birthDateEl.value){
-    birthDateEl.value = saved.birthDate;
+    birthDateEl.value = saved.birthDate || DEFAULT_BIRTH_YMD;
   }
 
   if(birthTimeEl && !birthTimeEl.value){
-    birthTimeEl.value = saved.birthTime;
+    birthTimeEl.value = saved.birthTime || DEFAULT_BIRTH_TIME;
   }
 
   if(birthPlaceEl && !birthPlaceEl.value){
-    birthPlaceEl.value = saved.birthPlaceText;
+    birthPlaceEl.value = saved.birthPlaceText || DEFAULT_BIRTH_PLACE;
   }
 }
 
@@ -200,25 +204,28 @@ function renderStarHelperCard(star, starItem){
   `;
 }
 
-const astronomySnapshot = buildAstronomySnapshot(new Date(`${targetDate}T12:00:00Z`));
-  console.log("[astronomy snapshot]", astronomySnapshot);
-  console.log("[astronomy aspects]", buildPlanetAspects(astronomySnapshot?.planets));
 async function renderAstro(){
   const saved = getAstroInput();
 
-  const birthDate = document.getElementById("astroBirthDate")?.value || saved.birthDate;
-  const birthTime = document.getElementById("astroBirthTime")?.value || saved.birthTime;
-  const birthPlaceText = document.getElementById("astroBirthPlace")?.value || saved.birthPlaceText;
+  const birthDate = document.getElementById("astroBirthDate")?.value || saved.birthDate || DEFAULT_BIRTH_YMD;
+  const birthTime = document.getElementById("astroBirthTime")?.value || saved.birthTime || DEFAULT_BIRTH_TIME;
+  const birthPlaceText = document.getElementById("astroBirthPlace")?.value || saved.birthPlaceText || DEFAULT_BIRTH_PLACE;
 
   saveAstroInput({ birthDate, birthTime, birthPlaceText });
   renderEntryState();
+
+  const targetDate = new Date().toISOString().slice(0, 10);
 
   const profile = buildAstroBaseProfile({
     birthDate,
     birthTime,
     birthPlaceText,
-    targetDate: new Date().toISOString().slice(0, 10)
+    targetDate
   });
+
+  const astronomySnapshot = buildAstronomySnapshot(new Date(`${targetDate}T12:00:00Z`));
+  console.log("[astronomy snapshot]", astronomySnapshot);
+  console.log("[astronomy aspects]", buildPlanetAspects(astronomySnapshot?.planets));
 
   const resultBox = document.getElementById("astroResult");
   if(!resultBox) return;
@@ -253,6 +260,8 @@ async function renderAstro(){
           : ""
       }
     </section>
+
+    ${renderPlanetReasonCard(astronomySnapshot)}
 
     ${renderAstroReport(profile)}
 
