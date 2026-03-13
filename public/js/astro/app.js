@@ -1,6 +1,7 @@
 import { buildAstroBaseProfile } from "/js/astro/engine/astro.engine.js";
 import { renderAstroReport } from "/js/astro/interpreter/astro.render.js";
 import { getAstroInput, saveAstroInput } from "/js/astro/astro.storage.js";
+import { buildPlanetAspects, buildAspectNarratives } from "/js/astro/adapters/astronomy-aspect.adapter.js";
 
 const DEFAULT_BIRTH_YMD = "1940-01-01";
 
