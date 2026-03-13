@@ -20,6 +20,40 @@ function getActiveYear(){
   );
 }
 
+function getResolvedInput(){
+  const saved = getAstroInput();
+
+  const phone = localStorage.getItem("phone");
+  const guestBirth = localStorage.getItem("guest_birth");
+
+  const birthDate =
+    phone
+      ? (localStorage.getItem("birth") || saved.birthDate || DEFAULT_BIRTH_YMD)
+      : guestBirth
+        ? (localStorage.getItem("guest_birth") || saved.birthDate || DEFAULT_BIRTH_YMD)
+        : (saved.birthDate || DEFAULT_BIRTH_YMD);
+
+  const birthTime =
+    phone
+      ? (localStorage.getItem("birthTime") || saved.birthTime || DEFAULT_BIRTH_TIME)
+      : guestBirth
+        ? (localStorage.getItem("guest_birthTime") || saved.birthTime || DEFAULT_BIRTH_TIME)
+        : (saved.birthTime || DEFAULT_BIRTH_TIME);
+
+  const birthPlaceText =
+    phone
+      ? (localStorage.getItem("birthPlaceText") || saved.birthPlaceText || DEFAULT_BIRTH_PLACE)
+      : guestBirth
+        ? (localStorage.getItem("guest_birthPlaceText") || saved.birthPlaceText || DEFAULT_BIRTH_PLACE)
+        : (saved.birthPlaceText || DEFAULT_BIRTH_PLACE);
+
+  return {
+    birthDate: birthDate || DEFAULT_BIRTH_YMD,
+    birthTime: birthTime || DEFAULT_BIRTH_TIME,
+    birthPlaceText: birthPlaceText || DEFAULT_BIRTH_PLACE
+  };
+}
+
 function renderPlanetReasonCard(snapshot){
   const planets = snapshot?.planets;
   if(!planets) return "";
@@ -94,7 +128,7 @@ function renderEntryState(){
   const phone = localStorage.getItem("phone");
   const guestBirth = localStorage.getItem("guest_birth");
   const name = localStorage.getItem("name") || "회원";
-  const saved = getAstroInput();
+  const saved = getResolvedInput();
 
   if(phone){
     box.innerHTML = `
@@ -109,9 +143,9 @@ function renderEntryState(){
     box.innerHTML = `
       <h2>✅ 게스트 기준 적용 완료</h2>
       <p>생년월일: <b>${saved.birthDate}</b></p>
-      <p>출생시간: <b>${saved.birthTime || DEFAULT_BIRTH_TIME}</b></p>
-      <p>출생지: <b>${saved.birthPlaceText || DEFAULT_BIRTH_PLACE}</b></p>
-      <p class="small">출생시간과 출생지를 함께 입력하면 더 자세한 내 별자리운세 흐름을 볼 수 있어요.</p>
+      <p>출생시간: <b>${saved.birthTime}</b></p>
+      <p>출생지: <b>${saved.birthPlaceText}</b></p>
+      <p class="small">입력한 기준으로 내 별자리운세를 다시 볼 수 있어요.</p>
     `;
     return;
   }
@@ -124,22 +158,27 @@ function renderEntryState(){
 }
 
 function fillDefaultInputs(){
-  const saved = getAstroInput();
+  const saved = getResolvedInput();
 
   const birthDateEl = document.getElementById("astroBirthDate");
   const birthTimeEl = document.getElementById("astroBirthTime");
   const birthPlaceEl = document.getElementById("astroBirthPlace");
+  const runBtn = document.getElementById("runAstroBtn");
 
-  if(birthDateEl && !birthDateEl.value){
+  if(birthDateEl){
     birthDateEl.value = saved.birthDate || DEFAULT_BIRTH_YMD;
   }
 
-  if(birthTimeEl && !birthTimeEl.value){
+  if(birthTimeEl){
     birthTimeEl.value = saved.birthTime || DEFAULT_BIRTH_TIME;
   }
 
-  if(birthPlaceEl && !birthPlaceEl.value){
+  if(birthPlaceEl){
     birthPlaceEl.value = saved.birthPlaceText || DEFAULT_BIRTH_PLACE;
+  }
+
+  if(runBtn){
+    runBtn.disabled = false;
   }
 }
 
@@ -205,11 +244,11 @@ function renderStarHelperCard(star, starItem){
 }
 
 async function renderAstro(){
-  const saved = getAstroInput();
+  const fallback = getResolvedInput();
 
-  const birthDate = document.getElementById("astroBirthDate")?.value || saved.birthDate || DEFAULT_BIRTH_YMD;
-  const birthTime = document.getElementById("astroBirthTime")?.value || saved.birthTime || DEFAULT_BIRTH_TIME;
-  const birthPlaceText = document.getElementById("astroBirthPlace")?.value || saved.birthPlaceText || DEFAULT_BIRTH_PLACE;
+  const birthDate = document.getElementById("astroBirthDate")?.value || fallback.birthDate;
+  const birthTime = document.getElementById("astroBirthTime")?.value || fallback.birthTime;
+  const birthPlaceText = document.getElementById("astroBirthPlace")?.value || fallback.birthPlaceText;
 
   saveAstroInput({ birthDate, birthTime, birthPlaceText });
   renderEntryState();
