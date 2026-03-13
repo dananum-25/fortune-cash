@@ -23,6 +23,13 @@ function degreeToSign(longitude){
   };
 }
 
+export function buildAstronomySnapshotFromBirth({ birthDate, birthTime }){
+  const safeDate = String(birthDate || "1940-01-01");
+  const safeTime = String(birthTime || "11:00");
+  const date = new Date(`${safeDate}T${safeTime}:00+09:00`);
+  return buildAstronomySnapshot(date);
+}
+
 function vectorToEclipticLongitude(vec){
   const rot = Astronomy.Rotation_EQJ_ECL();
   const eclVec = Astronomy.RotateVector(rot, vec);
