@@ -4,6 +4,7 @@ import { getAstroInput, saveAstroInput } from "/js/astro/astro.storage.js";
 import { buildAstronomySnapshot } from "/js/astro/adapters/astronomy-engine.adapter.js";
 import { buildPlanetAspects, buildAspectNarratives } from "/js/astro/adapters/astronomy-aspect.adapter.js";
 import { buildAscendantSnapshot } from "/js/astro/adapters/astronomy-ascendant.adapter.js";
+import { buildEqualHouseCusps, buildPlanetHousePlacements } from "/js/astro/adapters/astronomy-house.adapter.js";
 
 const DEFAULT_BIRTH_YMD = "1940-01-01";
 const DEFAULT_BIRTH_TIME = "11:00";
@@ -270,6 +271,86 @@ function renderAscendantCard(ascendant){
   `;
 }
 
+function getHouseMeaning(house){
+  const map = {
+    1: "자기표현, 첫인상, 몸, 시작 태도",
+    2: "돈, 소유, 소비, 현실 감각",
+    3: "대화, 학습, 이동, 정보 교환",
+    4: "가정, 뿌리, 안정감, 사생활",
+    5: "연애, 즐거움, 창작, 자기표현",
+    6: "일상, 루틴, 건강관리, 실무",
+    7: "관계, 파트너십, 계약, 타인",
+    8: "공동 자원, 깊은 변화, 심리",
+    9: "확장, 여행, 철학, 공부, 시야",
+    10: "직업, 평판, 목표, 사회적 위치",
+    11: "친구, 네트워크, 미래 계획",
+    12: "휴식, 무의식, 정리, 숨은 영역"
+  };
+
+  return map[house] || "";
+}
+
+function getPlanetLabel(key){
+  const map = {
+    sun: "태양",
+    moon: "달",
+    mercury: "수성",
+    venus: "금성",
+    mars: "화성",
+    jupiter: "목성",
+    saturn: "토성",
+    uranus: "천왕성",
+    neptune: "해왕성",
+    pluto: "명왕성"
+  };
+
+  return map[key] || key;
+}
+
+function renderHouseCard(houses, placements){
+  if(!Array.isArray(houses) || !houses.length) return "";
+
+  const majorKeys = ["sun", "moon", "mercury", "venus", "mars", "jupiter", "saturn"];
+
+  return `
+    <div class="card">
+      <h2>🏠 12하우스 배치</h2>
+
+      <p>
+        하우스는 삶의 영역을 뜻합니다.
+        같은 행성이라도 어느 하우스에 들어가느냐에 따라
+        돈, 관계, 일, 건강 등에서 체감되는 방식이 달라집니다.
+      </p>
+
+      <div class="hr"></div>
+
+      <h3>하우스 시작점</h3>
+      ${houses.map(item => `
+        <p><b>${item.house}하우스</b> — ${item.cuspSignName} ${item.cuspDegree}°</p>
+      `).join("")}
+
+      <div class="hr"></div>
+
+      <h3>주요 행성 배치</h3>
+      ${majorKeys.map(key => {
+        const item = placements?.[key];
+        if(!item || !item.house) return "";
+        return `
+          <p>
+            <b>${getPlanetLabel(key)}</b> — ${item.house}하우스
+            <span class="small">(${getHouseMeaning(item.house)})</span>
+          </p>
+        `;
+      }).join("")}
+
+      <p class="small">
+        현재는 Equal House 방식으로 계산하고 있습니다.
+        나중에 Placidus 등 다른 하우스 체계로 확장할 수 있습니다.
+      </p>
+    </div>
+  `;
+}
+
 async function renderAstro(){
   const fallback = getResolvedInput();
 
@@ -296,9 +377,20 @@ async function renderAstro(){
     geo: profile?.geo
   });
 
+  const houses = ascendantSnapshot
+    ? buildEqualHouseCusps(ascendantSnapshot.ascendantLongitude)
+    : [];
+
+  const housePlacements = astronomySnapshot?.planets
+    ? buildPlanetHousePlacements(astronomySnapshot.planets, houses)
+    : {};
+
   console.log("[astronomy snapshot]", astronomySnapshot);
   console.log("[astronomy aspects]", buildPlanetAspects(astronomySnapshot?.planets));
   console.log("[ascendant snapshot]", ascendantSnapshot);
+  console.log("[house cusps]", houses);
+  console.log("[house placements]", housePlacements);
+  
   const resultBox = document.getElementById("astroResult");
   if(!resultBox) return;
 
@@ -334,6 +426,8 @@ async function renderAstro(){
     </section>
 
     ${renderAscendantCard(ascendantSnapshot)}
+
+    ${renderHouseCard(houses, housePlacements)}
 
     ${renderPlanetReasonCard(astronomySnapshot)}
 
