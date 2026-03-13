@@ -3,6 +3,7 @@ import { renderAstroReport } from "/js/astro/interpreter/astro.render.js";
 import { getAstroInput, saveAstroInput } from "/js/astro/astro.storage.js";
 import { buildAstronomySnapshot } from "/js/astro/adapters/astronomy-engine.adapter.js";
 import { buildPlanetAspects, buildAspectNarratives } from "/js/astro/adapters/astronomy-aspect.adapter.js";
+import { buildAscendantSnapshot } from "/js/astro/adapters/astronomy-ascendant.adapter.js";
 
 const DEFAULT_BIRTH_YMD = "1940-01-01";
 const DEFAULT_BIRTH_TIME = "11:00";
@@ -242,6 +243,32 @@ function renderStarHelperCard(star, starItem){
     </div>
   `;
 }
+function renderAscendantCard(ascendant){
+  if(!ascendant) return "";
+
+  return `
+    <div class="card">
+      <h2>⬆ 상승궁(Ascendant)</h2>
+
+      <p>
+        상승궁은 태어난 순간 동쪽 지평선에서 떠오르던 별자리입니다.
+        태양별자리가 기본 성향을 본다면, 상승궁은 외부에 드러나는 첫인상과
+        세상에 반응하는 방식, 시작할 때의 태도를 읽을 때 중요하게 봅니다.
+      </p>
+
+      <div class="hr"></div>
+
+      <p><b>상승궁:</b> ${ascendant.ascendantSignName}</p>
+      <p><b>도수:</b> ${ascendant.ascendantDegree}°</p>
+      <p><b>출생 기준:</b> ${ascendant.birthDate} ${ascendant.birthTime}</p>
+
+      <p class="small">
+        상승궁은 출생시간과 출생지 영향을 크게 받기 때문에,
+        시간이 달라지면 결과가 달라질 수 있습니다.
+      </p>
+    </div>
+  `;
+}
 
 async function renderAstro(){
   const fallback = getResolvedInput();
@@ -263,9 +290,15 @@ async function renderAstro(){
   });
 
   const astronomySnapshot = buildAstronomySnapshot(new Date(`${targetDate}T12:00:00Z`));
+  const ascendantSnapshot = buildAscendantSnapshot({
+    birthDate,
+    birthTime,
+    geo: profile?.geo
+  });
+
   console.log("[astronomy snapshot]", astronomySnapshot);
   console.log("[astronomy aspects]", buildPlanetAspects(astronomySnapshot?.planets));
-
+  console.log("[ascendant snapshot]", ascendantSnapshot);
   const resultBox = document.getElementById("astroResult");
   if(!resultBox) return;
 
@@ -299,6 +332,8 @@ async function renderAstro(){
           : ""
       }
     </section>
+
+    ${renderAscendantCard(ascendantSnapshot)}
 
     ${renderPlanetReasonCard(astronomySnapshot)}
 
