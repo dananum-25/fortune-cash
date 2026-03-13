@@ -18,6 +18,73 @@ function getActiveYear(){
   );
 }
 
+function renderPlanetReasonCard(snapshot){
+  const planets = snapshot?.planets;
+  if(!planets) return "";
+
+  const sun = planets.sun;
+  const moon = planets.moon;
+  const mercury = planets.mercury;
+  const venus = planets.venus;
+  const mars = planets.mars;
+  const jupiter = planets.jupiter;
+  const saturn = planets.saturn;
+
+  const aspects = buildPlanetAspects(planets);
+  const narratives = buildAspectNarratives(aspects);
+
+  return `
+    <div class="card">
+      <h2>🪐 오늘 하늘 기준 설명</h2>
+
+      <p>
+        오늘 태양은 <b>${sun.signName} ${sun.degree}°</b>에 위치합니다.
+        태양은 현재 전체적인 방향성과 중심 주제를 읽는 핵심 기준이기 때문에,
+        오늘의 기본 분위기를 설명할 때 가장 먼저 참고합니다.
+      </p>
+
+      <p>
+        달은 <b>${moon.signName} ${moon.degree}°</b>에 있습니다.
+        달은 감정 반응, 컨디션, 관계에서의 체감 흐름을 보여주므로
+        오늘 기분 변화와 정서적 반응을 읽는 데 중요합니다.
+      </p>
+
+      <p>
+        수성은 <b>${mercury.signName} ${mercury.degree}°</b>에 있어
+        대화, 일정 조율, 전달 방식, 실수 가능성 같은 커뮤니케이션 흐름을 볼 때 참고합니다.
+      </p>
+
+      <p>
+        금성은 <b>${venus.signName} ${venus.degree}°</b>에 있고,
+        화성은 <b>${mars.signName} ${mars.degree}°</b>에 있습니다.
+        금성은 관계와 호감, 화성은 행동과 추진력을 뜻하므로
+        사람 사이 분위기와 실제 행동 패턴을 함께 설명할 때 자주 사용합니다.
+      </p>
+
+      <p>
+        목성은 <b>${jupiter.signName} ${jupiter.degree}°</b>에 있어
+        확장과 기회를 해석할 때 참고하고,
+        토성은 <b>${saturn.signName} ${saturn.degree}°</b>에 있어
+        현실 점검, 책임, 제약, 구조화가 필요한 부분을 설명할 때 사용합니다.
+      </p>
+
+      ${
+        narratives.length
+          ? `
+            <div class="hr"></div>
+            <h3>📐 오늘 주요 각도 해석</h3>
+            ${narratives.map(line => `<p>${line}</p>`).join("")}
+          `
+          : ""
+      }
+
+      <p class="small">
+        이 설명은 실제 하늘의 행성 위치와 행성 간 각도를 바탕으로 현재 흐름을 읽는 방식입니다.
+      </p>
+    </div>
+  `;
+}
+
 function renderEntryState(){
   const box = document.getElementById("loginCheck");
   if(!box) return;
@@ -133,6 +200,9 @@ function renderStarHelperCard(star, starItem){
   `;
 }
 
+const astronomySnapshot = buildAstronomySnapshot(new Date(`${targetDate}T12:00:00Z`));
+  console.log("[astronomy snapshot]", astronomySnapshot);
+  console.log("[astronomy aspects]", buildPlanetAspects(astronomySnapshot?.planets));
 async function renderAstro(){
   const saved = getAstroInput();
 
