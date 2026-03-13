@@ -5,6 +5,7 @@ import { buildAstronomySnapshot } from "/js/astro/adapters/astronomy-engine.adap
 import { buildPlanetAspects, buildAspectNarratives } from "/js/astro/adapters/astronomy-aspect.adapter.js";
 import { buildAscendantSnapshot } from "/js/astro/adapters/astronomy-ascendant.adapter.js";
 import { buildEqualHouseCusps, buildPlanetHousePlacements } from "/js/astro/adapters/astronomy-house.adapter.js";
+import { buildTransitToNatalAspects, buildTransitNarratives } from "/js/astro/adapters/astronomy-transit.adapter.js";
 
 const DEFAULT_BIRTH_YMD = "1940-01-01";
 const DEFAULT_BIRTH_TIME = "11:00";
@@ -351,6 +352,35 @@ function renderHouseCard(houses, placements){
   `;
 }
 
+function renderTransitNatalCard(aspects){
+  if(!Array.isArray(aspects) || aspects.length === 0){
+    return `
+      <div class="card">
+        <h2>🔭 내 출생 차트와 오늘 하늘의 관계</h2>
+        <p>오늘은 내 출생 차트와 강하게 맞물리는 주요 각도가 뚜렷하지 않습니다.</p>
+        <p class="small">이 경우에는 전체 흐름보다 기본 루틴 유지와 균형 관리가 더 중요할 수 있습니다.</p>
+      </div>
+    `;
+  }
+
+  const lines = buildTransitNarratives(aspects);
+
+  return `
+    <div class="card">
+      <h2>🔭 내 출생 차트와 오늘 하늘의 관계</h2>
+
+      <p>
+        아래 내용은 내 출생 행성과 오늘 하늘의 행성이 어떤 각도를 이루는지 보는 해석입니다.
+        이 부분이 들어가야 “전체적인 운세”가 아니라 “내 기준 운세”에 더 가까워집니다.
+      </p>
+
+      <div class="hr"></div>
+
+      ${lines.map(line => `<p>${line}</p>`).join("")}
+    </div>
+  `;
+}
+
 async function renderAstro(){
   const fallback = getResolvedInput();
 
@@ -371,6 +401,11 @@ async function renderAstro(){
   });
 
   const astronomySnapshot = buildAstronomySnapshot(new Date(`${targetDate}T12:00:00Z`));
+  const natalSnapshot = buildAstronomySnapshotFromBirth({
+    birthDate,
+    birthTime
+  });
+
   const ascendantSnapshot = buildAscendantSnapshot({
     birthDate,
     birthTime,
@@ -385,11 +420,18 @@ async function renderAstro(){
     ? buildPlanetHousePlacements(astronomySnapshot.planets, houses)
     : {};
 
+  const transitNatalAspects =
+    natalSnapshot?.planets && astronomySnapshot?.planets
+      ? buildTransitToNatalAspects(natalSnapshot.planets, astronomySnapshot.planets)
+      : [];
+
   console.log("[astronomy snapshot]", astronomySnapshot);
+  console.log("[natal snapshot]", natalSnapshot);
   console.log("[astronomy aspects]", buildPlanetAspects(astronomySnapshot?.planets));
   console.log("[ascendant snapshot]", ascendantSnapshot);
   console.log("[house cusps]", houses);
   console.log("[house placements]", housePlacements);
+  console.log("[transit to natal aspects]", transitNatalAspects);
   
   const resultBox = document.getElementById("astroResult");
   if(!resultBox) return;
@@ -428,6 +470,8 @@ async function renderAstro(){
     ${renderAscendantCard(ascendantSnapshot)}
 
     ${renderHouseCard(houses, housePlacements)}
+
+    ${renderTransitNatalCard(transitNatalAspects)}
 
     ${renderPlanetReasonCard(astronomySnapshot)}
 
