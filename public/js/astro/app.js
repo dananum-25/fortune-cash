@@ -124,6 +124,99 @@ function renderPlanetReasonCard(snapshot){
   `;
 }
 
+function getSunMeaning(signName){
+  const map = {
+    "양자리": "빠르게 시작하고 직접 부딪히는 성향이 강합니다.",
+    "황소자리": "안정감과 지속성을 중요하게 보는 편입니다.",
+    "쌍둥이자리": "정보, 대화, 변화에 민감하게 반응하는 편입니다.",
+    "게자리": "정서적 안정과 친밀한 관계를 중요하게 여깁니다.",
+    "사자자리": "표현력, 존재감, 자존감을 중요하게 보는 편입니다.",
+    "처녀자리": "정리, 분석, 실용성을 중시하는 성향이 강합니다.",
+    "천칭자리": "균형, 관계, 조화를 중요하게 여깁니다.",
+    "전갈자리": "깊이, 집중, 강한 몰입을 보이는 편입니다.",
+    "사수자리": "확장, 자유, 시야 넓히기를 중요하게 여깁니다.",
+    "염소자리": "책임감, 성취, 구조를 중요하게 보는 편입니다.",
+    "물병자리": "독립성, 새로움, 차별화된 시각이 강합니다.",
+    "물고기자리": "감수성, 직감, 공감력이 크게 작동하는 편입니다."
+  };
+
+  return map[signName] || "";
+}
+
+function getMoonMeaning(signName){
+  const map = {
+    "양자리": "감정 반응이 빠르고 즉각적으로 드러나는 편입니다.",
+    "황소자리": "감정이 안정적으로 유지될 때 편안함을 느낍니다.",
+    "쌍둥이자리": "기분이 생각과 말로 빠르게 연결되는 편입니다.",
+    "게자리": "정서적 거리와 친밀감에 매우 민감한 편입니다.",
+    "사자자리": "감정 표현이 분명하고 인정 욕구가 섞이기 쉽습니다.",
+    "처녀자리": "감정을 분석적으로 처리하려는 경향이 있습니다.",
+    "천칭자리": "관계의 분위기에 따라 감정 균형이 달라질 수 있습니다.",
+    "전갈자리": "감정이 깊고 한 번 들어가면 오래 가는 편입니다.",
+    "사수자리": "감정이 답답하면 바로 벗어나고 싶어지는 편입니다.",
+    "염소자리": "감정을 쉽게 드러내기보다 안쪽에서 정리하는 편입니다.",
+    "물병자리": "감정을 조금 떨어져서 객관적으로 보려는 편입니다.",
+    "물고기자리": "주변 분위기와 감정을 잘 흡수하는 편입니다."
+  };
+
+  return map[signName] || "";
+}
+
+function getAscMeaning(signName){
+  const map = {
+    "양자리": "처음 보이는 인상은 빠르고 직선적이며 추진력이 있어 보일 수 있습니다.",
+    "황소자리": "차분하고 안정감 있는 인상으로 보이기 쉽습니다.",
+    "쌍둥이자리": "가볍고 말이 잘 통하는 인상으로 보일 수 있습니다.",
+    "게자리": "부드럽고 조심스러운 분위기로 보이기 쉽습니다.",
+    "사자자리": "존재감 있고 눈에 띄는 인상을 줄 가능성이 큽니다.",
+    "처녀자리": "깔끔하고 세심한 사람처럼 보일 수 있습니다.",
+    "천칭자리": "균형감 있고 호감형 이미지로 보이기 쉽습니다.",
+    "전갈자리": "강한 눈빛과 깊은 분위기로 보일 수 있습니다.",
+    "사수자리": "시원하고 활달한 인상으로 보일 가능성이 큽니다.",
+    "염소자리": "성실하고 단정한 이미지로 보이기 쉽습니다.",
+    "물병자리": "독특하고 자기 방식이 분명한 인상으로 보일 수 있습니다.",
+    "물고기자리": "부드럽고 감성적인 분위기로 보일 가능성이 큽니다."
+  };
+
+  return map[signName] || "";
+}
+
+function renderBig3Card(natalSnapshot, ascendantSnapshot){
+  const sun = natalSnapshot?.planets?.sun;
+  const moon = natalSnapshot?.planets?.moon;
+  const asc = ascendantSnapshot;
+
+  if(!sun || !moon || !asc) return "";
+
+  return `
+    <div class="card">
+      <h2>🌞🌙⬆ Big 3 요약</h2>
+
+      <p class="small">
+        점성술에서 가장 먼저 보는 핵심 3요소는 태양, 달, 상승궁입니다.
+        태양은 기본 성향, 달은 감정 반응, 상승궁은 외부로 보이는 인상을 설명합니다.
+      </p>
+
+      <div class="hr"></div>
+
+      <p>
+        <b>태양:</b> ${sun.signName} ${sun.degree}°<br>
+        ${getSunMeaning(sun.signName)}
+      </p>
+
+      <p>
+        <b>달:</b> ${moon.signName} ${moon.degree}°<br>
+        ${getMoonMeaning(moon.signName)}
+      </p>
+
+      <p>
+        <b>상승궁:</b> ${asc.ascendantSignName} ${asc.ascendantDegree}°<br>
+        ${getAscMeaning(asc.ascendantSignName)}
+      </p>
+    </div>
+  `;
+}
+
 function renderEntryState(){
   const box = document.getElementById("loginCheck");
   if(!box) return;
@@ -466,6 +559,8 @@ async function renderAstro(){
           : ""
       }
     </section>
+
+    ${renderBig3Card(natalSnapshot, ascendantSnapshot)}
 
     ${renderAscendantCard(ascendantSnapshot)}
 
