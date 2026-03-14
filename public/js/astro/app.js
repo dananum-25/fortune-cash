@@ -740,4 +740,4 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   document.getElementById("runAstroBtn")?.addEventListener("click", renderAstro);
 
   await renderAstro();
-});
+})
