@@ -635,7 +635,7 @@ async function renderAstro(){
   const retroBaseDate = new Date();
 console.log("[retro base date]", retroBaseDate, retroBaseDate instanceof Date, Number.isNaN(retroBaseDate.getTime()));
 
-const retroStatus = buildRetrogradeStatus(retroBaseDate);
+const retroStatus = null
 
 console.log("[monthly year]", getActiveYear(), Number(getActiveYear()));
 const monthlySnapshots = buildMonthlySnapshots(Number(getActiveYear()));
