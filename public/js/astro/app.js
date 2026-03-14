@@ -1,7 +1,7 @@
 import { buildAstroBaseProfile } from "/js/astro/engine/astro.engine.js";
 import { renderAstroReport } from "/js/astro/interpreter/astro.render.js";
 import { getAstroInput, saveAstroInput } from "/js/astro/astro.storage.js";
-import { buildAstronomySnapshot } from "/js/astro/adapters/astronomy-engine.adapter.js";
+import { buildAstronomySnapshot, buildAstronomySnapshotFromBirth } from "/js/astro/adapters/astronomy-engine.adapter.js";
 import { buildPlanetAspects, buildAspectNarratives } from "/js/astro/adapters/astronomy-aspect.adapter.js";
 import { buildAscendantSnapshot } from "/js/astro/adapters/astronomy-ascendant.adapter.js";
 import { buildEqualHouseCusps, buildPlanetHousePlacements } from "/js/astro/adapters/astronomy-house.adapter.js";
@@ -24,6 +24,26 @@ function getActiveYear(){
     window.APP_CONFIG?.fortuneYear ||
     new Date().getFullYear()
   );
+}
+
+function buildMonthlySnapshots(year){
+  const data = [];
+
+  for(let month = 1; month <= 12; month++){
+    const mm = String(month).padStart(2, "0");
+    const date = new Date(`${year}-${mm}-15T12:00:00Z`);
+
+    const snapshot = buildAstronomySnapshot(date);
+    const aspects = buildPlanetAspects(snapshot?.planets);
+
+    data.push({
+      month,
+      planets: snapshot?.planets || null,
+      aspects
+    });
+  }
+
+  return data;
 }
 
 function renderLifeAreaCard(planets, houses){
