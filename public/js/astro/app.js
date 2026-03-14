@@ -33,8 +33,9 @@ function buildMonthlySnapshots(year){
   for(let month = 1; month <= 12; month++){
     const date = new Date(Date.UTC(safeYear, month - 1, 15, 12, 0, 0));
 
-    if(Number.isNaN(date.getTime())){
-      console.warn("[buildMonthlySnapshots] invalid date", { safeYear, month });
+    console.log("[monthly date check]", month, date, date instanceof Date, Number.isNaN(date.getTime()));
+
+    if(!(date instanceof Date) || Number.isNaN(date.getTime())){
       continue;
     }
 
@@ -638,11 +639,8 @@ console.log("[retro base date]", retroBaseDate, retroBaseDate instanceof Date, N
 const retroStatus = null
 
 console.log("[monthly year]", getActiveYear(), Number(getActiveYear()));
-const monthlySnapshots = buildMonthlySnapshots(Number(getActiveYear()));
-  const monthlySummaries = buildMonthlyAstroSummary({
-    year: getActiveYear(),
-    monthlyData: monthlySnapshots
-  });
+const monthlySnapshots = [];
+const monthlySummaries = [];
 
   console.log("[astronomy snapshot]", astronomySnapshot);
   console.log("[natal snapshot]", natalSnapshot);
