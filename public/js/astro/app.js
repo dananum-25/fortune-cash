@@ -27,19 +27,18 @@ function getActiveYear(){
 }
 
 function buildMonthlySnapshots(year){
-
   const data = [];
-
   const safeYear = Number(year) || new Date().getFullYear();
 
   for(let month = 1; month <= 12; month++){
-
-    const mm = String(month).padStart(2,"0");
-
     const date = new Date(Date.UTC(safeYear, month - 1, 15, 12, 0, 0));
 
-    const snapshot = buildAstronomySnapshot(date);
+    if(Number.isNaN(date.getTime())){
+      console.warn("[buildMonthlySnapshots] invalid date", { safeYear, month });
+      continue;
+    }
 
+    const snapshot = buildAstronomySnapshot(date);
     const aspects = buildPlanetAspects(snapshot?.planets);
 
     data.push({
@@ -47,7 +46,6 @@ function buildMonthlySnapshots(year){
       planets: snapshot?.planets || null,
       aspects
     });
-
   }
 
   return data;
@@ -634,8 +632,13 @@ async function renderAstro(){
       ? buildTransitToNatalAspects(natalSnapshot.planets, astronomySnapshot.planets)
       : [];
 
-  const retroStatus = buildRetrogradeStatus(new Date());
-  const monthlySnapshots = buildMonthlySnapshots(Number(getActiveYear()));
+  const retroBaseDate = new Date();
+console.log("[retro base date]", retroBaseDate, retroBaseDate instanceof Date, Number.isNaN(retroBaseDate.getTime()));
+
+const retroStatus = buildRetrogradeStatus(retroBaseDate);
+
+console.log("[monthly year]", getActiveYear(), Number(getActiveYear()));
+const monthlySnapshots = buildMonthlySnapshots(Number(getActiveYear()));
   const monthlySummaries = buildMonthlyAstroSummary({
     year: getActiveYear(),
     monthlyData: monthlySnapshots
