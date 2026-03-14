@@ -6,6 +6,7 @@ import { buildPlanetAspects, buildAspectNarratives } from "/js/astro/adapters/as
 import { buildAscendantSnapshot } from "/js/astro/adapters/astronomy-ascendant.adapter.js";
 import { buildEqualHouseCusps, buildPlanetHousePlacements } from "/js/astro/adapters/astronomy-house.adapter.js";
 import { buildTransitToNatalAspects, buildTransitNarratives } from "/js/astro/adapters/astronomy-transit.adapter.js";
+import { buildLifeAreaInterpretation } from "/js/astro/interpreter/astro.life.interpret.js";
 
 const DEFAULT_BIRTH_YMD = "1940-01-01";
 const DEFAULT_BIRTH_TIME = "11:00";
@@ -21,6 +22,29 @@ function getActiveYear(){
     window.APP_CONFIG?.fortuneYear ||
     new Date().getFullYear()
   );
+}
+
+function renderLifeAreaCard(planets, houses){
+
+  const life = buildLifeAreaInterpretation(planets, houses);
+
+  return `
+  <div class="card">
+    <h2>📊 생활 영역 흐름</h2>
+
+    <p><b>💼 직업 / 일</b><br>${life.career}</p>
+
+    <p style="margin-top:10px;">
+    <b>❤️ 관계 / 연애</b><br>${life.love}</p>
+
+    <p style="margin-top:10px;">
+    <b>💰 재물 / 소비</b><br>${life.money}</p>
+
+    <p style="margin-top:10px;">
+    <b>💪 건강 / 생활</b><br>${life.health}</p>
+
+  </div>
+  `;
 }
 
 function getResolvedInput(){
