@@ -7,6 +7,8 @@ import { buildAscendantSnapshot } from "/js/astro/adapters/astronomy-ascendant.a
 import { buildEqualHouseCusps, buildPlanetHousePlacements } from "/js/astro/adapters/astronomy-house.adapter.js";
 import { buildTransitToNatalAspects, buildTransitNarratives } from "/js/astro/adapters/astronomy-transit.adapter.js";
 import { buildLifeAreaInterpretation } from "/js/astro/interpreter/astro.life.interpret.js";
+import { buildMonthlyAstroSummary } from "/js/astro/interpreter/astro.monthly.interpret.js";
+import { buildRetrogradeStatus } from "/js/astro/adapters/astronomy-retrograde.adapter.js";
 
 const DEFAULT_BIRTH_YMD = "1940-01-01";
 const DEFAULT_BIRTH_TIME = "11:00";
@@ -44,6 +46,69 @@ function renderLifeAreaCard(planets, houses){
     <b>💪 건강 / 생활</b><br>${life.health}</p>
 
   </div>
+  `;
+}
+
+function renderRetrogradeCard(retro){
+
+  if(!retro) return "";
+
+  const items = Object.keys(retro).map(key=>{
+
+    const item = retro[key];
+
+    const state =
+      item.motion === "retrograde"
+        ? "🔴 역행"
+        : "🟢 순행";
+
+    return `
+      <p>
+      <b>${item.label}</b> : ${state}
+      </p>
+    `;
+  }).join("");
+
+  return `
+  <div class="card">
+
+  <h2>🪐 현재 행성 상태</h2>
+
+  <p class="small">
+  행성이 역행 상태일 때는 해당 영역의 흐름이 느려지거나
+  점검이 필요한 시기로 해석하기도 합니다.
+  </p>
+
+  <div class="hr"></div>
+
+  ${items}
+
+  </div>
+  `;
+}
+
+function renderMonthlyAstroCard(year, monthlySummaries){
+  if(!Array.isArray(monthlySummaries) || monthlySummaries.length === 0){
+    return "";
+  }
+
+  return `
+    <div class="card">
+      <h2>🗓 ${year} 월간 점성술 흐름</h2>
+
+      <p class="small">
+        각 달의 중순 기준 하늘 흐름을 바탕으로 월별 분위기를 요약한 참고 자료입니다.
+      </p>
+
+      <div class="hr"></div>
+
+      ${monthlySummaries.map(item => `
+        <p>
+          <b>${item.label}</b><br>
+          ${item.summary}
+        </p>
+      `).join("")}
+    </div>
   `;
 }
 
@@ -542,6 +607,7 @@ async function renderAstro(){
       ? buildTransitToNatalAspects(natalSnapshot.planets, astronomySnapshot.planets)
       : [];
 
+  const retroStatus = buildRetrogradeStatus(new Date());
   const monthlySnapshots = buildMonthlySnapshots(getActiveYear());
   const monthlySummaries = buildMonthlyAstroSummary({
     year: getActiveYear(),
@@ -596,6 +662,8 @@ async function renderAstro(){
     ${renderAscendantCard(ascendantSnapshot)}
 
     ${renderHouseCard(houses, housePlacements)}
+
+    ${renderRetrogradeCard(retroStatus)}
 
     ${renderLifeAreaCard(astronomySnapshot?.planets, housePlacements)}
 
