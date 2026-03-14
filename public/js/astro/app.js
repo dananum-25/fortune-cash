@@ -542,6 +542,12 @@ async function renderAstro(){
       ? buildTransitToNatalAspects(natalSnapshot.planets, astronomySnapshot.planets)
       : [];
 
+  const monthlySnapshots = buildMonthlySnapshots(getActiveYear());
+  const monthlySummaries = buildMonthlyAstroSummary({
+    year: getActiveYear(),
+    monthlyData: monthlySnapshots
+  });
+
   console.log("[astronomy snapshot]", astronomySnapshot);
   console.log("[natal snapshot]", natalSnapshot);
   console.log("[astronomy aspects]", buildPlanetAspects(astronomySnapshot?.planets));
@@ -549,6 +555,7 @@ async function renderAstro(){
   console.log("[house cusps]", houses);
   console.log("[house placements]", housePlacements);
   console.log("[transit to natal aspects]", transitNatalAspects);
+  console.log("[monthly snapshots]", monthlySnapshots);
   
   const resultBox = document.getElementById("astroResult");
   if(!resultBox) return;
@@ -590,7 +597,11 @@ async function renderAstro(){
 
     ${renderHouseCard(houses, housePlacements)}
 
+    ${renderLifeAreaCard(astronomySnapshot?.planets, housePlacements)}
+
     ${renderTransitNatalCard(transitNatalAspects)}
+
+    ${renderMonthlyAstroCard(getActiveYear(), monthlySummaries)}
 
     ${renderPlanetReasonCard(astronomySnapshot)}
 
