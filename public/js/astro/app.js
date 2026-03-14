@@ -27,13 +27,17 @@ function getActiveYear(){
 }
 
 function buildMonthlySnapshots(year){
+
   const data = [];
 
   for(let month = 1; month <= 12; month++){
-    const mm = String(month).padStart(2, "0");
+
+    const mm = String(month).padStart(2,"0");
+
     const date = new Date(`${year}-${mm}-15T12:00:00Z`);
 
     const snapshot = buildAstronomySnapshot(date);
+
     const aspects = buildPlanetAspects(snapshot?.planets);
 
     data.push({
@@ -41,6 +45,7 @@ function buildMonthlySnapshots(year){
       planets: snapshot?.planets || null,
       aspects
     });
+
   }
 
   return data;
