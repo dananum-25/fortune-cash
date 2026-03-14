@@ -1,3 +1,5 @@
+import { buildAstronomySnapshot } from "/js/astro/adapters/astronomy-engine.adapter.js";
+
 function getPlanetLabel(key){
   const map = {
     mercury: "수성",
@@ -9,65 +11,66 @@ function getPlanetLabel(key){
     neptune: "해왕성",
     pluto: "명왕성"
   };
+
   return map[key] || key;
 }
 
-function velocityToRetrograde(v){
-  if(v < 0){
-    return "retrograde";
-  }
-  return "direct";
-}
+function normalizeDiff(nextLongitude, currentLongitude){
+  let diff = Number(nextLongitude || 0) - Number(currentLongitude || 0);
 
-function buildPlanetState(body, time){
+  if(diff > 180) diff -= 360;
+  if(diff < -180) diff += 360;
 
-  const state = Astronomy.HelioState(body, time);
-
-  const vx = state.vx;
-  const vy = state.vy;
-  const vz = state.vz;
-
-  const speed = Math.sqrt(vx*vx + vy*vy + vz*vz);
-
-  const retro = velocityToRetrograde(vx);
-
-  return {
-    speed,
-    motion: retro
-  };
+  return diff;
 }
 
 export function buildRetrogradeStatus(date){
-
-  if(typeof Astronomy === "undefined"){
-    console.warn("[astro] astronomy engine not loaded");
+  if(!(date instanceof Date) || Number.isNaN(date.getTime())){
+    console.warn("[astro-retrograde] invalid date", date);
     return null;
   }
 
-  const time = new Astronomy.AstroTime(date);
+  const tomorrow = new Date(date.getTime() + 24 * 60 * 60 * 1000);
 
-  const bodies = {
-    mercury: Astronomy.Body.Mercury,
-    venus: Astronomy.Body.Venus,
-    mars: Astronomy.Body.Mars,
-    jupiter: Astronomy.Body.Jupiter,
-    saturn: Astronomy.Body.Saturn,
-    uranus: Astronomy.Body.Uranus,
-    neptune: Astronomy.Body.Neptune,
-    pluto: Astronomy.Body.Pluto
-  };
+  const todaySnapshot = buildAstronomySnapshot(date);
+  const tomorrowSnapshot = buildAstronomySnapshot(tomorrow);
+
+  if(!todaySnapshot?.planets || !tomorrowSnapshot?.planets){
+    console.warn("[astro-retrograde] snapshot build failed");
+    return null;
+  }
+
+  const keys = [
+    "mercury",
+    "venus",
+    "mars",
+    "jupiter",
+    "saturn",
+    "uranus",
+    "neptune",
+    "pluto"
+  ];
 
   const result = {};
 
-  Object.keys(bodies).forEach(key => {
+  keys.forEach(key => {
+    const todayPlanet = todaySnapshot.planets[key];
+    const tomorrowPlanet = tomorrowSnapshot.planets[key];
 
-    const info = buildPlanetState(bodies[key], time);
+    if(!todayPlanet || !tomorrowPlanet){
+      return;
+    }
+
+    const delta = normalizeDiff(
+      tomorrowPlanet.longitude,
+      todayPlanet.longitude
+    );
 
     result[key] = {
       label: getPlanetLabel(key),
-      motion: info.motion
+      motion: delta < 0 ? "retrograde" : "direct",
+      delta: Number(delta.toFixed(6))
     };
-
   });
 
   return result;
