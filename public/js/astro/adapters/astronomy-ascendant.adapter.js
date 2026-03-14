@@ -28,10 +28,23 @@ function degreeToSign(longitude){
 }
 
 function parseBirthToDate(birthDate, birthTime){
-  const safeDate = String(birthDate || "1940-01-01");
-  const safeTime = String(birthTime || "11:00");
-  const iso = `${safeDate}T${safeTime}:00+09:00`;
-  return new Date(iso);
+
+  const safeDate = birthDate || "1940-01-01";
+  const safeTime = birthTime || "11:00";
+
+  const parts = safeDate.split("-");
+  const timeParts = safeTime.split(":");
+
+  const y = Number(parts[0]);
+  const m = Number(parts[1]) - 1;
+  const d = Number(parts[2]);
+
+  const hh = Number(timeParts[0]);
+  const mm = Number(timeParts[1]);
+
+  const date = new Date(Date.UTC(y, m, d, hh - 9, mm, 0));
+
+  return date;
 }
 
 function toNumber(v){
