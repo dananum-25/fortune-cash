@@ -1,3 +1,7 @@
+const DEFAULT_ASC_LAT = 37.57295;
+const DEFAULT_ASC_LON = 126.97936;
+const DEFAULT_ASC_ELEVATION = 0;
+
 function normalizeDegree(deg){
   let v = Number(deg || 0) % 360;
   if(v < 0) v += 360;
@@ -30,20 +34,54 @@ function parseBirthToDate(birthDate, birthTime){
   return new Date(iso);
 }
 
+function toNumber(v){
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+function resolveGeo(geo){
+  const lat =
+    toNumber(geo?.lat) ??
+    toNumber(geo?.latitude) ??
+    DEFAULT_ASC_LAT;
+
+  const lon =
+    toNumber(geo?.lon) ??
+    toNumber(geo?.lng) ??
+    toNumber(geo?.longitude) ??
+    DEFAULT_ASC_LON;
+
+  const elevation =
+    toNumber(geo?.elevation) ??
+    toNumber(geo?.altitude) ??
+    DEFAULT_ASC_ELEVATION;
+
+  return { lat, lon, elevation };
+}
+
 export function buildAscendantSnapshot({ birthDate, birthTime, geo }){
   if(typeof Astronomy === "undefined"){
     console.warn("[astronomy-ascendant] library not loaded");
     return null;
   }
 
-  if(!geo || typeof geo.lat !== "number" || typeof geo.lon !== "number"){
-    console.warn("[astronomy-ascendant] invalid geo");
+  const resolvedGeo = resolveGeo(geo);
+
+  if(
+    !Number.isFinite(resolvedGeo.lat) ||
+    !Number.isFinite(resolvedGeo.lon)
+  ){
+    console.warn("[astronomy-ascendant] invalid geo", geo);
     return null;
   }
 
   const date = parseBirthToDate(birthDate, birthTime);
   const time = new Astronomy.AstroTime(date);
-  const observer = new Astronomy.Observer(geo.lat, geo.lon, geo.elevation || 0);
+  const observer = new Astronomy.Observer(
+    resolvedGeo.lat,
+    resolvedGeo.lon,
+    resolvedGeo.elevation
+  );
 
   const horizon = Astronomy.Horizon(time, observer, 90, 0, "normal");
 
@@ -63,8 +101,8 @@ export function buildAscendantSnapshot({ birthDate, birthTime, geo }){
   return {
     birthDate,
     birthTime,
-    latitude: geo.lat,
-    longitudeGeo: geo.lon,
+    latitude: resolvedGeo.lat,
+    longitudeGeo: resolvedGeo.lon,
     ascendantLongitude: zodiac.longitude,
     ascendantDegree: zodiac.degree,
     ascendantSignIndex: zodiac.signIndex,
