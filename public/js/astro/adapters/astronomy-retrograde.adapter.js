@@ -11,7 +11,6 @@ function getPlanetLabel(key){
     neptune: "해왕성",
     pluto: "명왕성"
   };
-
   return map[key] || key;
 }
 
@@ -24,19 +23,28 @@ function normalizeDiff(nextLongitude, currentLongitude){
   return diff;
 }
 
-export function buildRetrogradeStatus(date){
-  if(!(date instanceof Date) || Number.isNaN(date.getTime())){
-    console.warn("[astro-retrograde] invalid date", date);
-    return null;
+function toSafeDate(input){
+  if(input instanceof Date && !Number.isNaN(input.getTime())){
+    return input;
   }
 
+  const d = new Date(input);
+  if(d instanceof Date && !Number.isNaN(d.getTime())){
+    return d;
+  }
+
+  return new Date();
+}
+
+export function buildRetrogradeStatus(dateInput){
+  const date = toSafeDate(dateInput);
   const tomorrow = new Date(date.getTime() + 24 * 60 * 60 * 1000);
 
   const todaySnapshot = buildAstronomySnapshot(date);
   const tomorrowSnapshot = buildAstronomySnapshot(tomorrow);
 
   if(!todaySnapshot?.planets || !tomorrowSnapshot?.planets){
-    console.warn("[astro-retrograde] snapshot build failed");
+    console.warn("[astro-retrograde] snapshot build failed", { date, tomorrow });
     return null;
   }
 
@@ -57,9 +65,7 @@ export function buildRetrogradeStatus(date){
     const todayPlanet = todaySnapshot.planets[key];
     const tomorrowPlanet = tomorrowSnapshot.planets[key];
 
-    if(!todayPlanet || !tomorrowPlanet){
-      return;
-    }
+    if(!todayPlanet || !tomorrowPlanet) return;
 
     const delta = normalizeDiff(
       tomorrowPlanet.longitude,
