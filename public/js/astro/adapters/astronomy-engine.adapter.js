@@ -65,6 +65,11 @@ export function buildAstronomySnapshot(date){
     return null;
   }
 
+  if(!(date instanceof Date) || Number.isNaN(date.getTime())){
+    console.warn("[astronomy-engine] invalid date input", date);
+    return null;
+  }
+
   const time = new Astronomy.AstroTime(date);
 
   function planet(body){
