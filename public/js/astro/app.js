@@ -30,11 +30,13 @@ function buildMonthlySnapshots(year){
 
   const data = [];
 
+  const safeYear = Number(year) || new Date().getFullYear();
+
   for(let month = 1; month <= 12; month++){
 
     const mm = String(month).padStart(2,"0");
 
-    const date = new Date(`${year}-${mm}-15T12:00:00Z`);
+    const date = new Date(Date.UTC(safeYear, month - 1, 15, 12, 0, 0));
 
     const snapshot = buildAstronomySnapshot(date);
 
@@ -633,7 +635,7 @@ async function renderAstro(){
       : [];
 
   const retroStatus = buildRetrogradeStatus(new Date());
-  const monthlySnapshots = buildMonthlySnapshots(getActiveYear());
+  const monthlySnapshots = buildMonthlySnapshots(Number(getActiveYear()));
   const monthlySummaries = buildMonthlyAstroSummary({
     year: getActiveYear(),
     monthlyData: monthlySnapshots
