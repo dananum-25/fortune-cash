@@ -277,7 +277,7 @@ function showZodiac(){
 
   const value = select.value;
   const label = ZODIAC_LABELS[value] || "띠";
-  const item = zodiacDB?.[value];
+  const item = zodiacDB[selectedZodiac];
 
   let overall = "";
   let wealth = "";
