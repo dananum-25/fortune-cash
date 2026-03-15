@@ -277,20 +277,32 @@ function buildProfile(){
   };
 }
 
+function pickDailyWithRelation(daily, relation, section, seed){
+  const relationPool = daily?.relation_bonus?.[relation]?.[section];
+  const basePool = daily?.[section];
+
+  if(Array.isArray(relationPool) && relationPool.length){
+    return pickStable(relationPool, seed);
+  }
+
+  return pickStable(basePool, seed);
+}
+
 function buildFortuneResult(profile){
   const today = getTodayKSTDate();
 
   const daily = fortuneDB?.daily || {};
   const yearly = fortuneDB?.year || {};
+  const relation = profile?.relation || "normal";
 
   return {
-    todayMain: pickStable(daily.main, buildDailySeed(profile, "daily-main", today)),
-    todayLove: pickStable(daily.love, buildDailySeed(profile, "daily-love", today)),
-    todayMoney: pickStable(daily.money, buildDailySeed(profile, "daily-money", today)),
-    todayHealth: pickStable(daily.health, buildDailySeed(profile, "daily-health", today)),
-    todayWork: pickStable(daily.work, buildDailySeed(profile, "daily-work", today)),
-    todayRelation: pickStable(daily.relationship, buildDailySeed(profile, "daily-relationship", today)),
-    todayAdvice: pickStable(daily.advice, buildDailySeed(profile, "daily-advice", today)),
+    todayMain: pickDailyWithRelation(daily, relation, "main", buildDailySeed(profile, "daily-main", today)),
+    todayLove: pickDailyWithRelation(daily, relation, "love", buildDailySeed(profile, "daily-love", today)),
+    todayMoney: pickDailyWithRelation(daily, relation, "money", buildDailySeed(profile, "daily-money", today)),
+    todayHealth: pickDailyWithRelation(daily, relation, "health", buildDailySeed(profile, "daily-health", today)),
+    todayWork: pickDailyWithRelation(daily, relation, "work", buildDailySeed(profile, "daily-work", today)),
+    todayRelation: pickDailyWithRelation(daily, relation, "relationship", buildDailySeed(profile, "daily-relationship", today)),
+    todayAdvice: pickDailyWithRelation(daily, relation, "advice", buildDailySeed(profile, "daily-advice", today)),
     todayLuckyColor: pickStable(daily.lucky_color, buildDailySeed(profile, "daily-color", today)),
     todayLuckyNumber: pickStable(daily.lucky_number, buildDailySeed(profile, "daily-number", today)),
 
