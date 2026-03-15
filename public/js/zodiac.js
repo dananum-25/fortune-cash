@@ -372,11 +372,41 @@ function renderResult(profile, result){
   resultSection.style.display = "block";
 }
 
+function buildProfileByAnimalOverride(animalOverride){
+  const input = getSavedBirthInput();
+  const zodiacYear = getZodiacYear(input.birthDate);
+  const baseAnimal = getZodiacAnimal(zodiacYear);
+  const animal = animalOverride || baseAnimal;
+  const element = getBirthElement(zodiacYear);
+  const ageGroup = getAgeGroup(zodiacYear);
+
+  const today = getTodayKSTDate();
+  const dayBranch = getDayBranch(today);
+  const relation = getRelation(animal, dayBranch);
+
+  return {
+    ...input,
+    zodiacYear,
+    animal,
+    animalName: ZODIAC_NAMES[animal],
+    myAnimal: baseAnimal,
+    myAnimalName: ZODIAC_NAMES[baseAnimal],
+    element,
+    elementName: ELEMENT_NAMES[element],
+    ageGroup,
+    dayBranch,
+    relation,
+    relationLabel: RELATION_LABELS[relation]
+  };
+}
+
 function showZodiac(){
-  const profile = buildProfile();
+  const selectedAnimal = document.getElementById("zodiacSelect")?.value || null;
+  const profile = buildProfileByAnimalOverride(selectedAnimal);
   const result = buildFortuneResult(profile);
 
-  syncSelectToProfile(profile);
+  renderLoginState(profile);
+  renderMyZodiacInfo(profile);
   renderResult(profile, result);
   renderGuide(profile);
 
@@ -388,18 +418,130 @@ function showZodiac(){
   }
 }
 
+function renderZodiacOptions(){
+  const select = document.getElementById("zodiacSelect");
+  if(!select) return;
+
+  select.innerHTML = ZODIAC_ANIMALS.map(animal => `
+    <option value="${animal}">${ZODIAC_NAMES[animal]}</option>
+  `).join("");
+}
+
+function renderLoginState(profile){
+  const box = document.getElementById("loginCheck");
+  if(!box) return;
+
+  if(profile.mode === "member"){
+    box.innerHTML = `
+      <p class="info-text"><b>회원 기준</b> 저장된 생년월일로 띠를 계산했습니다.</p>
+      <p class="small">출생일: ${profile.birthDate}</p>
+    `;
+    return;
+  }
+
+  if(profile.mode === "guest"){
+    box.innerHTML = `
+      <p class="info-text"><b>게스트 기준</b> 입력한 생년월일로 띠를 계산했습니다.</p>
+      <p class="small">출생일: ${profile.birthDate}</p>
+    `;
+    return;
+  }
+
+  box.innerHTML = `
+    <p class="info-text"><b>비회원 기본 기준</b> 1940-01-01 기준으로 띠를 계산했습니다.</p>
+    <p class="small">원하는 생년월일을 입력하면 내 기준으로 다시 볼 수 있습니다.</p>
+  `;
+}
+
+function renderMyZodiacInfo(profile){
+  const box = document.getElementById("myZodiacInfo");
+  if(!box) return;
+
+  box.innerHTML = `
+    <p class="info-text"><b>내 띠</b> ${profile.animalName}</p>
+    <p class="info-text"><b>입춘 기준 적용 연도</b> ${profile.zodiacYear}년</p>
+    <p class="info-text"><b>출생연도 서브타입</b> ${profile.elementName} ${profile.animalName}</p>
+    <p class="info-text"><b>오늘 관계 흐름</b> ${profile.relationLabel}</p>
+  `;
+}
+
+function fillGuestBirthInput(profile){
+  const input = document.getElementById("guestBirthInline");
+  if(!input) return;
+  input.value = profile.birthDate || DEFAULT_BIRTH_YMD;
+}
+
+function applyGuestBirth(){
+  const input = document.getElementById("guestBirthInline");
+  if(!input) return;
+
+  const birthDate = input.value || DEFAULT_BIRTH_YMD;
+
+  localStorage.setItem("guest_birth", birthDate);
+  localStorage.setItem("guest_birthTime", DEFAULT_BIRTH_TIME);
+
+  const profile = buildProfile();
+  const result = buildFortuneResult(profile);
+
+  syncSelectToProfile(profile);
+  renderLoginState(profile);
+  renderMyZodiacInfo(profile);
+  fillGuestBirthInput(profile);
+  renderResult(profile, result);
+  renderGuide(profile);
+}
+
+function renderRelatedZodiacGrid(){
+  const grid = document.getElementById("relatedZodiacGrid");
+  if(!grid) return;
+
+  grid.innerHTML = ZODIAC_ANIMALS.map(animal => `
+    <button class="action-btn related-zodiac-btn" type="button" data-animal="${animal}">
+      ${ZODIAC_NAMES[animal]}
+    </button>
+  `).join("");
+
+  grid.querySelectorAll(".related-zodiac-btn").forEach(btn => {
+    btn.addEventListener("click", ()=>{
+      const select = document.getElementById("zodiacSelect");
+      if(select){
+        select.value = btn.dataset.animal;
+      }
+      showZodiac();
+    });
+  });
+}
+
+function bindEvents(){
+  const showBtn = document.getElementById("showZodiacBtn");
+  if(showBtn){
+    showBtn.addEventListener("click", showZodiac);
+  }
+
+  const applyBtn = document.getElementById("applyGuestBirthBtn");
+  if(applyBtn){
+    applyBtn.addEventListener("click", applyGuestBirth);
+  }
+}
+
 document.addEventListener("DOMContentLoaded", async ()=>{
   await loadDB();
+
+  renderZodiacOptions();
+  renderRelatedZodiacGrid();
 
   if(window.loadMyPoint) await loadMyPoint();
   if(window.Common?.renderPoint) Common.renderPoint();
 
-  syncSelectToProfile(buildProfile());
+  const profile = buildProfile();
+  const result = buildFortuneResult(profile);
 
-  const btn = document.querySelector("button[onclick='showZodiac()']");
-  if(btn){
-    btn.onclick = showZodiac;
-  }
+  syncSelectToProfile(profile);
+  renderLoginState(profile);
+  renderMyZodiacInfo(profile);
+  fillGuestBirthInput(profile);
+  bindEvents();
 
-  showZodiac();
+  renderResult(profile, result);
+  renderGuide(profile);
 });
