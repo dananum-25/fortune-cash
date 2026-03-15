@@ -184,8 +184,35 @@ function getZodiacYear(birthDateText){
   const year = d.getFullYear();
   const md = `${safePad(d.getMonth()+1)}-${safePad(d.getDate())}`;
   const ipchun = getIpchunText(year);
+  const STEMS = [
+ "갑","을","병","정","무",
+ "기","경","신","임","계"
+];
 
+const BRANCHES = [
+ "자","축","인","묘","진","사",
+ "오","미","신","유","술","해"
+];
+  
   return md < ipchun ? year - 1 : year;
+}
+
+function getGanzhi(year){
+
+  let stemIndex = (year - 4) % 10;
+  if(stemIndex < 0) stemIndex += 10;
+
+  let branchIndex = (year - 4) % 12;
+  if(branchIndex < 0) branchIndex += 12;
+
+  return {
+    stem: STEMS[stemIndex],
+    branch: BRANCHES[branchIndex],
+    name: STEMS[stemIndex] + BRANCHES[branchIndex],
+    stemIndex,
+    branchIndex,
+    ganzhiIndex: (year - 4) % 60
+  };
 }
 
 function getZodiacAnimal(zodiacYear){
@@ -273,6 +300,8 @@ function buildYearSeed(profile, section, targetDate){
 function buildProfile(){
   const input = getSavedBirthInput();
   const zodiacYear = getZodiacYear(input.birthDate);
+  const birthGanzhi = getGanzhi(zodiacYear);
+  const currentGanzhi = getGanzhi(getTodayKSTDate().getFullYear());
   const animal = getZodiacAnimal(zodiacYear);
   const element = getBirthElement(zodiacYear);
   const ageGroup = getAgeGroup(zodiacYear);
