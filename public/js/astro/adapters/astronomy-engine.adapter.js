@@ -23,28 +23,17 @@ function degreeToSign(longitude){
   };
 }
 
-function buildSafeBirthDate(birthDate, birthTime){
-  const safeDate = String(birthDate || "1940-01-01");
-  const safeTime = String(birthTime || "11:00");
-
-  const dateParts = safeDate.split("-");
-  const timeParts = safeTime.split(":");
-
-  const year = Number(dateParts[0]);
-  const monthIndex = Number(dateParts[1]) - 1;
-  const day = Number(dateParts[2]);
-
-  const hour = Number(timeParts[0]);
-  const minute = Number(timeParts[1]);
-
-  const date = new Date(Date.UTC(year, monthIndex, day, hour - 9, minute, 0));
-
-  if(!(date instanceof Date) || Number.isNaN(date.getTime())){
-    console.warn("[astronomy-engine] invalid birth date", { birthDate, birthTime });
-    return new Date(Date.UTC(1940, 0, 1, 2, 0, 0));
+function buildSafeDateFromInput(input){
+  if(input instanceof Date && !Number.isNaN(input.getTime())){
+    return input;
   }
 
-  return date;
+  const parsed = new Date(input);
+  if(parsed instanceof Date && !Number.isNaN(parsed.getTime())){
+    return parsed;
+  }
+
+  return null;
 }
 
 function buildSafeBirthDate(birthDate, birthTime){
@@ -69,11 +58,6 @@ function buildSafeBirthDate(birthDate, birthTime){
   }
 
   return date;
-}
-
-export function buildAstronomySnapshotFromBirth({ birthDate, birthTime }){
-  const date = buildSafeBirthDate(birthDate, birthTime);
-  return buildAstronomySnapshot(date);
 }
 
 function vectorToEclipticLongitude(vec){
@@ -83,18 +67,21 @@ function vectorToEclipticLongitude(vec){
   return normalizeDegree(sphere.lon);
 }
 
-export function buildAstronomySnapshot(date){
+export function buildAstronomySnapshot(dateInput){
   if(typeof Astronomy === "undefined"){
     console.warn("[astronomy-engine] library not loaded");
     return null;
   }
 
-  if(!(date instanceof Date) || Number.isNaN(date.getTime())){
-    console.warn("[astronomy-engine] invalid date input", date);
+  const safeDate = buildSafeDateFromInput(dateInput);
+
+  if(!safeDate){
+    console.warn("[astronomy-engine] invalid date input", dateInput);
     return null;
   }
 
-  const time = new Astronomy.AstroTime(date);
+  const time = new Astronomy.AstroTime(safeDate);
+
   function planet(body){
     const vec = Astronomy.GeoVector(body, time, false);
     const longitude = vectorToEclipticLongitude(vec);
@@ -115,7 +102,12 @@ export function buildAstronomySnapshot(date){
   };
 
   return {
-    date,
+    date: safeDate,
     planets
   };
+}
+
+export function buildAstronomySnapshotFromBirth({ birthDate, birthTime }){
+  const safeDate = buildSafeBirthDate(birthDate, birthTime);
+  return buildAstronomySnapshot(safeDate);
 }
