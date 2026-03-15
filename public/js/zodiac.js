@@ -277,12 +277,33 @@ function buildProfile(){
   };
 }
 
-function pickDailyWithRelation(daily, relation, section, seed){
-  const relationPool = daily?.relation_bonus?.[relation]?.[section];
-  const basePool = daily?.[section];
+function pickDailyFinal(daily, relation, animal, element, section, seed){
 
+  const relationPool = daily?.relation_bonus?.[relation]?.[section];
   if(Array.isArray(relationPool) && relationPool.length){
     return pickStable(relationPool, seed);
+  }
+
+  const animalPool = daily?.animal_bonus?.[animal]?.[section];
+  if(Array.isArray(animalPool) && animalPool.length){
+    return pickStable(animalPool, seed);
+  }
+
+  const elementPool = daily?.element_bonus?.[element]?.[section];
+  if(Array.isArray(elementPool) && elementPool.length){
+    return pickStable(elementPool, seed);
+  }
+
+  const basePool = daily?.[section];
+  return pickStable(basePool, seed);
+}
+
+function pickDailyWithAnimal(daily, animal, section, seed){
+  const animalPool = daily?.animal_bonus?.[animal]?.[section];
+  const basePool = daily?.[section];
+
+  if(Array.isArray(animalPool) && animalPool.length){
+    return pickStable(animalPool, seed);
   }
 
   return pickStable(basePool, seed);
@@ -310,16 +331,18 @@ function buildFortuneResult(profile){
   const daily = fortuneDB?.daily || {};
   const yearly = fortuneDB?.year || {};
   const relation = profile?.relation || "normal";
+  const animal = profile?.animal || "rat";
+  const element = profile?.element || "wood";
 
   return {
 
-    todayMain: pickDailyWithRelation(daily, relation, "main", buildDailySeed(profile, "daily-main", today)),
-    todayLove: pickDailyWithRelation(daily, relation, "love", buildDailySeed(profile, "daily-love", today)),
-    todayMoney: pickDailyWithRelation(daily, relation, "money", buildDailySeed(profile, "daily-money", today)),
-    todayHealth: pickDailyWithRelation(daily, relation, "health", buildDailySeed(profile, "daily-health", today)),
-    todayWork: pickDailyWithRelation(daily, relation, "work", buildDailySeed(profile, "daily-work", today)),
-    todayRelation: pickDailyWithRelation(daily, relation, "relationship", buildDailySeed(profile, "daily-relationship", today)),
-    todayAdvice: pickDailyWithRelation(daily, relation, "advice", buildDailySeed(profile, "daily-advice", today)),
+    todayMain: pickDailyFinal(daily, relation, animal, element, "main", buildDailySeed(profile, "daily-main", today)),
+    todayLove: pickDailyFinal(daily, relation, animal, element, "love", buildDailySeed(profile, "daily-love", today)),
+    todayMoney: pickDailyFinal(daily, relation, animal, element, "money", buildDailySeed(profile, "daily-money", today)),
+    todayHealth: pickDailyFinal(daily, relation, animal, element, "health", buildDailySeed(profile, "daily-health", today)),
+    todayWork: pickDailyFinal(daily, relation, animal, element, "work", buildDailySeed(profile, "daily-work", today)),
+    todayRelation: pickDailyFinal(daily, relation, animal, element, "relationship", buildDailySeed(profile, "daily-relationship", today)),
+    todayAdvice: pickDailyFinal(daily, relation, animal, element, "advice", buildDailySeed(profile, "daily-advice", today)),
 
     todayLuckyColor: pickStable(daily.lucky_color, buildDailySeed(profile, "daily-color", today)),
     todayLuckyNumber: pickStable(daily.lucky_number, buildDailySeed(profile, "daily-number", today)),
