@@ -120,11 +120,22 @@ function renderEntryState(){
     return;
   }
 
-  box.innerHTML = `
-    <h2>✅ 기본 기준으로 바로 보기</h2>
-    <p>현재는 <b>${escapeHtml(ZODIAC_DEFAULT_BIRTH)}</b> 기준으로 결과를 볼 수 있습니다.</p>
-    <p class="small">기본값으로 계산된 <b>${escapeHtml(zodiacLabel)}</b> 상담 내용을 바로 보여줍니다.</p>
-  `;
+  const zodiacKey = getZodiacFromBirth(birth);
+const zodiacLabel = ZODIAC_LABELS[zodiacKey] || "띠";
+
+box.innerHTML = `
+  <h2>✅ 기본 기준으로 바로 보기</h2>
+  <p>현재는 <b>${escapeHtml(ZODIAC_DEFAULT_BIRTH)}</b> 기준으로 결과를 볼 수 있습니다.</p>
+  <p class="small">기본값으로 계산된 <b>${escapeHtml(zodiacLabel)}</b> 상담 내용을 바로 보여줍니다.</p>
+`;
+}
+
+function fillDefaultBirthInput(){
+  const birthEl = document.getElementById("guestBirthInline");
+  if(!birthEl) return;
+
+  const activeBirth = getActiveBirthForZodiac() || ZODIAC_DEFAULT_BIRTH;
+  birthEl.value = activeBirth;
 }
 
 function renderPointBoxZodiac(){
