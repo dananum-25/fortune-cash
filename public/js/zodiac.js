@@ -100,7 +100,7 @@ async function loadDB(){
     fetch("/data/fortune/animal_bonus.json", { cache: "no-store" }),
     fetch("/data/fortune/element_bonus.json", { cache: "no-store" }),
     fetch("/data/fortune/year.json", { cache: "no-store" }),
-    fetch("/data/ipchun.json", { cache: "no-store" })
+    fetch("/data/ipchun_db.json", { cache: "no-store" })
   ]);
 
   const daily = await dailyRes.json();
