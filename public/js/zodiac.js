@@ -87,20 +87,38 @@ const AGE_GROUP_TEXT = {
 };
 
 async function loadDB(){
-  const [fortuneRes, ipchunRes] = await Promise.all([
-    fetch("/data/fortune_ko.json", { cache: "no-store" }),
-    fetch("/data/ipchun_db.json", { cache: "no-store" })
+  const [
+    dailyRes,
+    relationRes,
+    animalRes,
+    elementRes,
+    yearRes,
+    ipchunRes
+  ] = await Promise.all([
+    fetch("/data/fortune/daily.json", { cache: "no-store" }),
+    fetch("/data/fortune/relation_bonus.json", { cache: "no-store" }),
+    fetch("/data/fortune/animal_bonus.json", { cache: "no-store" }),
+    fetch("/data/fortune/element_bonus.json", { cache: "no-store" }),
+    fetch("/data/fortune/year.json", { cache: "no-store" }),
+    fetch("/data/ipchun.json", { cache: "no-store" })
   ]);
 
-  if(!fortuneRes.ok){
-    throw new Error(`fortune_ko.json 로드 실패: ${fortuneRes.status}`);
-  }
+  const daily = await dailyRes.json();
+  const relation = await relationRes.json();
+  const animal = await animalRes.json();
+  const element = await elementRes.json();
+  const year = await yearRes.json();
 
-  if(!ipchunRes.ok){
-    throw new Error(`ipchun.json 로드 실패: ${ipchunRes.status}`);
-  }
+  fortuneDB = {
+    daily: {
+      ...daily,
+      relation_bonus: relation,
+      animal_bonus: animal,
+      element_bonus: element
+    },
+    year
+  };
 
-  fortuneDB = await fortuneRes.json();
   ipchunDB = await ipchunRes.json();
 }
 
