@@ -75,12 +75,57 @@ function resolveGeo(geo){
   return { lat, lon, elevation };
 }
 
-export function buildAscendantSnapshot({ birthDate, birthTime, geo }){
-  if(typeof Astronomy === "undefined"){
-    console.warn("[astronomy-ascendant] library not loaded");
-    return null;
-  }
+function toRadians(deg){
+  return deg * Math.PI / 180;
+}
 
+function toDegrees(rad){
+  return rad * 180 / Math.PI;
+}
+
+function julianDay(date){
+  return (date.getTime() / 86400000) + 2440587.5;
+}
+
+function meanObliquityDeg(T){
+  return 23.439291 - (0.0130042 * T);
+}
+
+function localSiderealTimeDeg(jd, longitude){
+  const T = (jd - 2451545.0) / 36525.0;
+
+  let gmst =
+    280.46061837 +
+    360.98564736629 * (jd - 2451545.0) +
+    0.000387933 * T * T -
+    (T * T * T) / 38710000.0;
+
+  gmst = normalizeDegree(gmst);
+
+  return normalizeDegree(gmst + longitude);
+}
+
+function calculateAscendantLongitude(date, latitude, longitude){
+  const jd = julianDay(date);
+  const T = (jd - 2451545.0) / 36525.0;
+
+  const eps = toRadians(meanObliquityDeg(T));
+  const theta = toRadians(localSiderealTimeDeg(jd, longitude));
+
+  const safeLat = Math.max(-89.9999, Math.min(89.9999, latitude));
+  const phi = toRadians(safeLat);
+
+  const numerator = -Math.cos(theta);
+  const denominator =
+    (Math.sin(theta) * Math.cos(eps)) +
+    (Math.tan(phi) * Math.sin(eps));
+
+  const lambda = Math.atan2(numerator, denominator);
+
+  return normalizeDegree(toDegrees(lambda));
+}
+
+export function buildAscendantSnapshot({ birthDate, birthTime, geo }){
   const safeDate = buildSafeBirthDate(birthDate, birthTime);
   const resolvedGeo = resolveGeo(geo);
 
@@ -92,30 +137,12 @@ export function buildAscendantSnapshot({ birthDate, birthTime, geo }){
     return null;
   }
 
-  const observer = new Astronomy.Observer(
+  const ascLongitude = calculateAscendantLongitude(
+    safeDate,
     resolvedGeo.lat,
-    resolvedGeo.lon,
-    resolvedGeo.elevation
+    resolvedGeo.lon
   );
 
-  const time = new Astronomy.AstroTime(safeDate);
-const horizon = Astronomy.Horizon(time, observer, 90, 0);
-
-  if(!horizon || typeof horizon.ra !== "number"){
-    console.warn("[astronomy-ascendant] horizon calc failed");
-    return null;
-  }
-
-  const rotation = Astronomy.Rotation_EQJ_ECL();
-  const vecEq = Astronomy.VectorFromSphere({
-    lat: 0,
-    lon: horizon.ra,
-    dist: 1
-  });
-  const vecEcl = Astronomy.RotateVector(rotation, vecEq);
-  const sphere = Astronomy.SphereFromVector(vecEcl);
-
-  const ascLongitude = normalizeDegree(sphere.lon);
   const zodiac = degreeToSign(ascLongitude);
 
   return {
