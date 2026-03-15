@@ -120,7 +120,7 @@ function renderEntryState(){
     return;
   }
 
-  const zodiacKey = getZodiacFromBirth(birth);
+  const selectedZodiac = select.value;
 const zodiacLabel = ZODIAC_LABELS[zodiacKey] || "띠";
 
 box.innerHTML = `
