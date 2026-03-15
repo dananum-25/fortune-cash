@@ -133,6 +133,30 @@ function buildSafeBirthDate(birthDate, birthTime){
   return date;
 }
 
+function buildSafeBirthDate(birthDate, birthTime){
+  const safeDate = String(birthDate || "1940-01-01");
+  const safeTime = String(birthTime || "11:00");
+
+  const dateParts = safeDate.split("-");
+  const timeParts = safeTime.split(":");
+
+  const year = Number(dateParts[0]);
+  const monthIndex = Number(dateParts[1]) - 1;
+  const day = Number(dateParts[2]);
+
+  const hour = Number(timeParts[0]);
+  const minute = Number(timeParts[1]);
+
+  const date = new Date(Date.UTC(year, monthIndex, day, hour - 9, minute, 0));
+
+  if(!(date instanceof Date) || Number.isNaN(date.getTime())){
+    console.warn("[astronomy-engine] invalid birth date", { birthDate, birthTime });
+    return new Date(Date.UTC(1940, 0, 1, 2, 0, 0));
+  }
+
+  return date;
+}
+
 export function buildAstronomySnapshotFromBirth({ birthDate, birthTime }){
   const safeBirthDate = buildSafeBirthDate(birthDate, birthTime);
   return buildAstronomySnapshot(safeBirthDate);
