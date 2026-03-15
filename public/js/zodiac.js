@@ -77,19 +77,13 @@ function getZodiacFromBirth(birth){
 }
 
 async function loadDB(){
-  const activeYear = getActiveYear();
+  const res = await fetch("/data/zodiac_fortunes_ko.json", { cache: "no-store" });
 
-  try{
-    const res = await fetch(`/data/zodiac_${activeYear}.json`, { cache: "no-store" });
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    zodiacDB = await res.json();
-  }catch(e){
-    const res = await fetch("/data/zodiac_fortunes_ko.json", { cache: "no-store" })
-    if(!res.ok){
-      throw new Error(`zodiac db load failed: ${res.status}`);
-    }
-    zodiacDB = await res.json();
+  if(!res.ok){
+    throw new Error(`zodiac db load failed: ${res.status}`);
   }
+
+  zodiacDB = await res.json();
 }
 
 function renderEntryState(){
