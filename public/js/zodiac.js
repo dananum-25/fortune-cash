@@ -181,6 +181,13 @@ function renderMyZodiacInfo(currentKey){
   `;
 }
 
+function fillDefaultBirthInput(){
+  const birthEl = document.getElementById("guestBirthInline");
+  if(!birthEl) return;
+
+  birthEl.value = getActiveBirthForZodiac();
+}
+
 function renderGuide(){
   const box = document.getElementById("guideBox");
   if(!box) return;
@@ -421,13 +428,18 @@ document.addEventListener("DOMContentLoaded", async ()=>{
       await window.loadMyPoint();
     }
 
+    await loadIpchunDB();
     await loadDB();
+
     buildZodiacOptions();
+    fillDefaultBirthInput();
     renderEntryState();
     renderPointBoxZodiac();
 
-    const myZodiac = getZodiacFromBirth(getActiveBirthForZodiac());
+    const activeBirth = getActiveBirthForZodiac();
+    const myZodiac = getZodiacFromBirth(activeBirth);
     const select = document.getElementById("zodiacSelect");
+
     if(select){
       select.value = myZodiac;
     }
