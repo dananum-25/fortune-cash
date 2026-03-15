@@ -89,7 +89,7 @@ const AGE_GROUP_TEXT = {
 async function loadDB(){
   const [fortuneRes, ipchunRes] = await Promise.all([
     fetch("/data/fortune_ko.json", { cache: "no-store" }),
-    fetch("/data/ipchun.json", { cache: "no-store" })
+    fetch("/data/ipchun_db.json", { cache: "no-store" })
   ]);
 
   if(!fortuneRes.ok){
