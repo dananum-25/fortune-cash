@@ -58,11 +58,13 @@ function getZodiacMode(){
 }
 
 function getActiveBirthForZodiac(){
-  return (
-    localStorage.getItem("birth") ||
-    localStorage.getItem("guest_birth") ||
-    ZODIAC_DEFAULT_BIRTH
-  );
+  const phone = localStorage.getItem("phone");
+  const memberBirth = localStorage.getItem("birth");
+  const guestBirth = localStorage.getItem("guest_birth");
+
+  if(phone && memberBirth) return memberBirth;
+  if(guestBirth) return guestBirth;
+  return ZODIAC_DEFAULT_BIRTH;
 }
 
 function getZodiacFromBirth(birth){
@@ -97,12 +99,14 @@ function renderEntryState(){
   const mode = getZodiacMode();
   const birth = getActiveBirthForZodiac();
   const name = localStorage.getItem("name") || "회원";
+  const zodiacKey = getZodiacFromBirth(birth);
+  const zodiacLabel = ZODIAC_LABELS[zodiacKey] || "띠";
 
   if(mode === "member"){
     box.innerHTML = `
       <h2>✅ 준비 완료</h2>
       <p><b>${escapeHtml(name)}</b>님 저장된 생년월일이 자동 적용되었습니다.</p>
-      <p class="small">내 띠 기준으로 운세를 바로 확인할 수 있습니다.</p>
+      <p class="small">현재 <b>${escapeHtml(zodiacLabel)}</b> 기준으로 운세를 바로 확인할 수 있습니다.</p>
     `;
     return;
   }
@@ -111,7 +115,7 @@ function renderEntryState(){
     box.innerHTML = `
       <h2>✅ 게스트 기준 적용 완료</h2>
       <p>생년월일: <b>${escapeHtml(birth)}</b></p>
-      <p class="small">입력한 생년월일 기준으로 띠를 계산합니다.</p>
+      <p class="small">입력한 생년월일 기준 <b>${escapeHtml(zodiacLabel)}</b> 상담 내용을 보여줍니다.</p>
     `;
     return;
   }
@@ -119,7 +123,7 @@ function renderEntryState(){
   box.innerHTML = `
     <h2>✅ 기본 기준으로 바로 보기</h2>
     <p>현재는 <b>${escapeHtml(ZODIAC_DEFAULT_BIRTH)}</b> 기준으로 결과를 볼 수 있습니다.</p>
-    <p class="small">원하는 값으로 바꿔서 내 기준으로 다시 볼 수 있어요.</p>
+    <p class="small">기본값으로 계산된 <b>${escapeHtml(zodiacLabel)}</b> 상담 내용을 바로 보여줍니다.</p>
   `;
 }
 
