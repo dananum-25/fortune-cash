@@ -3,98 +3,122 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2026년 띠별 운세 무료 보기 | 쥐띠 소띠 호랑이띠</title>
+<title>띠별 운세 | 올해 운세 무료 보기</title>
+<meta name="description" content="띠별 운세를 무료로 확인하세요. 쥐띠, 소띠, 호랑이띠 등 12띠 운세와 해석 가이드를 제공합니다.">
+<link rel="canonical" id="canonicalLink" href="https://fortune-cash.vercel.app/pages/zodiac/zodiac.html">
 
-<meta name="description" content="2026년 띠별 운세를 무료로 확인하세요. 쥐띠, 소띠, 호랑이띠 등 12띠 연간운세 해석과 활용법을 제공합니다.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="무료 운세 플랫폼">
+<meta property="og:title" id="ogTitle" content="띠별 운세 | 올해 운세 무료 보기">
+<meta property="og:description" id="ogDescription" content="12띠 운세를 무료로 확인하세요.">
+<meta property="og:url" id="ogUrl" content="https://fortune-cash.vercel.app/pages/zodiac/zodiac.html">
+<meta property="og:image" content="https://fortune-cash.vercel.app/assets/zodiac_fortune.png">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" id="twitterTitle" content="띠별 운세 | 올해 운세 무료 보기">
+<meta name="twitter:description" id="twitterDescription" content="12띠 운세를 무료로 확인하세요.">
+<meta name="twitter:image" content="https://fortune-cash.vercel.app/assets/zodiac_fortune.png">
 
 <link rel="stylesheet" href="/css/common.css">
 </head>
-
 <body>
 
-<div class="container">
+<div class="wrap">
 
-<h1>🐯 2026년 띠별 운세 무료 보기</h1>
+  <h1 class="page-title" id="pageTitle">띠별 연간 운세</h1>
 
-<div id="pointBox"></div>
+  <div id="loginCheck" class="card notice-box">
+    <p class="info-text">띠 기준 정보를 확인하는 중입니다.</p>
+  </div>
 
-<section>
+  <div id="pointBox" class="card notice-box"></div>
 
-<h2>띠별 운세란 무엇인가요?</h2>
+  <section id="guestBirthCard" class="card">
+    <h2>내 기준으로 다시 보기</h2>
+    <p class="info-text">회원은 저장된 생년월일이 자동 적용됩니다.</p>
+    <p class="info-text">게스트와 비회원은 생년월일을 입력하면 본인 띠 기준으로 다시 볼 수 있습니다.</p>
+    <input id="guestBirthInline" type="date">
+    <button class="action-btn" id="applyGuestBirthBtn" type="button">내 생년월일 적용</button>
+    <p class="small" style="margin-top:10px;">비회원 기본 기준은 1940-01-01입니다.</p>
+  </section>
 
-<p>
-띠별 운세는 태어난 해의 띠를 기준으로 한 해의 흐름을 살펴보는 운세입니다.
-쥐띠, 소띠, 호랑이띠, 토끼띠, 용띠, 뱀띠, 말띠, 양띠,
-원숭이띠, 닭띠, 개띠, 돼지띠까지 총 12띠의 운세를 제공합니다.
-</p>
+  <div id="myZodiacInfo" class="card notice-box">
+    <p class="info-text">내 띠 정보와 현재 보고 있는 띠를 함께 보여줍니다.</p>
+  </div>
 
-<p>
-2026년 띠별 운세는 재물운, 애정운, 직장운, 건강운 등
-삶의 주요 영역에 대한 흐름을 참고할 수 있도록 구성되어 있습니다.
-운세는 참고 자료이며 개인의 노력과 선택이 가장 중요합니다.
-</p>
+  <section class="card">
+    <h2>띠별 운세란 무엇인가요?</h2>
+    <p class="info-text">
+      띠별 운세는 태어난 해의 12지신을 기준으로 한 해의 흐름을 참고하는 운세입니다.
+      재물운, 애정운, 직장운, 건강운 같은 생활 영역을 가볍게 확인할 수 있습니다.
+    </p>
+    <p class="info-text">
+      결과는 참고용 콘텐츠이며 실제 선택과 행동이 가장 중요합니다.
+    </p>
+  </section>
 
-</section>
+  <section class="card">
+    <h2>띠를 선택하세요</h2>
+    <select id="zodiacSelect"></select>
+    <button class="action-btn" id="showZodiacBtn" type="button">운세 보기</button>
+  </section>
 
-<hr>
+  <section id="resultSection" style="display:none;">
+    <div id="resultBox"></div>
+    <div id="guideBox"></div>
+  </section>
 
-<section>
+  <section class="card">
+    <h2>다른 띠도 보기</h2>
+    <div class="grid" id="relatedZodiacGrid"></div>
+  </section>
 
-<h2>띠를 선택하세요</h2>
+  <section class="card">
+    <h2>추천 운세 콘텐츠</h2>
+    <p><a class="action-link" href="/pages/period/period.html">오늘/내일/연간 운세</a></p>
+    <p><a class="action-link" href="/pages/astro/index.html">별자리운세</a></p>
+    <p><a class="action-link" href="/pages/saju/saju.html">사주 분석</a></p>
+    <p><a class="action-link" href="/pages/tojung/tojung.html">토정비결</a></p>
+    <p><a class="action-link" href="/fortune-guide.html">운세 가이드</a></p>
+  </section>
 
-<select id="zodiacSelect">
-  <option value="rat">쥐띠</option>
-  <option value="ox">소띠</option>
-  <option value="tiger">호랑이띠</option>
-  <option value="rabbit">토끼띠</option>
-  <option value="dragon">용띠</option>
-  <option value="snake">뱀띠</option>
-  <option value="horse">말띠</option>
-  <option value="goat">양띠</option>
-  <option value="monkey">원숭이띠</option>
-  <option value="rooster">닭띠</option>
-  <option value="dog">개띠</option>
-  <option value="pig">돼지띠</option>
-</select>
+  <section class="card">
+    <h2>자주 묻는 질문</h2>
 
-<button onclick="showZodiac()">운세 보기</button>
+    <p class="info-text"><b>Q. 띠별 운세는 어떻게 계산되나요?</b></p>
+    <p class="info-text">
+      전통적인 12지신 기준으로 흐름을 해석한 참고용 콘텐츠입니다.
+    </p>
 
-</section>
+    <p class="info-text" style="margin-top:12px;"><b>Q. 띠별 운세는 정확한가요?</b></p>
+    <p class="info-text">
+      운세는 참고용이며, 실제 결과는 개인의 선택과 행동에 따라 달라질 수 있습니다.
+    </p>
+  </section>
 
-<section id="resultSection" style="display:none;">
-  <div id="resultBox"></div>
-  <div id="guideBox"></div>
+  <button class="action-btn" id="shareBtn" type="button">공유하기</button>
+  <button class="action-btn" type="button" onclick="Common.goHome()">홈으로</button>
 
-  <hr>
-
-  <h3>관련 운세</h3>
-  <ul>
-    <li><a href="/pages/period/period.html">오늘 운세</a></li>
-    <li><a href="/pages/star/star.html">별자리 운세</a></li>
-    <li><a href="/pages/tarot/tarot.html">타로 운세</a></li>
-  </ul>
-
-</section>
-
-<section>
-
-<h2>자주 묻는 질문</h2>
-
-<p><strong>Q. 띠별 운세는 어떻게 계산되나요?</strong><br>
-전통적인 12지신 체계를 기반으로 연간 흐름을 해석합니다.</p>
-
-<p><strong>Q. 띠별 운세는 정확한가요?</strong><br>
-운세는 참고용이며, 개인의 선택과 행동이 가장 중요합니다.</p>
-
-</section>
+  <footer>
+    <div>무료 운세 플랫폼</div>
+    <div>문의: daekoju@naver.com</div>
+    <div class="footer-links">
+      <a href="/privacy.html">개인정보처리방침</a> |
+      <a href="/terms.html">이용약관</a> |
+      <a href="/about.html">사이트 소개</a> |
+      <a href="/contact.html">문의</a> |
+      <a href="/fortune-guide.html">운세 가이드</a>
+    </div>
+  </footer>
 
 </div>
 
 <script src="/js/config.js"></script>
+<script src="/js/birth.js"></script>
 <script src="/js/auth.js"></script>
 <script src="/js/points.js"></script>
 <script src="/js/common.js"></script>
-<script src="zodiac.js"></script>
-
+<script src="/js/reward.js"></script>
+<script src="/pages/zodiac/zodiac.js"></script>
 </body>
 </html>
