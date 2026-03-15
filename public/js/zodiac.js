@@ -448,7 +448,19 @@ document.addEventListener("DOMContentLoaded", async ()=>{
     fillDefaultBirthInput();
     renderEntryState();
     renderPointBoxZodiac();
+// ⭐ 기본값 띠 계산 강제 실행
+    const birth = getActiveBirthForZodiac() || "1940-01-01";
+    const zodiac = getZodiacFromBirth(birth);
 
+    const select = document.getElementById("zodiacSelect");
+    if(select){
+      select.value = zodiac;
+    }
+
+    renderMyZodiacInfo(zodiac);
+
+    // ⭐ 결과 바로 출력
+    showZodiac();
     const activeBirth = getActiveBirthForZodiac();
     const myZodiac = getZodiacFromBirth(activeBirth);
     const select = document.getElementById("zodiacSelect");
