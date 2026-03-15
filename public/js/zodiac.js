@@ -1,9 +1,17 @@
-let zodiacDB = {};
+const DEFAULT_BIRTH_YMD = "1940-01-01";
+const DEFAULT_BIRTH_TIME = "11:00";
+
+let fortuneDB = null;
+let ipchunDB = null;
 let rewarded = false;
 
-const ZODIAC_DEFAULT_BIRTH = "1940-01-01";
+const ZODIAC_ANIMALS = [
+  "rat", "ox", "tiger", "rabbit",
+  "dragon", "snake", "horse", "goat",
+  "monkey", "rooster", "dog", "pig"
+];
 
-const ZODIAC_LABELS = {
+const ZODIAC_NAMES = {
   rat: "쥐띠",
   ox: "소띠",
   tiger: "호랑이띠",
@@ -18,472 +26,380 @@ const ZODIAC_LABELS = {
   pig: "돼지띠"
 };
 
-const ZODIAC_ORDER = [
-  "rat", "ox", "tiger", "rabbit",
-  "dragon", "snake", "horse", "goat",
-  "monkey", "rooster", "dog", "pig"
+const ELEMENTS = [
+  "wood", "wood",
+  "fire", "fire",
+  "earth", "earth",
+  "metal", "metal",
+  "water", "water"
 ];
 
-function escapeHtml(s){
-  return String(s ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
+const ELEMENT_NAMES = {
+  wood: "목",
+  fire: "화",
+  earth: "토",
+  metal: "금",
+  water: "수"
+};
 
-function getActiveYear(){
-  return (
-    window.FortuneConfig?.year ||
-    window.APP_CONFIG?.fortuneYear ||
-    new Date().getFullYear()
-  );
-}
+const RELATION_LABELS = {
+  he: "합",
+  chong: "충",
+  normal: "평"
+};
 
-function getTodayStamp(){
-  const d = new Date();
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  return `${yyyy}${mm}${dd}`;
-}
+const RELATION_TEXT = {
+  he: "오늘 지지와 내 띠 흐름이 비교적 잘 맞는 날입니다. 사람, 일정, 제안 흐름을 부드럽게 연결하기 좋습니다.",
+  chong: "오늘 지지와 내 띠 흐름이 부딪히는 날입니다. 말실수, 일정 엇갈림, 감정 반응을 조금 더 조심하는 편이 좋습니다.",
+  normal: "오늘 지지와 내 띠 흐름은 큰 충돌 없이 무난한 편입니다. 무리한 확장보다 안정적인 운영이 잘 맞습니다."
+};
 
-function getZodiacMode(){
-  const phone = localStorage.getItem("phone");
-  const guestBirth = localStorage.getItem("guest_birth");
-  if(phone) return "member";
-  if(guestBirth) return "guest";
-  return "default";
-}
+const ZODIAC_RELATION = {
+  rat: { chong: "horse", he: "ox" },
+  ox: { chong: "goat", he: "rat" },
+  tiger: { chong: "monkey", he: "pig" },
+  rabbit: { chong: "rooster", he: "dog" },
+  dragon: { chong: "dog", he: "rooster" },
+  snake: { chong: "pig", he: "monkey" },
+  horse: { chong: "rat", he: "goat" },
+  goat: { chong: "ox", he: "horse" },
+  monkey: { chong: "tiger", he: "snake" },
+  rooster: { chong: "rabbit", he: "dragon" },
+  dog: { chong: "dragon", he: "rabbit" },
+  pig: { chong: "snake", he: "tiger" }
+};
 
-function getActiveBirthForZodiac(){
-  const phone = localStorage.getItem("phone");
-  const memberBirth = localStorage.getItem("birth");
-  const guestBirth = localStorage.getItem("guest_birth");
+const SUBTYPE_TEXT = {
+  wood: "성장, 확장, 배움 쪽 감각을 살릴수록 흐름이 좋아집니다.",
+  fire: "표현력과 추진력이 강하게 살아날 수 있어 속도 조절이 중요합니다.",
+  earth: "안정, 유지, 현실 감각을 살릴 때 운의 체감이 좋아집니다.",
+  metal: "기준, 정리, 정확성을 살릴수록 결과가 단단해집니다.",
+  water: "흐름 파악, 유연성, 관계 조율이 강점으로 작용할 수 있습니다."
+};
 
-  if(phone && memberBirth) return memberBirth;
-  if(guestBirth) return guestBirth;
-  return ZODIAC_DEFAULT_BIRTH;
-}
-
-function getZodiacFromBirth(birth){
-  const m = String(birth || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if(!m) return "dragon";
-
-  const year = Number(m[1]);
-  const map = ["monkey","rooster","dog","pig","rat","ox","tiger","rabbit","dragon","snake","horse","goat"];
-  return map[year % 12] || "dragon";
-}
+const AGE_GROUP_TEXT = {
+  child: "보호자, 생활리듬, 환경 안정이 운세 체감에 더 크게 작용하는 구간입니다.",
+  teen: "학업, 집중, 친구 관계, 생활패턴 관리가 핵심으로 작용하는 구간입니다.",
+  young: "진로, 이동, 선택, 인간관계 폭이 운세 체감에 크게 연결되는 구간입니다.",
+  adult: "일, 돈, 책임, 관계 균형이 가장 중요한 구간입니다.",
+  mid: "유지, 재정 관리, 생활 안정, 관계 정리가 중요한 구간입니다.",
+  senior: "건강 리듬, 생활 균형, 가까운 관계의 편안함이 더 중요하게 작용하는 구간입니다."
+};
 
 async function loadDB(){
-  const res = await fetch("/data/zodiac_fortunes_ko.json", { cache: "no-store" });
+  const [fortuneRes, ipchunRes] = await Promise.all([
+    fetch("/data/fortune_ko.json", { cache: "no-store" }),
+    fetch("/data/ipchun.json", { cache: "no-store" })
+  ]);
 
-  if(!res.ok){
-    throw new Error(`zodiac db load failed: ${res.status}`);
-  }
-
-  zodiacDB = await res.json();
+  fortuneDB = await fortuneRes.json();
+  ipchunDB = await ipchunRes.json();
 }
 
-function renderEntryState(){
-  const box = document.getElementById("loginCheck");
-  if(!box) return;
-
-  const mode = getZodiacMode();
-  const birth = getActiveBirthForZodiac();
-  const name = localStorage.getItem("name") || "회원";
-  const zodiacKey = getZodiacFromBirth(birth);
-  const zodiacLabel = ZODIAC_LABELS[zodiacKey] || "띠";
-
-  if(mode === "member"){
-    box.innerHTML = `
-      <h2>✅ 준비 완료</h2>
-      <p><b>${escapeHtml(name)}</b>님 저장된 생년월일이 자동 적용되었습니다.</p>
-      <p class="small">현재 <b>${escapeHtml(zodiacLabel)}</b> 기준으로 운세를 바로 확인할 수 있습니다.</p>
-    `;
-    return;
-  }
-
-  if(mode === "guest"){
-    box.innerHTML = `
-      <h2>✅ 게스트 기준 적용 완료</h2>
-      <p>생년월일: <b>${escapeHtml(birth)}</b></p>
-      <p class="small">입력한 생년월일 기준 <b>${escapeHtml(zodiacLabel)}</b> 상담 내용을 보여줍니다.</p>
-    `;
-    return;
-  }
-
-  const selectedZodiac = select.value;
-const selectedZodiacLabel = ZODIAC_LABELS[selectedZodiac] || "띠";
-
-box.innerHTML = `
-  <h2>✅ 기본 기준으로 바로 보기</h2>
-  <p>현재는 <b>${escapeHtml(ZODIAC_DEFAULT_BIRTH)}</b> 기준으로 결과를 볼 수 있습니다.</p>
-  <p class="small">기본값으로 계산된 <b>${escapeHtml(zodiacLabel)}</b> 상담 내용을 바로 보여줍니다.</p>
-`;
+function safePad(n){
+  return String(n).padStart(2, "0");
 }
 
-function fillDefaultBirthInput(){
-  const birthEl = document.getElementById("guestBirthInline");
-  if(!birthEl) return;
-
-  const activeBirth = getActiveBirthForZodiac() || ZODIAC_DEFAULT_BIRTH;
-  birthEl.value = activeBirth;
+function toDateOnlyText(date){
+  return `${date.getFullYear()}-${safePad(date.getMonth()+1)}-${safePad(date.getDate())}`;
 }
 
-function renderPointBoxZodiac(){
-  const box = document.getElementById("pointBox");
-  if(!box) return;
+function getTodayKSTDate(){
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+}
 
+function getSavedBirthInput(){
   const phone = localStorage.getItem("phone");
+  const guestBirth = localStorage.getItem("guest_birth");
 
   if(phone){
-    const point = Number(localStorage.getItem("point") || localStorage.getItem("points") || 0);
-    box.innerHTML = `
-      <h2>🎁 포인트 안내</h2>
-      <p>현재 포인트: <b>${point}P</b></p>
-      <p class="small">회원은 띠별 운세 결과를 확인하면 1일 1회 1포인트가 적립됩니다.</p>
-    `;
-    return;
+    return {
+      birthDate: localStorage.getItem("birth") || DEFAULT_BIRTH_YMD,
+      birthTime: localStorage.getItem("birthTime") || DEFAULT_BIRTH_TIME,
+      mode: "member"
+    };
   }
 
-  box.innerHTML = `
-    <h2>🎁 포인트 안내</h2>
-    <p>게스트와 비회원은 포인트 적립 없이 콘텐츠를 이용할 수 있습니다.</p>
-    <p class="small">포인트 적립과 생년월일 자동 저장을 원하면 회원가입 후 이용해주세요.</p>
-  `;
-}
-
-function renderMyZodiacInfo(currentKey){
-  const box = document.getElementById("myZodiacInfo");
-  if(!box) return;
-
-  const mode = getZodiacMode();
-  const birth = getActiveBirthForZodiac();
-  const myKey = getZodiacFromBirth(birth);
-  const myLabel = ZODIAC_LABELS[myKey] || "띠";
-  const currentLabel = ZODIAC_LABELS[currentKey] || "띠";
-  const name = mode === "member"
-    ? (localStorage.getItem("name") || "회원")
-    : (mode === "guest" ? "게스트" : "기본 기준");
-
-  if(myKey === currentKey){
-    box.innerHTML = `
-      <p class="info-text"><b>${escapeHtml(name)}</b></p>
-      <p class="info-text" style="margin-top:8px;">생년월일: ${escapeHtml(birth)}</p>
-      <p class="info-text" style="margin-top:8px;">당신의 띠는 <b style="color:#ffd56b;">${escapeHtml(myLabel)}</b> 입니다.</p>
-      <p class="info-text" style="margin-top:8px;">현재 내 띠 기준 운세를 보고 있어요.</p>
-    `;
-    return;
+  if(guestBirth){
+    return {
+      birthDate: localStorage.getItem("guest_birth") || DEFAULT_BIRTH_YMD,
+      birthTime: localStorage.getItem("guest_birthTime") || DEFAULT_BIRTH_TIME,
+      mode: "guest"
+    };
   }
 
-  box.innerHTML = `
-    <p class="info-text"><b>${escapeHtml(name)}</b></p>
-    <p class="info-text" style="margin-top:8px;">생년월일: ${escapeHtml(birth)}</p>
-    <p class="info-text" style="margin-top:8px;">당신의 띠는 <b style="color:#ffd56b;">${escapeHtml(myLabel)}</b> 입니다.</p>
-    <p class="info-text" style="margin-top:8px;">지금 보고 있는 결과는 <b style="color:#ffd56b;">${escapeHtml(currentLabel)}</b> 기준 운세예요.</p>
+  return {
+    birthDate: DEFAULT_BIRTH_YMD,
+    birthTime: DEFAULT_BIRTH_TIME,
+    mode: "default"
+  };
+}
+
+function parseBirthDate(birthDate){
+  const m = String(birthDate || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(!m){
+    return new Date(DEFAULT_BIRTH_YMD);
+  }
+
+  const year = Number(m[1]);
+  const month = Number(m[2]) - 1;
+  const day = Number(m[3]);
+
+  return new Date(year, month, day);
+}
+
+function getIpchunText(year){
+  return ipchunDB?.[String(year)] || "02-04";
+}
+
+function getZodiacYear(birthDateText){
+  const d = parseBirthDate(birthDateText);
+  const year = d.getFullYear();
+  const md = `${safePad(d.getMonth()+1)}-${safePad(d.getDate())}`;
+  const ipchun = getIpchunText(year);
+
+  return md < ipchun ? year - 1 : year;
+}
+
+function getZodiacAnimal(zodiacYear){
+  let index = (zodiacYear - 4) % 12;
+  if(index < 0) index += 12;
+  return ZODIAC_ANIMALS[index];
+}
+
+function getBirthElement(zodiacYear){
+  let stemIndex = (zodiacYear - 4) % 10;
+  if(stemIndex < 0) stemIndex += 10;
+  return ELEMENTS[stemIndex];
+}
+
+function getAgeGroup(zodiacYear){
+  const currentYear = getTodayKSTDate().getFullYear();
+  const age = currentYear - zodiacYear + 1;
+
+  if(age < 13) return "child";
+  if(age < 20) return "teen";
+  if(age < 30) return "young";
+  if(age < 45) return "adult";
+  if(age < 60) return "mid";
+  return "senior";
+}
+
+function getDayBranch(targetDate){
+  const base = new Date(1900, 0, 1);
+  const diffDays = Math.floor((targetDate - base) / 86400000);
+  let index = diffDays % 12;
+  if(index < 0) index += 12;
+  return ZODIAC_ANIMALS[index];
+}
+
+function getRelation(animal, dayBranch){
+  const rel = ZODIAC_RELATION?.[animal];
+  if(!rel) return "normal";
+  if(rel.chong === dayBranch) return "chong";
+  if(rel.he === dayBranch) return "he";
+  return "normal";
+}
+
+function hashString(str){
+  let hash = 0;
+  for(let i = 0; i < str.length; i++){
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+function pickStable(arr, seed){
+  if(!Array.isArray(arr) || arr.length === 0) return "";
+  const index = hashString(seed) % arr.length;
+  return arr[index];
+}
+
+function buildDailySeed(profile, section, targetDate){
+  return [
+    profile.birthDate,
+    profile.birthTime,
+    profile.zodiacYear,
+    profile.animal,
+    profile.element,
+    profile.ageGroup,
+    profile.relation,
+    toDateOnlyText(targetDate),
+    section
+  ].join("|");
+}
+
+function buildYearSeed(profile, section, targetDate){
+  return [
+    profile.birthDate,
+    profile.birthTime,
+    profile.zodiacYear,
+    profile.animal,
+    profile.element,
+    profile.ageGroup,
+    targetDate.getFullYear(),
+    section
+  ].join("|");
+}
+
+function buildProfile(){
+  const input = getSavedBirthInput();
+  const zodiacYear = getZodiacYear(input.birthDate);
+  const animal = getZodiacAnimal(zodiacYear);
+  const element = getBirthElement(zodiacYear);
+  const ageGroup = getAgeGroup(zodiacYear);
+
+  const today = getTodayKSTDate();
+  const dayBranch = getDayBranch(today);
+  const relation = getRelation(animal, dayBranch);
+
+  return {
+    ...input,
+    zodiacYear,
+    animal,
+    animalName: ZODIAC_NAMES[animal],
+    element,
+    elementName: ELEMENT_NAMES[element],
+    ageGroup,
+    dayBranch,
+    relation,
+    relationLabel: RELATION_LABELS[relation]
+  };
+}
+
+function buildFortuneResult(profile){
+  const today = getTodayKSTDate();
+
+  const daily = fortuneDB?.daily || {};
+  const yearly = fortuneDB?.year || {};
+
+  return {
+    todayMain: pickStable(daily.main, buildDailySeed(profile, "daily-main", today)),
+    todayLove: pickStable(daily.love, buildDailySeed(profile, "daily-love", today)),
+    todayMoney: pickStable(daily.money, buildDailySeed(profile, "daily-money", today)),
+    todayHealth: pickStable(daily.health, buildDailySeed(profile, "daily-health", today)),
+    todayWork: pickStable(daily.work, buildDailySeed(profile, "daily-work", today)),
+    todayRelation: pickStable(daily.relationship, buildDailySeed(profile, "daily-relationship", today)),
+    todayAdvice: pickStable(daily.advice, buildDailySeed(profile, "daily-advice", today)),
+    todayLuckyColor: pickStable(daily.lucky_color, buildDailySeed(profile, "daily-color", today)),
+    todayLuckyNumber: pickStable(daily.lucky_number, buildDailySeed(profile, "daily-number", today)),
+
+    yearMain: pickStable(yearly.main, buildYearSeed(profile, "year-main", today)),
+    yearLove: pickStable(yearly.love, buildYearSeed(profile, "year-love", today)),
+    yearMoney: pickStable(yearly.money, buildYearSeed(profile, "year-money", today)),
+    yearHealth: pickStable(yearly.health, buildYearSeed(profile, "year-health", today)),
+    yearWork: pickStable(yearly.work, buildYearSeed(profile, "year-work", today)),
+    yearRelation: pickStable(yearly.relationship, buildYearSeed(profile, "year-relationship", today)),
+    yearAdvice: pickStable(yearly.advice, buildYearSeed(profile, "year-advice", today)),
+    yearKeyword: pickStable(yearly.keywords, buildYearSeed(profile, "year-keyword", today)),
+    yearLuckyColor: pickStable(yearly.lucky_color, buildYearSeed(profile, "year-color", today)),
+    yearLuckyNumber: pickStable(yearly.lucky_number, buildYearSeed(profile, "year-number", today))
+  };
+}
+
+function syncSelectToProfile(profile){
+  const select = document.getElementById("zodiacSelect");
+  if(!select) return;
+  select.value = profile.animal;
+}
+
+function renderGuide(profile){
+  const guideBox = document.getElementById("guideBox");
+  if(!guideBox) return;
+
+  guideBox.innerHTML = `
+    <h3>🔎 이번 결과는 이렇게 계산했어요</h3>
+    <p><b>띠 판정:</b> 생년월일을 입춘 기준으로 계산해 ${profile.animalName}로 판정했습니다.</p>
+    <p><b>출생연도 타입:</b> ${profile.zodiacYear}년 기준 ${profile.elementName} 기운 서브타입을 반영했습니다.</p>
+    <p><b>오늘 흐름:</b> 오늘 지지와 ${profile.animalName}의 관계는 <b>${profile.relationLabel}</b> 흐름입니다.</p>
+    <p><b>연령대 보정:</b> ${AGE_GROUP_TEXT[profile.ageGroup]}</p>
+    <p class="small">오늘 운세는 같은 생년월일이면 하루 동안 동일하게 유지되도록 고정 계산됩니다.</p>
   `;
 }
 
-function fillDefaultBirthInput(){
-  const birthEl = document.getElementById("guestBirthInline");
-  if(!birthEl) return;
-
-  birthEl.value = getActiveBirthForZodiac();
-}
-
-function renderGuide(){
-  const box = document.getElementById("guideBox");
-  if(!box) return;
-
-  box.innerHTML = `
-    <div class="card">
-      <h2>🔎 해석 가이드</h2>
-      <p class="info-text">
-        띠별 운세는 한 해의 흐름을 참고하는 자료입니다.
-        좋은 흐름은 적극 활용하고, 조심해야 할 시기는 속도를 조절하며 대응하세요.
-      </p>
-      <p class="info-text">
-        재물, 관계, 건강, 일상 전반을 균형 있게 보는 방식으로 활용하는 것이 좋습니다.
-      </p>
-    </div>
-  `;
-}
-
-function buildZodiacOptions(){
-  const select = document.getElementById("zodiacSelect");
-  const related = document.getElementById("relatedZodiacGrid");
-  if(!select || !related) return;
-
-  select.innerHTML = ZODIAC_ORDER.map(key => {
-    return `<option value="${key}">${ZODIAC_LABELS[key]}</option>`;
-  }).join("");
-
-  related.innerHTML = ZODIAC_ORDER.map(key => {
-    return `<button class="action-link" type="button" data-zodiac-key="${key}">${ZODIAC_LABELS[key]}</button>`;
-  }).join("");
-
-  related.querySelectorAll("[data-zodiac-key]").forEach(btn => {
-    btn.addEventListener("click", ()=>{
-      select.value = btn.dataset.zodiacKey;
-      showZodiac();
-    });
-  });
-}
-
-function updateSeoMeta(zodiacKey){
-  const label = ZODIAC_LABELS[zodiacKey] || "띠별";
-  const activeYear = getActiveYear();
-  const title = `${activeYear}년 ${label} 운세 | 띠별 연간운세 무료 보기`;
-  const desc = `${label} 기준 ${activeYear}년 운세를 참고용으로 확인하세요. 재물운, 애정운, 직장운, 건강운 흐름을 제공합니다.`;
-  const url = "https://fortune-cash.vercel.app/pages/zodiac/zodiac.html";
-
-  document.title = title;
-
-  const metaDesc = document.querySelector('meta[name="description"]');
-  if(metaDesc) metaDesc.setAttribute("content", desc);
-
-  const canonical = document.getElementById("canonicalLink");
-  if(canonical) canonical.setAttribute("href", url);
-
-  const ogTitle = document.getElementById("ogTitle");
-  const ogDescription = document.getElementById("ogDescription");
-  const ogUrl = document.getElementById("ogUrl");
-  const twitterTitle = document.getElementById("twitterTitle");
-  const twitterDescription = document.getElementById("twitterDescription");
-
-  if(ogTitle) ogTitle.setAttribute("content", title);
-  if(ogDescription) ogDescription.setAttribute("content", desc);
-  if(ogUrl) ogUrl.setAttribute("content", url);
-  if(twitterTitle) twitterTitle.setAttribute("content", title);
-  if(twitterDescription) twitterDescription.setAttribute("content", desc);
-
-  const pageTitle = document.getElementById("pageTitle");
-  if(pageTitle) pageTitle.textContent = `${activeYear}년 띠별 연간 운세`;
-}
-
-function showZodiac(){
-  const select = document.getElementById("zodiacSelect");
-  const resultSection = document.getElementById("resultSection");
+function renderResult(profile, result){
   const resultBox = document.getElementById("resultBox");
-  if(!select || !resultSection || !resultBox) return;
+  const resultSection = document.getElementById("resultSection");
 
-  const value = select.value;
-  const label = ZODIAC_LABELS[value] || "띠";
-  const item = zodiacDB[selectedZodiac];
-
-  let overall = "";
-  let wealth = "";
-  let love = "";
-  let career = "";
-  let health = "";
-  let tipsHtml = "";
-
-  if(item && typeof item === "object" && !Array.isArray(item)){
-    overall = item.overall || "올해 흐름을 차분하게 살피며 균형 있게 운영하는 것이 좋습니다.";
-    wealth = item.wealth || "지출 관리와 현실적인 계획이 중요합니다.";
-    love = item.love || "관계에서는 대화와 배려가 중요하게 작용합니다.";
-    career = item.career || "일과 목표는 무리한 확장보다 안정적인 진행이 좋습니다.";
-    health = item.health || "생활 리듬과 컨디션 관리를 꾸준히 해주세요.";
-
-    if(Array.isArray(item.tips) && item.tips.length){
-      tipsHtml = `
-        <div class="card">
-          <h2>🧭 운영 팁</h2>
-          <ul class="list">
-            ${item.tips.map(v => `<li>${escapeHtml(v)}</li>`).join("")}
-          </ul>
-        </div>
-      `;
-    }
-  }else{
-    const text = Array.isArray(item) && item.length
-      ? item[Math.floor(Math.random() * item.length)]
-      : "운세 데이터가 준비되지 않았습니다.";
-
-    overall = text;
-    wealth = "재물은 무리한 확장보다 관리 중심으로 보는 것이 좋습니다.";
-    love = "관계는 감정보다 대화와 균형이 중요합니다.";
-    career = "일은 순서를 정하고 차근차근 진행하는 것이 좋습니다.";
-    health = "생활 리듬을 무너뜨리지 않는 것이 중요합니다.";
-  }
-
-  updateSeoMeta(value);
-  renderMyZodiacInfo(value);
-  renderGuide();
+  if(!resultBox || !resultSection) return;
 
   resultBox.innerHTML = `
-    <div class="card">
-      <h2>${escapeHtml(label)} ${escapeHtml(getActiveYear())}년 운세</h2>
-      <p class="info-text">${escapeHtml(overall)}</p>
-    </div>
+    <h2>${profile.animalName} 오늘 운세</h2>
 
-    <div class="card">
-      <h2>💰 재물운</h2>
-      <p class="info-text">${escapeHtml(wealth)}</p>
-    </div>
+    <p><b>내 띠:</b> ${profile.animalName}</p>
+    <p><b>출생 기준 띠 계산 연도:</b> ${profile.zodiacYear}년</p>
+    <p><b>출생연도 서브타입:</b> ${profile.elementName} ${profile.animalName}</p>
+    <p><b>오늘 관계 흐름:</b> ${profile.relationLabel}</p>
 
-    <div class="card">
-      <h2>❤️ 애정운</h2>
-      <p class="info-text">${escapeHtml(love)}</p>
-    </div>
+    <hr>
 
-    <div class="card">
-      <h2>💼 직장운</h2>
-      <p class="info-text">${escapeHtml(career)}</p>
-    </div>
+    <p><b>오늘 총운</b><br>${result.todayMain}</p>
+    <p><b>애정운</b><br>${result.todayLove}</p>
+    <p><b>재물운</b><br>${result.todayMoney}</p>
+    <p><b>건강운</b><br>${result.todayHealth}</p>
+    <p><b>일운</b><br>${result.todayWork}</p>
+    <p><b>대인운</b><br>${result.todayRelation}</p>
+    <p><b>오늘의 조언</b><br>${result.todayAdvice}</p>
 
-    <div class="card">
-      <h2>💪 건강운</h2>
-      <p class="info-text">${escapeHtml(health)}</p>
-    </div>
+    <p><b>행운 색상</b> ${result.todayLuckyColor}</p>
+    <p><b>행운 숫자</b> ${result.todayLuckyNumber}</p>
 
-    ${tipsHtml}
+    <hr>
+
+    <h2>올해 운세</h2>
+
+    <p><b>올해 총운</b><br>${result.yearMain}</p>
+    <p><b>올해 애정운</b><br>${result.yearLove}</p>
+    <p><b>올해 재물운</b><br>${result.yearMoney}</p>
+    <p><b>올해 건강운</b><br>${result.yearHealth}</p>
+    <p><b>올해 일운</b><br>${result.yearWork}</p>
+    <p><b>올해 대인운</b><br>${result.yearRelation}</p>
+    <p><b>올해 조언</b><br>${result.yearAdvice}</p>
+
+    <p><b>올해 키워드</b> ${result.yearKeyword}</p>
+    <p><b>올해 행운 색상</b> ${result.yearLuckyColor}</p>
+    <p><b>올해 행운 숫자</b> ${result.yearLuckyNumber}</p>
+
+    <hr>
+
+    <h3>왜 이렇게 나왔나요?</h3>
+    <p>${RELATION_TEXT[profile.relation]}</p>
+    <p>${SUBTYPE_TEXT[profile.element]}</p>
   `;
 
   resultSection.style.display = "block";
-  rewardZodiacOncePerDay();
 }
 
-async function rewardZodiacOncePerDay(){
-  const phone = localStorage.getItem("phone");
-  if(!phone || rewarded) return;
+function showZodiac(){
+  const profile = buildProfile();
+  const result = buildFortuneResult(profile);
 
-  const key = `zodiac_${getTodayStamp()}`;
-  if(localStorage.getItem(key) === "1"){
+  syncSelectToProfile(profile);
+  renderResult(profile, result);
+  renderGuide(profile);
+
+  if(!rewarded){
     rewarded = true;
-    return;
-  }
-
-  if(window.rewardContent){
-    try{
-      const res = await window.rewardContent("zodiac");
-      if(res?.status === "ok"){
-        localStorage.setItem(key, "1");
-        rewarded = true;
-
-        if(window.loadMyPoint){
-          await window.loadMyPoint();
-        }
-
-        renderPointBoxZodiac();
-        alert("포인트가 적립되었습니다 ✅");
-      }else if(res?.status === "already"){
-        localStorage.setItem(key, "1");
-        rewarded = true;
-      }
-    }catch(e){
-      console.warn("[zodiac.js] reward failed", e);
+    if(window.rewardContent){
+      rewardContent("zodiac");
     }
   }
-}
-
-function applyGuestBirthForZodiac(){
-  const birthEl = document.getElementById("guestBirthInline");
-  const rawBirth = String(birthEl?.value || "").trim();
-
-  if(!/^\d{4}-\d{2}-\d{2}$/.test(rawBirth)){
-    alert("생년월일을 입력해주세요.");
-    return;
-  }
-
-  localStorage.setItem("guestMode", "true");
-  localStorage.setItem("guest_birth", rawBirth);
-
-  const myZodiac = getZodiacFromBirth(rawBirth);
-  const select = document.getElementById("zodiacSelect");
-
-  if(select){
-    select.value = myZodiac;
-  }
-
-  renderEntryState();
-  renderMyZodiacInfo(myZodiac);
-  showZodiac();
-}
-
-function bindShare(){
-  const btn = document.getElementById("shareBtn");
-  if(!btn) return;
-
-  btn.addEventListener("click", async ()=>{
-    const data = {
-      title: document.title,
-      text: "띠별 운세를 확인해보세요.",
-      url: window.location.href
-    };
-
-    try{
-      if(navigator.share){
-        await navigator.share(data);
-      }else if(navigator.clipboard){
-        await navigator.clipboard.writeText(window.location.href);
-        alert("현재 페이지 주소를 복사했어요.");
-      }else{
-        alert("공유 기능을 사용할 수 없는 환경입니다.");
-      }
-    }catch(e){
-      console.warn("[zodiac.js] share cancelled", e);
-    }
-  });
 }
 
 document.addEventListener("DOMContentLoaded", async ()=>{
-  try{
-    if(window.loadMyPoint){
-      await window.loadMyPoint();
-    }
+  await loadDB();
 
-    await loadIpchunDB();
-    await loadDB();
+  if(window.loadMyPoint) await loadMyPoint();
+  if(window.Common?.renderPoint) Common.renderPoint();
 
-    buildZodiacOptions();
-    fillDefaultBirthInput();
-    renderEntryState();
-    renderPointBoxZodiac();
-// ⭐ 기본값 띠 계산 강제 실행
-    const birth = getActiveBirthForZodiac() || "1940-01-01";
-    const zodiac = getZodiacFromBirth(birth);
+  syncSelectToProfile(buildProfile());
 
-    const select = document.getElementById("zodiacSelect");
-    if(select){
-      select.value = zodiac;
-    }
-
-    renderMyZodiacInfo(zodiac);
-
-    // ⭐ 결과 바로 출력
-    showZodiac();
-    const activeBirth = getActiveBirthForZodiac();
-    const myZodiac = getZodiacFromBirth(activeBirth);
-    const select = document.getElementById("zodiacSelect");
-
-    if(select){
-      select.value = myZodiac;
-    }
-
-    renderMyZodiacInfo(myZodiac);
-    bindShare();
-
-    document.getElementById("showZodiacBtn")?.addEventListener("click", showZodiac);
-    document.getElementById("applyGuestBirthBtn")?.addEventListener("click", applyGuestBirthForZodiac);
-
-    showZodiac();
-  }catch(err){
-    console.error("[zodiac.js] init failed", err);
-
-    const resultSection = document.getElementById("resultSection");
-    const resultBox = document.getElementById("resultBox");
-
-    if(resultSection) resultSection.style.display = "block";
-    if(resultBox){
-      resultBox.innerHTML = `
-        <div class="card">
-          <h2>⚠ 결과 생성 실패</h2>
-          <p class="info-text">띠별 운세 데이터를 불러오지 못했어요. 잠시 후 다시 시도해주세요.</p>
-        </div>
-      `;
-    }
+  const btn = document.querySelector("button[onclick='showZodiac()']");
+  if(btn){
+    btn.onclick = showZodiac;
   }
+
+  showZodiac();
 });
