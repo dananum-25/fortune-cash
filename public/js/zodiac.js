@@ -92,6 +92,14 @@ async function loadDB(){
     fetch("/data/ipchun.json", { cache: "no-store" })
   ]);
 
+  if(!fortuneRes.ok){
+    throw new Error(`fortune_ko.json 로드 실패: ${fortuneRes.status}`);
+  }
+
+  if(!ipchunRes.ok){
+    throw new Error(`ipchun.json 로드 실패: ${ipchunRes.status}`);
+  }
+
   fortuneDB = await fortuneRes.json();
   ipchunDB = await ipchunRes.json();
 }
