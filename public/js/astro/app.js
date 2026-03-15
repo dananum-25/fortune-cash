@@ -608,11 +608,16 @@ async function renderAstro(){
     targetDate
   });
 
-  const astronomySnapshot = buildAstronomySnapshot(new Date(`${targetDate}T12:00:00Z`));
-  const natalSnapshot = buildAstronomySnapshotFromBirth({
-    birthDate,
-    birthTime
-  });
+  const todayBaseDate = new Date(`${targetDate}T12:00:00Z`);
+console.log("[today base date]", todayBaseDate, todayBaseDate instanceof Date, Number.isNaN(todayBaseDate.getTime()));
+
+const astronomySnapshot = buildAstronomySnapshot(todayBaseDate);
+
+console.log("[birth input]", birthDate, birthTime);
+const natalSnapshot = buildAstronomySnapshotFromBirth({
+  birthDate,
+  birthTime
+});
 
   const ascendantSnapshot = buildAscendantSnapshot({
     birthDate,
