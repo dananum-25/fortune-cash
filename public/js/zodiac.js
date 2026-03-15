@@ -121,7 +121,7 @@ function renderEntryState(){
   }
 
   const selectedZodiac = select.value;
-const zodiacLabel = ZODIAC_LABELS[zodiacKey] || "띠";
+const selectedZodiacLabel = ZODIAC_LABELS[selectedZodiac] || "띠";
 
 box.innerHTML = `
   <h2>✅ 기본 기준으로 바로 보기</h2>
