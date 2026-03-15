@@ -27,22 +27,25 @@ function degreeToSign(longitude){
   };
 }
 
-function parseBirthToDate(birthDate, birthTime){
+function buildSafeBirthDate(birthDate, birthTime){
+  const safeDate = String(birthDate || "1940-01-01");
+  const safeTime = String(birthTime || "11:00");
 
-  const safeDate = birthDate || "1940-01-01";
-  const safeTime = birthTime || "11:00";
-
-  const parts = safeDate.split("-");
+  const dateParts = safeDate.split("-");
   const timeParts = safeTime.split(":");
 
-  const y = Number(parts[0]);
-  const m = Number(parts[1]) - 1;
-  const d = Number(parts[2]);
+  const year = Number(dateParts[0]);
+  const monthIndex = Number(dateParts[1]) - 1;
+  const day = Number(dateParts[2]);
 
-  const hh = Number(timeParts[0]);
-  const mm = Number(timeParts[1]);
+  const hour = Number(timeParts[0]);
+  const minute = Number(timeParts[1]);
 
-  const date = new Date(Date.UTC(y, m, d, hh - 9, mm, 0));
+  const date = new Date(Date.UTC(year, monthIndex, day, hour - 9, minute, 0));
+
+  if(!(date instanceof Date) || Number.isNaN(date.getTime())){
+    return new Date(Date.UTC(1940, 0, 1, 2, 0, 0));
+  }
 
   return date;
 }
@@ -78,6 +81,7 @@ export function buildAscendantSnapshot({ birthDate, birthTime, geo }){
     return null;
   }
 
+  const safeDate = buildSafeBirthDate(birthDate, birthTime);
   const resolvedGeo = resolveGeo(geo);
 
   if(
@@ -88,15 +92,13 @@ export function buildAscendantSnapshot({ birthDate, birthTime, geo }){
     return null;
   }
 
-  const date = parseBirthToDate(birthDate, birthTime);
-  const time = new Astronomy.AstroTime(date);
   const observer = new Astronomy.Observer(
     resolvedGeo.lat,
     resolvedGeo.lon,
     resolvedGeo.elevation
   );
 
-  const horizon = Astronomy.Horizon(time, observer, 90, 0);
+  const horizon = Astronomy.Horizon(safeDate, observer, 90, 0);
 
   if(!horizon || typeof horizon.ra !== "number"){
     console.warn("[astronomy-ascendant] horizon calc failed");
@@ -104,7 +106,11 @@ export function buildAscendantSnapshot({ birthDate, birthTime, geo }){
   }
 
   const rotation = Astronomy.Rotation_EQJ_ECL();
-  const vecEq = Astronomy.VectorFromSphere({ lat: 0, lon: horizon.ra, dist: 1 });
+  const vecEq = Astronomy.VectorFromSphere({
+    lat: 0,
+    lon: horizon.ra,
+    dist: 1
+  });
   const vecEcl = Astronomy.RotateVector(rotation, vecEq);
   const sphere = Astronomy.SphereFromVector(vecEcl);
 
