@@ -23,31 +23,35 @@
 </head>
 <body>
 
-<div class="wrap">
+<div class="wrap page-wrap zodiac-page">
 
-  <h1 class="page-title" id="pageTitle">띠별 연간 운세</h1>
+  <h1 class="page-title section-title" id="pageTitle">띠별 연간 운세</h1>
 
-  <div id="loginCheck" class="card notice-box">
+  <div id="loginCheck" class="card notice-box info-card">
     <p class="info-text">띠 기준 정보를 확인하는 중입니다.</p>
   </div>
 
-  <div id="pointBox" class="card notice-box"></div>
+  <div id="pointBox" class="card notice-box info-card"></div>
 
-  <section id="guestBirthCard" class="card">
-    <h2>내 기준으로 다시 보기</h2>
+  <section id="guestBirthCard" class="card form-card">
+    <h2 class="section-title">내 기준으로 다시 보기</h2>
     <p class="info-text">회원은 저장된 생년월일이 자동 적용됩니다.</p>
     <p class="info-text">게스트와 비회원은 생년월일을 입력하면 본인 띠 기준으로 다시 볼 수 있습니다.</p>
-    <input id="guestBirthInline" type="date">
-    <button class="action-btn" id="applyGuestBirthBtn" type="button">내 생년월일 적용</button>
-    <p class="small" style="margin-top:10px;">비회원 기본 기준은 1940-01-01입니다.</p>
+
+    <div class="form-group">
+      <input id="guestBirthInline" class="input-field" type="date">
+    </div>
+
+    <button class="action-btn full-btn" id="applyGuestBirthBtn" type="button">내 생년월일 적용</button>
+    <p class="small form-help">비회원 기본 기준은 1940-01-01입니다.</p>
   </section>
 
-  <div id="myZodiacInfo" class="card notice-box">
+  <div id="myZodiacInfo" class="card notice-box info-card">
     <p class="info-text">내 띠 정보와 현재 보고 있는 띠를 함께 보여줍니다.</p>
   </div>
 
-  <section class="card">
-    <h2>띠별 운세란 무엇인가요?</h2>
+  <section class="card content-card">
+    <h2 class="section-title">띠별 운세란 무엇인가요?</h2>
     <p class="info-text">
       띠별 운세는 태어난 해의 12지신을 기준으로 한 해의 흐름을 참고하는 운세입니다.
       재물운, 애정운, 직장운, 건강운 같은 생활 영역을 가볍게 확인할 수 있습니다.
@@ -57,33 +61,39 @@
     </p>
   </section>
 
-  <section class="card">
-    <h2>띠를 선택하세요</h2>
-    <select id="zodiacSelect"></select>
-    <button class="action-btn" id="showZodiacBtn" type="button">운세 보기</button>
+  <section class="card content-card">
+    <h2 class="section-title">띠를 선택하세요</h2>
+
+    <div class="form-group">
+      <select id="zodiacSelect" class="input-field"></select>
+    </div>
+
+    <button class="action-btn full-btn" id="showZodiacBtn" type="button">운세 보기</button>
   </section>
 
-  <section id="resultSection" style="display:none;">
-    <div id="resultBox"></div>
-    <div id="guideBox"></div>
+  <section id="resultSection" class="result-section" style="display:none;">
+    <div id="resultBox" class="card result-card"></div>
+    <div id="guideBox" class="card guide-card"></div>
   </section>
 
-  <section class="card">
-    <h2>다른 띠도 보기</h2>
-    <div class="grid" id="relatedZodiacGrid"></div>
+  <section class="card content-card">
+    <h2 class="section-title">다른 띠도 보기</h2>
+    <div class="grid related-grid" id="relatedZodiacGrid"></div>
   </section>
 
-  <section class="card">
-    <h2>추천 운세 콘텐츠</h2>
-    <p><a class="action-link" href="/pages/period/period.html">오늘/내일/연간 운세</a></p>
-    <p><a class="action-link" href="/pages/astro/index.html">별자리운세</a></p>
-    <p><a class="action-link" href="/pages/saju/saju.html">사주 분석</a></p>
-    <p><a class="action-link" href="/pages/tojung/tojung.html">토정비결</a></p>
-    <p><a class="action-link" href="/fortune-guide.html">운세 가이드</a></p>
+  <section class="card content-card">
+    <h2 class="section-title">추천 운세 콘텐츠</h2>
+    <div class="link-list">
+      <a class="action-link" href="/pages/period/period.html">오늘/내일/연간 운세</a>
+      <a class="action-link" href="/pages/astro/index.html">별자리운세</a>
+      <a class="action-link" href="/pages/saju/saju.html">사주 분석</a>
+      <a class="action-link" href="/pages/tojung/tojung.html">토정비결</a>
+      <a class="action-link" href="/fortune-guide.html">운세 가이드</a>
+    </div>
   </section>
 
-  <section class="card">
-    <h2>자주 묻는 질문</h2>
+  <section class="card content-card">
+    <h2 class="section-title">자주 묻는 질문</h2>
 
     <p class="info-text"><b>Q. 띠별 운세는 어떻게 계산되나요?</b></p>
     <p class="info-text">
@@ -96,12 +106,14 @@
     </p>
   </section>
 
-  <button class="action-btn" id="shareBtn" type="button">공유하기</button>
-  <button class="action-btn" type="button" onclick="Common.goHome()">홈으로</button>
+  <div class="bottom-action-group">
+    <button class="action-btn" id="shareBtn" type="button">공유하기</button>
+    <button class="action-btn secondary-btn" type="button" onclick="Common.goHome()">홈으로</button>
+  </div>
 
-  <footer>
-    <div>무료 운세 플랫폼</div>
-    <div>문의: daekoju@naver.com</div>
+  <footer class="site-footer">
+    <div class="footer-brand">무료 운세 플랫폼</div>
+    <div class="footer-contact">문의: daekoju@naver.com</div>
     <div class="footer-links">
       <a href="/privacy.html">개인정보처리방침</a> |
       <a href="/terms.html">이용약관</a> |
