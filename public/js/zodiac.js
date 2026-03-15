@@ -299,21 +299,21 @@ function pickDailyFinal(daily, relation, animal, element, section, seed){
 
   const relationPool = daily?.relation_bonus?.[relation]?.[section];
   if(Array.isArray(relationPool) && relationPool.length){
-    return pickStable(relationPool, seed);
+    return pickStable(relationPool, `${seed}|relation`);
   }
 
   const animalPool = daily?.animal_bonus?.[animal]?.[section];
   if(Array.isArray(animalPool) && animalPool.length){
-    return pickStable(animalPool, seed);
+    return pickStable(animalPool, `${seed}|animal`);
   }
 
   const elementPool = daily?.element_bonus?.[element]?.[section];
   if(Array.isArray(elementPool) && elementPool.length){
-    return pickStable(elementPool, seed);
+    return pickStable(elementPool, `${seed}|element`);
   }
 
   const basePool = daily?.[section];
-  return pickStable(basePool, seed);
+  return pickStable(basePool, `${seed}|base`);
 }
 
 function pickDailyWithAnimal(daily, animal, section, seed){
@@ -343,7 +343,6 @@ function pickDailyWithRelation(daily, relation, section, seed){
 }
 
 function buildFortuneResult(profile){
-
   const today = getTodayKSTDate();
 
   const daily = fortuneDB?.daily || {};
@@ -353,7 +352,6 @@ function buildFortuneResult(profile){
   const element = profile?.element || "wood";
 
   return {
-
     todayMain: pickDailyFinal(daily, relation, animal, element, "main", buildDailySeed(profile, "daily-main", today)),
     todayLove: pickDailyFinal(daily, relation, animal, element, "love", buildDailySeed(profile, "daily-love", today)),
     todayMoney: pickDailyFinal(daily, relation, animal, element, "money", buildDailySeed(profile, "daily-money", today)),
@@ -362,24 +360,21 @@ function buildFortuneResult(profile){
     todayRelation: pickDailyFinal(daily, relation, animal, element, "relationship", buildDailySeed(profile, "daily-relationship", today)),
     todayAdvice: pickDailyFinal(daily, relation, animal, element, "advice", buildDailySeed(profile, "daily-advice", today)),
 
-    todayLuckyColor: pickStable(daily.lucky_color, buildDailySeed(profile, "daily-color", today)),
-    todayLuckyNumber: pickStable(daily.lucky_number, buildDailySeed(profile, "daily-number", today)),
+    todayLuckyColor: pickStable(daily?.lucky_color, buildDailySeed(profile, "daily-color", today)),
+    todayLuckyNumber: pickStable(daily?.lucky_number, buildDailySeed(profile, "daily-number", today)),
 
-    yearMain: pickStable(yearly.main, buildYearSeed(profile, "year-main", today)),
-    yearLove: pickStable(yearly.love, buildYearSeed(profile, "year-love", today)),
-    yearMoney: pickStable(yearly.money, buildYearSeed(profile, "year-money", today)),
-    yearHealth: pickStable(yearly.health, buildYearSeed(profile, "year-health", today)),
-    yearWork: pickStable(yearly.work, buildYearSeed(profile, "year-work", today)),
-    yearRelation: pickStable(yearly.relationship, buildYearSeed(profile, "year-relationship", today)),
-    yearAdvice: pickStable(yearly.advice, buildYearSeed(profile, "year-advice", today)),
-    yearKeyword: pickStable(yearly.keywords, buildYearSeed(profile, "year-keyword", today)),
-    yearLuckyColor: pickStable(yearly.lucky_color, buildYearSeed(profile, "year-color", today)),
-    yearLuckyNumber: pickStable(yearly.lucky_number, buildYearSeed(profile, "year-number", today))
-
+    yearMain: pickStable(yearly?.main, buildYearSeed(profile, "year-main", today)),
+    yearLove: pickStable(yearly?.love, buildYearSeed(profile, "year-love", today)),
+    yearMoney: pickStable(yearly?.money, buildYearSeed(profile, "year-money", today)),
+    yearHealth: pickStable(yearly?.health, buildYearSeed(profile, "year-health", today)),
+    yearWork: pickStable(yearly?.work, buildYearSeed(profile, "year-work", today)),
+    yearRelation: pickStable(yearly?.relationship, buildYearSeed(profile, "year-relationship", today)),
+    yearAdvice: pickStable(yearly?.advice, buildYearSeed(profile, "year-advice", today)),
+    yearKeyword: pickStable(yearly?.keywords, buildYearSeed(profile, "year-keyword", today)),
+    yearLuckyColor: pickStable(yearly?.lucky_color, buildYearSeed(profile, "year-color", today)),
+    yearLuckyNumber: pickStable(yearly?.lucky_number, buildYearSeed(profile, "year-number", today))
   };
-
 }
-
 function syncSelectToProfile(profile){
   const select = document.getElementById("zodiacSelect");
   if(!select) return;
