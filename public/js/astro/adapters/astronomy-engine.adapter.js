@@ -95,7 +95,6 @@ export function buildAstronomySnapshot(date){
   }
 
   const time = new Astronomy.AstroTime(date);
-
   function planet(body){
     const vec = Astronomy.GeoVector(body, time, false);
     const longitude = vectorToEclipticLongitude(vec);
