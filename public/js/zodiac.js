@@ -388,11 +388,13 @@ function applyGuestBirthForZodiac(){
 
   const myZodiac = getZodiacFromBirth(rawBirth);
   const select = document.getElementById("zodiacSelect");
+
   if(select){
     select.value = myZodiac;
   }
 
   renderEntryState();
+  renderMyZodiacInfo(myZodiac);
   showZodiac();
 }
 
