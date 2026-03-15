@@ -98,7 +98,8 @@ export function buildAscendantSnapshot({ birthDate, birthTime, geo }){
     resolvedGeo.elevation
   );
 
-  const horizon = Astronomy.Horizon(safeDate, observer, 90, 0);
+  const time = new Astronomy.AstroTime(safeDate);
+const horizon = Astronomy.Horizon(time, observer, 90, 0);
 
   if(!horizon || typeof horizon.ra !== "number"){
     console.warn("[astronomy-ascendant] horizon calc failed");
