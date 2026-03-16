@@ -53,15 +53,17 @@ const ELEMENT_NAMES = {
 };
 
 const RELATION_LABELS = {
-  he: "잘 맞는 흐름",
-  chong: "조심할 흐름",
-  normal: "무난한 흐름"
+  he: "잘 맞는 흐름 (합)",
+  chong: "조심할 흐름 (충)",
+  normal: "무난한 흐름 (평)"
 };
 
-const RELATION_DETAIL_NAMES = {
-  he: "합",
-  chong: "충",
-  normal: "평"
+const ELEMENT_FLOW_LABELS = {
+  same: "균형 흐름 (동행)",
+  support: "도움 흐름 (상생)",
+  output: "활동 흐름 (설기)",
+  control: "조정 흐름 (상극)",
+  pressure: "부담 흐름 (역극)"
 };
 
 const RELATION_TEXT = {
@@ -76,43 +78,12 @@ const YEAR_RELATION_TEXT = {
   normal: "올해는 큰 충돌보다 안정적인 운영과 기본 관리가 더 중요할 수 있습니다."
 };
 
-const ELEMENT_FLOW_LABELS = {
-  same: "균형 흐름",
-  support: "도움 흐름",
-  output: "활동 흐름",
-  control: "조정 흐름",
-  pressure: "부담 흐름"
-};
-
-const ELEMENT_FLOW_DETAIL_NAMES = {
-  same: "동행",
-  support: "상생",
-  output: "설기",
-  control: "상극",
-  pressure: "역극"
-};
-
 const ELEMENT_FLOW_TEXT = {
   same: "올해는 내 기본 성향과 익숙한 강점을 자연스럽게 살리기 좋은 흐름입니다.",
   support: "올해는 외부 환경이나 주변 흐름이 비교적 내 편으로 작용할 가능성이 있습니다.",
   output: "올해는 움직임과 실행이 늘 수 있어 성과도 나지만 소모 관리도 중요합니다.",
   control: "올해는 기준을 다시 세우고 불필요한 부분을 조정하는 일이 중요할 수 있습니다.",
   pressure: "올해는 부담이 커질 수 있어 선택과 집중, 체력 안배가 특히 중요할 수 있습니다."
-};
-
-const ZODIAC_RELATION = {
-  rat: { chong: "horse", he: "ox" },
-  ox: { chong: "goat", he: "rat" },
-  tiger: { chong: "monkey", he: "pig" },
-  rabbit: { chong: "rooster", he: "dog" },
-  dragon: { chong: "dog", he: "rooster" },
-  snake: { chong: "pig", he: "monkey" },
-  horse: { chong: "rat", he: "goat" },
-  goat: { chong: "ox", he: "horse" },
-  monkey: { chong: "tiger", he: "snake" },
-  rooster: { chong: "rabbit", he: "dragon" },
-  dog: { chong: "dragon", he: "rabbit" },
-  pig: { chong: "snake", he: "tiger" }
 };
 
 const SUBTYPE_TEXT = {
@@ -130,6 +101,21 @@ const AGE_GROUP_TEXT = {
   adult: "일, 돈, 책임, 관계 균형이 가장 중요한 구간입니다.",
   mid: "유지, 재정 관리, 생활 안정, 관계 정리가 중요한 구간입니다.",
   senior: "건강 리듬, 생활 균형, 가까운 관계의 편안함이 더 중요하게 작용하는 구간입니다."
+};
+
+const ZODIAC_RELATION = {
+  rat: { chong: "horse", he: "ox" },
+  ox: { chong: "goat", he: "rat" },
+  tiger: { chong: "monkey", he: "pig" },
+  rabbit: { chong: "rooster", he: "dog" },
+  dragon: { chong: "dog", he: "rooster" },
+  snake: { chong: "pig", he: "monkey" },
+  horse: { chong: "rat", he: "goat" },
+  goat: { chong: "ox", he: "horse" },
+  monkey: { chong: "tiger", he: "snake" },
+  rooster: { chong: "rabbit", he: "dragon" },
+  dog: { chong: "dragon", he: "rabbit" },
+  pig: { chong: "snake", he: "tiger" }
 };
 
 async function loadDB(){
@@ -375,7 +361,10 @@ function pickStable(arr, seed){
 function pickStableFromObjectPools(obj, seed, preferredTypes = []){
   if(!obj || typeof obj !== "object" || Array.isArray(obj)) return "";
 
-  const availableTypes = Object.keys(obj).filter(key => Array.isArray(obj[key]) && obj[key].length > 0);
+  const availableTypes = Object.keys(obj).filter(
+    key => Array.isArray(obj[key]) && obj[key].length > 0
+  );
+
   if(availableTypes.length === 0) return "";
 
   const orderedTypes = [
@@ -415,6 +404,46 @@ function buildYearSeed(profile, section, targetDate){
     targetDate.getFullYear(),
     section
   ].join("|");
+}
+
+function getDailyPreferredTypes(relation, section){
+  if(section === "advice"){
+    if(relation === "he") return ["action"];
+    if(relation === "chong") return ["warning", "recovery"];
+    return ["action"];
+  }
+
+  if(relation === "he") return ["opportunity", "relation", "action"];
+  if(relation === "chong") return ["warning", "timing", "recovery"];
+  return ["relation", "timing", "action"];
+}
+
+function getYearPreferredTypes(yearRelation, elementFlow, section){
+  if(section === "advice"){
+    if(yearRelation === "he") return ["connection", "expansion"];
+    if(yearRelation === "chong") return ["caution", "adjustment", "foundation"];
+    if(elementFlow === "support") return ["connection", "expansion"];
+    if(elementFlow === "pressure") return ["caution", "foundation"];
+    return ["foundation", "adjustment"];
+  }
+
+  if(yearRelation === "he"){
+    return ["connection", "expansion", "harvest", "foundation"];
+  }
+
+  if(yearRelation === "chong"){
+    return ["caution", "adjustment", "foundation", "harvest"];
+  }
+
+  if(elementFlow === "support"){
+    return ["expansion", "connection", "harvest", "foundation"];
+  }
+
+  if(elementFlow === "pressure"){
+    return ["foundation", "adjustment", "caution", "harvest"];
+  }
+
+  return ["foundation", "adjustment", "harvest", "connection", "caution", "expansion"];
 }
 
 function buildProfile(){
@@ -510,51 +539,15 @@ function buildProfileByAnimalOverride(animalOverride){
   };
 }
 
-function getDailyPreferredTypes(relation, section){
-  if(section === "advice"){
-    if(relation === "he") return ["action"];
-    if(relation === "chong") return ["warning", "recovery"];
-    return ["action"];
-  }
-
-  if(relation === "he") return ["opportunity", "relation", "action"];
-  if(relation === "chong") return ["warning", "timing", "recovery"];
-  return ["relation", "timing", "action"];
-}
-
-function getYearPreferredTypes(yearRelation, elementFlow, section){
-  if(section === "advice"){
-    if(yearRelation === "he") return ["connection", "expansion"];
-    if(yearRelation === "chong") return ["caution", "adjustment", "foundation"];
-    if(elementFlow === "support") return ["connection", "expansion"];
-    if(elementFlow === "pressure") return ["caution", "foundation"];
-    return ["foundation", "adjustment"];
-  }
-
-  if(yearRelation === "he"){
-    return ["connection", "expansion", "harvest", "foundation"];
-  }
-
-  if(yearRelation === "chong"){
-    return ["caution", "adjustment", "foundation", "harvest"];
-  }
-
-  if(elementFlow === "support"){
-    return ["expansion", "connection", "harvest", "foundation"];
-  }
-
-  if(elementFlow === "pressure"){
-    return ["foundation", "adjustment", "caution", "harvest"];
-  }
-
-  return ["foundation", "adjustment", "harvest", "connection", "caution", "expansion"];
-}
-
 function pickDailyFinal(daily, relation, animal, element, section, seed){
   const preferredTypes = getDailyPreferredTypes(relation, section);
 
   const relationPoolObj = daily?.relation_bonus?.[relation]?.[section];
-  const relationPick = pickStableFromObjectPools(relationPoolObj, `${seed}|relation`, preferredTypes);
+  const relationPick = pickStableFromObjectPools(
+    relationPoolObj,
+    `${seed}|relation`,
+    preferredTypes
+  );
   if(relationPick) return relationPick;
 
   const animalPool = daily?.animal_bonus?.[animal]?.[section];
@@ -586,7 +579,11 @@ function pickYearFinal(yearly, profile, section, seed){
   }
 
   const relationPoolObj = yearly?.relation_bonus?.[yearRelation]?.[section];
-  const relationPick = pickStableFromObjectPools(relationPoolObj, `${seed}|relation`, preferredTypes);
+  const relationPick = pickStableFromObjectPools(
+    relationPoolObj,
+    `${seed}|relation`,
+    preferredTypes
+  );
   if(relationPick) return relationPick;
 
   const elementPool = yearly?.element_bonus?.[elementFlow]?.[section];
@@ -670,9 +667,9 @@ function renderGuide(profile){
     <p>출생 연도 간지 : ${profile.birthGanzhi}</p>
     <p>올해 간지 : ${profile.currentGanzhi}</p>
     <p>내 띠 : ${profile.animalName}</p>
-    <p>올해 띠 흐름 : ${RELATION_DETAIL_NAMES[profile.yearRelation]}</p>
-    <p>오늘 띠 흐름 : ${RELATION_DETAIL_NAMES[profile.relation]}</p>
-    <p>오행 흐름 : ${ELEMENT_FLOW_DETAIL_NAMES[profile.elementFlow]}</p>
+    <p>올해 띠 흐름 : ${profile.yearRelationLabel}</p>
+    <p>오늘 띠 흐름 : ${profile.relationLabel}</p>
+    <p>오행 흐름 : ${profile.elementFlowLabel}</p>
     <p class="small">오늘 운세는 같은 생년월일이면 하루 동안 동일하게 유지되도록 고정 계산됩니다.</p>
     <p class="small"><a href="/pages/guide/fortune-terms.html">오행·지지·간지 용어 설명 보기</a></p>
   `;
