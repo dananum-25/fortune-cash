@@ -53,6 +53,12 @@ const BRANCHES = [
 ];
 
 const RELATION_LABELS = {
+  he: "잘 맞는 흐름",
+  chong: "조심할 흐름",
+  normal: "무난한 흐름"
+};
+
+const RELATION_DETAIL_NAMES = {
   he: "합",
   chong: "충",
   normal: "평"
@@ -103,6 +109,14 @@ const AGE_GROUP_TEXT = {
 };
 
 const ELEMENT_FLOW_LABELS = {
+  same: "균형 흐름",
+  support: "도움 흐름",
+  output: "활동 흐름",
+  control: "조정 흐름",
+  pressure: "부담 흐름"
+};
+
+const ELEMENT_FLOW_DETAIL_NAMES = {
   same: "동행",
   support: "상생",
   output: "설기",
@@ -583,17 +597,33 @@ function renderGuide(profile) {
   if (!guideBox) return;
 
   guideBox.innerHTML = `
-    <h3>🔎 이번 결과는 이렇게 계산했어요</h3>
-    <p><b>띠 판정:</b> 생년월일을 입춘 기준으로 계산해 ${profile.animalName}로 판정했습니다.</p>
-    <p><b>출생연도 간지:</b> ${profile.birthGanzhi}년 기준으로 연도 흐름을 잡았습니다.</p>
-    <p><b>출생연도 타입:</b> ${profile.zodiacYear}년 기준 ${profile.elementName} 기운 서브타입을 반영했습니다.</p>
-    <p><b>올해 간지:</b> 올해는 ${profile.currentGanzhi}년 흐름으로 반영했습니다.</p>
-    <p><b>올해 띠 관계:</b> 올해 지지와 ${profile.animalName}의 관계는 <b>${profile.yearRelationLabel}</b> 흐름입니다.</p>
-    <p><b>오늘 흐름:</b> 오늘 지지와 ${profile.animalName}의 관계는 <b>${profile.relationLabel}</b> 흐름입니다.</p>
-    <p><b>올해 오행 흐름:</b> ${profile.elementFlowLabel}</p>
+    <h3>왜 이런 결과가 나왔나요?</h3>
+
+    <p><b>먼저 쉽게 보면</b></p>
     <p>${YEAR_RELATION_TEXT[profile.yearRelation]}</p>
+    <p>${RELATION_TEXT[profile.relation]}</p>
     <p>${ELEMENT_FLOW_TEXT[profile.elementFlow]}</p>
+
+    <hr>
+
+    <p><b>조금 더 풀어서 보면</b></p>
+    <p>생년월일을 입춘 기준으로 계산했을 때 내 띠는 <b>${profile.animalName}</b>입니다.</p>
+    <p>태어난 해의 흐름은 <b>${profile.birthGanzhi}년</b> 기준으로 잡았고, 출생 연도 오행은 <b>${profile.elementName}</b>입니다.</p>
+    <p>올해 전체 분위기는 <b>${profile.currentGanzhi}년</b> 흐름으로 보고 있습니다.</p>
+    <p>올해의 지지와 내 띠 관계는 <b>${profile.yearRelationLabel}</b> 쪽에 가깝고, 오늘의 지지와 내 띠 관계는 <b>${profile.relationLabel}</b> 쪽으로 보고 있습니다.</p>
+    <p>또 출생 오행과 올해 오행 관계는 <b>${profile.elementFlowLabel}</b>으로 해석하고 있습니다.</p>
     <p><b>연령대 보정:</b> ${AGE_GROUP_TEXT[profile.ageGroup]}</p>
+
+    <hr>
+
+    <p><b>참고 정보</b></p>
+    <p>출생 연도 간지 : ${profile.birthGanzhi}</p>
+    <p>올해 간지 : ${profile.currentGanzhi}</p>
+    <p>내 띠 : ${profile.animalName}</p>
+    <p>올해 지지 흐름 : ${RELATION_DETAIL_NAMES[profile.yearRelation]}</p>
+    <p>오늘 지지 흐름 : ${RELATION_DETAIL_NAMES[profile.relation]}</p>
+    <p>오행 흐름 : ${ELEMENT_FLOW_DETAIL_NAMES[profile.elementFlow]}</p>
+    <p class="small">용어가 낯설다면 <a href="/pages/guide/fortune-terms.html">운세 용어 설명</a>에서 쉽게 볼 수 있습니다.</p>
     <p class="small">오늘 운세는 같은 생년월일이면 하루 동안 동일하게 유지되도록 고정 계산됩니다.</p>
   `;
 }
@@ -651,6 +681,7 @@ function renderResult(profile, result) {
     <p>${RELATION_TEXT[profile.relation]}</p>
     <p>${SUBTYPE_TEXT[profile.element]}</p>
     <p>${ELEMENT_FLOW_TEXT[profile.elementFlow]}</p>
+    <p class="small"><a href="/pages/guide/fortune-terms.html">오행·지지·간지 용어 설명 보기</a></p>
   `;
 
   resultSection.style.display = "block";
@@ -716,12 +747,13 @@ function renderMyZodiacInfo(profile) {
   box.innerHTML = `
     <p class="info-text"><b>내 띠</b> ${profile.animalName}</p>
     <p class="info-text"><b>입춘 기준 적용 연도</b> ${profile.zodiacYear}년</p>
-    <p class="info-text"><b>출생연도 간지</b> ${profile.birthGanzhi}년</p>
-    <p class="info-text"><b>출생연도 서브타입</b> ${profile.elementName} ${profile.animalName}</p>
-    <p class="info-text"><b>올해 간지</b> ${profile.currentGanzhi}년</p>
-    <p class="info-text"><b>올해 띠 흐름</b> ${profile.yearRelationLabel}</p>
-    <p class="info-text"><b>올해 오행 흐름</b> ${profile.elementFlowLabel}</p>
-    <p class="info-text"><b>오늘 관계 흐름</b> ${profile.relationLabel}</p>
+    <p class="info-text"><b>출생 연도 간지</b> ${profile.birthGanzhi}년</p>
+    <p class="info-text"><b>출생 기운</b> ${profile.elementName} ${profile.animalName}</p>
+    <p class="info-text"><b>올해 분위기</b> ${profile.currentGanzhi}년</p>
+    <p class="info-text"><b>올해 흐름</b> ${profile.yearRelationLabel}</p>
+    <p class="info-text"><b>올해 오행 분위기</b> ${profile.elementFlowLabel}</p>
+    <p class="info-text"><b>오늘 흐름</b> ${profile.relationLabel}</p>
+    <p class="small"><a href="/pages/guide/fortune-terms.html">용어 설명 보기</a></p>
   `;
 }
 
