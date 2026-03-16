@@ -125,6 +125,9 @@ async function loadDB() {
     animalRes,
     elementRes,
     yearRes,
+    yearRelationRes,
+    yearElementRes,
+    yearGanzhiRes,
     ipchunRes
   ] = await Promise.all([
     fetch("/data/fortune/daily.json", { cache: "no-store" }),
@@ -132,6 +135,9 @@ async function loadDB() {
     fetch("/data/fortune/animal_bonus.json", { cache: "no-store" }),
     fetch("/data/fortune/element_bonus.json", { cache: "no-store" }),
     fetch("/data/fortune/year.json", { cache: "no-store" }),
+    fetch("/data/fortune/year_relation_bonus.json", { cache: "no-store" }),
+    fetch("/data/fortune/year_element_bonus.json", { cache: "no-store" }),
+    fetch("/data/fortune/year_ganzhi_bonus.json", { cache: "no-store" }),
     fetch("/data/ipchun_db.json", { cache: "no-store" })
   ]);
 
@@ -139,7 +145,11 @@ async function loadDB() {
   const relation = await relationRes.json();
   const animal = await animalRes.json();
   const element = await elementRes.json();
+
   const year = await yearRes.json();
+  const yearRelation = await yearRelationRes.json();
+  const yearElement = await yearElementRes.json();
+  const yearGanzhi = await yearGanzhiRes.json();
 
   fortuneDB = {
     daily: {
@@ -148,7 +158,12 @@ async function loadDB() {
       animal_bonus: animal,
       element_bonus: element
     },
-    year
+    year: {
+      ...year,
+      relation_bonus: yearRelation,
+      element_bonus: yearElement,
+      ganzhi_bonus: yearGanzhi
+    }
   };
 
   ipchunDB = await ipchunRes.json();
@@ -165,6 +180,26 @@ function toDateOnlyText(date) {
 function getTodayKSTDate() {
   const now = new Date();
   return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+}
+
+function pickYearFinal(yearly, yearRelation, elementFlow, currentGanzhi, section, seed) {
+  const relationPool = yearly?.relation_bonus?.[yearRelation]?.[section];
+  if (Array.isArray(relationPool) && relationPool.length) {
+    return pickStable(relationPool, `${seed}|yearRelation`);
+  }
+
+  const elementPool = yearly?.element_bonus?.[elementFlow]?.[section];
+  if (Array.isArray(elementPool) && elementPool.length) {
+    return pickStable(elementPool, `${seed}|yearElement`);
+  }
+
+  const ganzhiPool = yearly?.ganzhi_bonus?.[currentGanzhi]?.[section];
+  if (Array.isArray(ganzhiPool) && ganzhiPool.length) {
+    return pickStable(ganzhiPool, `${seed}|yearGanzhi`);
+  }
+
+  const basePool = yearly?.[section];
+  return pickStable(basePool, `${seed}|yearBase`);
 }
 
 function getSavedBirthInput() {
@@ -507,6 +542,10 @@ function buildFortuneResult(profile) {
   const animal = profile?.animal || "rat";
   const element = profile?.element || "wood";
 
+  const yearRelation = profile?.yearRelation || "normal";
+  const elementFlow = profile?.elementFlow || "same";
+  const currentGanzhi = profile?.currentGanzhi || "갑자";
+
   return {
     todayMain: pickDailyFinal(daily, relation, animal, element, "main", buildDailySeed(profile, "daily-main", today)),
     todayLove: pickDailyFinal(daily, relation, animal, element, "love", buildDailySeed(profile, "daily-love", today)),
@@ -519,13 +558,14 @@ function buildFortuneResult(profile) {
     todayLuckyColor: pickStable(daily?.lucky_color, buildDailySeed(profile, "daily-color", today)),
     todayLuckyNumber: pickStable(daily?.lucky_number, buildDailySeed(profile, "daily-number", today)),
 
-    yearMain: pickStable(yearly?.main, buildYearSeed(profile, "year-main")),
-    yearLove: pickStable(yearly?.love, buildYearSeed(profile, "year-love")),
-    yearMoney: pickStable(yearly?.money, buildYearSeed(profile, "year-money")),
-    yearHealth: pickStable(yearly?.health, buildYearSeed(profile, "year-health")),
-    yearWork: pickStable(yearly?.work, buildYearSeed(profile, "year-work")),
-    yearRelation: pickStable(yearly?.relationship, buildYearSeed(profile, "year-relationship")),
-    yearAdvice: pickStable(yearly?.advice, buildYearSeed(profile, "year-advice")),
+    yearMain: pickYearFinal(yearly, yearRelation, elementFlow, currentGanzhi, "main", buildYearSeed(profile, "year-main")),
+    yearLove: pickYearFinal(yearly, yearRelation, elementFlow, currentGanzhi, "love", buildYearSeed(profile, "year-love")),
+    yearMoney: pickYearFinal(yearly, yearRelation, elementFlow, currentGanzhi, "money", buildYearSeed(profile, "year-money")),
+    yearHealth: pickYearFinal(yearly, yearRelation, elementFlow, currentGanzhi, "health", buildYearSeed(profile, "year-health")),
+    yearWork: pickYearFinal(yearly, yearRelation, elementFlow, currentGanzhi, "work", buildYearSeed(profile, "year-work")),
+    yearRelation: pickYearFinal(yearly, yearRelation, elementFlow, currentGanzhi, "relationship", buildYearSeed(profile, "year-relationship")),
+    yearAdvice: pickYearFinal(yearly, yearRelation, elementFlow, currentGanzhi, "advice", buildYearSeed(profile, "year-advice")),
+
     yearKeyword: pickStable(yearly?.keywords, buildYearSeed(profile, "year-keyword")),
     yearLuckyColor: pickStable(yearly?.lucky_color, buildYearSeed(profile, "year-color")),
     yearLuckyNumber: pickStable(yearly?.lucky_number, buildYearSeed(profile, "year-number"))
