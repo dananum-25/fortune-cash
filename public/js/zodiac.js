@@ -26,6 +26,16 @@ const ZODIAC_NAMES = {
   pig: "돼지띠"
 };
 
+const STEMS = [
+  "갑", "을", "병", "정", "무",
+  "기", "경", "신", "임", "계"
+];
+
+const BRANCHES = [
+  "자", "축", "인", "묘", "진", "사",
+  "오", "미", "신", "유", "술", "해"
+];
+
 const ELEMENTS = [
   "wood", "wood",
   "fire", "fire",
@@ -42,16 +52,6 @@ const ELEMENT_NAMES = {
   water: "수"
 };
 
-const STEMS = [
-  "갑", "을", "병", "정", "무",
-  "기", "경", "신", "임", "계"
-];
-
-const BRANCHES = [
-  "자", "축", "인", "묘", "진", "사",
-  "오", "미", "신", "유", "술", "해"
-];
-
 const RELATION_LABELS = {
   he: "잘 맞는 흐름",
   chong: "조심할 흐름",
@@ -65,47 +65,15 @@ const RELATION_DETAIL_NAMES = {
 };
 
 const RELATION_TEXT = {
-  he: "오늘 지지와 내 띠 흐름이 비교적 잘 맞는 날입니다. 사람, 일정, 제안 흐름을 부드럽게 연결하기 좋습니다.",
-  chong: "오늘 지지와 내 띠 흐름이 부딪히는 날입니다. 말실수, 일정 엇갈림, 감정 반응을 조금 더 조심하는 편이 좋습니다.",
-  normal: "오늘 지지와 내 띠 흐름은 큰 충돌 없이 무난한 편입니다. 무리한 확장보다 안정적인 운영이 잘 맞습니다."
+  he: "오늘은 사람, 일정, 제안 흐름이 비교적 자연스럽게 이어질 가능성이 있습니다. 혼자 밀기보다 연결을 잘 활용하는 편이 좋습니다.",
+  chong: "오늘은 말실수, 일정 엇갈림, 감정 반응을 조금 더 조심하는 편이 좋습니다. 무리하게 밀어붙이기보다 조정이 중요할 수 있습니다.",
+  normal: "오늘은 큰 충돌보다 안정적인 운영이 더 잘 맞는 흐름입니다. 과하게 흔들기보다 기본을 지키는 편이 좋습니다."
 };
 
 const YEAR_RELATION_TEXT = {
-  he: "올해의 지지 흐름이 내 띠와 비교적 잘 맞는 편입니다. 확장과 연결을 시도하기 좋은 해로 볼 수 있습니다.",
-  chong: "올해의 지지 흐름이 내 띠와 부딪히는 편입니다. 무리한 확장보다 점검과 조정이 더 중요할 수 있습니다.",
-  normal: "올해의 지지 흐름은 내 띠와 크게 충돌하지 않는 무난한 편입니다. 안정적인 운영이 잘 맞습니다."
-};
-
-const ZODIAC_RELATION = {
-  rat: { chong: "horse", he: "ox" },
-  ox: { chong: "goat", he: "rat" },
-  tiger: { chong: "monkey", he: "pig" },
-  rabbit: { chong: "rooster", he: "dog" },
-  dragon: { chong: "dog", he: "rooster" },
-  snake: { chong: "pig", he: "monkey" },
-  horse: { chong: "rat", he: "goat" },
-  goat: { chong: "ox", he: "horse" },
-  monkey: { chong: "tiger", he: "snake" },
-  rooster: { chong: "rabbit", he: "dragon" },
-  dog: { chong: "dragon", he: "rabbit" },
-  pig: { chong: "snake", he: "tiger" }
-};
-
-const SUBTYPE_TEXT = {
-  wood: "성장, 확장, 배움 쪽 감각을 살릴수록 흐름이 좋아집니다.",
-  fire: "표현력과 추진력이 강하게 살아날 수 있어 속도 조절이 중요합니다.",
-  earth: "안정, 유지, 현실 감각을 살릴 때 운의 체감이 좋아집니다.",
-  metal: "기준, 정리, 정확성을 살릴수록 결과가 단단해집니다.",
-  water: "흐름 파악, 유연성, 관계 조율이 강점으로 작용할 수 있습니다."
-};
-
-const AGE_GROUP_TEXT = {
-  child: "보호자, 생활리듬, 환경 안정이 운세 체감에 더 크게 작용하는 구간입니다.",
-  teen: "학업, 집중, 친구 관계, 생활패턴 관리가 핵심으로 작용하는 구간입니다.",
-  young: "진로, 이동, 선택, 인간관계 폭이 운세 체감에 크게 연결되는 구간입니다.",
-  adult: "일, 돈, 책임, 관계 균형이 가장 중요한 구간입니다.",
-  mid: "유지, 재정 관리, 생활 안정, 관계 정리가 중요한 구간입니다.",
-  senior: "건강 리듬, 생활 균형, 가까운 관계의 편안함이 더 중요하게 작용하는 구간입니다."
+  he: "올해는 사람, 기회, 협력 흐름이 비교적 잘 이어질 가능성이 있습니다.",
+  chong: "올해는 무리한 확장보다 조정과 균형이 더 중요하게 작용할 수 있습니다.",
+  normal: "올해는 큰 충돌보다 안정적인 운영과 기본 관리가 더 중요할 수 있습니다."
 };
 
 const ELEMENT_FLOW_LABELS = {
@@ -125,14 +93,46 @@ const ELEMENT_FLOW_DETAIL_NAMES = {
 };
 
 const ELEMENT_FLOW_TEXT = {
-  same: "내 출생 오행과 올해 오행이 같은 계열이라, 기존 방식과 익숙한 강점을 살리기 좋은 흐름입니다.",
-  support: "올해 오행이 내 출생 오행을 도와주는 흐름이라, 기반을 키우고 기회를 받기 좋은 편입니다.",
-  output: "내 기운을 바깥으로 많이 쓰게 되는 흐름이라, 활동성은 늘 수 있지만 과소모는 조심하는 편이 좋습니다.",
-  control: "내 기준과 올해 흐름이 부딪히기 쉬워, 무리하게 밀어붙이기보다 조율이 중요합니다.",
-  pressure: "올해 흐름의 압박을 느끼기 쉬운 편이라, 유지와 체력 관리가 더 중요하게 작용할 수 있습니다."
+  same: "올해는 내 기본 성향과 익숙한 강점을 자연스럽게 살리기 좋은 흐름입니다.",
+  support: "올해는 외부 환경이나 주변 흐름이 비교적 내 편으로 작용할 가능성이 있습니다.",
+  output: "올해는 움직임과 실행이 늘 수 있어 성과도 나지만 소모 관리도 중요합니다.",
+  control: "올해는 기준을 다시 세우고 불필요한 부분을 조정하는 일이 중요할 수 있습니다.",
+  pressure: "올해는 부담이 커질 수 있어 선택과 집중, 체력 안배가 특히 중요할 수 있습니다."
 };
 
-async function loadDB() {
+const ZODIAC_RELATION = {
+  rat: { chong: "horse", he: "ox" },
+  ox: { chong: "goat", he: "rat" },
+  tiger: { chong: "monkey", he: "pig" },
+  rabbit: { chong: "rooster", he: "dog" },
+  dragon: { chong: "dog", he: "rooster" },
+  snake: { chong: "pig", he: "monkey" },
+  horse: { chong: "rat", he: "goat" },
+  goat: { chong: "ox", he: "horse" },
+  monkey: { chong: "tiger", he: "snake" },
+  rooster: { chong: "rabbit", he: "dragon" },
+  dog: { chong: "dragon", he: "rabbit" },
+  pig: { chong: "snake", he: "tiger" }
+};
+
+const SUBTYPE_TEXT = {
+  wood: "성장, 확장, 배움 쪽 감각을 살릴수록 흐름이 좋아질 수 있습니다.",
+  fire: "표현력과 추진력이 강하게 살아날 수 있어 속도 조절이 중요할 수 있습니다.",
+  earth: "안정, 유지, 현실 감각을 살릴 때 운의 체감이 좋아질 수 있습니다.",
+  metal: "기준, 정리, 정확성을 살릴수록 결과가 단단해질 수 있습니다.",
+  water: "흐름 파악, 유연성, 관계 조율이 강점으로 작용할 수 있습니다."
+};
+
+const AGE_GROUP_TEXT = {
+  child: "보호자, 생활리듬, 환경 안정이 운세 체감에 더 크게 작용하는 구간입니다.",
+  teen: "학업, 집중, 친구 관계, 생활패턴 관리가 핵심으로 작용하는 구간입니다.",
+  young: "진로, 이동, 선택, 인간관계 폭이 운세 체감에 크게 연결되는 구간입니다.",
+  adult: "일, 돈, 책임, 관계 균형이 가장 중요한 구간입니다.",
+  mid: "유지, 재정 관리, 생활 안정, 관계 정리가 중요한 구간입니다.",
+  senior: "건강 리듬, 생활 균형, 가까운 관계의 편안함이 더 중요하게 작용하는 구간입니다."
+};
+
+async function loadDB(){
   const [
     dailyRes,
     relationRes,
@@ -183,44 +183,24 @@ async function loadDB() {
   ipchunDB = await ipchunRes.json();
 }
 
-function safePad(n) {
+function safePad(n){
   return String(n).padStart(2, "0");
 }
 
-function toDateOnlyText(date) {
+function toDateOnlyText(date){
   return `${date.getFullYear()}-${safePad(date.getMonth() + 1)}-${safePad(date.getDate())}`;
 }
 
-function getTodayKSTDate() {
+function getTodayKSTDate(){
   const now = new Date();
   return new Date(now.getFullYear(), now.getMonth(), now.getDate());
 }
 
-function pickYearFinal(yearly, yearRelation, elementFlow, currentGanzhi, section, seed) {
-  const relationPool = yearly?.relation_bonus?.[yearRelation]?.[section];
-  if (Array.isArray(relationPool) && relationPool.length) {
-    return pickStable(relationPool, `${seed}|yearRelation`);
-  }
-
-  const elementPool = yearly?.element_bonus?.[elementFlow]?.[section];
-  if (Array.isArray(elementPool) && elementPool.length) {
-    return pickStable(elementPool, `${seed}|yearElement`);
-  }
-
-  const ganzhiPool = yearly?.ganzhi_bonus?.[currentGanzhi]?.[section];
-  if (Array.isArray(ganzhiPool) && ganzhiPool.length) {
-    return pickStable(ganzhiPool, `${seed}|yearGanzhi`);
-  }
-
-  const basePool = yearly?.[section];
-  return pickStable(basePool, `${seed}|yearBase`);
-}
-
-function getSavedBirthInput() {
+function getSavedBirthInput(){
   const phone = localStorage.getItem("phone");
   const guestBirth = localStorage.getItem("guest_birth");
 
-  if (phone) {
+  if(phone){
     return {
       birthDate: localStorage.getItem("birth") || DEFAULT_BIRTH_YMD,
       birthTime: localStorage.getItem("birthTime") || DEFAULT_BIRTH_TIME,
@@ -228,7 +208,7 @@ function getSavedBirthInput() {
     };
   }
 
-  if (guestBirth) {
+  if(guestBirth){
     return {
       birthDate: localStorage.getItem("guest_birth") || DEFAULT_BIRTH_YMD,
       birthTime: localStorage.getItem("guest_birthTime") || DEFAULT_BIRTH_TIME,
@@ -243,9 +223,9 @@ function getSavedBirthInput() {
   };
 }
 
-function parseBirthDate(birthDate) {
+function parseBirthDate(birthDate){
   const m = String(birthDate || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (!m) {
+  if(!m){
     return new Date(DEFAULT_BIRTH_YMD);
   }
 
@@ -256,11 +236,11 @@ function parseBirthDate(birthDate) {
   return new Date(year, month, day);
 }
 
-function getIpchunText(year) {
+function getIpchunText(year){
   return ipchunDB?.[String(year)] || "02-04";
 }
 
-function getZodiacYear(birthDateText) {
+function getZodiacYear(birthDateText){
   const d = parseBirthDate(birthDateText);
   const year = d.getFullYear();
   const md = `${safePad(d.getMonth() + 1)}-${safePad(d.getDate())}`;
@@ -269,23 +249,15 @@ function getZodiacYear(birthDateText) {
   return md < ipchun ? year - 1 : year;
 }
 
-function getFlowYearByDate(date) {
-  const year = date.getFullYear();
-  const md = `${safePad(date.getMonth() + 1)}-${safePad(date.getDate())}`;
-  const ipchun = getIpchunText(year);
-
-  return md < ipchun ? year - 1 : year;
-}
-
-function getGanzhi(year) {
+function getGanzhi(year){
   let stemIndex = (year - 4) % 10;
-  if (stemIndex < 0) stemIndex += 10;
+  if(stemIndex < 0) stemIndex += 10;
 
   let branchIndex = (year - 4) % 12;
-  if (branchIndex < 0) branchIndex += 12;
+  if(branchIndex < 0) branchIndex += 12;
 
   let ganzhiIndex = (year - 4) % 60;
-  if (ganzhiIndex < 0) ganzhiIndex += 60;
+  if(ganzhiIndex < 0) ganzhiIndex += 60;
 
   return {
     stem: STEMS[stemIndex],
@@ -297,85 +269,131 @@ function getGanzhi(year) {
   };
 }
 
-function getZodiacAnimal(zodiacYear) {
+function getZodiacAnimal(zodiacYear){
   let index = (zodiacYear - 4) % 12;
-  if (index < 0) index += 12;
+  if(index < 0) index += 12;
   return ZODIAC_ANIMALS[index];
 }
 
-function getBirthElement(zodiacYear) {
+function getBirthElement(zodiacYear){
   let stemIndex = (zodiacYear - 4) % 10;
-  if (stemIndex < 0) stemIndex += 10;
+  if(stemIndex < 0) stemIndex += 10;
   return ELEMENTS[stemIndex];
 }
 
-function getAgeGroup(zodiacYear) {
+function getAgeGroup(zodiacYear){
   const currentYear = getTodayKSTDate().getFullYear();
   const age = currentYear - zodiacYear + 1;
 
-  if (age < 13) return "child";
-  if (age < 20) return "teen";
-  if (age < 30) return "young";
-  if (age < 45) return "adult";
-  if (age < 60) return "mid";
+  if(age < 13) return "child";
+  if(age < 20) return "teen";
+  if(age < 30) return "young";
+  if(age < 45) return "adult";
+  if(age < 60) return "mid";
   return "senior";
 }
 
-function getDayBranch(targetDate) {
+function getDayBranch(targetDate){
   const base = new Date(1900, 0, 1);
   const diffDays = Math.floor((targetDate - base) / 86400000);
   let index = diffDays % 12;
-  if (index < 0) index += 12;
+  if(index < 0) index += 12;
   return ZODIAC_ANIMALS[index];
 }
 
-function getRelation(animal, dayBranch) {
+function getRelation(animal, dayBranch){
   const rel = ZODIAC_RELATION?.[animal];
-  if (!rel) return "normal";
-  if (rel.chong === dayBranch) return "chong";
-  if (rel.he === dayBranch) return "he";
+  if(!rel) return "normal";
+  if(rel.chong === dayBranch) return "chong";
+  if(rel.he === dayBranch) return "he";
   return "normal";
 }
 
-function getElementFlow(birthElement, currentElement) {
-  const order = ["wood", "fire", "earth", "metal", "water"];
-  const birthIndex = order.indexOf(birthElement);
-  const currentIndex = order.indexOf(currentElement);
+function getYearBranchAnimal(currentGanzhi){
+  const branchIndex = currentGanzhi?.branchIndex ?? 0;
+  return ZODIAC_ANIMALS[branchIndex];
+}
 
-  if (birthIndex === -1 || currentIndex === -1) return "same";
-  if (birthIndex === currentIndex) return "same";
-  if ((currentIndex + 1) % 5 === birthIndex) return "support";
-  if ((birthIndex + 1) % 5 === currentIndex) return "output";
-  if ((currentIndex + 2) % 5 === birthIndex) return "control";
+function getYearRelation(animal, currentGanzhi){
+  const yearAnimal = getYearBranchAnimal(currentGanzhi);
+  return getRelation(animal, yearAnimal);
+}
+
+function getElementFlow(birthElement, currentGanzhi){
+  const yearElement = ELEMENTS[currentGanzhi.stemIndex];
+
+  if(birthElement === yearElement) return "same";
+
+  if(
+    (birthElement === "wood" && yearElement === "fire") ||
+    (birthElement === "fire" && yearElement === "earth") ||
+    (birthElement === "earth" && yearElement === "metal") ||
+    (birthElement === "metal" && yearElement === "water") ||
+    (birthElement === "water" && yearElement === "wood")
+  ){
+    return "output";
+  }
+
+  if(
+    (yearElement === "wood" && birthElement === "fire") ||
+    (yearElement === "fire" && birthElement === "earth") ||
+    (yearElement === "earth" && birthElement === "metal") ||
+    (yearElement === "metal" && birthElement === "water") ||
+    (yearElement === "water" && birthElement === "wood")
+  ){
+    return "support";
+  }
+
+  if(
+    (birthElement === "wood" && yearElement === "earth") ||
+    (birthElement === "earth" && yearElement === "water") ||
+    (birthElement === "water" && yearElement === "fire") ||
+    (birthElement === "fire" && yearElement === "metal") ||
+    (birthElement === "metal" && yearElement === "wood")
+  ){
+    return "control";
+  }
+
   return "pressure";
 }
 
-function hashString(str) {
+function hashString(str){
   let hash = 0;
-  for (let i = 0; i < str.length; i++) {
+  for(let i = 0; i < str.length; i++){
     hash = ((hash << 5) - hash) + str.charCodeAt(i);
     hash |= 0;
   }
   return Math.abs(hash);
 }
 
-function pickStable(arr, seed) {
-  if (!Array.isArray(arr) || arr.length === 0) return "";
+function pickStable(arr, seed){
+  if(!Array.isArray(arr) || arr.length === 0) return "";
   const index = hashString(seed) % arr.length;
   return arr[index];
 }
 
-function buildDailySeed(profile, section, targetDate) {
+function pickStableFromObjectPools(obj, seed, preferredTypes = []){
+  if(!obj || typeof obj !== "object" || Array.isArray(obj)) return "";
+
+  const availableTypes = Object.keys(obj).filter(key => Array.isArray(obj[key]) && obj[key].length > 0);
+  if(availableTypes.length === 0) return "";
+
+  const orderedTypes = [
+    ...preferredTypes.filter(type => availableTypes.includes(type)),
+    ...availableTypes.filter(type => !preferredTypes.includes(type))
+  ];
+
+  const selectedType = orderedTypes[hashString(`${seed}|type`) % orderedTypes.length];
+  return pickStable(obj[selectedType], `${seed}|${selectedType}`);
+}
+
+function buildDailySeed(profile, section, targetDate){
   return [
     profile.birthDate,
     profile.birthTime,
     profile.zodiacYear,
     profile.animal,
     profile.element,
-    profile.birthGanzhi,
-    profile.currentGanzhi,
-    profile.yearRelation,
-    profile.elementFlow,
     profile.ageGroup,
     profile.relation,
     toDateOnlyText(targetDate),
@@ -383,51 +401,42 @@ function buildDailySeed(profile, section, targetDate) {
   ].join("|");
 }
 
-function buildYearSeed(profile, section) {
+function buildYearSeed(profile, section, targetDate){
   return [
     profile.birthDate,
     profile.birthTime,
     profile.zodiacYear,
     profile.animal,
     profile.element,
-    profile.birthGanzhi,
-    profile.currentGanzhi,
-    profile.currentFlowYear,
-    profile.currentYearAnimal,
-    profile.currentYearElement,
+    profile.ageGroup,
     profile.yearRelation,
     profile.elementFlow,
-    profile.ageGroup,
+    profile.currentGanzhi,
+    targetDate.getFullYear(),
     section
   ].join("|");
 }
 
-function buildProfile() {
+function buildProfile(){
   const input = getSavedBirthInput();
   const zodiacYear = getZodiacYear(input.birthDate);
-
-  const today = getTodayKSTDate();
-  const currentFlowYear = getFlowYearByDate(today);
-
-  const birthGanzhiObj = getGanzhi(zodiacYear);
-  const currentGanzhiObj = getGanzhi(currentFlowYear);
-
   const animal = getZodiacAnimal(zodiacYear);
   const element = getBirthElement(zodiacYear);
   const ageGroup = getAgeGroup(zodiacYear);
 
-  const currentYearAnimal = getZodiacAnimal(currentFlowYear);
-  const currentYearElement = getBirthElement(currentFlowYear);
+  const birthGanzhiObj = getGanzhi(zodiacYear);
+  const currentYear = getTodayKSTDate().getFullYear();
+  const currentGanzhiObj = getGanzhi(currentYear);
 
+  const today = getTodayKSTDate();
   const dayBranch = getDayBranch(today);
   const relation = getRelation(animal, dayBranch);
 
-  const yearRelation = getRelation(animal, currentYearAnimal);
-  const elementFlow = getElementFlow(element, currentYearElement);
+  const yearRelation = getYearRelation(animal, currentGanzhiObj);
+  const elementFlow = getElementFlow(element, currentGanzhiObj);
 
   return {
     ...input,
-
     zodiacYear,
     animal,
     animalName: ZODIAC_NAMES[animal],
@@ -435,119 +444,164 @@ function buildProfile() {
     elementName: ELEMENT_NAMES[element],
     ageGroup,
 
+    birthGanzhi: birthGanzhiObj.name,
+    birthGanzhiObj,
+
+    currentGanzhi: currentGanzhiObj.name,
+    currentGanzhiObj,
+
     dayBranch,
     relation,
     relationLabel: RELATION_LABELS[relation],
 
-    birthGanzhi: birthGanzhiObj.name,
-    birthStemIndex: birthGanzhiObj.stemIndex,
-    birthBranchIndex: birthGanzhiObj.branchIndex,
-    birthGanzhiIndex: birthGanzhiObj.ganzhiIndex,
-
-    currentFlowYear,
-    currentGanzhi: currentGanzhiObj.name,
-    currentStemIndex: currentGanzhiObj.stemIndex,
-    currentBranchIndex: currentGanzhiObj.branchIndex,
-    currentGanzhiIndex: currentGanzhiObj.ganzhiIndex,
-
-    currentYearAnimal,
-    currentYearAnimalName: ZODIAC_NAMES[currentYearAnimal],
-    currentYearElement,
-    currentYearElementName: ELEMENT_NAMES[currentYearElement],
-
     yearRelation,
     yearRelationLabel: RELATION_LABELS[yearRelation],
+
     elementFlow,
     elementFlowLabel: ELEMENT_FLOW_LABELS[elementFlow]
   };
 }
 
-function buildProfileByAnimalOverride(animalOverride) {
+function buildProfileByAnimalOverride(animalOverride){
   const input = getSavedBirthInput();
   const zodiacYear = getZodiacYear(input.birthDate);
-
-  const today = getTodayKSTDate();
-  const currentFlowYear = getFlowYearByDate(today);
-
-  const birthGanzhiObj = getGanzhi(zodiacYear);
-  const currentGanzhiObj = getGanzhi(currentFlowYear);
-
   const baseAnimal = getZodiacAnimal(zodiacYear);
   const animal = animalOverride || baseAnimal;
-
   const element = getBirthElement(zodiacYear);
   const ageGroup = getAgeGroup(zodiacYear);
 
-  const currentYearAnimal = getZodiacAnimal(currentFlowYear);
-  const currentYearElement = getBirthElement(currentFlowYear);
+  const birthGanzhiObj = getGanzhi(zodiacYear);
+  const currentYear = getTodayKSTDate().getFullYear();
+  const currentGanzhiObj = getGanzhi(currentYear);
 
+  const today = getTodayKSTDate();
   const dayBranch = getDayBranch(today);
   const relation = getRelation(animal, dayBranch);
-  const yearRelation = getRelation(animal, currentYearAnimal);
-  const elementFlow = getElementFlow(element, currentYearElement);
+
+  const yearRelation = getYearRelation(animal, currentGanzhiObj);
+  const elementFlow = getElementFlow(element, currentGanzhiObj);
 
   return {
     ...input,
-
     zodiacYear,
     animal,
     animalName: ZODIAC_NAMES[animal],
-
     myAnimal: baseAnimal,
     myAnimalName: ZODIAC_NAMES[baseAnimal],
-
     element,
     elementName: ELEMENT_NAMES[element],
     ageGroup,
+
+    birthGanzhi: birthGanzhiObj.name,
+    birthGanzhiObj,
+
+    currentGanzhi: currentGanzhiObj.name,
+    currentGanzhiObj,
 
     dayBranch,
     relation,
     relationLabel: RELATION_LABELS[relation],
 
-    birthGanzhi: birthGanzhiObj.name,
-    birthStemIndex: birthGanzhiObj.stemIndex,
-    birthBranchIndex: birthGanzhiObj.branchIndex,
-    birthGanzhiIndex: birthGanzhiObj.ganzhiIndex,
-
-    currentFlowYear,
-    currentGanzhi: currentGanzhiObj.name,
-    currentStemIndex: currentGanzhiObj.stemIndex,
-    currentBranchIndex: currentGanzhiObj.branchIndex,
-    currentGanzhiIndex: currentGanzhiObj.ganzhiIndex,
-
-    currentYearAnimal,
-    currentYearAnimalName: ZODIAC_NAMES[currentYearAnimal],
-    currentYearElement,
-    currentYearElementName: ELEMENT_NAMES[currentYearElement],
-
     yearRelation,
     yearRelationLabel: RELATION_LABELS[yearRelation],
+
     elementFlow,
     elementFlowLabel: ELEMENT_FLOW_LABELS[elementFlow]
   };
 }
 
-function pickDailyFinal(daily, relation, animal, element, section, seed) {
-  const relationPool = daily?.relation_bonus?.[relation]?.[section];
-  if (Array.isArray(relationPool) && relationPool.length) {
-    return pickStable(relationPool, `${seed}|relation`);
+function getDailyPreferredTypes(relation, section){
+  if(section === "advice"){
+    if(relation === "he") return ["action"];
+    if(relation === "chong") return ["warning", "recovery"];
+    return ["action"];
   }
 
+  if(relation === "he") return ["opportunity", "relation", "action"];
+  if(relation === "chong") return ["warning", "timing", "recovery"];
+  return ["relation", "timing", "action"];
+}
+
+function getYearPreferredTypes(yearRelation, elementFlow, section){
+  if(section === "advice"){
+    if(yearRelation === "he") return ["connection", "expansion"];
+    if(yearRelation === "chong") return ["caution", "adjustment", "foundation"];
+    if(elementFlow === "support") return ["connection", "expansion"];
+    if(elementFlow === "pressure") return ["caution", "foundation"];
+    return ["foundation", "adjustment"];
+  }
+
+  if(yearRelation === "he"){
+    return ["connection", "expansion", "harvest", "foundation"];
+  }
+
+  if(yearRelation === "chong"){
+    return ["caution", "adjustment", "foundation", "harvest"];
+  }
+
+  if(elementFlow === "support"){
+    return ["expansion", "connection", "harvest", "foundation"];
+  }
+
+  if(elementFlow === "pressure"){
+    return ["foundation", "adjustment", "caution", "harvest"];
+  }
+
+  return ["foundation", "adjustment", "harvest", "connection", "caution", "expansion"];
+}
+
+function pickDailyFinal(daily, relation, animal, element, section, seed){
+  const preferredTypes = getDailyPreferredTypes(relation, section);
+
+  const relationPoolObj = daily?.relation_bonus?.[relation]?.[section];
+  const relationPick = pickStableFromObjectPools(relationPoolObj, `${seed}|relation`, preferredTypes);
+  if(relationPick) return relationPick;
+
   const animalPool = daily?.animal_bonus?.[animal]?.[section];
-  if (Array.isArray(animalPool) && animalPool.length) {
+  if(Array.isArray(animalPool) && animalPool.length){
     return pickStable(animalPool, `${seed}|animal`);
   }
 
   const elementPool = daily?.element_bonus?.[element]?.[section];
-  if (Array.isArray(elementPool) && elementPool.length) {
+  if(Array.isArray(elementPool) && elementPool.length){
     return pickStable(elementPool, `${seed}|element`);
   }
 
-  const basePool = daily?.[section];
-  return pickStable(basePool, `${seed}|base`);
+  const basePoolObj = daily?.[section];
+  const basePick = pickStableFromObjectPools(basePoolObj, `${seed}|base`, preferredTypes);
+  if(basePick) return basePick;
+
+  return "";
 }
 
-function buildFortuneResult(profile) {
+function pickYearFinal(yearly, profile, section, seed){
+  const yearRelation = profile?.yearRelation || "normal";
+  const elementFlow = profile?.elementFlow || "same";
+  const currentGanzhi = profile?.currentGanzhi || "";
+  const preferredTypes = getYearPreferredTypes(yearRelation, elementFlow, section);
+
+  const ganzhiPool = yearly?.ganzhi_bonus?.[currentGanzhi]?.[section];
+  if(Array.isArray(ganzhiPool) && ganzhiPool.length){
+    return pickStable(ganzhiPool, `${seed}|ganzhi`);
+  }
+
+  const relationPoolObj = yearly?.relation_bonus?.[yearRelation]?.[section];
+  const relationPick = pickStableFromObjectPools(relationPoolObj, `${seed}|relation`, preferredTypes);
+  if(relationPick) return relationPick;
+
+  const elementPool = yearly?.element_bonus?.[elementFlow]?.[section];
+  if(Array.isArray(elementPool) && elementPool.length){
+    return pickStable(elementPool, `${seed}|element`);
+  }
+
+  const basePoolObj = yearly?.[section];
+  const basePick = pickStableFromObjectPools(basePoolObj, `${seed}|base`, preferredTypes);
+  if(basePick) return basePick;
+
+  return "";
+}
+
+function buildFortuneResult(profile){
   const today = getTodayKSTDate();
 
   const daily = fortuneDB?.daily || {};
@@ -555,10 +609,6 @@ function buildFortuneResult(profile) {
   const relation = profile?.relation || "normal";
   const animal = profile?.animal || "rat";
   const element = profile?.element || "wood";
-
-  const yearRelation = profile?.yearRelation || "normal";
-  const elementFlow = profile?.elementFlow || "same";
-  const currentGanzhi = profile?.currentGanzhi || "갑자";
 
   return {
     todayMain: pickDailyFinal(daily, relation, animal, element, "main", buildDailySeed(profile, "daily-main", today)),
@@ -572,29 +622,29 @@ function buildFortuneResult(profile) {
     todayLuckyColor: pickStable(daily?.lucky_color, buildDailySeed(profile, "daily-color", today)),
     todayLuckyNumber: pickStable(daily?.lucky_number, buildDailySeed(profile, "daily-number", today)),
 
-    yearMain: pickYearFinal(yearly, yearRelation, elementFlow, currentGanzhi, "main", buildYearSeed(profile, "year-main")),
-    yearLove: pickYearFinal(yearly, yearRelation, elementFlow, currentGanzhi, "love", buildYearSeed(profile, "year-love")),
-    yearMoney: pickYearFinal(yearly, yearRelation, elementFlow, currentGanzhi, "money", buildYearSeed(profile, "year-money")),
-    yearHealth: pickYearFinal(yearly, yearRelation, elementFlow, currentGanzhi, "health", buildYearSeed(profile, "year-health")),
-    yearWork: pickYearFinal(yearly, yearRelation, elementFlow, currentGanzhi, "work", buildYearSeed(profile, "year-work")),
-    yearRelation: pickYearFinal(yearly, yearRelation, elementFlow, currentGanzhi, "relationship", buildYearSeed(profile, "year-relationship")),
-    yearAdvice: pickYearFinal(yearly, yearRelation, elementFlow, currentGanzhi, "advice", buildYearSeed(profile, "year-advice")),
+    yearMain: pickYearFinal(yearly, profile, "main", buildYearSeed(profile, "year-main", today)),
+    yearLove: pickYearFinal(yearly, profile, "love", buildYearSeed(profile, "year-love", today)),
+    yearMoney: pickYearFinal(yearly, profile, "money", buildYearSeed(profile, "year-money", today)),
+    yearHealth: pickYearFinal(yearly, profile, "health", buildYearSeed(profile, "year-health", today)),
+    yearWork: pickYearFinal(yearly, profile, "work", buildYearSeed(profile, "year-work", today)),
+    yearRelation: pickYearFinal(yearly, profile, "relationship", buildYearSeed(profile, "year-relationship", today)),
+    yearAdvice: pickYearFinal(yearly, profile, "advice", buildYearSeed(profile, "year-advice", today)),
 
-    yearKeyword: pickStable(yearly?.keywords, buildYearSeed(profile, "year-keyword")),
-    yearLuckyColor: pickStable(yearly?.lucky_color, buildYearSeed(profile, "year-color")),
-    yearLuckyNumber: pickStable(yearly?.lucky_number, buildYearSeed(profile, "year-number"))
+    yearKeyword: pickStable(yearly?.keywords, buildYearSeed(profile, "year-keyword", today)),
+    yearLuckyColor: pickStable(yearly?.lucky_color, buildYearSeed(profile, "year-color", today)),
+    yearLuckyNumber: pickStable(yearly?.lucky_number, buildYearSeed(profile, "year-number", today))
   };
 }
 
-function syncSelectToProfile(profile) {
+function syncSelectToProfile(profile){
   const select = document.getElementById("zodiacSelect");
-  if (!select) return;
+  if(!select) return;
   select.value = profile.animal;
 }
 
-function renderGuide(profile) {
+function renderGuide(profile){
   const guideBox = document.getElementById("guideBox");
-  if (!guideBox) return;
+  if(!guideBox) return;
 
   guideBox.innerHTML = `
     <h3>왜 이런 결과가 나왔나요?</h3>
@@ -608,10 +658,10 @@ function renderGuide(profile) {
 
     <p><b>조금 더 풀어서 보면</b></p>
     <p>생년월일을 입춘 기준으로 계산했을 때 내 띠는 <b>${profile.animalName}</b>입니다.</p>
-    <p>태어난 해의 흐름은 <b>${profile.birthGanzhi}년</b> 기준으로 잡았고, 출생 연도 오행은 <b>${profile.elementName}</b>입니다.</p>
-    <p>올해 전체 분위기는 <b>${profile.currentGanzhi}년</b> 흐름으로 보고 있습니다.</p>
-    <p>올해의 지지와 내 띠 관계는 <b>${profile.yearRelationLabel}</b> 쪽에 가깝고, 오늘의 지지와 내 띠 관계는 <b>${profile.relationLabel}</b> 쪽으로 보고 있습니다.</p>
-    <p>또 출생 오행과 올해 오행 관계는 <b>${profile.elementFlowLabel}</b>으로 해석하고 있습니다.</p>
+    <p>태어난 해의 흐름은 <b>${profile.birthGanzhi}</b> 기준으로 보고 있습니다.</p>
+    <p>올해 분위기는 <b>${profile.currentGanzhi}</b> 흐름으로 반영했습니다.</p>
+    <p>올해의 띠 흐름은 <b>${profile.yearRelationLabel}</b> 쪽에 가깝고, 오늘의 흐름은 <b>${profile.relationLabel}</b> 쪽에 가깝습니다.</p>
+    <p>또 출생 기운과 올해 분위기 관계는 <b>${profile.elementFlowLabel}</b>으로 해석하고 있습니다.</p>
     <p><b>연령대 보정:</b> ${AGE_GROUP_TEXT[profile.ageGroup]}</p>
 
     <hr>
@@ -620,30 +670,28 @@ function renderGuide(profile) {
     <p>출생 연도 간지 : ${profile.birthGanzhi}</p>
     <p>올해 간지 : ${profile.currentGanzhi}</p>
     <p>내 띠 : ${profile.animalName}</p>
-    <p>올해 지지 흐름 : ${RELATION_DETAIL_NAMES[profile.yearRelation]}</p>
-    <p>오늘 지지 흐름 : ${RELATION_DETAIL_NAMES[profile.relation]}</p>
+    <p>올해 띠 흐름 : ${RELATION_DETAIL_NAMES[profile.yearRelation]}</p>
+    <p>오늘 띠 흐름 : ${RELATION_DETAIL_NAMES[profile.relation]}</p>
     <p>오행 흐름 : ${ELEMENT_FLOW_DETAIL_NAMES[profile.elementFlow]}</p>
-    <p class="small">용어가 낯설다면 <a href="/pages/guide/fortune-terms.html">운세 용어 설명</a>에서 쉽게 볼 수 있습니다.</p>
     <p class="small">오늘 운세는 같은 생년월일이면 하루 동안 동일하게 유지되도록 고정 계산됩니다.</p>
+    <p class="small"><a href="/pages/guide/fortune-terms.html">오행·지지·간지 용어 설명 보기</a></p>
   `;
 }
 
-function renderResult(profile, result) {
+function renderResult(profile, result){
   const resultBox = document.getElementById("resultBox");
   const resultSection = document.getElementById("resultSection");
 
-  if (!resultBox || !resultSection) return;
+  if(!resultBox || !resultSection) return;
 
   resultBox.innerHTML = `
     <h2>${profile.animalName} 오늘 운세</h2>
 
     <p><b>내 띠:</b> ${profile.animalName}</p>
     <p><b>출생 기준 띠 계산 연도:</b> ${profile.zodiacYear}년</p>
-    <p><b>출생연도 간지:</b> ${profile.birthGanzhi}년</p>
-    <p><b>출생연도 서브타입:</b> ${profile.elementName} ${profile.animalName}</p>
-    <p><b>올해 간지:</b> ${profile.currentGanzhi}년</p>
-    <p><b>올해 띠 흐름:</b> ${profile.yearRelationLabel}</p>
-    <p><b>오늘 관계 흐름:</b> ${profile.relationLabel}</p>
+    <p><b>출생 연도 간지:</b> ${profile.birthGanzhi}</p>
+    <p><b>출생 기운:</b> ${profile.elementName} ${profile.animalName}</p>
+    <p><b>오늘 흐름:</b> ${profile.relationLabel}</p>
 
     <hr>
 
@@ -661,6 +709,10 @@ function renderResult(profile, result) {
     <hr>
 
     <h2>올해 운세</h2>
+
+    <p><b>올해 분위기</b> ${profile.currentGanzhi}</p>
+    <p><b>올해 흐름</b> ${profile.yearRelationLabel}</p>
+    <p><b>올해 오행 분위기</b> ${profile.elementFlowLabel}</p>
 
     <p><b>올해 총운</b><br>${result.yearMain}</p>
     <p><b>올해 애정운</b><br>${result.yearLove}</p>
@@ -687,7 +739,7 @@ function renderResult(profile, result) {
   resultSection.style.display = "block";
 }
 
-function showZodiac() {
+function showZodiac(){
   const selectedAnimal = document.getElementById("zodiacSelect")?.value || null;
   const profile = buildProfileByAnimalOverride(selectedAnimal);
   const result = buildFortuneResult(profile);
@@ -697,28 +749,28 @@ function showZodiac() {
   renderResult(profile, result);
   renderGuide(profile);
 
-  if (!rewarded) {
+  if(!rewarded){
     rewarded = true;
-    if (window.rewardContent) {
+    if(window.rewardContent){
       rewardContent("zodiac");
     }
   }
 }
 
-function renderZodiacOptions() {
+function renderZodiacOptions(){
   const select = document.getElementById("zodiacSelect");
-  if (!select) return;
+  if(!select) return;
 
   select.innerHTML = ZODIAC_ANIMALS.map(animal => `
     <option value="${animal}">${ZODIAC_NAMES[animal]}</option>
   `).join("");
 }
 
-function renderLoginState(profile) {
+function renderLoginState(profile){
   const box = document.getElementById("loginCheck");
-  if (!box) return;
+  if(!box) return;
 
-  if (profile.mode === "member") {
+  if(profile.mode === "member"){
     box.innerHTML = `
       <p class="info-text"><b>회원 기준</b> 저장된 생년월일로 띠를 계산했습니다.</p>
       <p class="small">출생일: ${profile.birthDate}</p>
@@ -726,7 +778,7 @@ function renderLoginState(profile) {
     return;
   }
 
-  if (profile.mode === "guest") {
+  if(profile.mode === "guest"){
     box.innerHTML = `
       <p class="info-text"><b>게스트 기준</b> 입력한 생년월일로 띠를 계산했습니다.</p>
       <p class="small">출생일: ${profile.birthDate}</p>
@@ -740,16 +792,16 @@ function renderLoginState(profile) {
   `;
 }
 
-function renderMyZodiacInfo(profile) {
+function renderMyZodiacInfo(profile){
   const box = document.getElementById("myZodiacInfo");
-  if (!box) return;
+  if(!box) return;
 
   box.innerHTML = `
     <p class="info-text"><b>내 띠</b> ${profile.animalName}</p>
     <p class="info-text"><b>입춘 기준 적용 연도</b> ${profile.zodiacYear}년</p>
-    <p class="info-text"><b>출생 연도 간지</b> ${profile.birthGanzhi}년</p>
+    <p class="info-text"><b>출생 연도 간지</b> ${profile.birthGanzhi}</p>
     <p class="info-text"><b>출생 기운</b> ${profile.elementName} ${profile.animalName}</p>
-    <p class="info-text"><b>올해 분위기</b> ${profile.currentGanzhi}년</p>
+    <p class="info-text"><b>올해 분위기</b> ${profile.currentGanzhi}</p>
     <p class="info-text"><b>올해 흐름</b> ${profile.yearRelationLabel}</p>
     <p class="info-text"><b>올해 오행 분위기</b> ${profile.elementFlowLabel}</p>
     <p class="info-text"><b>오늘 흐름</b> ${profile.relationLabel}</p>
@@ -757,15 +809,15 @@ function renderMyZodiacInfo(profile) {
   `;
 }
 
-function fillGuestBirthInput(profile) {
+function fillGuestBirthInput(profile){
   const input = document.getElementById("guestBirthInline");
-  if (!input) return;
+  if(!input) return;
   input.value = profile.birthDate || DEFAULT_BIRTH_YMD;
 }
 
-function applyGuestBirth() {
+function applyGuestBirth(){
   const input = document.getElementById("guestBirthInline");
-  if (!input) return;
+  if(!input) return;
 
   const birthDate = input.value || DEFAULT_BIRTH_YMD;
 
@@ -783,9 +835,9 @@ function applyGuestBirth() {
   renderGuide(profile);
 }
 
-function renderRelatedZodiacGrid() {
+function renderRelatedZodiacGrid(){
   const grid = document.getElementById("relatedZodiacGrid");
-  if (!grid) return;
+  if(!grid) return;
 
   grid.innerHTML = ZODIAC_ANIMALS.map(animal => `
     <button class="action-btn related-zodiac-btn" type="button" data-animal="${animal}">
@@ -796,7 +848,7 @@ function renderRelatedZodiacGrid() {
   grid.querySelectorAll(".related-zodiac-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const select = document.getElementById("zodiacSelect");
-      if (select) {
+      if(select){
         select.value = btn.dataset.animal;
       }
       showZodiac();
@@ -804,14 +856,14 @@ function renderRelatedZodiacGrid() {
   });
 }
 
-function bindEvents() {
+function bindEvents(){
   const showBtn = document.getElementById("showZodiacBtn");
-  if (showBtn) {
+  if(showBtn){
     showBtn.addEventListener("click", showZodiac);
   }
 
   const applyBtn = document.getElementById("applyGuestBirthBtn");
-  if (applyBtn) {
+  if(applyBtn){
     applyBtn.addEventListener("click", applyGuestBirth);
   }
 }
@@ -822,8 +874,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderZodiacOptions();
   renderRelatedZodiacGrid();
 
-  if (window.loadMyPoint) await loadMyPoint();
-  if (window.Common?.renderPoint) Common.renderPoint();
+  if(window.loadMyPoint) await loadMyPoint();
+  if(window.Common?.renderPoint) Common.renderPoint();
 
   const profile = buildProfile();
   const result = buildFortuneResult(profile);
