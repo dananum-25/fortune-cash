@@ -118,38 +118,36 @@ const ZODIAC_RELATION = {
   pig: { chong: "snake", he: "tiger" }
 };
 
+async function safeFetchJson(url){
+  const res = await fetch(url, { cache: "no-store" });
+  if(!res.ok){
+    throw new Error(`DB 로딩 실패: ${url} (${res.status})`);
+  }
+  return await res.json();
+}
+
 async function loadDB(){
   const [
-    dailyRes,
-    relationRes,
-    animalRes,
-    elementRes,
-    yearRes,
-    yearRelationRes,
-    yearElementRes,
-    yearGanzhiRes,
-    ipchunRes
+    daily,
+    relation,
+    animal,
+    element,
+    year,
+    yearRelation,
+    yearElement,
+    yearGanzhi,
+    ipchun
   ] = await Promise.all([
-    fetch("/data/fortune/daily.json", { cache: "no-store" }),
-    fetch("/data/fortune/relation_bonus.json", { cache: "no-store" }),
-    fetch("/data/fortune/animal_bonus.json", { cache: "no-store" }),
-    fetch("/data/fortune/element_bonus.json", { cache: "no-store" }),
-    fetch("/data/fortune/year.json", { cache: "no-store" }),
-    fetch("/data/fortune/year_relation_bonus.json", { cache: "no-store" }),
-    fetch("/data/fortune/year_element_bonus.json", { cache: "no-store" }),
-    fetch("/data/fortune/year_ganzhi_bonus.json", { cache: "no-store" }),
-    fetch("/data/ipchun_db.json", { cache: "no-store" })
+    safeFetchJson("/data/fortune/daily.json"),
+    safeFetchJson("/data/fortune/relation_bonus.json"),
+    safeFetchJson("/data/fortune/animal_bonus.json"),
+    safeFetchJson("/data/fortune/element_bonus.json"),
+    safeFetchJson("/data/fortune/year.json"),
+    safeFetchJson("/data/fortune/year_relation_bonus.json"),
+    safeFetchJson("/data/fortune/year_element_bonus.json"),
+    safeFetchJson("/data/fortune/year_ganzhi_bonus.json"),
+    safeFetchJson("/data/ipchun_db.json")
   ]);
-
-  const daily = await dailyRes.json();
-  const relation = await relationRes.json();
-  const animal = await animalRes.json();
-  const element = await elementRes.json();
-
-  const year = await yearRes.json();
-  const yearRelation = await yearRelationRes.json();
-  const yearElement = await yearElementRes.json();
-  const yearGanzhi = await yearGanzhiRes.json();
 
   fortuneDB = {
     daily: {
@@ -166,7 +164,7 @@ async function loadDB(){
     }
   };
 
-  ipchunDB = await ipchunRes.json();
+  ipchunDB = ipchun;
 }
 
 function safePad(n){
@@ -177,9 +175,24 @@ function toDateOnlyText(date){
   return `${date.getFullYear()}-${safePad(date.getMonth() + 1)}-${safePad(date.getDate())}`;
 }
 
+function getKSTDateParts(baseDate = new Date()){
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(baseDate);
+
+  const year = Number(parts.find(p => p.type === "year")?.value || "1970");
+  const month = Number(parts.find(p => p.type === "month")?.value || "01");
+  const day = Number(parts.find(p => p.type === "day")?.value || "01");
+
+  return { year, month, day };
+}
+
 function getTodayKSTDate(){
-  const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const { year, month, day } = getKSTDateParts(new Date());
+  return new Date(year, month - 1, day);
 }
 
 function getSavedBirthInput(){
@@ -212,7 +225,7 @@ function getSavedBirthInput(){
 function parseBirthDate(birthDate){
   const m = String(birthDate || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if(!m){
-    return new Date(DEFAULT_BIRTH_YMD);
+    return new Date(1940, 0, 1);
   }
 
   const year = Number(m[1]);
@@ -573,9 +586,13 @@ function pickYearFinal(yearly, profile, section, seed){
   const currentGanzhi = profile?.currentGanzhi || "";
   const preferredTypes = getYearPreferredTypes(yearRelation, elementFlow, section);
 
-  const ganzhiPool = yearly?.ganzhi_bonus?.[currentGanzhi]?.[section];
-  if(Array.isArray(ganzhiPool) && ganzhiPool.length){
-    return pickStable(ganzhiPool, `${seed}|ganzhi`);
+  const ganzhiSection = yearly?.ganzhi_bonus?.[currentGanzhi]?.[section];
+  if(Array.isArray(ganzhiSection) && ganzhiSection.length){
+    return pickStable(ganzhiSection, `${seed}|ganzhi`);
+  }
+  if(ganzhiSection && typeof ganzhiSection === "object" && !Array.isArray(ganzhiSection)){
+    const ganzhiPick = pickStableFromObjectPools(ganzhiSection, `${seed}|ganzhi`, preferredTypes);
+    if(ganzhiPick) return ganzhiPick;
   }
 
   const relationPoolObj = yearly?.relation_bonus?.[yearRelation]?.[section];
@@ -681,8 +698,12 @@ function renderResult(profile, result){
 
   if(!resultBox || !resultSection) return;
 
+  const isOverrideView = profile.myAnimal && profile.myAnimal !== profile.animal;
+
   resultBox.innerHTML = `
     <h2>${profile.animalName} 오늘 운세</h2>
+
+    ${isOverrideView ? `<p class="small">현재는 선택한 띠 기준으로 보고 있습니다. 내 실제 띠는 ${profile.myAnimalName}입니다.</p>` : ""}
 
     <p><b>내 띠:</b> ${profile.animalName}</p>
     <p><b>출생 기준 띠 계산 연도:</b> ${profile.zodiacYear}년</p>
@@ -793,8 +814,11 @@ function renderMyZodiacInfo(profile){
   const box = document.getElementById("myZodiacInfo");
   if(!box) return;
 
+  const isOverrideView = profile.myAnimal && profile.myAnimal !== profile.animal;
+
   box.innerHTML = `
-    <p class="info-text"><b>내 띠</b> ${profile.animalName}</p>
+    ${isOverrideView ? `<p class="info-text"><b>내 실제 띠</b> ${profile.myAnimalName}</p>` : ""}
+    <p class="info-text"><b>현재 보는 띠</b> ${profile.animalName}</p>
     <p class="info-text"><b>입춘 기준 적용 연도</b> ${profile.zodiacYear}년</p>
     <p class="info-text"><b>출생 연도 간지</b> ${profile.birthGanzhi}</p>
     <p class="info-text"><b>출생 기운</b> ${profile.elementName} ${profile.animalName}</p>
@@ -853,6 +877,20 @@ function renderRelatedZodiacGrid(){
   });
 }
 
+function renderLoadError(err){
+  console.error(err);
+  const resultSection = document.getElementById("resultSection");
+  const resultBox = document.getElementById("resultBox");
+  if(resultSection && resultBox){
+    resultBox.innerHTML = `
+      <h2>띠운세를 불러오지 못했습니다</h2>
+      <p>데이터 파일 경로나 JSON 형식을 한 번 확인해보세요.</p>
+      <p class="small">${String(err?.message || err)}</p>
+    `;
+    resultSection.style.display = "block";
+  }
+}
+
 function bindEvents(){
   const showBtn = document.getElementById("showZodiacBtn");
   if(showBtn){
@@ -866,23 +904,27 @@ function bindEvents(){
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  await loadDB();
+  try {
+    await loadDB();
 
-  renderZodiacOptions();
-  renderRelatedZodiacGrid();
+    renderZodiacOptions();
+    renderRelatedZodiacGrid();
 
-  if(window.loadMyPoint) await loadMyPoint();
-  if(window.Common?.renderPoint) Common.renderPoint();
+    if(window.loadMyPoint) await loadMyPoint();
+    if(window.Common?.renderPoint) Common.renderPoint();
 
-  const profile = buildProfile();
-  const result = buildFortuneResult(profile);
+    const profile = buildProfile();
+    const result = buildFortuneResult(profile);
 
-  syncSelectToProfile(profile);
-  renderLoginState(profile);
-  renderMyZodiacInfo(profile);
-  fillGuestBirthInput(profile);
-  bindEvents();
+    syncSelectToProfile(profile);
+    renderLoginState(profile);
+    renderMyZodiacInfo(profile);
+    fillGuestBirthInput(profile);
+    bindEvents();
 
-  renderResult(profile, result);
-  renderGuide(profile);
+    renderResult(profile, result);
+    renderGuide(profile);
+  } catch (err) {
+    renderLoadError(err);
+  }
 });
