@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>토끼띠 오늘 운세 | 생년월일 기반 무료 운세</title>
+<meta name="description" content="토끼띠 오늘 운세를 확인하세요. 생년월일 기준 띠·오행·간지 흐름을 반영한 무료 운세입니다.">
+
+<link rel="canonical" href="https://fortune-cash.vercel.app/pages/zodiac/rabbit.html">
+
+<link rel="stylesheet" href="/css/common.css">
+</head>
+
+<body>
+<div class="wrap">
+
+<h1>토끼띠 오늘 운세</h1>
+
+<div id="resultBox"></div>
+
+</div>
+
+<script src="/js/zodiac.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  await loadDB();
+
+  // 👇 핵심: 띠 고정
+  const profile = buildProfileByAnimalOverride("rabbit");
+  const result = buildFortuneResult(profile);
+
+  renderResult(profile, result);
+});
+</script>
+
+</body>
+</html>
