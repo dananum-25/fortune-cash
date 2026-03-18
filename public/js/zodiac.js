@@ -167,6 +167,12 @@ async function loadDB(){
   ipchunDB = ipchun;
 }
 
+function getAnimalFromURL(){
+  const path = window.location.pathname;
+  const match = path.match(/zodiac\/(rat|ox|tiger|rabbit|dragon|snake|horse|goat|monkey|rooster|dog|pig)/);
+  return match ? match[1] : null;
+}
+
 function safePad(n){
   return String(n).padStart(2, "0");
 }
