@@ -4,34 +4,232 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>쥐띠 오늘 운세 | 생년월일 기반 무료 운세</title>
-<meta name="description" content="쥐띠 오늘 운세를 확인하세요. 생년월일 기준 띠·오행·간지 흐름을 반영한 무료 운세입니다.">
-
+<title>쥐띠 오늘 운세 | 생년월일 기반 무료 띠 운세</title>
+<meta name="description" content="쥐띠 오늘 운세를 무료로 확인하세요. 생년월일 기준 띠, 오행, 간지 흐름을 반영한 계산 기반 운세입니다.">
 <link rel="canonical" href="https://fortune-cash.vercel.app/pages/zodiac/rat.html">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="무료 운세 플랫폼">
+<meta property="og:title" content="쥐띠 오늘 운세 | 생년월일 기반 무료 띠 운세">
+<meta property="og:description" content="쥐띠 오늘 운세를 무료로 확인하세요. 생년월일 기준 띠, 오행, 간지 흐름을 반영한 계산 기반 운세입니다.">
+<meta property="og:url" content="https://fortune-cash.vercel.app/pages/zodiac/rat.html">
+<meta property="og:image" content="https://fortune-cash.vercel.app/assets/zodiac_fortune.png">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="쥐띠 오늘 운세 | 생년월일 기반 무료 띠 운세">
+<meta name="twitter:description" content="쥐띠 오늘 운세를 무료로 확인하세요. 생년월일 기준 띠, 오행, 간지 흐름을 반영한 계산 기반 운세입니다.">
+<meta name="twitter:image" content="https://fortune-cash.vercel.app/assets/zodiac_fortune.png">
+
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"BreadcrumbList",
+  "itemListElement":[
+    {
+      "@type":"ListItem",
+      "position":1,
+      "name":"홈",
+      "item":"https://fortune-cash.vercel.app/"
+    },
+    {
+      "@type":"ListItem",
+      "position":2,
+      "name":"띠별 운세",
+      "item":"https://fortune-cash.vercel.app/pages/zodiac/zodiac.html"
+    },
+    {
+      "@type":"ListItem",
+      "position":3,
+      "name":"쥐띠 오늘 운세",
+      "item":"https://fortune-cash.vercel.app/pages/zodiac/rat.html"
+    }
+  ]
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"FAQPage",
+  "mainEntity":[
+    {
+      "@type":"Question",
+      "name":"쥐띠 오늘 운세는 어떻게 계산되나요?",
+      "acceptedAnswer":{
+        "@type":"Answer",
+        "text":"입춘 기준 띠 계산과 생년월일 기준 오행, 간지 흐름을 함께 반영한 참고용 운세입니다."
+      }
+    },
+    {
+      "@type":"Question",
+      "name":"왜 같은 쥐띠인데도 결과가 다를 수 있나요?",
+      "acceptedAnswer":{
+        "@type":"Answer",
+        "text":"생년월일, 입춘 기준 적용 연도, 오행 흐름, 올해 분위기를 함께 보기 때문에 결과가 달라질 수 있습니다."
+      }
+    }
+  ]
+}
+</script>
 
 <link rel="stylesheet" href="/css/common.css">
 </head>
-
 <body>
-<div class="wrap">
 
-<h1>쥐띠 오늘 운세</h1>
+<div class="wrap page-wrap zodiac-page">
 
-<div id="resultBox"></div>
+  <h1 class="page-title section-title">쥐띠 오늘 운세</h1>
+  <p class="info-text">
+    쥐띠 오늘 운세를 무료로 확인하세요.
+    생년월일 기준 띠, 오행, 간지 흐름을 반영한 계산 기반 운세입니다.
+  </p>
+
+  <div id="loginCheck" class="card notice-box info-card">
+    <p class="info-text">띠 기준 정보를 확인하는 중입니다.</p>
+  </div>
+
+  <div id="pointBox" class="card notice-box info-card"></div>
+
+  <section id="guestBirthCard" class="card form-card">
+    <h2 class="section-title">내 기준으로 다시 보기</h2>
+    <p class="info-text">회원은 저장된 생년월일이 자동 적용됩니다.</p>
+    <p class="info-text">게스트와 비회원은 생년월일을 입력하면 내 기준으로 다시 볼 수 있습니다.</p>
+
+    <div class="form-group">
+      <input id="guestBirthInline" class="input-field" type="date">
+    </div>
+
+    <button class="action-btn full-btn" id="applyGuestBirthBtn" type="button">내 생년월일 적용</button>
+    <p class="small form-help">비회원 기본 기준은 1940-01-01입니다.</p>
+  </section>
+
+  <div id="myZodiacInfo" class="card notice-box info-card">
+    <p class="info-text">내 띠 정보와 현재 보고 있는 띠를 함께 보여줍니다.</p>
+  </div>
+
+  <section class="card content-card">
+    <h2 class="section-title">쥐띠 운세란 무엇인가요?</h2>
+    <p class="info-text">
+      쥐띠 운세는 12지신 중 쥐띠 흐름을 기준으로 오늘과 올해의 분위기를 참고하는 운세입니다.
+      재물운, 애정운, 일운, 건강운, 대인운 같은 생활 영역을 가볍게 확인할 수 있습니다.
+    </p>
+    <p class="info-text">
+      결과는 참고용 콘텐츠이며 실제 선택과 행동이 가장 중요합니다.
+    </p>
+  </section>
+
+  <section class="card content-card">
+    <h2 class="section-title">왜 이 쥐띠 운세는 다른가요?</h2>
+    <p class="info-text">
+      일반 띠 운세는 출생연도만 기준으로 보는 경우가 많지만,
+      이 페이지는 입춘 기준 띠 계산, 오행 흐름, 간지 흐름을 함께 반영합니다.
+    </p>
+    <p class="info-text">
+      그래서 같은 쥐띠라도 생년월일 기준에 따라 해석 흐름이 달라질 수 있습니다.
+    </p>
+  </section>
+
+  <section id="resultSection" class="result-section" style="display:none;">
+    <div id="resultBox" class="card result-card"></div>
+    <div id="guideBox" class="card guide-card"></div>
+  </section>
+
+  <section class="card content-card">
+    <h2 class="section-title">다른 띠도 보기</h2>
+    <div class="link-list">
+      <a class="action-link" href="/pages/zodiac/ox.html">소띠 오늘 운세</a>
+      <a class="action-link" href="/pages/zodiac/tiger.html">호랑이띠 오늘 운세</a>
+      <a class="action-link" href="/pages/zodiac/rabbit.html">토끼띠 오늘 운세</a>
+      <a class="action-link" href="/pages/zodiac/dragon.html">용띠 오늘 운세</a>
+      <a class="action-link" href="/pages/zodiac/snake.html">뱀띠 오늘 운세</a>
+      <a class="action-link" href="/pages/zodiac/horse.html">말띠 오늘 운세</a>
+      <a class="action-link" href="/pages/zodiac/goat.html">양띠 오늘 운세</a>
+      <a class="action-link" href="/pages/zodiac/monkey.html">원숭이띠 오늘 운세</a>
+      <a class="action-link" href="/pages/zodiac/rooster.html">닭띠 오늘 운세</a>
+      <a class="action-link" href="/pages/zodiac/dog.html">개띠 오늘 운세</a>
+      <a class="action-link" href="/pages/zodiac/pig.html">돼지띠 오늘 운세</a>
+      <a class="action-link" href="/pages/zodiac/zodiac.html">띠별 운세 전체 보기</a>
+    </div>
+  </section>
+
+  <section class="card content-card">
+    <h2 class="section-title">추천 운세 콘텐츠</h2>
+    <div class="link-list">
+      <a class="action-link" href="/pages/period/period.html">오늘/내일/연간 운세</a>
+      <a class="action-link" href="/pages/astro/index.html">별자리운세</a>
+      <a class="action-link" href="/pages/saju/saju.html">사주 분석</a>
+      <a class="action-link" href="/pages/tojung/tojung.html">토정비결</a>
+      <a class="action-link" href="/fortune-guide.html">운세 가이드</a>
+      <a class="action-link" href="/pages/guide/fortune-terms.html">오행·지지·간지 용어 설명</a>
+    </div>
+  </section>
+
+  <section class="card content-card">
+    <h2 class="section-title">자주 묻는 질문</h2>
+
+    <p class="info-text"><b>Q. 쥐띠 오늘 운세는 어떻게 계산되나요?</b></p>
+    <p class="info-text">
+      입춘 기준으로 띠를 계산하고, 오늘의 흐름과 올해의 오행·간지 흐름을 함께 반영한 참고용 운세입니다.
+    </p>
+
+    <p class="info-text" style="margin-top:12px;"><b>Q. 왜 같은 쥐띠인데도 결과가 다를 수 있나요?</b></p>
+    <p class="info-text">
+      생년월일 기준과 오행 흐름, 간지 흐름을 함께 보기 때문에 사람마다 해석 차이가 생길 수 있습니다.
+    </p>
+
+    <p class="info-text" style="margin-top:12px;"><b>Q. 쥐띠 운세는 정확한가요?</b></p>
+    <p class="info-text">
+      운세는 참고용이며, 실제 결과는 개인의 선택과 행동에 따라 달라질 수 있습니다.
+    </p>
+  </section>
+
+  <div class="bottom-action-group">
+    <button class="action-btn" id="shareBtn" type="button">공유하기</button>
+    <button class="action-btn secondary-btn" type="button" onclick="Common.goHome()">홈으로</button>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-brand">무료 운세 플랫폼</div>
+    <div class="footer-contact">문의: daekoju@naver.com</div>
+    <div class="footer-links">
+      <a href="/privacy.html">개인정보처리방침</a> |
+      <a href="/terms.html">이용약관</a> |
+      <a href="/about.html">사이트 소개</a> |
+      <a href="/contact.html">문의</a> |
+      <a href="/fortune-guide.html">운세 가이드</a>
+    </div>
+  </footer>
 
 </div>
 
+<script src="/js/config.js"></script>
+<script src="/js/birth.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/points.js"></script>
+<script src="/js/common.js"></script>
+<script src="/js/reward.js"></script>
 <script src="/js/zodiac.js"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", async () => {
-  await loadDB();
+  try {
+    await loadDB();
 
-  // 👇 핵심: 띠 고정
-  const profile = buildProfileByAnimalOverride("rat");
-  const result = buildFortuneResult(profile);
+    if(window.loadMyPoint) await loadMyPoint();
+    if(window.Common?.renderPoint) Common.renderPoint();
 
-  renderResult(profile, result);
+    const profile = buildProfileByAnimalOverride("rat");
+    const result = buildFortuneResult(profile);
+
+    renderLoginState(profile);
+    renderMyZodiacInfo(profile);
+    fillGuestBirthInput(profile);
+    bindEvents();
+    renderResult(profile, result);
+    renderGuide(profile);
+  } catch (err) {
+    renderLoadError(err);
+  }
 });
 </script>
 
