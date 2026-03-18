@@ -851,7 +851,10 @@ function applyGuestBirth(){
   localStorage.setItem("guest_birth", birthDate);
   localStorage.setItem("guest_birthTime", DEFAULT_BIRTH_TIME);
 
-  const profile = buildProfile();
+  const urlAnimal = getAnimalFromURL();
+const profile = urlAnimal
+  ? buildProfileByAnimalOverride(urlAnimal)
+  : buildProfile();
   const result = buildFortuneResult(profile);
 
   syncSelectToProfile(profile);
