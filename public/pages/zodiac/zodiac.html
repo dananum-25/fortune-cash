@@ -1,18 +1,55 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"FAQPage",
+  "mainEntity":[
+    {
+      "@type":"Question",
+      "name":"띠별 운세는 어떻게 계산되나요?",
+      "acceptedAnswer":{
+        "@type":"Answer",
+        "text":"입춘 기준으로 띠를 계산하고, 오늘의 흐름과 올해의 오행·간지 흐름을 함께 반영한 참고용 운세입니다."
+      }
+    },
+    {
+      "@type":"Question",
+      "name":"오늘 운세는 왜 매일 달라지나요?",
+      "acceptedAnswer":{
+        "@type":"Answer",
+        "text":"날짜에 따른 간지와 흐름이 달라지기 때문에 오늘 운세도 함께 달라집니다."
+      }
+    },
+    {
+      "@type":"Question",
+      "name":"무료 운세와 사주의 차이는?",
+      "acceptedAnswer":{
+        "@type":"Answer",
+        "text":"무료 운세는 오늘과 올해 흐름을 가볍게 보는 콘텐츠이고, 사주는 인생 전체 구조를 더 깊게 보는 해석 방식입니다."
+      }
+    }
+  ]
+}
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>무료 오늘 운세 | 생년월일 기반 띠·오행·간지 분석</title>
 <meta name="description" content="생년월일 기준으로 계산된 무료 오늘 운세를 확인하세요. 띠, 오행, 간지 흐름을 반영한 실제 계산 기반 운세를 제공합니다.">
-<link rel="canonical" id="canonicalLink" href="https://fortune-cash.vercel.app/pages/zodiac/zodiac.html">
+<link rel="canonical" id="canonicalLink" href="https://fortune-cash.vercel.app/pages/zodiac.html">
 
-<meta property="og:type" content="article">
+<meta property="og:type" content="website">
 <meta property="og:site_name" content="무료 운세 플랫폼">
-<meta property="og:title" id="ogTitle" content="띠별 운세 | 올해 운세 무료 보기">
-<meta property="og:description" id="ogDescription" content="12띠 운세를 무료로 확인하세요.">
-<meta property="og:url" id="ogUrl" content="https://fortune-cash.vercel.app/pages/zodiac/zodiac.html">
+<meta property="og:title" id="ogTitle" content="무료 오늘 운세 | 생년월일 기반 띠·오행·간지 분석">
+<meta property="og:description" id="ogDescription" content="생년월일 기준으로 계산된 무료 오늘 운세. 띠, 오행, 간지 흐름을 반영한 계산 기반 운세를 확인하세요.">
+<meta property="og:url" id="ogUrl" content="https://fortune-cash.vercel.app/pages/zodiac.html">
 <meta property="og:image" content="https://fortune-cash.vercel.app/assets/zodiac_fortune.png">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" id="twitterTitle" content="무료 오늘 운세 | 생년월일 기반 띠·오행·간지 분석">
+<meta name="twitter:description" id="twitterDescription" content="생년월일 기준으로 계산된 무료 오늘 운세. 띠, 오행, 간지 흐름을 반영한 계산 기반 운세를 확인하세요.">
+<meta name="twitter:image" content="https://fortune-cash.vercel.app/assets/zodiac_fortune.png">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" id="twitterTitle" content="띠별 운세 | 올해 운세 무료 보기">
@@ -56,27 +93,26 @@
   </div>
 
   <section class="card content-card">
-    <h2 class="section-title">띠별 운세란 무엇인가요?</h2>
-    <section class="card content-card">
+  <h2 class="section-title">띠별 운세란 무엇인가요?</h2>
+  <p class="info-text">
+    띠별 운세는 태어난 해의 12지신을 기준으로 오늘과 올해의 흐름을 참고하는 운세입니다.
+    재물운, 애정운, 직장운, 건강운 같은 생활 영역을 가볍게 확인할 수 있습니다.
+  </p>
+  <p class="info-text">
+    결과는 참고용 콘텐츠이며 실제 선택과 행동이 가장 중요합니다.
+  </p>
+</section>
+
+<section class="card content-card">
   <h2 class="section-title">왜 이 운세는 다른가요?</h2>
-
   <p class="info-text">
-  일반 띠별 운세는 단순히 출생연도만 기준으로 하지만,
-  이 운세는 입춘 기준, 오행, 간지 흐름까지 함께 반영합니다.
+    일반 띠 운세는 출생연도만 기준으로 보는 경우가 많지만,
+    이 페이지는 입춘 기준 띠 계산, 오행 흐름, 간지 흐름을 함께 반영합니다.
   </p>
-
   <p class="info-text">
-  그래서 같은 띠라도 생년월일에 따라 다른 결과가 나올 수 있습니다.
+    그래서 같은 띠라도 생년월일 기준에 따라 해석 흐름이 달라질 수 있습니다.
   </p>
-    </section>
-    <p class="info-text">
-      띠별 운세는 태어난 해의 12지신을 기준으로 한 해의 흐름을 참고하는 운세입니다.
-      재물운, 애정운, 직장운, 건강운 같은 생활 영역을 가볍게 확인할 수 있습니다.
-    </p>
-    <p class="info-text">
-      결과는 참고용 콘텐츠이며 실제 선택과 행동이 가장 중요합니다.
-    </p>
-  </section>
+</section>
 
   <section class="card content-card">
     <h2 class="section-title">띠를 선택하세요</h2>
@@ -98,41 +134,52 @@
     <div class="grid related-grid" id="relatedZodiacGrid"></div>
   </section>
 
-  <section class="card content-card">
-    <h2 class="section-title">추천 운세 콘텐츠</h2>
-    <div class="link-list">
-      <a class="action-link" href="/pages/period/period.html">오늘/내일/연간 운세</a>
-      <a class="action-link" href="/pages/astro/index.html">별자리운세</a>
-      <a class="action-link" href="/pages/saju/saju.html">사주 분석</a>
-      <a class="action-link" href="/pages/tojung/tojung.html">토정비결</a>
-      <a class="action-link" href="/fortune-guide.html">운세 가이드</a>
-      <a class="action-link" href="/pages/guide/fortune-terms.html">오행·지지·간지 용어 설명</a>
-      <a class="action-link" href="/pages/zodiac/zodiac.html">띠별 운세 전체 보기</a>
-    </div>
-  </section>
+<section class="card content-card">
+  <h2 class="section-title">오늘 운세 활용 방법</h2>
+  <ul class="info-text">
+    <li>중요한 결정 전 참고 흐름 확인</li>
+    <li>금전 지출이나 계약 판단 전 분위기 체크</li>
+    <li>인간관계와 연락 흐름 파악</li>
+    <li>오늘과 올해의 차이를 함께 비교</li>
+  </ul>
+</section>
+
+<section class="card content-card">
+  <h2 class="section-title">추천 운세 콘텐츠</h2>
+  <div class="link-list">
+    <a class="action-link" href="/pages/zodiac.html">띠별 운세 전체 보기</a>
+    <a class="action-link" href="/pages/period/period.html">오늘/내일/연간 운세</a>
+    <a class="action-link" href="/pages/astro/index.html">별자리운세</a>
+    <a class="action-link" href="/pages/saju/saju.html">사주 분석</a>
+    <a class="action-link" href="/pages/tojung/tojung.html">토정비결</a>
+    <a class="action-link" href="/fortune-guide.html">운세 가이드</a>
+    <a class="action-link" href="/pages/guide/fortune-terms.html">오행·지지·간지 용어 설명</a>
+  </div>
+</section>
 
   <section class="card content-card">
-    <h2 class="section-title">자주 묻는 질문</h2>
+  <h2 class="section-title">자주 묻는 질문</h2>
 
-    <p class="info-text"><b>Q. 띠별 운세는 어떻게 계산되나요?</b></p>
-    <p class="info-text">
-      전통적인 12지신 기준으로 흐름을 해석한 참고용 콘텐츠입니다.
-    </p>
+  <p class="info-text"><b>Q. 띠별 운세는 어떻게 계산되나요?</b></p>
+  <p class="info-text">
+    입춘 기준으로 띠를 계산하고, 오늘의 흐름과 올해의 오행·간지 흐름을 함께 반영한 참고용 운세입니다.
+  </p>
 
-    <p class="info-text" style="margin-top:12px;"><b>Q. 띠별 운세는 정확한가요?</b></p>
-    <p class="info-text">
-      운세는 참고용이며, 실제 결과는 개인의 선택과 행동에 따라 달라질 수 있습니다.
-    </p>
-    <p class="info-text" style="margin-top:12px;"><b>Q. 오늘 운세는 왜 매일 달라지나요?</b></p>
-<p class="info-text">
-날짜에 따른 간지와 오행 흐름이 매일 변하기 때문에 운세도 함께 달라집니다.
-</p>
+  <p class="info-text" style="margin-top:12px;"><b>Q. 오늘 운세는 왜 매일 달라지나요?</b></p>
+  <p class="info-text">
+    날짜에 따른 간지와 흐름이 달라지기 때문에 오늘 운세도 함께 달라집니다.
+  </p>
 
-<p class="info-text" style="margin-top:12px;"><b>Q. 무료 운세와 사주의 차이는?</b></p>
-<p class="info-text">
-무료 운세는 하루 흐름을 보는 것이고, 사주는 인생 전체 구조를 분석하는 방식입니다.
-</p>
-  </section>
+  <p class="info-text" style="margin-top:12px;"><b>Q. 무료 운세와 사주의 차이는?</b></p>
+  <p class="info-text">
+    무료 운세는 오늘과 올해 흐름을 가볍게 보는 콘텐츠이고, 사주는 인생 전체 구조를 더 깊게 보는 해석 방식입니다.
+  </p>
+
+  <p class="info-text" style="margin-top:12px;"><b>Q. 띠별 운세는 정확한가요?</b></p>
+  <p class="info-text">
+    운세는 참고용이며, 실제 결과는 개인의 선택과 행동에 따라 달라질 수 있습니다.
+  </p>
+</section>
 
   <div class="bottom-action-group">
     <button class="action-btn" id="shareBtn" type="button">공유하기</button>
