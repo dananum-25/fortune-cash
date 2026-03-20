@@ -167,12 +167,6 @@ async function loadDB(){
   ipchunDB = ipchun;
 }
 
-function getAnimalFromURL(){
-  const path = window.location.pathname;
-  const match = path.match(/zodiac\/(rat|ox|tiger|rabbit|dragon|snake|horse|goat|monkey|rooster|dog|pig)/);
-  return match ? match[1] : null;
-}
-
 function safePad(n){
   return String(n).padStart(2, "0");
 }
@@ -513,8 +507,7 @@ function buildProfile(){
 function buildProfileByAnimalOverride(animalOverride){
   const input = getSavedBirthInput();
   const zodiacYear = getZodiacYear(input.birthDate);
-  const baseAnimal = getZodiacAnimal(zodiacYear);
-  const animal = animalOverride || baseAnimal;
+  const animal = animalOverride || getZodiacAnimal(zodiacYear);
   const element = getBirthElement(zodiacYear);
   const ageGroup = getAgeGroup(zodiacYear);
 
@@ -534,8 +527,6 @@ function buildProfileByAnimalOverride(animalOverride){
     zodiacYear,
     animal,
     animalName: ZODIAC_NAMES[animal],
-    myAnimal: baseAnimal,
-    myAnimalName: ZODIAC_NAMES[baseAnimal],
     element,
     elementName: ELEMENT_NAMES[element],
     ageGroup,
@@ -626,18 +617,15 @@ function buildFortuneResult(profile){
 
   const daily = fortuneDB?.daily || {};
   const yearly = fortuneDB?.year || {};
-  const relation = profile?.relation || "normal";
-  const animal = profile?.animal || "rat";
-  const element = profile?.element || "wood";
 
   return {
-    todayMain: pickDailyFinal(daily, relation, animal, element, "main", buildDailySeed(profile, "daily-main", today)),
-    todayLove: pickDailyFinal(daily, relation, animal, element, "love", buildDailySeed(profile, "daily-love", today)),
-    todayMoney: pickDailyFinal(daily, relation, animal, element, "money", buildDailySeed(profile, "daily-money", today)),
-    todayHealth: pickDailyFinal(daily, relation, animal, element, "health", buildDailySeed(profile, "daily-health", today)),
-    todayWork: pickDailyFinal(daily, relation, animal, element, "work", buildDailySeed(profile, "daily-work", today)),
-    todayRelation: pickDailyFinal(daily, relation, animal, element, "relationship", buildDailySeed(profile, "daily-relationship", today)),
-    todayAdvice: pickDailyFinal(daily, relation, animal, element, "advice", buildDailySeed(profile, "daily-advice", today)),
+    todayMain: pickDailyFinal(daily, profile.relation, profile.animal, profile.element, "main", buildDailySeed(profile, "daily-main", today)),
+    todayLove: pickDailyFinal(daily, profile.relation, profile.animal, profile.element, "love", buildDailySeed(profile, "daily-love", today)),
+    todayMoney: pickDailyFinal(daily, profile.relation, profile.animal, profile.element, "money", buildDailySeed(profile, "daily-money", today)),
+    todayHealth: pickDailyFinal(daily, profile.relation, profile.animal, profile.element, "health", buildDailySeed(profile, "daily-health", today)),
+    todayWork: pickDailyFinal(daily, profile.relation, profile.animal, profile.element, "work", buildDailySeed(profile, "daily-work", today)),
+    todayRelation: pickDailyFinal(daily, profile.relation, profile.animal, profile.element, "relationship", buildDailySeed(profile, "daily-relationship", today)),
+    todayAdvice: pickDailyFinal(daily, profile.relation, profile.animal, profile.element, "advice", buildDailySeed(profile, "daily-advice", today)),
 
     todayLuckyColor: pickStable(daily?.lucky_color, buildDailySeed(profile, "daily-color", today)),
     todayLuckyNumber: pickStable(daily?.lucky_number, buildDailySeed(profile, "daily-number", today)),
@@ -695,15 +683,10 @@ function renderGuide(profile){
 function renderResult(profile, result){
   const resultBox = document.getElementById("resultBox");
   const resultSection = document.getElementById("resultSection");
-
   if(!resultBox || !resultSection) return;
-
-  const isOverrideView = profile.myAnimal && profile.myAnimal !== profile.animal;
 
   resultBox.innerHTML = `
     <h2>${profile.animalName} 오늘 운세</h2>
-
-    ${isOverrideView ? `<p class="small">현재는 선택한 띠 기준으로 보고 있습니다. 내 실제 띠는 ${profile.myAnimalName}입니다.</p>` : ""}
 
     <p><b>내 띠:</b> ${profile.animalName}</p>
     <p><b>출생 기준 띠 계산 연도:</b> ${profile.zodiacYear}년</p>
@@ -805,19 +788,17 @@ function renderMyZodiacInfo(profile){
   const box = document.getElementById("myZodiacInfo");
   if(!box) return;
 
-  const isOverrideView = profile.myAnimal && profile.myAnimal !== profile.animal;
-
   box.innerHTML = `
-  <p class="info-text"><b>내 띠</b> ${profile.animalName}</p>
-  <p class="info-text"><b>입춘 기준 적용 연도</b> ${profile.zodiacYear}년</p>
-  <p class="info-text"><b>출생 연도 간지</b> ${profile.birthGanzhi}</p>
-  <p class="info-text"><b>출생 기운</b> ${profile.elementName} ${profile.animalName}</p>
-  <p class="info-text"><b>올해 분위기</b> ${profile.currentGanzhi}</p>
-  <p class="info-text"><b>올해 흐름</b> ${profile.yearRelationLabel}</p>
-  <p class="info-text"><b>올해 오행 분위기</b> ${profile.elementFlowLabel}</p>
-  <p class="info-text"><b>오늘 흐름</b> ${profile.relationLabel}</p>
-  <p class="small"><a href="/pages/guide/fortune-terms.html">용어 설명 보기</a></p>
-`;
+    <p class="info-text"><b>내 띠</b> ${profile.animalName}</p>
+    <p class="info-text"><b>입춘 기준 적용 연도</b> ${profile.zodiacYear}년</p>
+    <p class="info-text"><b>출생 연도 간지</b> ${profile.birthGanzhi}</p>
+    <p class="info-text"><b>출생 기운</b> ${profile.elementName} ${profile.animalName}</p>
+    <p class="info-text"><b>올해 분위기</b> ${profile.currentGanzhi}</p>
+    <p class="info-text"><b>올해 흐름</b> ${profile.yearRelationLabel}</p>
+    <p class="info-text"><b>올해 오행 분위기</b> ${profile.elementFlowLabel}</p>
+    <p class="info-text"><b>오늘 흐름</b> ${profile.relationLabel}</p>
+    <p class="small"><a href="/pages/guide/fortune-terms.html">용어 설명 보기</a></p>
+  `;
 }
 
 function fillGuestBirthInput(profile){
@@ -831,7 +812,6 @@ function applyGuestBirth(){
   if(!input) return;
 
   const birthDate = input.value || DEFAULT_BIRTH_YMD;
-
   localStorage.setItem("guest_birth", birthDate);
   localStorage.setItem("guest_birthTime", DEFAULT_BIRTH_TIME);
 
@@ -843,27 +823,6 @@ function applyGuestBirth(){
   fillGuestBirthInput(profile);
   renderResult(profile, result);
   renderGuide(profile);
-}
-
-function renderRelatedZodiacGrid(){
-  const grid = document.getElementById("relatedZodiacGrid");
-  if(!grid) return;
-
-  grid.innerHTML = ZODIAC_ANIMALS.map(animal => `
-    <button class="action-btn related-zodiac-btn" type="button" data-animal="${animal}">
-      ${ZODIAC_NAMES[animal]}
-    </button>
-  `).join("");
-
-  grid.querySelectorAll(".related-zodiac-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const select = document.getElementById("zodiacSelect");
-      if(select){
-        select.value = btn.dataset.animal;
-      }
-      showZodiac();
-    });
-  });
 }
 
 function renderLoadError(err){
@@ -899,14 +858,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     if(window.loadMyPoint) await loadMyPoint();
     if(window.Common?.renderPoint) Common.renderPoint();
 
-    const profile = buildProfile();
+    const urlAnimal = getAnimalFromURL();
+
+    const profile = urlAnimal
+      ? buildProfileByAnimalOverride(urlAnimal)
+      : buildProfile();
+
     const result = buildFortuneResult(profile);
 
     renderLoginState(profile);
     renderMyZodiacInfo(profile);
     fillGuestBirthInput(profile);
     bindEvents();
-
     renderResult(profile, result);
     renderGuide(profile);
   } catch (err) {
