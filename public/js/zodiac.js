@@ -656,12 +656,6 @@ function buildFortuneResult(profile){
   };
 }
 
-function syncSelectToProfile(profile){
-  const select = document.getElementById("zodiacSelect");
-  if(!select) return;
-  select.value = profile.animal;
-}
-
 function renderGuide(profile){
   const guideBox = document.getElementById("guideBox");
   if(!guideBox) return;
@@ -763,13 +757,13 @@ function renderResult(profile, result){
   resultSection.style.display = "block";
 }
 
-function showZodiac(){
-  const selectedAnimal = document.getElementById("zodiacSelect")?.value || null;
-  const profile = buildProfileByAnimalOverride(selectedAnimal);
+function showMyZodiac(){
+  const profile = buildProfile();
   const result = buildFortuneResult(profile);
 
   renderLoginState(profile);
   renderMyZodiacInfo(profile);
+  fillGuestBirthInput(profile);
   renderResult(profile, result);
   renderGuide(profile);
 
@@ -779,15 +773,6 @@ function showZodiac(){
       rewardContent("zodiac");
     }
   }
-}
-
-function renderZodiacOptions(){
-  const select = document.getElementById("zodiacSelect");
-  if(!select) return;
-
-  select.innerHTML = ZODIAC_ANIMALS.map(animal => `
-    <option value="${animal}">${ZODIAC_NAMES[animal]}</option>
-  `).join("");
 }
 
 function renderLoginState(profile){
@@ -823,17 +808,16 @@ function renderMyZodiacInfo(profile){
   const isOverrideView = profile.myAnimal && profile.myAnimal !== profile.animal;
 
   box.innerHTML = `
-    ${isOverrideView ? `<p class="info-text"><b>내 실제 띠</b> ${profile.myAnimalName}</p>` : ""}
-    <p class="info-text"><b>현재 보는 띠</b> ${profile.animalName}</p>
-    <p class="info-text"><b>입춘 기준 적용 연도</b> ${profile.zodiacYear}년</p>
-    <p class="info-text"><b>출생 연도 간지</b> ${profile.birthGanzhi}</p>
-    <p class="info-text"><b>출생 기운</b> ${profile.elementName} ${profile.animalName}</p>
-    <p class="info-text"><b>올해 분위기</b> ${profile.currentGanzhi}</p>
-    <p class="info-text"><b>올해 흐름</b> ${profile.yearRelationLabel}</p>
-    <p class="info-text"><b>올해 오행 분위기</b> ${profile.elementFlowLabel}</p>
-    <p class="info-text"><b>오늘 흐름</b> ${profile.relationLabel}</p>
-    <p class="small"><a href="/pages/guide/fortune-terms.html">용어 설명 보기</a></p>
-  `;
+  <p class="info-text"><b>내 띠</b> ${profile.animalName}</p>
+  <p class="info-text"><b>입춘 기준 적용 연도</b> ${profile.zodiacYear}년</p>
+  <p class="info-text"><b>출생 연도 간지</b> ${profile.birthGanzhi}</p>
+  <p class="info-text"><b>출생 기운</b> ${profile.elementName} ${profile.animalName}</p>
+  <p class="info-text"><b>올해 분위기</b> ${profile.currentGanzhi}</p>
+  <p class="info-text"><b>올해 흐름</b> ${profile.yearRelationLabel}</p>
+  <p class="info-text"><b>올해 오행 분위기</b> ${profile.elementFlowLabel}</p>
+  <p class="info-text"><b>오늘 흐름</b> ${profile.relationLabel}</p>
+  <p class="small"><a href="/pages/guide/fortune-terms.html">용어 설명 보기</a></p>
+`;
 }
 
 function fillGuestBirthInput(profile){
@@ -851,13 +835,9 @@ function applyGuestBirth(){
   localStorage.setItem("guest_birth", birthDate);
   localStorage.setItem("guest_birthTime", DEFAULT_BIRTH_TIME);
 
-  const urlAnimal = getAnimalFromURL();
-const profile = urlAnimal
-  ? buildProfileByAnimalOverride(urlAnimal)
-  : buildProfile();
+  const profile = buildProfile();
   const result = buildFortuneResult(profile);
 
-  syncSelectToProfile(profile);
   renderLoginState(profile);
   renderMyZodiacInfo(profile);
   fillGuestBirthInput(profile);
@@ -901,9 +881,9 @@ function renderLoadError(err){
 }
 
 function bindEvents(){
-  const showBtn = document.getElementById("showZodiacBtn");
+  const showBtn = document.getElementById("showMyZodiacBtn");
   if(showBtn){
-    showBtn.addEventListener("click", showZodiac);
+    showBtn.addEventListener("click", showMyZodiac);
   }
 
   const applyBtn = document.getElementById("applyGuestBirthBtn");
@@ -916,16 +896,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     await loadDB();
 
-    renderZodiacOptions();
-    renderRelatedZodiacGrid();
-
     if(window.loadMyPoint) await loadMyPoint();
     if(window.Common?.renderPoint) Common.renderPoint();
 
     const profile = buildProfile();
     const result = buildFortuneResult(profile);
 
-    syncSelectToProfile(profile);
     renderLoginState(profile);
     renderMyZodiacInfo(profile);
     fillGuestBirthInput(profile);
