@@ -96,7 +96,7 @@
   <section id="guestBirthCard" class="card form-card">
     <h2 class="section-title">내 기준으로 다시 보기</h2>
     <p class="info-text">회원은 저장된 생년월일이 자동 적용됩니다.</p>
-    <p class="info-text">게스트와 비회원은 생년월일을 입력하면 본인 띠 기준으로 다시 볼 수 있습니다.</p>
+    <p class="info-text">게스트와 비회원은 생년월일을 입력하면 내 띠와 운세가 자동으로 계산됩니다.</p>
 
     <div class="form-group">
       <input id="guestBirthInline" class="input-field" type="date">
@@ -132,15 +132,13 @@
   </p>
 </section>
 
-  <section class="card content-card">
-    <h2 class="section-title">띠를 선택하세요</h2>
-
-    <div class="form-group">
-      <select id="zodiacSelect" class="input-field"></select>
-    </div>
-
-    <button class="action-btn full-btn" id="showZodiacBtn" type="button">운세 보기</button>
-  </section>
+<section class="card content-card">
+  <h2 class="section-title">내 띠 자동 확인</h2>
+  <p class="info-text">
+    생년월일을 입력하면 입춘 기준으로 내 띠를 자동 계산해 오늘 운세와 올해 흐름을 보여줍니다.
+  </p>
+  <button class="action-btn full-btn" id="showMyZodiacBtn" type="button">내 띠 운세 보기</button>
+</section>
 
   <section id="resultSection" class="result-section" style="display:none;">
     <div id="resultBox" class="card result-card"></div>
