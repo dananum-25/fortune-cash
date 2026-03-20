@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
 
-Host: https://fortune-cash.vercel.app
 Sitemap: https://fortune-cash.vercel.app/sitemap.xml
