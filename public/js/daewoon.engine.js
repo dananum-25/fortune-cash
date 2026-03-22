@@ -6,7 +6,7 @@
 
 import { heavenly, earthly } from "/js/saju.engine.js";
 import { SOLAR_TERMS } from "/js/solarTerms.db.js";
-import { getExactSolarTermDate } from "/js/solarTerms.exact.db.js";
+import { getVerifiedSolarTermDate } from "/js/solarTerms.exact.db.js";
 // -------------------------------
 // 1) 음양 판별
 // -------------------------------
@@ -42,12 +42,15 @@ export function getDaewoonDirection(gender, yearStem){
 // 나중에 절입 시각 DB로 바꾸면 정밀 계산 가능
 // -------------------------------
 function getTermDateApprox(year, termName){
-  const exactDate = getExactSolarTermDate(year, termName);
-  if (exactDate) return exactDate;
+
+  const verifiedDate = getVerifiedSolarTermDate(year, termName);
+  if(verifiedDate){
+    return verifiedDate;
+  }
 
   const terms = SOLAR_TERMS?.[year];
   const md = terms?.[termName];
-  if (!md) return null;
+  if(!md) return null;
 
   const [mm, dd] = md.split("-").map(Number);
   return new Date(year, mm - 1, dd, 0, 0, 0);
@@ -72,9 +75,24 @@ function findNearestTermApprox(birthDate, direction){
     if(!terms) continue;
 
     for(const name of orderedTerms){
+      const verifiedDate = getVerifiedSolarTermDate(y, name);
+
+      if(verifiedDate){
+        pool.push({
+          name,
+          date: verifiedDate,
+          verified: true
+        });
+        continue;
+      }
+
       const d = getTermDateApprox(y, name);
       if(d){
-        pool.push({ name, date: d });
+        pool.push({
+          name,
+          date: d,
+          verified: false
+        });
       }
     }
   }
@@ -114,17 +132,20 @@ export function getDaewoonStartAgeApprox(birthDate, direction){
   const ms = Math.abs(nearestTerm.date - birthDate);
   const diffDays = ms / 86400000;
 
-  // 3일 = 1년 근사
   let startAge = Math.round(diffDays / 3);
 
-  // 너무 0으로 떨어지는 경우 최소 1세 처리
   if(startAge < 1) startAge = 1;
+
+  const precision =
+    nearestTerm?.verified === true
+      ? "verified_datetime_based"
+      : "date_or_unverified_datetime_based";
 
   return {
     startAge,
     nearestTerm,
     diffDays,
-    precision: "approx_by_date_only"
+    precision
   };
 }
 
