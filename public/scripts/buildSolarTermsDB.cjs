@@ -1,5 +1,4 @@
 const fs = require("fs");
-const fetch = require("node-fetch");
 
 const SERVICE_KEY = "d9ffad9262e64a03ed1e3e83c76ddaf70e5c6de2e0659839eaa9ca4f2113e3e4";
 
