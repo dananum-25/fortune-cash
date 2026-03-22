@@ -15,21 +15,23 @@ async function loadJson(path){
 }
 
 export async function loadMyeongriDB(){
-  const [daymaster, tenGod, strength, habchung, counseling] = await Promise.all([
-    loadJson(`${DB_BASE}/daymaster.json`),
-    loadJson(`${DB_BASE}/tenGod.json`),
-    loadJson(`${DB_BASE}/strength.json`),
-    loadJson(`${DB_BASE}/habchung.json`),
-    loadJson(`${DB_BASE}/counseling.json`)
-  ]);
+  const [daymaster, tenGod, strength, habchung, sinsal12, counseling] = await Promise.all([
+  loadJson(`${DB_BASE}/daymaster.json`),
+  loadJson(`${DB_BASE}/tenGod.json`),
+  loadJson(`${DB_BASE}/strength.json`),
+  loadJson(`${DB_BASE}/habchung.json`),
+  loadJson(`${DB_BASE}/sinsal12.json`),
+  loadJson(`${DB_BASE}/counseling.json`)
+]);
 
   return {
-    daymaster,
-    tenGod,
-    strength,
-    habchung,
-    counseling
-  };
+  daymaster,
+  tenGod,
+  strength,
+  habchung,
+  sinsal12,
+  counseling
+};
 }
 
 export function matchDaymasterMessage(db, dayMasterStem){
@@ -42,6 +44,10 @@ export function matchTenGodMessage(db, tenGodName){
 
 export function matchStrengthMessage(db, strengthLabel){
   return db?.strength?.[strengthLabel] || null;
+}
+
+export function matchSinsalMessage(db, sinsalName){
+  return db?.sinsal12?.[sinsalName] || null;
 }
 
 export function matchHabChungMessage(db, typeName){
@@ -93,12 +99,27 @@ export function buildDbInterpretation(db, resultV2){
     }
   }
 
+  const sinsalMsgs = [];
+  const sinsalSummary = Array.isArray(resultV2?.sinsal12?.summary)
+    ? resultV2.sinsal12.summary
+    : [];
+
+  for (const item of sinsalSummary) {
+    const m = String(item).match(/:\s*([^\s/]+)/);
+    const sinsalName = m ? m[1].trim() : "";
+    if (!sinsalName) continue;
+
+    const msg = matchSinsalMessage(db, sinsalName);
+    if (msg) sinsalMsgs.push(msg);
+  }
+
   return {
     principles: db?.counseling?.principles || [],
     bridges: db?.counseling?.bridges || {},
     dayMaster: dayMasterMsg,
     tenGod: tenGodMsg,
     strength: strengthMsg,
-    habchung: habchungMsgs
+    habchung: habchungMsgs,
+    sinsal12: sinsalMsgs
   };
 }
