@@ -6,8 +6,7 @@
 
 import { heavenly, earthly } from "/js/saju.engine.js";
 import { SOLAR_TERMS } from "/js/solarTerms.db.js";
-import { SOLAR_TERMS_EXACT } from "/js/solarTerms.exact.db.js";
-
+import { getExactSolarTermDate } from "/js/solarTerms.exact.db.js";
 // -------------------------------
 // 1) 음양 판별
 // -------------------------------
@@ -43,14 +42,12 @@ export function getDaewoonDirection(gender, yearStem){
 // 나중에 절입 시각 DB로 바꾸면 정밀 계산 가능
 // -------------------------------
 function getTermDateApprox(year, termName){
-  const exact = SOLAR_TERMS_EXACT?.[year]?.[termName];
-  if(exact){
-    return new Date(exact);
-  }
+  const exactDate = getExactSolarTermDate(year, termName);
+  if (exactDate) return exactDate;
 
   const terms = SOLAR_TERMS?.[year];
   const md = terms?.[termName];
-  if(!md) return null;
+  if (!md) return null;
 
   const [mm, dd] = md.split("-").map(Number);
   return new Date(year, mm - 1, dd, 0, 0, 0);
