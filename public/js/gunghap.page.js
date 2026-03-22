@@ -1,3 +1,4 @@
+let gunghapDB = null;
 import { calculateGunghapV2 } from "/js/gunghap.v2.engine.js";
 import { loadGunghapDB, buildGunghapDbInterpretation } from "/js/gunghap.db.engine.js";
 
@@ -22,6 +23,12 @@ function fillTimeOptions(hourId, minuteId){
     if(m === 0) opt.selected = true;
     minuteSel.appendChild(opt);
   }
+}
+
+async function ensureGunghapDBLoaded(){
+  if(gunghapDB) return gunghapDB;
+  gunghapDB = await loadGunghapDB();
+  return gunghapDB;
 }
 
 function renderList(id, items){
@@ -81,12 +88,29 @@ function formatJijanganMain(info, fallbackLabel){
   return stem;
 }
 
-function renderResult(result, nameA, nameB){
+function renderResult(result, nameA, nameB, dbInterp){
   const aTitle = nameA || "첫 번째 사람";
   const bTitle = nameB || "두 번째 사람";
 
   setText("resultTitle", `${aTitle} × ${bTitle} 궁합`);
-  setText("resultSummary", result?.relation?.scoreSummary?.summary || "");
+  const summaryParts = [];
+
+if (dbInterp?.score?.summary) summaryParts.push(...dbInterp.score.summary);
+if (dbInterp?.dayBranch?.summary) summaryParts.push(...dbInterp.dayBranch.summary);
+if (dbInterp?.jijangan?.summary) summaryParts.push(...dbInterp.jijangan.summary);
+
+if (Array.isArray(dbInterp?.special)) {
+  dbInterp.special.forEach((item) => {
+    if (item?.summary) summaryParts.push(...item.summary);
+  });
+}
+
+setText(
+  "resultSummary",
+  summaryParts.length
+    ? summaryParts.join(" ")
+    : (result?.relation?.scoreSummary?.summary || "")
+);
 
   setText("personATitle", aTitle);
   setText("personBTitle", bTitle);
@@ -143,11 +167,24 @@ function renderResult(result, nameA, nameB){
 
   setText("sinsalHint", sinsalHint || "내용 없음");
 
-  renderList("adviceList", result?.advice || []);
+  const adviceList = [
+  ...(result?.advice || []),
+  ...(dbInterp?.score?.advice || []),
+  ...(dbInterp?.dayBranch?.advice || []),
+  ...(dbInterp?.jijangan?.advice || [])
+];
+
+if (Array.isArray(dbInterp?.special)) {
+  dbInterp.special.forEach((item) => {
+    if (item?.advice) adviceList.push(...item.advice);
+  });
+}
+
+renderList("adviceList", adviceList);
   $("resultWrap").classList.remove("hidden");
 }
 
-$("gunghapForm").addEventListener("submit", (e) => {
+$("gunghapForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const nameA = $("nameA").value.trim();
@@ -170,7 +207,10 @@ $("gunghapForm").addEventListener("submit", (e) => {
   const result = calculateGunghapV2(personA, personB);
   if(!result) return;
 
-  renderResult(result, nameA, nameB);
+  const db = await ensureGunghapDBLoaded();
+  const dbInterp = buildGunghapDbInterpretation(db, result);
+
+  renderResult(result, nameA, nameB, dbInterp);
 });
 
 fillTimeOptions("hourA", "minuteA");
