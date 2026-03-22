@@ -71,6 +71,33 @@ function renderResult(result, userName){
 
   renderList("jobList", result?.career?.typeMessage?.jobs || []);
 
+  const flow = result?.flow?.raw || {};
+  const sewoonMsg = result?.flow?.sewoonMessage;
+  const daewoonMsg = result?.flow?.daewoonMessage;
+
+  setText(
+    "currentSeWoon",
+    flow?.sewoon?.ganji ? `${flow.sewoon.ganji} (${flow.sewoon.year}년)` : "-"
+  );
+
+  setText(
+    "currentDaewoon",
+    flow?.currentDaewoon?.ganji
+      ? `${flow.currentDaewoon.ganji} (${flow.currentDaewoon.fromAge}~${flow.currentDaewoon.toAge})`
+      : "-"
+  );
+
+  setText("sewoonFlowTitle", sewoonMsg?.title || "-");
+  setText("daewoonFlowTitle", daewoonMsg?.title || "-");
+
+  const flowList = [
+    ...(sewoonMsg?.summary || []),
+    ...(daewoonMsg?.summary || []),
+    ...(sewoonMsg?.advice || []),
+    ...(daewoonMsg?.advice || [])
+  ];
+  renderList("careerFlowList", flowList);
+
   const advice = [
     ...(result?.career?.typeMessage?.advice || []),
     ...(result?.career?.strengthMessage?.summary || [])
