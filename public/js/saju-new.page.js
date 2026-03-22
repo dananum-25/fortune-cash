@@ -1,4 +1,5 @@
-import { calculateSajuLegacyCompat } from "/js/saju.compat.engine.js";
+import { calculateSajuResultV2 } from "/js/saju.result.v2.engine.js";
+import { loadMyeongriDB, buildDbInterpretation } from "/js/myeongri.db.engine.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -6,6 +7,8 @@ const form = $("sajuForm");
 const errorBox = $("errorBox");
 const resultWrap = $("resultWrap");
 const shareBtn = $("shareBtn");
+
+let myeongriDB = null;
 
 function fillSelectOptions() {
   const hourSel = $("birthHour");
@@ -39,11 +42,15 @@ function hideError() {
 }
 
 function setText(id, value) {
-  $(id).textContent = value ?? "";
+  const el = $(id);
+  if (!el) return;
+  el.textContent = value ?? "";
 }
 
 function renderList(id, items) {
   const el = $(id);
+  if (!el) return;
+
   el.innerHTML = "";
 
   const arr = Array.isArray(items) ? items : [];
@@ -61,15 +68,91 @@ function renderList(id, items) {
   });
 }
 
-function renderResult(result) {
-  setText("yearPillar", result?.saju?.year);
-  setText("monthPillar", result?.saju?.month);
-  setText("dayPillar", result?.saju?.day);
-  setText("hourPillar", result?.saju?.hour);
+function safeArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function buildDbSummaryText(dbInterp) {
+  const lines = [];
+
+  if (dbInterp?.dayMaster?.summary) {
+    lines.push(...safeArray(dbInterp.dayMaster.summary));
+  }
+
+  if (dbInterp?.tenGod?.summary) {
+    lines.push(...safeArray(dbInterp.tenGod.summary));
+  }
+
+  if (dbInterp?.strength?.summary) {
+    lines.push(...safeArray(dbInterp.strength.summary));
+  }
+
+  if (dbInterp?.bridges?.flow) {
+    lines.push(...safeArray(dbInterp.bridges.flow));
+  }
+
+  return lines.join(" ");
+}
+
+function buildDbStrengthList(dbInterp) {
+  const list = [];
+
+  if (dbInterp?.dayMaster?.title) list.push(dbInterp.dayMaster.title);
+  if (dbInterp?.tenGod?.title) list.push(dbInterp.tenGod.title);
+  if (dbInterp?.strength?.title) list.push(dbInterp.strength.title);
+
+  return list;
+}
+
+function buildDbCautionList(dbInterp) {
+  const list = [];
+
+  if (dbInterp?.dayMaster?.caution) list.push(...safeArray(dbInterp.dayMaster.caution));
+  if (dbInterp?.tenGod?.caution) list.push(...safeArray(dbInterp.tenGod.caution));
+  if (dbInterp?.strength?.caution) list.push(...safeArray(dbInterp.strength.caution));
+
+  if (Array.isArray(dbInterp?.habchung)) {
+    dbInterp.habchung.forEach((item) => {
+      if (item?.summary) list.push(...safeArray(item.summary));
+    });
+  }
+
+  return list;
+}
+
+function buildDbAdviceList(dbInterp, result) {
+  const list = [];
+
+  if (dbInterp?.dayMaster?.advice) list.push(...safeArray(dbInterp.dayMaster.advice));
+  if (dbInterp?.tenGod?.advice) list.push(...safeArray(dbInterp.tenGod.advice));
+  if (dbInterp?.strength?.advice) list.push(...safeArray(dbInterp.strength.advice));
+
+  if (Array.isArray(dbInterp?.habchung)) {
+    dbInterp.habchung.forEach((item) => {
+      if (item?.advice) list.push(...safeArray(item.advice));
+    });
+  }
+
+  if (result?.daewoon?.startAge != null) {
+    list.push(`현재 엔진 기준 첫 대운 시작은 약 ${result.daewoon.startAge}세로 계산되었습니다.`);
+  }
+
+  if (dbInterp?.bridges?.advice) {
+    list.push(...safeArray(dbInterp.bridges.advice));
+  }
+
+  return list;
+}
+
+function renderResult(result, dbInterp) {
+  setText("yearPillar", result?.pillars?.year);
+  setText("monthPillar", result?.pillars?.month);
+  setText("dayPillar", result?.pillars?.day);
+  setText("hourPillar", result?.pillars?.hour);
 
   setText(
     "dayMaster",
-    `${result?.dayMaster?.stem || ""} (${result?.dayMaster?.element || ""}, ${result?.dayMaster?.yinYang || ""})`
+    `${result?.dayMaster?.stem || ""} (${result?.dayMaster?.element || ""})`
   );
 
   setText(
@@ -80,13 +163,13 @@ function renderResult(result) {
   const tg = result?.tenGods || {};
   setText(
     "tenGods",
-    `연간 ${tg.year || "-"} / 월간 ${tg.month || "-"} / 일간 ${tg.day || "-"} / 시간 ${tg.hour || "-"}`
+    `연간 ${tg.yearStemTenGod || "-"} / 월간 ${tg.monthStemTenGod || "-"} / 일간 ${tg.dayStemTenGod || "-"} / 시간 ${tg.hourStemTenGod || "-"}`
   );
 
   const fe = result?.fiveElements || {};
   setText(
     "fiveElements",
-    `목 ${fe.wood ?? 0} · 화 ${fe.fire ?? 0} · 토 ${fe.earth ?? 0} · 금 ${fe.metal ?? 0} · 수 ${fe.water ?? 0}`
+    `목 ${fe["목"] ?? 0} · 화 ${fe["화"] ?? 0} · 토 ${fe["토"] ?? 0} · 금 ${fe["금"] ?? 0} · 수 ${fe["수"] ?? 0}`
   );
 
   const daewoon = result?.daewoon || {};
@@ -97,13 +180,20 @@ function renderResult(result) {
 
   renderList(
     "daewoonList",
-    Array.isArray(daewoon.list) ? daewoon.list.map(v => v.label) : []
+    Array.isArray(daewoon.list)
+      ? daewoon.list.map(v => `${v.ganji} (${v.fromAge}~${v.toAge})`)
+      : []
   );
 
-  setText("summaryText", result?.text?.summary || "");
-  renderList("strengthList", result?.text?.strengths || []);
-  renderList("cautionList", result?.text?.cautions || []);
-  renderList("adviceList", result?.text?.advice || []);
+  const summaryText = buildDbSummaryText(dbInterp);
+  const strengthList = buildDbStrengthList(dbInterp);
+  const cautionList = buildDbCautionList(dbInterp);
+  const adviceList = buildDbAdviceList(dbInterp, result);
+
+  setText("summaryText", summaryText);
+  renderList("strengthList", strengthList);
+  renderList("cautionList", cautionList);
+  renderList("adviceList", adviceList);
 
   resultWrap.classList.remove("hidden");
 }
@@ -129,7 +219,13 @@ async function shareCurrentPage() {
   }
 }
 
-form.addEventListener("submit", (e) => {
+async function ensureDBLoaded() {
+  if (myeongriDB) return myeongriDB;
+  myeongriDB = await loadMyeongriDB();
+  return myeongriDB;
+}
+
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
   hideError();
 
@@ -149,7 +245,9 @@ form.addEventListener("submit", (e) => {
   }
 
   try {
-    const result = calculateSajuLegacyCompat({
+    const db = await ensureDBLoaded();
+
+    const result = calculateSajuResultV2({
       ymd,
       hour,
       minute,
@@ -161,7 +259,8 @@ form.addEventListener("submit", (e) => {
       return;
     }
 
-    renderResult(result);
+    const dbInterp = buildDbInterpretation(db, result);
+    renderResult(result, dbInterp);
   } catch (err) {
     console.error(err);
     showError(err?.message || "분석 중 오류가 발생했습니다.");
