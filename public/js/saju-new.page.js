@@ -49,17 +49,6 @@ function setText(id, value) {
   if (!el) return;
   el.textContent = value ?? "";
 }
-
-function buildPrecisionNotice(ymd) {
-  const year = Number(String(ymd).slice(0, 4));
-  const verifiedIpchun = isExactSolarTermVerified(year, "입춘");
-
-  if (verifiedIpchun) {
-    return "입춘 절입시는 검증된 시각 데이터를 우선 사용합니다.";
-  }
-
-  return "현재 절입시는 시각 검증 전 단계이며, 날짜 기반 또는 임시 시각값이 포함될 수 있습니다.";
-}
  
 function renderList(id, items) {
   const el = $(id);
@@ -152,7 +141,7 @@ function buildResultSubTitle({ birthPlace, ymd, hour, minute, gender }) {
   return parts.join(" / ");
 }
 
-function buildPrecisionNotice(ymd) {
+function buildPrecisionNotice(ymd, hour = 12, minute = 0) {
   const year = Number(String(ymd || "").slice(0, 4));
   const month = Number(String(ymd || "").slice(5, 7));
   const day = Number(String(ymd || "").slice(8, 10));
@@ -164,26 +153,23 @@ function buildPrecisionNotice(ymd) {
   const verifiedIpchun = hasVerifiedSolarTerm(year, "입춘");
   const verifiedGyeongchip = hasVerifiedSolarTerm(year, "경칩");
 
-  const isBoundarySeason =
-    (month === 2 && day >= 2 && day <= 6) ||
-    (month === 3 && day >= 4 && day <= 7);
+  const isIpchunBoundary = month === 2 && day >= 2 && day <= 6;
+  const isGyeongchipBoundary = month === 3 && day >= 4 && day <= 7;
+
+  if (verifiedIpchun && isIpchunBoundary) {
+    return `입춘 경계일 구간입니다. 현재 입력 시각 ${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")} 은 검증된 입춘 절입시와 비교됩니다.`;
+  }
+
+  if (verifiedGyeongchip && isGyeongchipBoundary) {
+    return `경칩 경계일 구간입니다. 현재 입력 시각 ${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")} 은 검증된 경칩 절입시와 비교됩니다.`;
+  }
 
   if (verifiedIpchun && verifiedGyeongchip) {
-    if (isBoundarySeason) {
-      return "경계일 구간입니다. 이 연도는 일부 검증된 절입시를 우선 사용하므로 경계 판정 신뢰도가 더 높습니다.";
-    }
-    return "이 연도는 주요 월주 경계 절기 중 일부가 검증된 절입시를 우선 사용합니다.";
+    return "이 연도는 주요 월주 경계 절기 일부에 대해 검증된 절입시를 우선 사용합니다.";
   }
 
   if (verifiedIpchun) {
-    if (isBoundarySeason) {
-      return "경계일 구간입니다. 입춘은 검증된 절입시를 우선 사용하지만, 다른 절기는 미검증일 수 있습니다.";
-    }
     return "이 연도는 입춘 절입시에 한해 검증된 시각 데이터를 우선 사용합니다.";
-  }
-
-  if (isBoundarySeason) {
-    return "경계일 구간입니다. 현재 이 연도는 절입시 검증 전 단계라서 날짜 기반 판정이 포함될 수 있습니다.";
   }
 
   return "현재 이 연도는 절입시 검증 전 단계라서 날짜 기반 또는 미검증 시각값이 포함될 수 있습니다.";
