@@ -6,7 +6,11 @@
 // ===============================
 
 import { SOLAR_TERMS } from "/js/solarTerms.db.js";
-import { SOLAR_TERMS_EXACT } from "/js/solarTerms.exact.db.js";
+import {
+  SOLAR_TERMS_EXACT,
+  getExactSolarTermDate,
+  isExactSolarTermVerified
+} from "/js/solarTerms.exact.db.js";
 
 export const heavenly = ["갑","을","병","정","무","기","경","신","임","계"];
 export const earthly  = ["자","축","인","묘","진","사","오","미","신","유","술","해"];
@@ -57,20 +61,16 @@ function sexagenaryYear(year){
 // 4) 입춘 기준 연주
 // -------------------------------
 function getIpchun(year){
-
-  const exact = SOLAR_TERMS_EXACT?.[year]?.["입춘"];
-  if(exact){
-    return new Date(exact);
-  }
+  const exactDate = getExactSolarTermDate(year, "입춘");
+  if (exactDate) return exactDate;
 
   const terms = SOLAR_TERMS?.[year];
 
-  if(!terms || !terms["입춘"]){
+  if (!terms || !terms["입춘"]) {
     return new Date(year, 1, 4, 0, 0, 0);
   }
 
   const [mm, dd] = terms["입춘"].split("-").map(Number);
-
   return new Date(year, mm - 1, dd, 0, 0, 0);
 }
 
@@ -92,8 +92,8 @@ export function getYearPillar(date){
 // -------------------------------
 
 function getTermDateTime(year, termName){
-  const exact = SOLAR_TERMS_EXACT?.[year]?.[termName];
-  if (exact) return new Date(exact);
+  const exactDate = getExactSolarTermDate(year, termName);
+  if (exactDate) return exactDate;
 
   const simple = SOLAR_TERMS?.[year]?.[termName];
   if (simple) {
