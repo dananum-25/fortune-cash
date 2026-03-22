@@ -42,18 +42,105 @@ function renderList(id, items){
   });
 }
 
+function setText(id, value){
+  const el = $(id);
+  if(!el) return;
+  el.textContent = value ?? "";
+}
+
+function formatPillars(pillars){
+  if(!pillars) return "-";
+  return [
+    `연주 ${pillars.year || "-"}`,
+    `월주 ${pillars.month || "-"}`,
+    `일주 ${pillars.day || "-"}`,
+    `시주 ${pillars.hour || "-"}`
+  ].join(" / ");
+}
+
+function formatCrossRelations(relations){
+  if(!Array.isArray(relations) || !relations.length) return "중립";
+  return relations.map(v => `${v.a}-${v.b} ${v.label}`).join(", ");
+}
+
+function formatArray(arr){
+  return Array.isArray(arr) && arr.length ? arr.join(", ") : "없음";
+}
+
+function formatJijanganMain(info, fallbackLabel){
+  if(!info){
+    return fallbackLabel || "내용 없음";
+  }
+
+  const stem = info.aMain || info.bMain || "";
+  if(!stem){
+    return fallbackLabel || "내용 없음";
+  }
+
+  return stem;
+}
+
 function renderResult(result, nameA, nameB){
-  $("resultTitle").textContent = `${nameA || "첫 번째 사람"} × ${nameB || "두 번째 사람"} 궁합`;
-  $("resultSummary").textContent = result?.relation?.scoreSummary?.summary || "";
+  const aTitle = nameA || "첫 번째 사람";
+  const bTitle = nameB || "두 번째 사람";
 
-  $("dayStemRel").textContent = result?.relation?.dayStemRelation?.label || "-";
-$("dayBranchRel").textContent = result?.relation?.dayBranchRelation?.label || "-";
+  setText("resultTitle", `${aTitle} × ${bTitle} 궁합`);
+  setText("resultSummary", result?.relation?.scoreSummary?.summary || "");
 
-const crossText = Array.isArray(result?.relation?.crossRelations) && result.relation.crossRelations.length
-  ? result.relation.crossRelations.map(v => `${v.a}-${v.b} ${v.label}`).join(", ")
-  : "중립";
+  setText("personATitle", aTitle);
+  setText("personBTitle", bTitle);
 
-$("fiveRel").textContent = crossText;
+  setText("personAPillars", formatPillars(result?.personA?.pillars));
+  setText("personBPillars", formatPillars(result?.personB?.pillars));
+
+  setText("dayStemRel", result?.relation?.dayStemRelation?.label || "-");
+  setText("dayBranchRel", result?.relation?.dayBranchRelation?.label || "-");
+  setText("fiveRel", formatCrossRelations(result?.relation?.crossRelations));
+  setText(
+    "totalScore",
+    `${result?.relation?.totalScore ?? 0}점 / ${result?.relation?.scoreSummary?.label || "-"}`
+  );
+
+  setText(
+    "aJijanganMain",
+    result?.relation?.jijanganInfo?.aMain
+      ? `${result.relation.jijanganInfo.aMain}`
+      : "내용 없음"
+  );
+
+  setText(
+    "bJijanganMain",
+    result?.relation?.jijanganInfo?.bMain
+      ? `${result.relation.jijanganInfo.bMain}`
+      : "내용 없음"
+  );
+
+  setText(
+    "sharedExtraSinsal",
+    formatArray(result?.relation?.sinsalInfo?.sharedExtra)
+  );
+
+  setText(
+    "aExtraSinsal",
+    formatArray(result?.relation?.sinsalInfo?.aExtra)
+  );
+
+  setText(
+    "bExtraSinsal",
+    formatArray(result?.relation?.sinsalInfo?.bExtra)
+  );
+
+  const a12 = result?.relation?.sinsalInfo?.a12;
+  const b12 = result?.relation?.sinsalInfo?.b12;
+
+  const sinsalHint = [
+    a12?.연지?.sinsal ? `A 연지 ${a12.연지.sinsal}` : "",
+    a12?.월지?.sinsal ? `A 월지 ${a12.월지.sinsal}` : "",
+    b12?.연지?.sinsal ? `B 연지 ${b12.연지.sinsal}` : "",
+    b12?.월지?.sinsal ? `B 월지 ${b12.월지.sinsal}` : ""
+  ].filter(Boolean).join(" / ");
+
+  setText("sinsalHint", sinsalHint || "내용 없음");
 
   renderList("adviceList", result?.advice || []);
   $("resultWrap").classList.remove("hidden");
