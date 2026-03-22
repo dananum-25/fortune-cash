@@ -188,74 +188,69 @@
       연주, 월주, 일주, 시주와 오행, 십성, 대운을 새 엔진 기준으로 확인합니다.
     </div>
 
-    <div class="card">
-      <div class="section-title">입력</div>
-      <form id="sajuForm" class="grid">
-  <div class="field">
-    <label for="userName">이름 (선택)</label>
-    <input id="userName" type="text" placeholder="홍길동" />
-  </div>
-
-  <div class="field">
-    <label for="birthPlace">출생지역 (선택)</label>
-    <select id="birthPlace">
-      <option value="">선택</option>
-      <option value="서울">서울</option>
-      <option value="부산">부산</option>
-      <option value="대구">대구</option>
-      <option value="인천">인천</option>
-      <option value="광주">광주</option>
-      <option value="대전">대전</option>
-      <option value="울산">울산</option>
-      <option value="세종">세종</option>
-      <option value="경기">경기</option>
-      <option value="강원">강원</option>
-      <option value="충북">충북</option>
-      <option value="충남">충남</option>
-      <option value="전북">전북</option>
-      <option value="전남">전남</option>
-      <option value="경북">경북</option>
-      <option value="경남">경남</option>
-      <option value="제주">제주</option>
-    </select>
-  </div>
-
-  <div class="field">
-    <label for="birthDate">생년월일</label>
-    <input id="birthDate" type="date" required />
-  </div>
-
-  <div class="field">
-    <label for="gender">성별</label>
-    <select id="gender" required>
-      <option value="">선택</option>
-      <option value="남성">남성</option>
-      <option value="여성">여성</option>
-    </select>
-  </div>
-
-  <div class="field">
-    <label for="birthHour">출생 시</label>
-    <select id="birthHour"></select>
-  </div>
-
-  <div class="field">
-    <label for="birthMinute">출생 분</label>
-    <select id="birthMinute"></select>
-  </div>
-
-  <div class="field full">
-    <button type="submit">신규 엔진으로 분석하기</button>
-  </div>
-</form>
-</div>
-
-        <div class="field full">
-          <button type="submit">신규 엔진으로 분석하기</button>
-        </div>
-      </form>
-      <div id="errorBox" class="error hidden"></div>
+<div class="card">
+  <div class="section-title">입력</div>
+  <form id="sajuForm" class="grid">
+    <div class="field">
+      <label for="userName">이름 (선택)</label>
+      <input id="userName" type="text" placeholder="홍길동" />
     </div>
+
+    <div class="field">
+      <label for="birthPlace">출생지역 (선택)</label>
+      <select id="birthPlace">
+        <option value="">선택</option>
+        <option value="서울">서울</option>
+        <option value="부산">부산</option>
+        <option value="대구">대구</option>
+        <option value="인천">인천</option>
+        <option value="광주">광주</option>
+        <option value="대전">대전</option>
+        <option value="울산">울산</option>
+        <option value="세종">세종</option>
+        <option value="경기">경기</option>
+        <option value="강원">강원</option>
+        <option value="충북">충북</option>
+        <option value="충남">충남</option>
+        <option value="전북">전북</option>
+        <option value="전남">전남</option>
+        <option value="경북">경북</option>
+        <option value="경남">경남</option>
+        <option value="제주">제주</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="birthDate">생년월일</label>
+      <input id="birthDate" type="date" required />
+    </div>
+
+    <div class="field">
+      <label for="gender">성별</label>
+      <select id="gender" required>
+        <option value="">선택</option>
+        <option value="남성">남성</option>
+        <option value="여성">여성</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="birthHour">출생 시</label>
+      <select id="birthHour"></select>
+    </div>
+
+    <div class="field">
+      <label for="birthMinute">출생 분</label>
+      <select id="birthMinute"></select>
+    </div>
+
+    <div class="field full">
+      <button type="submit">신규 엔진으로 분석하기</button>
+    </div>
+  </form>
+
+  <div id="errorBox" class="error hidden"></div>
+</div>
 
 <div id="resultWrap" class="hidden">
   <div class="card">
