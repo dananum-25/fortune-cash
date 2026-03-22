@@ -177,6 +177,9 @@ export function calculateSajuResultV2({
   const strength = calculateDayMasterStrength(pillars);
   const strengthSummary = summarizeStrength(strength);
 
+  const sinsal12 = get12SinsalForPillars(pillars);
+  const sinsal12Summary = summarize12Sinsal(pillars);
+  
   // ----------------
   // 대운
   // ----------------
@@ -241,6 +244,11 @@ export function calculateSajuResultV2({
       summary: strengthSummary
     },
 
+    sinsal12: {
+      raw: sinsal12,
+      summary: sinsal12Summary
+    },
+    
     daewoon,
 
     meta:{
