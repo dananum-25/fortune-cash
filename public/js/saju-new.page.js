@@ -141,7 +141,7 @@ function buildResultSubTitle({ birthPlace, ymd, hour, minute, gender }) {
   return parts.join(" / ");
 }
 
-function buildPrecisionNotice(ymd, hour = 12, minute = 0) {
+async function buildPrecisionNotice(ymd, hour = 12, minute = 0) {
   const year = Number(String(ymd || "").slice(0, 4));
   const month = Number(String(ymd || "").slice(5, 7));
   const day = Number(String(ymd || "").slice(8, 10));
@@ -150,8 +150,8 @@ function buildPrecisionNotice(ymd, hour = 12, minute = 0) {
     return "절입시 검증 상태를 확인할 수 없습니다.";
   }
 
-  const verifiedIpchun = hasVerifiedSolarTerm(year, "입춘");
-  const verifiedGyeongchip = hasVerifiedSolarTerm(year, "경칩");
+  const verifiedIpchun = await hasVerifiedSolarTerm(year, "입춘");
+  const verifiedGyeongchip = await hasVerifiedSolarTerm(year, "경칩");
 
   const isIpchunBoundary = month === 2 && day >= 2 && day <= 6;
   const isGyeongchipBoundary = month === 3 && day >= 4 && day <= 7;
@@ -269,7 +269,7 @@ function buildDbCautionList(dbInterp) {
   return list;
 }
 
-function renderResult(result, dbInterp, flow, extraInput) {
+async function renderResult(result, dbInterp, flow, extraInput) {
   setText("resultTitle", buildResultTitle(extraInput?.userName));
   setText("resultSubTitle", buildResultSubTitle(extraInput || {}));
   setText("yearPillar", result?.pillars?.year);
@@ -277,7 +277,7 @@ function renderResult(result, dbInterp, flow, extraInput) {
   setText("dayPillar", result?.pillars?.day);
   setText("hourPillar", result?.pillars?.hour);
   setText("resultTitle", buildResultTitle(userName));
-  setText("precisionNotice", buildPrecisionNotice(extraInput?.ymd));
+  setText("precisionNotice", await buildPrecisionNotice(extraInput?.ymd));
   setText(
     "dayMaster",
     `${result?.dayMaster?.stem || ""} (${result?.dayMaster?.element || ""})`
@@ -427,7 +427,7 @@ const minute = Number($("birthMinute").value || 0);
     }
 
     const dbInterp = buildDbInterpretation(db, result);
-    renderResult(result, dbInterp, flow, {
+   await renderResult(result, dbInterp, flow, {
   userName,
   birthPlace,
   ymd,
