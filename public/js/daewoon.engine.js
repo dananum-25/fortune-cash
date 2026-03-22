@@ -43,6 +43,11 @@ export function getDaewoonDirection(gender, yearStem){
 // 나중에 절입 시각 DB로 바꾸면 정밀 계산 가능
 // -------------------------------
 function getTermDateApprox(year, termName){
+  const exact = SOLAR_TERMS_EXACT?.[year]?.[termName];
+  if(exact){
+    return new Date(exact);
+  }
+
   const terms = SOLAR_TERMS?.[year];
   const md = terms?.[termName];
   if(!md) return null;
