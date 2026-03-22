@@ -60,7 +60,7 @@ function buildPrecisionNotice(ymd) {
 
   return "현재 절입시는 시각 검증 전 단계이며, 날짜 기반 또는 임시 시각값이 포함될 수 있습니다.";
 }
-
+ 
 function renderList(id, items) {
   const el = $(id);
   if (!el) return;
