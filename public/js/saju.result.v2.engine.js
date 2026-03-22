@@ -213,9 +213,9 @@ export function calculateSajuResultV2({
   // 최종 반환
   // ----------------
 
+  const extraSinsal = getExtraSinsal(pillars);
+  
   return {
-
-    const extraSinsal = getExtraSinsal(pillars);
   
     input:{
       ymd,
