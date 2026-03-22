@@ -1,11 +1,11 @@
 {
   "coverage": {
-    "startYear": 2025,
-    "endYear": 2026
+    "pending_start_year": 2025,
+    "pending_end_year": 2026,
+    "verified_years": [2026]
   },
-  "verifiedYears": [],
   "notes": [
-    "verified=true 인 항목만 절입시 검증 완료로 간주",
-    "verified=false 는 자리값 또는 임시값"
+    "verified=true 만 정밀 절입시로 사용",
+    "pending 값은 경계일 테스트에 쓰지 않음"
   ]
 }
