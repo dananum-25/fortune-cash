@@ -268,14 +268,6 @@ function buildDbCautionList(dbInterp) {
 
   return list;
 }
-function buildResultTitle(name){
-
-  if(!name){
-    return "사주 분석 결과";
-  }
-
-  return `${name}님의 사주 분석`;
-}
 
 function renderResult(result, dbInterp, flow, extraInput) {
   setText("resultTitle", buildResultTitle(extraInput?.userName));
