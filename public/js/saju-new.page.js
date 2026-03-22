@@ -88,6 +88,12 @@ function buildDbSummaryText(dbInterp) {
     lines.push(...safeArray(dbInterp.strength.summary));
   }
 
+  if (Array.isArray(dbInterp?.sinsal12)) {
+    dbInterp.sinsal12.forEach((item) => {
+      if (item?.summary) lines.push(...safeArray(item.summary));
+    });
+  }
+
   if (dbInterp?.bridges?.flow) {
     lines.push(...safeArray(dbInterp.bridges.flow));
   }
@@ -118,28 +124,10 @@ function buildDbCautionList(dbInterp) {
     });
   }
 
-  return list;
-}
-
-function buildDbAdviceList(dbInterp, result) {
-  const list = [];
-
-  if (dbInterp?.dayMaster?.advice) list.push(...safeArray(dbInterp.dayMaster.advice));
-  if (dbInterp?.tenGod?.advice) list.push(...safeArray(dbInterp.tenGod.advice));
-  if (dbInterp?.strength?.advice) list.push(...safeArray(dbInterp.strength.advice));
-
-  if (Array.isArray(dbInterp?.habchung)) {
-    dbInterp.habchung.forEach((item) => {
-      if (item?.advice) list.push(...safeArray(item.advice));
+  if (Array.isArray(dbInterp?.sinsal12)) {
+    dbInterp.sinsal12.forEach((item) => {
+      if (item?.caution) list.push(...safeArray(item.caution));
     });
-  }
-
-  if (result?.daewoon?.startAge != null) {
-    list.push(`현재 엔진 기준 첫 대운 시작은 약 ${result.daewoon.startAge}세로 계산되었습니다.`);
-  }
-
-  if (dbInterp?.bridges?.advice) {
-    list.push(...safeArray(dbInterp.bridges.advice));
   }
 
   return list;
