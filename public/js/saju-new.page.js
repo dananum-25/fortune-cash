@@ -190,6 +190,13 @@ function renderResult(result, dbInterp) {
       ? sinsalSummary.join(" / ")
       : "내용 없음"
   );
+
+  setText(
+  "extraSinsal",
+  Array.isArray(result?.extraSinsal)
+    ? result.extraSinsal.join(", ")
+    : "-"
+);
   
   const daewoon = result?.daewoon || {};
   setText(
@@ -203,7 +210,7 @@ function renderResult(result, dbInterp) {
       ? daewoon.list.map(v => `${v.ganji} (${v.fromAge}~${v.toAge})`)
       : []
   );
-
+  
   const summaryText = buildDbSummaryText(dbInterp);
   const strengthList = buildDbStrengthList(dbInterp);
   const cautionList = buildDbCautionList(dbInterp);
