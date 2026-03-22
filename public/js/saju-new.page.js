@@ -276,8 +276,14 @@ async function renderResult(result, dbInterp, flow, extraInput) {
   setText("monthPillar", result?.pillars?.month);
   setText("dayPillar", result?.pillars?.day);
   setText("hourPillar", result?.pillars?.hour);
-  setText("resultTitle", buildResultTitle(userName));
-  setText("precisionNotice", await buildPrecisionNotice(extraInput?.ymd));
+  setText(
+  "precisionNotice",
+  await buildPrecisionNotice(
+    extraInput?.ymd,
+    extraInput?.hour ?? 12,
+    extraInput?.minute ?? 0
+  )
+);
   setText(
     "dayMaster",
     `${result?.dayMaster?.stem || ""} (${result?.dayMaster?.element || ""})`
