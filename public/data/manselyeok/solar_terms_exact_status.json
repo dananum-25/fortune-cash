@@ -1,0 +1,11 @@
+{
+  "coverage": {
+    "startYear": 2025,
+    "endYear": 2026
+  },
+  "verifiedYears": [],
+  "notes": [
+    "verified=true 인 항목만 절입시 검증 완료로 간주",
+    "verified=false 는 자리값 또는 임시값"
+  ]
+}
