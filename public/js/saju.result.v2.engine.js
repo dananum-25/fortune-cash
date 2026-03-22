@@ -24,6 +24,11 @@ import {
   summarizeStrength
 } from "/js/strength.engine.js";
 
+import {
+  get12SinsalForPillars,
+  summarize12Sinsal
+} from "/js/sinsal12.engine.js";
+
 // -------------------------------
 // 오행 맵
 // -------------------------------
