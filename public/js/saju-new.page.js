@@ -325,8 +325,7 @@ function renderResult(result, dbInterp, flow, extraInput) {
   const summaryText = buildDbSummaryText(dbInterp);
   const strengthList = buildDbStrengthList(dbInterp);
   const cautionList = buildDbCautionList(dbInterp);
-  const adviceList = buildDbAdviceList(dbInterp, result);
-
+  const adviceList = buildDbAdviceList(dbInterp, result, extraInput);
   setText("summaryText", summaryText);
   renderList("strengthList", strengthList);
   renderList("cautionList", cautionList);
