@@ -1,4 +1,5 @@
 import { calculateGunghapV2 } from "/js/gunghap.v2.engine.js";
+import { loadGunghapDB, buildGunghapDbInterpretation } from "/js/gunghap.db.engine.js";
 
 const $ = (id) => document.getElementById(id);
 
