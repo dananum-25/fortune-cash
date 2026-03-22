@@ -191,29 +191,45 @@
     <div class="card">
       <div class="section-title">입력</div>
       <form id="sajuForm" class="grid">
-        <div class="field">
-          <label for="birthDate">생년월일</label>
-          <input id="birthDate" type="date" required />
-        </div>
+<div class="form-group">
+<label>이름 (선택)</label>
+<input type="text" id="userName" placeholder="홍길동">
+</div>
 
-        <div class="field">
-          <label for="gender">성별</label>
-          <select id="gender" required>
-            <option value="">선택</option>
-            <option value="남성">남성</option>
-            <option value="여성">여성</option>
-          </select>
-        </div>
+<div class="form-group">
+<label>생년월일</label>
+<input type="date" id="birthDate">
+</div>
 
-        <div class="field">
-          <label for="birthHour">출생 시</label>
-          <select id="birthHour"></select>
-        </div>
+<div class="form-group">
+<label>출생시간</label>
+<select id="birthHour"></select>
+<select id="birthMinute"></select>
+</div>
 
-        <div class="field">
-          <label for="birthMinute">출생 분</label>
-          <select id="birthMinute"></select>
-        </div>
+<div class="form-group">
+<label>성별</label>
+<select id="gender">
+<option value="">선택</option>
+<option value="남성">남성</option>
+<option value="여성">여성</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>출생지역 (선택)</label>
+<select id="birthPlace">
+<option value="">선택</option>
+<option value="서울">서울</option>
+<option value="부산">부산</option>
+<option value="대구">대구</option>
+<option value="인천">인천</option>
+<option value="광주">광주</option>
+<option value="대전">대전</option>
+<option value="울산">울산</option>
+<option value="제주">제주</option>
+</select>
+</div>
 
         <div class="field full">
           <button type="submit">신규 엔진으로 분석하기</button>
