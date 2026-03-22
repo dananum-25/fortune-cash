@@ -17,10 +17,10 @@ export async function loadExactSolarTerms() {
 }
 
 // 2순위: 예전 자동계산 확정본
-export async function loadVerifiedSolarTerms() {
-  if (verifiedCache) return verifiedCache;
-  verifiedCache = await loadJson("/data/manselyeok/solar_terms_exact_verified.json");
-  return verifiedCache;
+export async function loadExactSolarTerms() {
+  if (exactCache) return exactCache;
+  exactCache = await loadJson("/data/manselyeok/solar_terms_exact.json");
+  return exactCache;
 }
 
 export async function getExactSolarTermDate(year, termName) {
@@ -50,9 +50,12 @@ export async function getBestSolarTermDate(year, termName) {
 }
 
 export async function hasVerifiedSolarTerm(year, termName) {
-  const exact = await getExactSolarTermDate(year, termName);
-  if (exact) return true;
 
-  const verified = await getVerifiedSolarTermDate(year, termName);
-  return Boolean(verified);
+  const exact = await loadExactSolarTerms();
+  if (exact?.[year]?.[termName]) return true;
+
+  const verified = await loadJson("/data/manselyeok/solar_terms_exact_verified.json");
+  if (verified?.[year]?.[termName]) return true;
+
+  return false;
 }
