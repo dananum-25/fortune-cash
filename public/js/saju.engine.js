@@ -6,6 +6,7 @@
 // ===============================
 
 import { SOLAR_TERMS } from "/js/solarTerms.db.js";
+import { SOLAR_TERMS_EXACT } from "/js/solarTerms.exact.db.js";
 
 export const heavenly = ["갑","을","병","정","무","기","경","신","임","계"];
 export const earthly  = ["자","축","인","묘","진","사","오","미","신","유","술","해"];
