@@ -1,0 +1,88 @@
+[
+  {
+    "question": "이 자료에서 명리심리상담은 무엇인가?",
+    "lookup_domains": [
+      "foundations"
+    ],
+    "recommended_sections": [
+      "001_4cb41237",
+      "001_ff455d5e",
+      "001_c3ed5a6b",
+      "002_6cd14b78"
+    ]
+  },
+  {
+    "question": "음양오행과 사주 구성 원리는 어디를 보면 되나?",
+    "lookup_domains": [
+      "saju_construction"
+    ],
+    "recommended_sections": [
+      "015_71c83eaa",
+      "018_bff0a19e",
+      "019_373a3b09",
+      "021_b75b3759",
+      "022_aa05d70c",
+      "022_50f4f3f0",
+      "023_89ce2f32",
+      "024_21dd09c0"
+    ]
+  },
+  {
+    "question": "십신을 심리 언어로 풀려면 어떤 부분을 참고하나?",
+    "lookup_domains": [
+      "ten_gods"
+    ],
+    "recommended_sections": [
+      "096_09e91b14",
+      "096_8126f005",
+      "097_dd517578",
+      "097_9d7a95b8",
+      "099_688c88ed",
+      "101_8c0250e0",
+      "103_c5f730f6",
+      "105_fec85077",
+      "107_6b5b800d",
+      "107_e4abc2ad"
+    ]
+  },
+  {
+    "question": "감정, 스트레스, 트라우마는 어디를 보면 되나?",
+    "lookup_domains": [
+      "emotions",
+      "stress",
+      "trauma"
+    ],
+    "recommended_sections": [
+      "128_2f298d16",
+      "129_bd3b1d92",
+      "129_74eda38a",
+      "130_49a40b53",
+      "131_92a27a7c",
+      "132_2fd62fb5",
+      "132_33e22602",
+      "133_075e4eb0",
+      "133_48c3ccbf",
+      "134_b72cb2f7",
+      "135_1537f90c",
+      "136_4778b362"
+    ]
+  },
+  {
+    "question": "상담 서비스 운영 시 꼭 지켜야 할 윤리는?",
+    "lookup_domains": [
+      "ethics"
+    ],
+    "recommended_sections": [
+      "413_d1116390",
+      "414_7ae2ebb9",
+      "414_07e5b418",
+      "416_013ec4e2",
+      "417_f038e418",
+      "418_17574a39",
+      "419_1532a38c",
+      "420_35277029",
+      "421_2f2893b6",
+      "422_17385864"
+    ]
+  }
+]

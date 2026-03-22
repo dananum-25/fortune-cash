@@ -1,0 +1,171 @@
+{
+  "modules": [
+    {
+      "module_id": "core_profile",
+      "name": "기본 성향 리포트",
+      "description": "음양·오행·사주 구성·일간 강약을 바탕으로 성향과 균형을 설명하는 핵심 결과 페이지.",
+      "source_domains": [
+        "saju_construction",
+        "daymaster_strength",
+        "ten_gods",
+        "foundations"
+      ],
+      "source_lectures": [
+        2,
+        3,
+        6,
+        7
+      ],
+      "input_fields": [
+        "생년",
+        "월",
+        "일",
+        "시",
+        "양력/음력",
+        "성별",
+        "출생지"
+      ],
+      "output_blocks": [
+        "사주 구성",
+        "음양 균형",
+        "오행 분포",
+        "일간 강약",
+        "핵심 성향 요약",
+        "주의 포인트"
+      ]
+    },
+    {
+      "module_id": "emotion_report",
+      "name": "감정 패턴 분석",
+      "description": "희로애락, 정서 반응, 불안·우울·분노 경향을 설명하고 조절 힌트를 주는 페이지.",
+      "source_domains": [
+        "emotions",
+        "ten_gods",
+        "stress",
+        "flow_timing"
+      ],
+      "source_lectures": [
+        6,
+        8,
+        9,
+        10,
+        17
+      ],
+      "input_fields": [
+        "사주 계산 결과",
+        "현재 고민 주제"
+      ],
+      "output_blocks": [
+        "주요 감정 경향",
+        "스트레스 유발 요인",
+        "표현 방식",
+        "완화 전략"
+      ]
+    },
+    {
+      "module_id": "relationship_report",
+      "name": "인간관계 스타일",
+      "description": "대인관계 패턴, 갈등 방식, 의사소통 강점/주의점을 설명하는 페이지.",
+      "source_domains": [
+        "relationships",
+        "family",
+        "love_marriage",
+        "ten_gods"
+      ],
+      "source_lectures": [
+        6,
+        12,
+        15,
+        16
+      ],
+      "input_fields": [
+        "본인 정보",
+        "상대 정보(선택)"
+      ],
+      "output_blocks": [
+        "관계 기본 패턴",
+        "갈등 촉발 지점",
+        "관계에서의 강점",
+        "소통 팁"
+      ]
+    },
+    {
+      "module_id": "career_report",
+      "name": "직업·적성 분석",
+      "description": "성향과 자원 활용 방식에 기반해 직업환경 적합성, 일 스타일, 성장 방향을 제시하는 페이지.",
+      "source_domains": [
+        "career",
+        "daymaster_strength",
+        "ten_gods",
+        "self_growth"
+      ],
+      "source_lectures": [
+        6,
+        7,
+        14,
+        18
+      ],
+      "input_fields": [
+        "사주 계산 결과",
+        "현재 직무/희망 분야(선택)"
+      ],
+      "output_blocks": [
+        "업무 스타일",
+        "강점 자원",
+        "주의 포인트",
+        "맞는 환경",
+        "성장 전략"
+      ]
+    },
+    {
+      "module_id": "counseling_console",
+      "name": "상담 보조 지식베이스",
+      "description": "상담 프로세스, 사례, 윤리를 근거로 상담사/운영자 화면에서 참고하는 내부용 모듈.",
+      "source_domains": [
+        "counseling_process",
+        "case_studies",
+        "ethics",
+        "trauma"
+      ],
+      "source_lectures": [
+        11,
+        13,
+        19,
+        20
+      ],
+      "input_fields": [
+        "내담자 질문",
+        "관련 사주 해석",
+        "위험 신호 여부"
+      ],
+      "output_blocks": [
+        "권장 상담 흐름",
+        "주의 문구",
+        "전문가 의뢰 기준",
+        "윤리 체크리스트"
+      ]
+    }
+  ],
+  "guardrails": [
+    {
+      "rule": "운명 단정 금지",
+      "details": "결과를 절대적 예언처럼 단정하지 않고 가능성·경향·선택지 언어로 표현.",
+      "source_lecture": 20
+    },
+    {
+      "rule": "전문가 의뢰 분기",
+      "details": "자살·타해 위험, 정신질환 의심, 법률/재정 자문 요청 등은 외부 전문가 의뢰 안내를 우선.",
+      "source_lecture": 20
+    },
+    {
+      "rule": "자율성 존중",
+      "details": "이용자의 선택권을 침해하지 않도록 '반드시' '무조건' 같은 단정 표현을 피함.",
+      "source_lecture": 20
+    },
+    {
+      "rule": "상담형 결과 제공",
+      "details": "사주 해석을 현재의 감정·행동 맥락과 연결하고 실천 가능한 제안으로 마무리.",
+      "source_lecture": 1
+    }
+  ]
+}
