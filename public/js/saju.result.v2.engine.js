@@ -25,6 +25,10 @@ import {
 } from "/js/strength.engine.js";
 
 import {
+  getExtraSinsal
+} from "/js/sinsal.extra.engine.js";
+
+import {
   get12SinsalForPillars,
   summarize12Sinsal
 } from "/js/sinsal12.engine.js";
@@ -211,6 +215,8 @@ export function calculateSajuResultV2({
 
   return {
 
+    const extraSinsal = getExtraSinsal(pillars);
+  
     input:{
       ymd,
       hour,
@@ -222,6 +228,8 @@ export function calculateSajuResultV2({
 
     dayMaster,
 
+    extraSinsal,
+    
     monthBranch,
 
     tenGods,
