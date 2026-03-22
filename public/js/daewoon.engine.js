@@ -6,6 +6,7 @@
 
 import { heavenly, earthly } from "/js/saju.engine.js";
 import { SOLAR_TERMS } from "/js/solarTerms.db.js";
+import { SOLAR_TERMS_EXACT } from "/js/solarTerms.exact.db.js";
 
 // -------------------------------
 // 1) 음양 판별
