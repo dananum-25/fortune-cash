@@ -451,4 +451,4 @@ if (shareBtn) {
   shareBtn.addEventListener("click", shareCurrentPage);
 }
 
-fillSelectOptions();
+fillTimeOptions();
