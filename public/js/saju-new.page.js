@@ -124,6 +124,56 @@ function safeArray(value) {
   return Array.isArray(value) ? value : [];
 }
 
+function buildResultTitle(name) {
+  if (!name) return "사주 분석 결과";
+  return `${name}님의 사주 분석 결과`;
+}
+
+function buildResultSubTitle({ birthPlace, ymd, hour, minute, gender }) {
+  const parts = [];
+
+  if (birthPlace) parts.push(`${birthPlace} 기준`);
+  if (ymd) parts.push(ymd);
+  parts.push(`${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`);
+  if (gender) parts.push(gender);
+
+  return parts.join(" / ");
+}
+
+function buildDbAdviceList(dbInterp, result, extraInput) {
+  const list = [];
+
+  if (dbInterp?.dayMaster?.advice) list.push(...safeArray(dbInterp.dayMaster.advice));
+  if (dbInterp?.tenGod?.advice) list.push(...safeArray(dbInterp.tenGod.advice));
+  if (dbInterp?.strength?.advice) list.push(...safeArray(dbInterp.strength.advice));
+
+  if (Array.isArray(dbInterp?.habchung)) {
+    dbInterp.habchung.forEach((item) => {
+      if (item?.advice) list.push(...safeArray(item.advice));
+    });
+  }
+
+  if (Array.isArray(dbInterp?.sinsal12)) {
+    dbInterp.sinsal12.forEach((item) => {
+      if (item?.advice) list.push(...safeArray(item.advice));
+    });
+  }
+
+  if (result?.daewoon?.startAge != null) {
+    list.push(`현재 엔진 기준 첫 대운 시작은 약 ${result.daewoon.startAge}세로 계산되었습니다.`);
+  }
+
+  if (extraInput?.birthPlace) {
+    list.push(`${extraInput.birthPlace} 기준 입력 정보로 분석을 표시했습니다. 현재 엔진의 절입 계산은 한국 표준시 기준입니다.`);
+  }
+
+  if (dbInterp?.bridges?.advice) {
+    list.push(...safeArray(dbInterp.bridges.advice));
+  }
+
+  return list;
+}
+
 function buildDbSummaryText(dbInterp) {
   const lines = [];
 
@@ -192,7 +242,9 @@ function buildResultTitle(name){
   return `${name}님의 사주 분석`;
 }
 
-function renderResult(result, dbInterp, flow) {
+function renderResult(result, dbInterp, flow, extraInput) {
+  setText("resultTitle", buildResultTitle(extraInput?.userName));
+  setText("resultSubTitle", buildResultSubTitle(extraInput || {}));
   setText("yearPillar", result?.pillars?.year);
   setText("monthPillar", result?.pillars?.month);
   setText("dayPillar", result?.pillars?.day);
@@ -314,8 +366,8 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
   hideError();
 
-  const userName = $("userName").value || "";
-const birthPlace = $("birthPlace").value || "";
+  const userName = $("userName").value.trim();
+const birthPlace = $("birthPlace").value;
 
 const ymd = $("birthDate").value;
 const gender = $("gender").value;
@@ -348,7 +400,14 @@ const minute = Number($("birthMinute").value || 0);
     }
 
     const dbInterp = buildDbInterpretation(db, result);
-    renderResult(result, dbInterp);
+    renderResult(result, dbInterp, flow, {
+  userName,
+  birthPlace,
+  ymd,
+  hour,
+  minute,
+  gender
+});
   } catch (err) {
     console.error(err);
     showError(err?.message || "분석 중 오류가 발생했습니다.");
