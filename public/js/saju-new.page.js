@@ -1,6 +1,7 @@
 import { calculateSajuResultV2 } from "/js/saju.result.v2.engine.js";
 import { loadMyeongriDB, buildDbInterpretation } from "/js/myeongri.db.engine.js";
 import { summarize12Sinsal } from "/js/sinsal12.engine.js";
+import { calculateFlowInterpretation } from "/js/flow.engine.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -69,6 +70,56 @@ function renderList(id, items) {
   });
 }
 
+function buildFlowKeywordText(flow) {
+  const parts = [];
+
+  if (flow?.sewoonType) parts.push(`세운 ${flow.sewoonType}`);
+  if (flow?.daewoonType) parts.push(`대운 ${flow.daewoonType}`);
+
+  return parts.length ? parts.join(" / ") : "내용 없음";
+}
+
+function buildFlowSummary(message) {
+  if (!message) return [];
+  return [
+    ...safeArray(message.summary)
+  ];
+}
+
+function buildFlowAdvice(flow) {
+  const list = [];
+
+  if (flow?.sewoonMessage?.advice) {
+    list.push(...safeArray(flow.sewoonMessage.advice));
+  }
+
+  if (flow?.daewoonMessage?.advice) {
+    list.push(...safeArray(flow.daewoonMessage.advice));
+  }
+
+  return list;
+}
+
+function renderFlow(flow) {
+  setText("currentAge", flow?.currentAge != null ? `${flow.currentAge}세` : "-");
+  setText(
+    "currentSeWoon",
+    flow?.sewoon?.ganji ? `${flow.sewoon.ganji} (${flow.sewoon.year}년)` : "-"
+  );
+  setText(
+    "currentDaewoon",
+    flow?.currentDaewoon?.ganji
+      ? `${flow.currentDaewoon.ganji} (${flow.currentDaewoon.fromAge}~${flow.currentDaewoon.toAge})`
+      : "-"
+  );
+
+  setText("flowKeywords", buildFlowKeywordText(flow));
+
+  renderList("sewoonSummaryList", buildFlowSummary(flow?.sewoonMessage));
+  renderList("daewoonSummaryList", buildFlowSummary(flow?.daewoonMessage));
+  renderList("flowAdviceList", buildFlowAdvice(flow));
+}
+
 function safeArray(value) {
   return Array.isArray(value) ? value : [];
 }
@@ -133,7 +184,7 @@ function buildDbCautionList(dbInterp) {
   return list;
 }
 
-function renderResult(result, dbInterp) {
+function renderResult(result, dbInterp, flow) {
   setText("yearPillar", result?.pillars?.year);
   setText("monthPillar", result?.pillars?.month);
   setText("dayPillar", result?.pillars?.day);
@@ -220,7 +271,7 @@ function renderResult(result, dbInterp) {
   renderList("strengthList", strengthList);
   renderList("cautionList", cautionList);
   renderList("adviceList", adviceList);
-
+  renderFlow(flow);
   resultWrap.classList.remove("hidden");
 }
 
