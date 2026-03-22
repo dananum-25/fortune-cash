@@ -5,6 +5,7 @@ const $ = (id) => document.getElementById(id);
 const form = $("sajuForm");
 const errorBox = $("errorBox");
 const resultWrap = $("resultWrap");
+const shareBtn = $("shareBtn");
 
 function fillSelectOptions() {
   const hourSel = $("birthHour");
@@ -107,6 +108,27 @@ function renderResult(result) {
   resultWrap.classList.remove("hidden");
 }
 
+async function shareCurrentPage() {
+  const shareData = {
+    title: "정밀 사주 분석",
+    text: "신규 명리 엔진 기반 사주 분석 페이지",
+    url: window.location.href
+  };
+
+  try {
+    if (navigator.share) {
+      await navigator.share(shareData);
+      return;
+    }
+
+    await navigator.clipboard.writeText(window.location.href);
+    alert("페이지 주소가 복사되었습니다.");
+  } catch (err) {
+    console.error(err);
+    alert("공유에 실패했습니다.");
+  }
+}
+
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   hideError();
@@ -145,5 +167,9 @@ form.addEventListener("submit", (e) => {
     showError(err?.message || "분석 중 오류가 발생했습니다.");
   }
 });
+
+if (shareBtn) {
+  shareBtn.addEventListener("click", shareCurrentPage);
+}
 
 fillSelectOptions();
