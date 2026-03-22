@@ -102,6 +102,17 @@ function buildFlowAdvice(flow) {
 }
 
 function renderFlow(flow) {
+  if (!flow) {
+    setText("currentAge", "-");
+    setText("currentSeWoon", "-");
+    setText("currentDaewoon", "-");
+    setText("flowKeywords", "내용 없음");
+    renderList("sewoonSummaryList", []);
+    renderList("daewoonSummaryList", []);
+    renderList("flowAdviceList", []);
+    return;
+  }
+
   setText("currentAge", flow?.currentAge != null ? `${flow.currentAge}세` : "-");
   setText(
     "currentSeWoon",
@@ -115,7 +126,6 @@ function renderFlow(flow) {
   );
 
   setText("flowKeywords", buildFlowKeywordText(flow));
-
   renderList("sewoonSummaryList", buildFlowSummary(flow?.sewoonMessage));
   renderList("daewoonSummaryList", buildFlowSummary(flow?.daewoonMessage));
   renderList("flowAdviceList", buildFlowAdvice(flow));
@@ -433,7 +443,7 @@ const minute = Number($("birthMinute").value || 0);
     }
 
     const dbInterp = buildDbInterpretation(db, result);
-   await renderResult(result, dbInterp, flow, {
+   await renderResult(result, dbInterp, null, {
   userName,
   birthPlace,
   ymd,
@@ -451,4 +461,4 @@ if (shareBtn) {
   shareBtn.addEventListener("click", shareCurrentPage);
 }
 
-fillTimeOptions();
+fillSelectOptions();
