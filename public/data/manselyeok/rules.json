@@ -1,0 +1,18 @@
+{
+  "version": "1.0.0",
+  "timezone": "Asia/Seoul",
+  "supported_range": {
+    "start_year": 1940,
+    "end_year": 2030
+  },
+  "year_boundary_rule": "ipchun",
+  "month_boundary_rule": "solar_terms",
+  "day_boundary_rule": "midnight",
+  "hour_boundary_rule": "traditional_2hour_blocks",
+  "notes": [
+    "연주는 입춘 기준",
+    "월주는 절기 기준",
+    "일주는 자정 기준",
+    "시주는 12지지 2시간 기준"
+  ]
+}
