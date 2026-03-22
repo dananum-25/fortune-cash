@@ -90,12 +90,13 @@ export function getYearPillar(date){
 // -------------------------------
 // 5) 월지
 // -------------------------------
+
 function getTermDateTime(year, termName){
   const exact = SOLAR_TERMS_EXACT?.[year]?.[termName];
-  if(exact) return new Date(exact);
+  if (exact) return new Date(exact);
 
   const simple = SOLAR_TERMS?.[year]?.[termName];
-  if(simple){
+  if (simple) {
     const [mm, dd] = simple.split("-").map(Number);
     return new Date(year, mm - 1, dd, 0, 0, 0);
   }
@@ -104,9 +105,9 @@ function getTermDateTime(year, termName){
 }
 
 function getMonthBranch(date){
-
   const y = date.getFullYear();
 
+  const sohan = getTermDateTime(y, "소한");
   const ipchun = getTermDateTime(y, "입춘");
   const gyeongchip = getTermDateTime(y, "경칩");
   const cheongmyeong = getTermDateTime(y, "청명");
@@ -118,20 +119,19 @@ function getMonthBranch(date){
   const hanro = getTermDateTime(y, "한로");
   const ibdong = getTermDateTime(y, "입동");
   const daeseol = getTermDateTime(y, "대설");
-  const sohan = getTermDateTime(y, "소한");
 
-  if(sohan && date < sohan) return "자";
-  if(ipchun && date < ipchun) return "축";
-  if(gyeongchip && date < gyeongchip) return "인";
-  if(cheongmyeong && date < cheongmyeong) return "묘";
-  if(ibha && date < ibha) return "진";
-  if(mangjong && date < mangjong) return "사";
-  if(soseo && date < soseo) return "오";
-  if(ipchu && date < ipchu) return "미";
-  if(baengno && date < baengno) return "신";
-  if(hanro && date < hanro) return "유";
-  if(ibdong && date < ibdong) return "술";
-  if(daeseol && date < daeseol) return "해";
+  if (sohan && date < sohan) return "자";
+  if (ipchun && date < ipchun) return "축";
+  if (gyeongchip && date < gyeongchip) return "인";
+  if (cheongmyeong && date < cheongmyeong) return "묘";
+  if (ibha && date < ibha) return "진";
+  if (mangjong && date < mangjong) return "사";
+  if (soseo && date < soseo) return "오";
+  if (ipchu && date < ipchu) return "미";
+  if (baengno && date < baengno) return "신";
+  if (hanro && date < hanro) return "유";
+  if (ibdong && date < ibdong) return "술";
+  if (daeseol && date < daeseol) return "해";
 
   return "자";
 }
