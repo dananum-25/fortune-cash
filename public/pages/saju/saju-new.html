@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>정밀 사주 분석 | 신규 엔진 테스트</title>
+  <meta name="description" content="절기 기준 연주·월주, 십성, 오행, 대운을 반영한 신규 사주 엔진 테스트 페이지입니다.">
+  <link rel="stylesheet" href="/css/common.css">
+  <style>
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:#f7f7fb;
+      color:#222;
+    }
+    .wrap{
+      max-width:900px;
+      margin:0 auto;
+      padding:20px 16px 80px;
+    }
+    h1{
+      font-size:28px;
+      margin:0 0 10px;
+    }
+    .desc{
+      color:#666;
+      font-size:14px;
+      margin-bottom:18px;
+      line-height:1.6;
+    }
+    .card{
+      background:#fff;
+      border-radius:16px;
+      padding:18px;
+      margin-bottom:16px;
+      box-shadow:0 2px 10px rgba(0,0,0,0.05);
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .field.full{
+      grid-column:1 / -1;
+    }
+    label{
+      font-size:14px;
+      font-weight:600;
+    }
+    input, select, button{
+      height:44px;
+      border:1px solid #ddd;
+      border-radius:10px;
+      padding:0 12px;
+      font-size:15px;
+      box-sizing:border-box;
+    }
+    button{
+      background:#111827;
+      color:#fff;
+      border:none;
+      font-weight:700;
+      cursor:pointer;
+    }
+    .section-title{
+      font-size:18px;
+      font-weight:800;
+      margin:0 0 12px;
+    }
+    .pillars{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+    }
+    .pillar-box{
+      background:#f3f4f6;
+      border-radius:12px;
+      padding:14px 10px;
+      text-align:center;
+    }
+    .pillar-label{
+      font-size:13px;
+      color:#666;
+      margin-bottom:6px;
+    }
+    .pillar-value{
+      font-size:22px;
+      font-weight:800;
+    }
+    .mini-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:10px;
+    }
+    .item{
+      background:#fafafa;
+      border:1px solid #eee;
+      border-radius:12px;
+      padding:12px;
+    }
+    .item strong{
+      display:block;
+      margin-bottom:6px;
+    }
+    .list{
+      margin:0;
+      padding-left:18px;
+      line-height:1.7;
+    }
+    .muted{
+      color:#666;
+      font-size:14px;
+    }
+    .hidden{
+      display:none;
+    }
+    .error{
+      color:#b91c1c;
+      font-size:14px;
+      margin-top:10px;
+      white-space:pre-line;
+    }
+    @media (max-width: 720px){
+      .grid, .mini-grid, .pillars{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>정밀 사주 분석</h1>
+    <div class="desc">
+      기존 페이지와 분리된 신규 엔진 테스트 페이지입니다.  
+      연주, 월주, 일주, 시주와 오행, 십성, 대운 방향까지 새 엔진 기준으로 확인합니다.
+    </div>
+
+    <div class="card">
+      <div class="section-title">입력</div>
+      <form id="sajuForm" class="grid">
+        <div class="field">
+          <label for="birthDate">생년월일</label>
+          <input id="birthDate" type="date" required />
+        </div>
+
+        <div class="field">
+          <label for="gender">성별</label>
+          <select id="gender" required>
+            <option value="">선택</option>
+            <option value="남성">남성</option>
+            <option value="여성">여성</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="birthHour">출생 시</label>
+          <select id="birthHour"></select>
+        </div>
+
+        <div class="field">
+          <label for="birthMinute">출생 분</label>
+          <select id="birthMinute"></select>
+        </div>
+
+        <div class="field full">
+          <button type="submit">신규 엔진으로 분석하기</button>
+        </div>
+      </form>
+      <div id="errorBox" class="error hidden"></div>
+    </div>
+
+    <div id="resultWrap" class="hidden">
+      <div class="card">
+        <div class="section-title">사주 원국</div>
+        <div class="pillars">
+          <div class="pillar-box">
+            <div class="pillar-label">연주</div>
+            <div class="pillar-value" id="yearPillar"></div>
+          </div>
+          <div class="pillar-box">
+            <div class="pillar-label">월주</div>
+            <div class="pillar-value" id="monthPillar"></div>
+          </div>
+          <div class="pillar-box">
+            <div class="pillar-label">일주</div>
+            <div class="pillar-value" id="dayPillar"></div>
+          </div>
+          <div class="pillar-box">
+            <div class="pillar-label">시주</div>
+            <div class="pillar-value" id="hourPillar"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">핵심 구조</div>
+        <div class="mini-grid">
+          <div class="item">
+            <strong>일간</strong>
+            <div id="dayMaster"></div>
+          </div>
+          <div class="item">
+            <strong>월지</strong>
+            <div id="monthBranch"></div>
+          </div>
+          <div class="item">
+            <strong>십성</strong>
+            <div id="tenGods"></div>
+          </div>
+          <div class="item">
+            <strong>오행 분포</strong>
+            <div id="fiveElements"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">대운 흐름</div>
+        <div class="muted" id="daewoonMeta"></div>
+        <ul class="list" id="daewoonList"></ul>
+      </div>
+
+      <div class="card">
+        <div class="section-title">상담형 해석</div>
+        <div id="summaryText" class="muted" style="margin-bottom:12px;"></div>
+
+        <strong>강점</strong>
+        <ul class="list" id="strengthList"></ul>
+
+        <strong style="display:block; margin-top:14px;">주의점</strong>
+        <ul class="list" id="cautionList"></ul>
+
+        <strong style="display:block; margin-top:14px;">조언</strong>
+        <ul class="list" id="adviceList"></ul>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/js/saju-new.page.js"></script>
+</body>
+</html>
