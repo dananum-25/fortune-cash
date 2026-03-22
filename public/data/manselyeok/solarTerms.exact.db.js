@@ -1,19 +1,43 @@
-// /js/solarTerms.exact.db.js
-import solarTermsExact from "/data/manselyeok/solar_terms_exact.json" assert { type: "json" };
+let verifiedCache = null;
+let pendingCache = null;
 
-export const SOLAR_TERMS_EXACT = solarTermsExact;
-
-export function getExactSolarTermRecord(year, termName) {
-  return SOLAR_TERMS_EXACT?.[year]?.[termName] || null;
+async function loadJson(path) {
+  const res = await fetch(path);
+  if (!res.ok) {
+    throw new Error(`${path} 로드 실패`);
+  }
+  return await res.json();
 }
 
-export function getExactSolarTermDate(year, termName) {
-  const record = getExactSolarTermRecord(year, termName);
-  if (!record?.datetime) return null;
+export async function loadVerifiedSolarTerms() {
+  if (verifiedCache) return verifiedCache;
+  verifiedCache = await loadJson("/data/manselyeok/solar_terms_exact_verified.json");
+  return verifiedCache;
+}
+
+export async function loadPendingSolarTerms() {
+  if (pendingCache) return pendingCache;
+  pendingCache = await loadJson("/data/manselyeok/solar_terms_exact_pending.json");
+  return pendingCache;
+}
+
+export async function getVerifiedSolarTermRecord(year, termName) {
+  const data = await loadVerifiedSolarTerms();
+  return data?.[year]?.[termName] || null;
+}
+
+export async function getVerifiedSolarTermDate(year, termName) {
+  const record = await getVerifiedSolarTermRecord(year, termName);
+  if (!record?.datetime || !record?.verified) return null;
   return new Date(record.datetime);
 }
 
-export function isExactSolarTermVerified(year, termName) {
-  const record = getExactSolarTermRecord(year, termName);
+export async function getPendingSolarTermRecord(year, termName) {
+  const data = await loadPendingSolarTerms();
+  return data?.[year]?.[termName] || null;
+}
+
+export async function hasVerifiedSolarTerm(year, termName) {
+  const record = await getVerifiedSolarTermRecord(year, termName);
   return Boolean(record?.verified);
 }
