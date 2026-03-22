@@ -1,5 +1,6 @@
 import { calculateSajuResultV2 } from "/js/saju.result.v2.engine.js";
 import { loadMyeongriDB, buildDbInterpretation } from "/js/myeongri.db.engine.js";
+import { summarize12Sinsal } from "/js/sinsal12.engine.js";
 
 const $ = (id) => document.getElementById(id);
 
