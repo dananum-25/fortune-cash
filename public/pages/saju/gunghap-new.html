@@ -92,36 +92,77 @@
       </div>
     </form>
 
-    <div id="resultWrap" class="hidden">
-      <div class="card">
-        <div class="section-title" id="resultTitle">궁합 결과</div>
-        <div class="muted" id="resultSummary"></div>
-      </div>
+<div id="resultWrap" class="hidden">
+  <div class="card">
+    <div class="section-title" id="resultTitle">궁합 결과</div>
+    <div class="muted" id="resultSummary"></div>
+  </div>
 
-      <div class="card">
-        <div class="section-title">핵심 관계 구조</div>
-        <div class="mini-grid">
-          <div class="item">
-            <strong>일간 관계</strong>
-            <div id="dayStemRel"></div>
-          </div>
-          <div class="item">
-            <strong>일지 관계</strong>
-            <div id="dayBranchRel"></div>
-          </div>
-          <div class="item">
-            <strong>오행 관계</strong>
-            <div id="fiveRel"></div>
-          </div>
-        </div>
+  <div class="card">
+    <div class="section-title">두 사람 사주 원국</div>
+    <div class="mini-grid">
+      <div class="item">
+        <strong id="personATitle">첫 번째 사람</strong>
+        <div id="personAPillars"></div>
       </div>
-
-      <div class="card">
-        <div class="section-title">조언</div>
-        <ul class="list" id="adviceList"></ul>
+      <div class="item">
+        <strong id="personBTitle">두 번째 사람</strong>
+        <div id="personBPillars"></div>
+      </div>
+      <div class="item">
+        <strong>일간 관계</strong>
+        <div id="dayStemRel"></div>
+      </div>
+      <div class="item">
+        <strong>일지 관계</strong>
+        <div id="dayBranchRel"></div>
+      </div>
+      <div class="item">
+        <strong>원국 간 지지 관계</strong>
+        <div id="fiveRel"></div>
+      </div>
+      <div class="item">
+        <strong>궁합 점수</strong>
+        <div id="totalScore"></div>
       </div>
     </div>
   </div>
+
+  <div class="card">
+    <div class="section-title">지장간 / 신살 보조 해석</div>
+    <div class="mini-grid">
+      <div class="item">
+        <strong>첫 번째 사람 월지 지장간 핵심</strong>
+        <div id="aJijanganMain"></div>
+      </div>
+      <div class="item">
+        <strong>두 번째 사람 월지 지장간 핵심</strong>
+        <div id="bJijanganMain"></div>
+      </div>
+      <div class="item">
+        <strong>공통 특수신살</strong>
+        <div id="sharedExtraSinsal"></div>
+      </div>
+      <div class="item">
+        <strong>첫 번째 사람 특수신살</strong>
+        <div id="aExtraSinsal"></div>
+      </div>
+      <div class="item">
+        <strong>두 번째 사람 특수신살</strong>
+        <div id="bExtraSinsal"></div>
+      </div>
+      <div class="item">
+        <strong>12신살 참고</strong>
+        <div id="sinsalHint"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">조언</div>
+    <ul class="list" id="adviceList"></ul>
+  </div>
+</div>
 
   <script type="module" src="/js/gunghap.page.js"></script>
 </body>
