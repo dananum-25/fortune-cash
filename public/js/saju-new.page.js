@@ -173,6 +173,36 @@ function renderResult(result, dbInterp) {
     `목 ${fe["목"] ?? 0} · 화 ${fe["화"] ?? 0} · 토 ${fe["토"] ?? 0} · 금 ${fe["금"] ?? 0} · 수 ${fe["수"] ?? 0}`
   );
 
+  const strengthLabel = result?.strength?.raw?.judgment?.label || "-";
+  const strengthSummary = result?.strength?.summary?.summary || "";
+  setText(
+    "strengthInfo",
+    `${strengthLabel}${strengthSummary ? " / " + strengthSummary : ""}`
+  );
+
+  const jijanganSummary = result?.jijangan?.summary || {};
+  const jijanganText = [
+    jijanganSummary?.year?.stem ? `연 ${jijanganSummary.year.stem}(${jijanganSummary.year.tenGod})` : "",
+    jijanganSummary?.month?.stem ? `월 ${jijanganSummary.month.stem}(${jijanganSummary.month.tenGod})` : "",
+    jijanganSummary?.day?.stem ? `일 ${jijanganSummary.day.stem}(${jijanganSummary.day.tenGod})` : "",
+    jijanganSummary?.hour?.stem ? `시 ${jijanganSummary.hour.stem}(${jijanganSummary.hour.tenGod})` : ""
+  ].filter(Boolean).join(" / ");
+
+  setText("jijanganInfo", jijanganText || "내용 없음");
+
+  const habchungSummary = Array.isArray(result?.habchung?.summary)
+    ? result.habchung.summary.join(", ")
+    : "";
+  setText("habchungInfo", habchungSummary || "해당 없음");
+
+  const sinsalSummary = summarize12Sinsal(result?.pillars);
+  setText(
+    "sinsalInfo",
+    Array.isArray(sinsalSummary) && sinsalSummary.length
+      ? sinsalSummary.join(" / ")
+      : "내용 없음"
+  );
+  
   const daewoon = result?.daewoon || {};
   setText(
     "daewoonMeta",
