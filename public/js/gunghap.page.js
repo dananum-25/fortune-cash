@@ -1,4 +1,4 @@
-import { calculateGunghap } from "/js/gunghap.engine.js";
+import { calculateGunghapV2 } from "/js/gunghap.v2.engine.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -47,8 +47,13 @@ function renderResult(result, nameA, nameB){
   $("resultSummary").textContent = result?.relation?.scoreSummary?.summary || "";
 
   $("dayStemRel").textContent = result?.relation?.dayStemRelation?.label || "-";
-  $("dayBranchRel").textContent = result?.relation?.dayBranchRelation?.label || "-";
-  $("fiveRel").textContent = result?.relation?.fiveElementRelation?.label || "-";
+$("dayBranchRel").textContent = result?.relation?.dayBranchRelation?.label || "-";
+
+const crossText = Array.isArray(result?.relation?.crossRelations) && result.relation.crossRelations.length
+  ? result.relation.crossRelations.map(v => `${v.a}-${v.b} ${v.label}`).join(", ")
+  : "중립";
+
+$("fiveRel").textContent = crossText;
 
   renderList("adviceList", result?.advice || []);
   $("resultWrap").classList.remove("hidden");
@@ -74,7 +79,7 @@ $("gunghapForm").addEventListener("submit", (e) => {
     minute: Number($("minuteB").value || 0)
   };
 
-  const result = calculateGunghap(personA, personB);
+  const result = calculateGunghapV2(personA, personB);
   if(!result) return;
 
   renderResult(result, nameA, nameB);
