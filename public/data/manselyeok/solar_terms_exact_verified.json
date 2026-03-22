@@ -1,0 +1,12 @@
+{
+  "2026": {
+    "입춘": {
+      "datetime": "2026-02-04T05:01:00+09:00",
+      "verified": true,
+      "source": "kasi_almanac_manual",
+      "checked_by": "user",
+      "checked_at": "2026-03-22",
+      "note": "월력요항 기준 반영"
+    }
+  }
+}
