@@ -183,13 +183,21 @@ function buildDbCautionList(dbInterp) {
 
   return list;
 }
+function buildResultTitle(name){
+
+  if(!name){
+    return "사주 분석 결과";
+  }
+
+  return `${name}님의 사주 분석`;
+}
 
 function renderResult(result, dbInterp, flow) {
   setText("yearPillar", result?.pillars?.year);
   setText("monthPillar", result?.pillars?.month);
   setText("dayPillar", result?.pillars?.day);
   setText("hourPillar", result?.pillars?.hour);
-
+  setText("resultTitle", buildResultTitle(userName));
   setText(
     "dayMaster",
     `${result?.dayMaster?.stem || ""} (${result?.dayMaster?.element || ""})`
@@ -306,10 +314,13 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
   hideError();
 
-  const ymd = $("birthDate").value;
-  const gender = $("gender").value;
-  const hour = Number($("birthHour").value || 12);
-  const minute = Number($("birthMinute").value || 0);
+  const userName = $("userName").value || "";
+const birthPlace = $("birthPlace").value || "";
+
+const ymd = $("birthDate").value;
+const gender = $("gender").value;
+const hour = Number($("birthHour").value || 12);
+const minute = Number($("birthMinute").value || 0);
 
   if (!ymd) {
     showError("생년월일을 입력해 주세요.");
