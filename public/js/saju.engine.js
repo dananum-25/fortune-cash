@@ -58,15 +58,20 @@ function sexagenaryYear(year){
 // -------------------------------
 function getIpchun(year){
 
+  const exact = SOLAR_TERMS_EXACT?.[year]?.["입춘"];
+  if(exact){
+    return new Date(exact);
+  }
+
   const terms = SOLAR_TERMS?.[year];
 
   if(!terms || !terms["입춘"]){
-    return new Date(year,1,4,0,0,0);
+    return new Date(year, 1, 4, 0, 0, 0);
   }
 
-  const [mm,dd] = terms["입춘"].split("-").map(Number);
+  const [mm, dd] = terms["입춘"].split("-").map(Number);
 
-  return new Date(year, mm-1, dd, 0,0,0);
+  return new Date(year, mm - 1, dd, 0, 0, 0);
 }
 
 export function getYearPillar(date){
@@ -85,32 +90,48 @@ export function getYearPillar(date){
 // -------------------------------
 // 5) 월지
 // -------------------------------
+function getTermDateTime(year, termName){
+  const exact = SOLAR_TERMS_EXACT?.[year]?.[termName];
+  if(exact) return new Date(exact);
+
+  const simple = SOLAR_TERMS?.[year]?.[termName];
+  if(simple){
+    const [mm, dd] = simple.split("-").map(Number);
+    return new Date(year, mm - 1, dd, 0, 0, 0);
+  }
+
+  return null;
+}
+
 function getMonthBranch(date){
 
   const y = date.getFullYear();
 
-  const terms = SOLAR_TERMS?.[y];
+  const ipchun = getTermDateTime(y, "입춘");
+  const gyeongchip = getTermDateTime(y, "경칩");
+  const cheongmyeong = getTermDateTime(y, "청명");
+  const ibha = getTermDateTime(y, "입하");
+  const mangjong = getTermDateTime(y, "망종");
+  const soseo = getTermDateTime(y, "소서");
+  const ipchu = getTermDateTime(y, "입추");
+  const baengno = getTermDateTime(y, "백로");
+  const hanro = getTermDateTime(y, "한로");
+  const ibdong = getTermDateTime(y, "입동");
+  const daeseol = getTermDateTime(y, "대설");
+  const sohan = getTermDateTime(y, "소한");
 
-  if(!terms) return "인";
-
-  const mm = String(date.getMonth()+1).padStart(2,"0");
-  const dd = String(date.getDate()).padStart(2,"0");
-
-  const md = `${mm}-${dd}`;
-
-  const t = (n)=>terms[n];
-
-  if(md < t("입춘")) return "축";
-  if(md < t("경칩")) return "인";
-  if(md < t("청명")) return "묘";
-  if(md < t("입하")) return "진";
-  if(md < t("망종")) return "사";
-  if(md < t("소서")) return "오";
-  if(md < t("입추")) return "미";
-  if(md < t("백로")) return "신";
-  if(md < t("한로")) return "유";
-  if(md < t("입동")) return "술";
-  if(md < t("대설")) return "해";
+  if(sohan && date < sohan) return "자";
+  if(ipchun && date < ipchun) return "축";
+  if(gyeongchip && date < gyeongchip) return "인";
+  if(cheongmyeong && date < cheongmyeong) return "묘";
+  if(ibha && date < ibha) return "진";
+  if(mangjong && date < mangjong) return "사";
+  if(soseo && date < soseo) return "오";
+  if(ipchu && date < ipchu) return "미";
+  if(baengno && date < baengno) return "신";
+  if(hanro && date < hanro) return "유";
+  if(ibdong && date < ibdong) return "술";
+  if(daeseol && date < daeseol) return "해";
 
   return "자";
 }
