@@ -52,7 +52,7 @@
       font-size:14px;
       font-weight:600;
     }
-    input, select, button{
+    input, select, button, a.action-btn{
       height:44px;
       border:1px solid #ddd;
       border-radius:10px;
@@ -125,8 +125,56 @@
       margin-top:10px;
       white-space:pre-line;
     }
+
+    .action-row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:14px;
+    }
+    .action-btn{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      background:#fff;
+      color:#111827;
+      font-weight:700;
+      border:1px solid #ddd;
+    }
+
+    .recommend-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:10px;
+    }
+    .recommend-card{
+      display:block;
+      text-decoration:none;
+      color:#111827;
+      background:#fafafa;
+      border:1px solid #eee;
+      border-radius:12px;
+      padding:14px;
+    }
+    .recommend-card strong{
+      display:block;
+      margin-bottom:6px;
+    }
+    .footer-links{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px 14px;
+      margin-top:8px;
+    }
+    .footer-links a{
+      color:#555;
+      font-size:14px;
+      text-decoration:none;
+    }
+
     @media (max-width: 720px){
-      .grid, .mini-grid, .pillars{
+      .grid, .mini-grid, .pillars, .recommend-grid, .action-row{
         grid-template-columns:1fr;
       }
     }
@@ -137,7 +185,7 @@
     <h1>정밀 사주 분석</h1>
     <div class="desc">
       기존 페이지와 분리된 신규 엔진 테스트 페이지입니다.  
-      연주, 월주, 일주, 시주와 오행, 십성, 대운 방향까지 새 엔진 기준으로 확인합니다.
+      연주, 월주, 일주, 시주와 오행, 십성, 대운을 새 엔진 기준으로 확인합니다.
     </div>
 
     <div class="card">
@@ -237,6 +285,51 @@
 
         <strong style="display:block; margin-top:14px;">조언</strong>
         <ul class="list" id="adviceList"></ul>
+
+        <div class="action-row">
+          <a class="action-btn" href="/" id="goHomeBtn">홈으로</a>
+          <button type="button" id="shareBtn">공유하기</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">추천 콘텐츠</div>
+        <div class="recommend-grid">
+          <a class="recommend-card" href="/saju.html">
+            <strong>기존 사주 페이지 보기</strong>
+            <span class="muted">기존 버전과 신규 버전을 비교할 수 있습니다.</span>
+          </a>
+          <a class="recommend-card" href="/star.html">
+            <strong>별자리 분석</strong>
+            <span class="muted">서양 점성술 기반 성향 페이지로 이동합니다.</span>
+          </a>
+          <a class="recommend-card" href="/zodiac.html">
+            <strong>띠 분석</strong>
+            <span class="muted">띠 중심 해석 페이지를 함께 확인해보세요.</span>
+          </a>
+          <a class="recommend-card" href="/mbti.html">
+            <strong>MBTI 분석</strong>
+            <span class="muted">행동 성향과 의사소통 방식도 함께 볼 수 있습니다.</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">안내</div>
+      <div class="muted">
+        이 페이지는 명리 계산 엔진을 정밀화하는 신규 테스트 페이지입니다.  
+        의료, 법률, 투자 판단을 대신하지 않으며, 해석은 자기이해와 방향 제안용 참고 정보입니다.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="footer-links">
+        <a href="/privacy.html">개인정보처리방침</a>
+        <a href="/terms.html">이용약관</a>
+        <a href="/about.html">사이트 소개</a>
+        <a href="/contact.html">문의</a>
+        <a href="/fortune-guide.html">운세 가이드</a>
       </div>
     </div>
   </div>
