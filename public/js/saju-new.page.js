@@ -2,6 +2,7 @@ import { calculateSajuResultV2 } from "/js/saju.result.v2.engine.js";
 import { loadMyeongriDB, buildDbInterpretation } from "/js/myeongri.db.engine.js";
 import { summarize12Sinsal } from "/js/sinsal12.engine.js";
 import { calculateFlowInterpretation } from "/js/flow.engine.js";
+import { isExactSolarTermVerified } from "/js/solarTerms.exact.db.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -47,6 +48,17 @@ function setText(id, value) {
   const el = $(id);
   if (!el) return;
   el.textContent = value ?? "";
+}
+
+function buildPrecisionNotice(ymd) {
+  const year = Number(String(ymd).slice(0, 4));
+  const verifiedIpchun = isExactSolarTermVerified(year, "입춘");
+
+  if (verifiedIpchun) {
+    return "입춘 절입시는 검증된 시각 데이터를 우선 사용합니다.";
+  }
+
+  return "현재 절입시는 시각 검증 전 단계이며, 날짜 기반 또는 임시 시각값이 포함될 수 있습니다.";
 }
 
 function renderList(id, items) {
@@ -250,6 +262,7 @@ function renderResult(result, dbInterp, flow, extraInput) {
   setText("dayPillar", result?.pillars?.day);
   setText("hourPillar", result?.pillars?.hour);
   setText("resultTitle", buildResultTitle(userName));
+  setText("precisionNotice", buildPrecisionNotice(extraInput?.ymd));
   setText(
     "dayMaster",
     `${result?.dayMaster?.stem || ""} (${result?.dayMaster?.element || ""})`
