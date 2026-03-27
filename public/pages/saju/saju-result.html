@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>정밀 사주 결과 | 전문 만세력</title>
+  <meta name="description" content="사주 원국, 대운, 절입 적용 여부와 전문 만세력 표를 확인합니다.">
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/saju-result.css">
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="section-title" id="resultTitle">정밀 사주 결과</div>
+      <div class="muted" id="resultSubTitle"></div>
+      <div class="notice-box" id="precisionNotice"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">전문 만세력 표</div>
+      <div id="manseTableWrap"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">핵심 요약</div>
+      <div class="mini-grid">
+        <div class="item"><strong>일간</strong><div id="dayMaster"></div></div>
+        <div class="item"><strong>월지</strong><div id="monthBranch"></div></div>
+        <div class="item"><strong>십성</strong><div id="tenGods"></div></div>
+        <div class="item"><strong>오행 분포</strong><div id="fiveElements"></div></div>
+        <div class="item"><strong>신강/신약</strong><div id="strengthInfo"></div></div>
+        <div class="item"><strong>지장간 요약</strong><div id="jijanganInfo"></div></div>
+        <div class="item"><strong>합충형파해</strong><div id="habchungInfo"></div></div>
+        <div class="item"><strong>12신살</strong><div id="sinsalInfo"></div></div>
+        <div class="item"><strong>귀인 / 특수신살</strong><div id="extraSinsal"></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">대운 흐름</div>
+      <div class="muted" id="daewoonMeta"></div>
+      <ul class="list" id="daewoonList"></ul>
+    </div>
+
+    <div class="card">
+      <div class="section-title">현재 흐름 해석</div>
+
+      <div class="mini-grid">
+        <div class="item">
+          <strong>현재 나이</strong>
+          <div id="currentAge"></div>
+        </div>
+        <div class="item">
+          <strong>현재 세운</strong>
+          <div id="currentSeWoon"></div>
+        </div>
+        <div class="item">
+          <strong>현재 대운</strong>
+          <div id="currentDaewoon"></div>
+        </div>
+        <div class="item">
+          <strong>흐름 키워드</strong>
+          <div id="flowKeywords"></div>
+        </div>
+      </div>
+
+      <strong class="sub-title">세운 해석</strong>
+      <ul class="list" id="sewoonSummaryList"></ul>
+
+      <strong class="sub-title">대운 해석</strong>
+      <ul class="list" id="daewoonSummaryList"></ul>
+
+      <strong class="sub-title">흐름 조언</strong>
+      <ul class="list" id="flowAdviceList"></ul>
+    </div>
+
+    <div class="card">
+      <div class="section-title">하나씩 풀어보기</div>
+      <div class="muted" id="summaryText"></div>
+
+      <strong class="sub-title">강점</strong>
+      <ul class="list" id="strengthList"></ul>
+
+      <strong class="sub-title">주의점</strong>
+      <ul class="list" id="cautionList"></ul>
+
+      <strong class="sub-title">조언</strong>
+      <ul class="list" id="adviceList"></ul>
+    </div>
+
+    <div class="card">
+      <div class="action-row">
+        <a class="action-btn" href="/saju-new.html">다시 입력하기</a>
+        <button type="button" id="shareBtn">공유하기</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/js/saju-result.page.js"></script>
+</body>
+</html>
