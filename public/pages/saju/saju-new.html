@@ -52,7 +52,7 @@
       font-size:14px;
       font-weight:600;
     }
-    input, select, button, a.action-btn{
+    input, select, button{
       height:44px;
       border:1px solid #ddd;
       border-radius:10px;
@@ -72,46 +72,6 @@
       font-weight:800;
       margin:0 0 12px;
     }
-    .pillars{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:10px;
-    }
-    .pillar-box{
-      background:#f3f4f6;
-      border-radius:12px;
-      padding:14px 10px;
-      text-align:center;
-    }
-    .pillar-label{
-      font-size:13px;
-      color:#666;
-      margin-bottom:6px;
-    }
-    .pillar-value{
-      font-size:22px;
-      font-weight:800;
-    }
-    .mini-grid{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:10px;
-    }
-    .item{
-      background:#fafafa;
-      border:1px solid #eee;
-      border-radius:12px;
-      padding:12px;
-    }
-    .item strong{
-      display:block;
-      margin-bottom:6px;
-    }
-    .list{
-      margin:0;
-      padding-left:18px;
-      line-height:1.7;
-    }
     .muted{
       color:#666;
       font-size:14px;
@@ -125,42 +85,6 @@
       margin-top:10px;
       white-space:pre-line;
     }
-
-    .action-row{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-      margin-top:14px;
-    }
-    .action-btn{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-decoration:none;
-      background:#fff;
-      color:#111827;
-      font-weight:700;
-      border:1px solid #ddd;
-    }
-
-    .recommend-grid{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:10px;
-    }
-    .recommend-card{
-      display:block;
-      text-decoration:none;
-      color:#111827;
-      background:#fafafa;
-      border:1px solid #eee;
-      border-radius:12px;
-      padding:14px;
-    }
-    .recommend-card strong{
-      display:block;
-      margin-bottom:6px;
-    }
     .footer-links{
       display:flex;
       flex-wrap:wrap;
@@ -172,9 +96,8 @@
       font-size:14px;
       text-decoration:none;
     }
-
     @media (max-width: 720px){
-      .grid, .mini-grid, .pillars, .recommend-grid, .action-row{
+      .grid{
         grid-template-columns:1fr;
       }
     }
@@ -184,238 +107,78 @@
   <div class="wrap">
     <h1>정밀 사주 분석</h1>
     <div class="desc">
-      기존 페이지와 분리된 신규 엔진 테스트 페이지입니다.  
-      연주, 월주, 일주, 시주와 오행, 십성, 대운을 새 엔진 기준으로 확인합니다.
+      기존 페이지와 분리된 신규 엔진 테스트 페이지입니다.
+      먼저 깔끔하게 입력하고, 결과는 전문 만세력 페이지에서 자세히 확인합니다.
     </div>
 
-<div class="card">
-  <div class="section-title">입력</div>
-  <form id="sajuForm" class="grid">
-    <div class="field">
-      <label for="userName">이름 (선택)</label>
-      <input id="userName" type="text" placeholder="홍길동" />
-    </div>
-
-    <div class="field">
-      <label for="birthPlace">출생지역 (선택)</label>
-      <select id="birthPlace">
-        <option value="">선택</option>
-        <option value="서울">서울</option>
-        <option value="부산">부산</option>
-        <option value="대구">대구</option>
-        <option value="인천">인천</option>
-        <option value="광주">광주</option>
-        <option value="대전">대전</option>
-        <option value="울산">울산</option>
-        <option value="세종">세종</option>
-        <option value="경기">경기</option>
-        <option value="강원">강원</option>
-        <option value="충북">충북</option>
-        <option value="충남">충남</option>
-        <option value="전북">전북</option>
-        <option value="전남">전남</option>
-        <option value="경북">경북</option>
-        <option value="경남">경남</option>
-        <option value="제주">제주</option>
-      </select>
-    </div>
-
-    <div class="field">
-      <label for="birthDate">생년월일</label>
-      <input id="birthDate" type="date" required />
-    </div>
-
-    <div class="field">
-      <label for="gender">성별</label>
-      <select id="gender" required>
-        <option value="">선택</option>
-        <option value="남성">남성</option>
-        <option value="여성">여성</option>
-      </select>
-    </div>
-
-    <div class="field">
-      <label for="birthHour">출생 시</label>
-      <select id="birthHour"></select>
-    </div>
-
-    <div class="field">
-      <label for="birthMinute">출생 분</label>
-      <select id="birthMinute"></select>
-    </div>
-
-    <div class="field full">
-      <button type="submit">신규 엔진으로 분석하기</button>
-    </div>
-  </form>
-
-  <div id="errorBox" class="error hidden"></div>
-</div>
-
-<div id="resultWrap" class="hidden">
-  <div class="card">
-  <div class="section-title" id="resultTitle">사주 분석 결과</div>
-  <div class="muted" id="resultSubTitle"></div>
-  <div class="muted" id="precisionNotice" style="margin-top:8px;"></div>
-</div>
-
-  <div class="card">
-    <div class="section-title">사주 원국</div>
-    
-        <div class="pillars">
-          <div class="pillar-box">
-            <div class="pillar-label">연주</div>
-            <div class="pillar-value" id="yearPillar"></div>
-          </div>
-          <div class="pillar-box">
-            <div class="pillar-label">월주</div>
-            <div class="pillar-value" id="monthPillar"></div>
-          </div>
-          <div class="pillar-box">
-            <div class="pillar-label">일주</div>
-            <div class="pillar-value" id="dayPillar"></div>
-          </div>
-          <div class="pillar-box">
-            <div class="pillar-label">시주</div>
-            <div class="pillar-value" id="hourPillar"></div>
-          </div>
+    <div class="card">
+      <div class="section-title">입력</div>
+      <form id="sajuForm" class="grid">
+        <div class="field">
+          <label for="userName">이름 (선택)</label>
+          <input id="userName" type="text" placeholder="홍길동" />
         </div>
-      </div>
 
-      <div class="card">
-        <div class="section-title">핵심 구조</div>
-        <div class="mini-grid">
-    <div class="mini-grid">
-  <div class="item">
-    <strong>일간</strong>
-    <div id="dayMaster"></div>
-  </div>
-  <div class="item">
-    <strong>월지</strong>
-    <div id="monthBranch"></div>
-  </div>
-  <div class="item">
-    <strong>십성</strong>
-    <div id="tenGods"></div>
-  </div>
-  <div class="item">
-    <strong>오행 분포</strong>
-    <div id="fiveElements"></div>
-  </div>
-  <div class="item">
-    <strong>신강/신약</strong>
-    <div id="strengthInfo"></div>
-  </div>
-  <div class="item">
-    <strong>지장간 요약</strong>
-    <div id="jijanganInfo"></div>
-  </div>
-  <div class="item">
-    <strong>합충형파해</strong>
-    <div id="habchungInfo"></div>
-  </div>
-  <div class="item">
-    <strong>12신살</strong>
-    <div id="sinsalInfo"></div>
-  </div>
-</div>
-          <div class="item">
-<strong>귀인 / 특수신살</strong>
-<div id="extraSinsal"></div>
-          </div>
-  
-          <div class="item">
-            <strong>오행 분포</strong>
-            <div id="fiveElements"></div>
-          </div>
+        <div class="field">
+          <label for="birthPlace">출생지역 (선택)</label>
+          <select id="birthPlace">
+            <option value="">선택</option>
+            <option value="서울">서울</option>
+            <option value="부산">부산</option>
+            <option value="대구">대구</option>
+            <option value="인천">인천</option>
+            <option value="광주">광주</option>
+            <option value="대전">대전</option>
+            <option value="울산">울산</option>
+            <option value="세종">세종</option>
+            <option value="경기">경기</option>
+            <option value="강원">강원</option>
+            <option value="충북">충북</option>
+            <option value="충남">충남</option>
+            <option value="전북">전북</option>
+            <option value="전남">전남</option>
+            <option value="경북">경북</option>
+            <option value="경남">경남</option>
+            <option value="제주">제주</option>
+          </select>
         </div>
-      </div>
 
-      <div class="card">
-        <div class="section-title">대운 흐름</div>
-        <div class="muted" id="daewoonMeta"></div>
-        <ul class="list" id="daewoonList"></ul>
-      </div>
-
-      <div class="card">
-  <div class="section-title">현재 흐름 해석</div>
-
-  <div class="mini-grid">
-    <div class="item">
-      <strong>현재 나이</strong>
-      <div id="currentAge"></div>
-    </div>
-    <div class="item">
-      <strong>현재 세운</strong>
-      <div id="currentSeWoon"></div>
-    </div>
-    <div class="item">
-      <strong>현재 대운</strong>
-      <div id="currentDaewoon"></div>
-    </div>
-    <div class="item">
-      <strong>흐름 키워드</strong>
-      <div id="flowKeywords"></div>
-    </div>
-  </div>
-<h2 id="resultTitle"></h2>
-  <strong style="display:block; margin-top:14px;">세운 해석</strong>
-  <ul class="list" id="sewoonSummaryList"></ul>
-
-  <strong style="display:block; margin-top:14px;">대운 해석</strong>
-  <ul class="list" id="daewoonSummaryList"></ul>
-
-  <strong style="display:block; margin-top:14px;">흐름 조언</strong>
-  <ul class="list" id="flowAdviceList"></ul>
-</div>
-      
-      <div class="card">
-        <div class="section-title">상담형 해석</div>
-        <div id="summaryText" class="muted" style="margin-bottom:12px;"></div>
-
-        <strong>강점</strong>
-        <ul class="list" id="strengthList"></ul>
-
-        <strong style="display:block; margin-top:14px;">주의점</strong>
-        <ul class="list" id="cautionList"></ul>
-
-        <strong style="display:block; margin-top:14px;">조언</strong>
-        <ul class="list" id="adviceList"></ul>
-
-        <div class="action-row">
-          <a class="action-btn" href="/" id="goHomeBtn">홈으로</a>
-          <button type="button" id="shareBtn">공유하기</button>
+        <div class="field">
+          <label for="birthDate">생년월일</label>
+          <input id="birthDate" type="date" required />
         </div>
-      </div>
 
-      <div class="card">
-        <div class="section-title">추천 콘텐츠</div>
-        <div class="recommend-grid">
-          <a class="recommend-card" href="/saju.html">
-            <strong>기존 사주 페이지 보기</strong>
-            <span class="muted">기존 버전과 신규 버전을 비교할 수 있습니다.</span>
-          </a>
-          <a class="recommend-card" href="/star.html">
-            <strong>별자리 분석</strong>
-            <span class="muted">서양 점성술 기반 성향 페이지로 이동합니다.</span>
-          </a>
-          <a class="recommend-card" href="/zodiac.html">
-            <strong>띠 분석</strong>
-            <span class="muted">띠 중심 해석 페이지를 함께 확인해보세요.</span>
-          </a>
-          <a class="recommend-card" href="/mbti.html">
-            <strong>MBTI 분석</strong>
-            <span class="muted">행동 성향과 의사소통 방식도 함께 볼 수 있습니다.</span>
-          </a>
+        <div class="field">
+          <label for="gender">성별</label>
+          <select id="gender" required>
+            <option value="">선택</option>
+            <option value="남성">남성</option>
+            <option value="여성">여성</option>
+          </select>
         </div>
-      </div>
+
+        <div class="field">
+          <label for="birthHour">출생 시</label>
+          <select id="birthHour"></select>
+        </div>
+
+        <div class="field">
+          <label for="birthMinute">출생 분</label>
+          <select id="birthMinute"></select>
+        </div>
+
+        <div class="field full">
+          <button type="submit">전문 만세력 보기</button>
+        </div>
+      </form>
+
+      <div id="errorBox" class="error hidden"></div>
     </div>
 
     <div class="card">
       <div class="section-title">안내</div>
       <div class="muted">
-        이 페이지는 명리 계산 엔진을 정밀화하는 신규 테스트 페이지입니다.  
-        의료, 법률, 투자 판단을 대신하지 않으며, 해석은 자기이해와 방향 제안용 참고 정보입니다.
+        입력 후 결과 페이지에서 사주 원국, 대운, 절입 적용 여부, 전문 만세력 표를 자세히 확인할 수 있습니다.
       </div>
     </div>
 
