@@ -66,7 +66,7 @@ form.addEventListener("submit", async (e) => {
     };
 
     sessionStorage.setItem("sajuInput", JSON.stringify(payload));
-    location.href = "/saju-result.html";
+location.href = "/pages/saju/saju-result.html";
   } catch (err) {
     console.error(err);
     showError(err?.message || "입력 처리 중 오류가 발생했습니다.");
