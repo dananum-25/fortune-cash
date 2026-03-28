@@ -54,7 +54,7 @@ export function matchHabChungMessage(db, typeName){
   return db?.habchung?.[typeName] || null;
 }
 
-export function buildDbInterpretation(db, resultV2){
+ export function buildDbInterpretation(db, resultV2){
   if(!db || !resultV2) return null;
 
   const dayMasterStem = resultV2?.dayMaster?.stem || "";
@@ -100,17 +100,23 @@ export function buildDbInterpretation(db, resultV2){
   }
 
   const sinsalMsgs = [];
+  const usedSinsalKeys = new Set();
   const sinsalSummary = Array.isArray(resultV2?.sinsal12?.summary)
     ? resultV2.sinsal12.summary
     : [];
 
   for (const item of sinsalSummary) {
-    const m = String(item).match(/:\s*([^\s/]+)/);
-    const sinsalName = m ? m[1].trim() : "";
-    if (!sinsalName) continue;
+    const text = String(item || "").trim();
+    if (!text) continue;
 
-    const msg = matchSinsalMessage(db, sinsalName);
-    if (msg) sinsalMsgs.push(msg);
+    const matchedKey = Object.keys(db?.sinsal12 || {}).find((key) => text.includes(key));
+    if (!matchedKey || usedSinsalKeys.has(matchedKey)) continue;
+
+    const msg = matchSinsalMessage(db, matchedKey);
+    if (msg) {
+      sinsalMsgs.push(msg);
+      usedSinsalKeys.add(matchedKey);
+    }
   }
 
   return {
@@ -123,3 +129,5 @@ export function buildDbInterpretation(db, resultV2){
     sinsal12: sinsalMsgs
   };
 }
+
+
