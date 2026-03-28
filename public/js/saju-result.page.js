@@ -427,18 +427,19 @@ async function init() {
       throw new Error("사주 결과를 계산하지 못했습니다.");
     }
 
+    const birthYear = Number(String(input.ymd).slice(0, 4));
+    const currentYear = new Date().getFullYear();
+
     const dbInterp = buildDbInterpretation(db, result);
-    const birthYear = Number(String(input.ymd || "").slice(0, 4));
-const currentYear = new Date().getFullYear();
 
-const flow = await calculateFlowInterpretation({
-  birthYear,
-  currentYear,
-  dayMasterStem: result?.dayMaster?.stem || "",
-  daewoon: result?.daewoon || null
-});
+    const flow = await calculateFlowInterpretation({
+      birthYear,
+      currentYear,
+      dayMasterStem: result?.dayMaster?.stem || "",
+      daewoon: result?.daewoon || null
+    });
 
-await renderResult(result, dbInterp, flow, input);
+    await renderResult(result, dbInterp, flow, input);
   } catch (err) {
     console.error(err);
     alert(err?.message || "결과 페이지를 불러오는 중 오류가 발생했습니다.");
