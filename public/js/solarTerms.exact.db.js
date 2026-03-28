@@ -9,21 +9,6 @@ async function loadJson(path) {
   return await res.json();
 }
 
-// 1순위: KASI API 실데이터
-export async function loadExactSolarTerms() {
-  if (exactCache) return exactCache;
-  exactCache = await loadJson("/data/manselyeok/solar_terms_exact.json");
-  return exactCache;
-}
-
-// 2순위: 예전 자동계산 확정본
-export async function loadVerifiedSolarTerms() {
-  if (verifiedCache) return verifiedCache;
-  verifiedCache = await loadJson("/data/manselyeok/solar_terms_exact_verified.json");
-  return verifiedCache;
-}
-
-export async function getExactSolarTermDate(year, termName) {
 function parseKstDateTime(datetime) {
   if (!datetime) return null;
 
@@ -48,6 +33,20 @@ function parseKstDateTime(datetime) {
     Number(mm),
     Number(ss)
   );
+}
+
+// 1순위: KASI API 실데이터
+export async function loadExactSolarTerms() {
+  if (exactCache) return exactCache;
+  exactCache = await loadJson("/data/manselyeok/solar_terms_exact.json");
+  return exactCache;
+}
+
+// 2순위: 예전 자동계산 확정본
+export async function loadVerifiedSolarTerms() {
+  if (verifiedCache) return verifiedCache;
+  verifiedCache = await loadJson("/data/manselyeok/solar_terms_exact_verified.json");
+  return verifiedCache;
 }
 
 export async function getExactSolarTermDate(year, termName) {
