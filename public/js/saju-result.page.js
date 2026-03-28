@@ -390,9 +390,9 @@ async function ensureDBLoaded() {
 async function init() {
   const raw = sessionStorage.getItem("sajuInput");
   if (!raw) {
-    alert("입력 정보가 없습니다.");
-    location.href = "/saju-new.html";
-    return;
+  alert("입력 정보가 없습니다.");
+  location.href = "/pages/saju/saju-new.html";
+  return;
   }
 
   try {
@@ -414,10 +414,10 @@ async function init() {
     const flow = calculateFlowInterpretation(result);
 
     await renderResult(result, dbInterp, flow, input);
-  } catch (err) {
-    console.error(err);
-    alert(err?.message || "결과 페이지를 불러오는 중 오류가 발생했습니다.");
-    location.href = "/saju-new.html";
+} catch (err) {
+  console.error(err);
+  alert(err?.message || "결과 페이지를 불러오는 중 오류가 발생했습니다.");
+  location.href = "/pages/saju/saju-new.html";
   }
 }
 
