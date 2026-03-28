@@ -60,6 +60,7 @@ function findCurrentDaewoon(daewoon, currentAge){
 }
 
 export async function calculateFlowInterpretation({
+export async function calculateFlowInterpretation({
   birthYear,
   currentYear,
   dayMasterStem,
@@ -67,13 +68,35 @@ export async function calculateFlowInterpretation({
 }){
   const db = await loadFlowDB();
 
-  const sewoon = getSeWoon(currentYear);
-  const currentAge = currentYear - birthYear + 1;
+  const safeBirthYear = Number(birthYear);
+  const safeCurrentYear = Number(currentYear);
+  const safeDayMasterStem = String(dayMasterStem || "").trim();
+
+  if (!safeBirthYear || !safeCurrentYear || !safeDayMasterStem) {
+    return {
+      currentAge: null,
+      sewoon: null,
+      currentDaewoon: null,
+      sewoonType: "",
+      daewoonType: "",
+      sewoonMessage: null,
+      daewoonMessage: null
+    };
+  }
+
+  const sewoon = getSeWoon(safeCurrentYear);
+  const currentAge = safeCurrentYear - safeBirthYear + 1;
 
   const currentDaewoon = findCurrentDaewoon(daewoon, currentAge);
 
-  const sewoonType = loadRelationType(dayMasterStem, sewoon.stem);
-  const daewoonType = currentDaewoon ? loadRelationType(dayMasterStem, currentDaewoon.ganji[0]) : "";
+  const sewoonType = sewoon?.stem
+    ? loadRelationType(safeDayMasterStem, sewoon.stem)
+    : "";
+
+  const daewoonType =
+    currentDaewoon?.ganji?.[0]
+      ? loadRelationType(safeDayMasterStem, currentDaewoon.ganji[0])
+      : "";
 
   const sewoonMsg = db?.[sewoonType] || null;
   const daewoonMsg = db?.[daewoonType] || null;
