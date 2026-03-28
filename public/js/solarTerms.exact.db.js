@@ -12,19 +12,21 @@ async function loadJson(path) {
 function parseKstDateTime(datetime) {
   if (!datetime) return null;
 
-  // "1982-02-04 18:12:00" 또는 "1982-02-04T18:12:00" 대응
-  const normalized = String(datetime).trim().replace("T", " ");
+  const normalized = String(datetime)
+    .trim()
+    .replace("T", " ")
+    .replace(/\+.*$/, "");
+
   const match = normalized.match(
     /^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})(?::(\d{2}))?$/
   );
 
   if (!match) {
-    throw new Error(`절기 datetime 형식 오류: ${datetime}`);
+    throw new Error(`절기 datetime 형식 오류 : ${datetime}`);
   }
 
   const [, y, m, d, hh, mm, ss = "00"] = match;
 
-  // 로컬 기준 Date 생성
   return new Date(
     Number(y),
     Number(m) - 1,
