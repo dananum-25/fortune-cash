@@ -391,20 +391,35 @@ async function ensureDBLoaded() {
 
 async function init() {
   const raw = sessionStorage.getItem("sajuInput");
+
   if (!raw) {
-  alert("입력 정보가 없습니다.");
-  location.href = SAJU_NEW_PAGE;
-  return;
+    alert("입력 정보가 없습니다.");
+    location.href = SAJU_NEW_PAGE;
+    return;
   }
 
   try {
-    const input = JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+
+    const input = {
+      userName: parsed?.userName || "",
+      birthPlace: parsed?.birthPlace || "",
+      ymd: parsed?.ymd || "",
+      gender: parsed?.gender || "",
+      hour: Number(parsed?.hour || 12),
+      minute: Number(parsed?.minute || 0)
+    };
+
+    if (!input.ymd) {
+      throw new Error("생년월일 정보가 없습니다.");
+    }
+
     const db = await ensureDBLoaded();
 
     const result = calculateSajuResultV2({
       ymd: input.ymd,
-      hour: Number(input.hour || 12),
-      minute: Number(input.minute || 0),
+      hour: input.hour,
+      minute: input.minute,
       gender: input.gender
     });
 
@@ -416,10 +431,10 @@ async function init() {
     const flow = calculateFlowInterpretation(result);
 
     await renderResult(result, dbInterp, flow, input);
-} catch (err) {
-  console.error(err);
-  alert(err?.message || "결과 페이지를 불러오는 중 오류가 발생했습니다.");
-  location.href = SAJU_NEW_PAGE;
+  } catch (err) {
+    console.error(err);
+    alert(err?.message || "결과 페이지를 불러오는 중 오류가 발생했습니다.");
+    location.href = SAJU_NEW_PAGE;
   }
 }
 
