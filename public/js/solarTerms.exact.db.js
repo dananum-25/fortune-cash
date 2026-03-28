@@ -84,3 +84,6 @@ export async function hasSolarTermData(year, termName) {
 
   return false;
 }
+export async function hasVerifiedSolarTerm(year, termName) {
+  return await hasSolarTermData(year, termName);
+}
