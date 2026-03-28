@@ -6,7 +6,7 @@
 // ===============================
 
 import { SOLAR_TERMS } from "/js/solarTerms.db.js";
-import { getVerifiedSolarTermDate } from "/js/solarTerms.exact.db.js";
+import { getBestSolarTermDate } from "/js/solarTerms.exact.db.js";
 export const heavenly = ["갑","을","병","정","무","기","경","신","임","계"];
 export const earthly  = ["자","축","인","묘","진","사","오","미","신","유","술","해"];
 
@@ -55,11 +55,11 @@ function sexagenaryYear(year){
 // -------------------------------
 // 4) 입춘 기준 연주
 // -------------------------------
-function getIpchun(year){
+async function getIpchun(year){
 
-  const verifiedDate = getVerifiedSolarTermDate(year, "입춘");
-  if(verifiedDate){
-    return verifiedDate;
+  const exactDate = await getBestSolarTermDate(year, "입춘");
+  if(exactDate){
+    return exactDate;
   }
 
   const terms = SOLAR_TERMS?.[year];
@@ -73,11 +73,11 @@ function getIpchun(year){
   return new Date(year, mm - 1, dd, 0, 0, 0);
 }
 
-export function getYearPillar(date){
+export async function getYearPillar(date){
 
   const year = date.getFullYear();
 
-  const ipchun = getIpchun(year);
+  const ipchun = await getIpchun(year);
 
   if(date < ipchun){
     return sexagenaryYear(year-1);
@@ -90,11 +90,11 @@ export function getYearPillar(date){
 // 5) 월지
 // -------------------------------
 
-function getTermDateTime(year, termName){
+async function getTermDateTime(year, termName){
 
-  const verifiedDate = getVerifiedSolarTermDate(year, termName);
-  if(verifiedDate){
-    return verifiedDate;
+  const exactDate = await getBestSolarTermDate(year, termName);
+  if(exactDate){
+    return exactDate;
   }
 
   const simple = SOLAR_TERMS?.[year]?.[termName];
@@ -106,21 +106,21 @@ function getTermDateTime(year, termName){
   return null;
 }
 
-function getMonthBranch(date){
+async function getMonthBranch(date){
   const y = date.getFullYear();
 
-  const sohan = getTermDateTime(y, "소한");
-  const ipchun = getTermDateTime(y, "입춘");
-  const gyeongchip = getTermDateTime(y, "경칩");
-  const cheongmyeong = getTermDateTime(y, "청명");
-  const ibha = getTermDateTime(y, "입하");
-  const mangjong = getTermDateTime(y, "망종");
-  const soseo = getTermDateTime(y, "소서");
-  const ipchu = getTermDateTime(y, "입추");
-  const baengno = getTermDateTime(y, "백로");
-  const hanro = getTermDateTime(y, "한로");
-  const ibdong = getTermDateTime(y, "입동");
-  const daeseol = getTermDateTime(y, "대설");
+  const sohan = await getTermDateTime(y, "소한");
+  const ipchun = await getTermDateTime(y, "입춘");
+  const gyeongchip = await getTermDateTime(y, "경칩");
+  const cheongmyeong = await getTermDateTime(y, "청명");
+  const ibha = await getTermDateTime(y, "입하");
+  const mangjong = await getTermDateTime(y, "망종");
+  const soseo = await getTermDateTime(y, "소서");
+  const ipchu = await getTermDateTime(y, "입추");
+  const baengno = await getTermDateTime(y, "백로");
+  const hanro = await getTermDateTime(y, "한로");
+  const ibdong = await getTermDateTime(y, "입동");
+  const daeseol = await getTermDateTime(y, "대설");
 
   if (sohan && date < sohan) return "자";
   if (ipchun && date < ipchun) return "축";
@@ -141,13 +141,11 @@ function getMonthBranch(date){
 // -------------------------------
 // 6) 월주
 // -------------------------------
-export function getMonthPillar(date){
+export async function getMonthPillar(date){
 
-  const monthBranch = getMonthBranch(date);
+  const monthBranch = await getMonthBranch(date);
 
-  const yearPillar = getYearPillar(date);
-
-  const yearStem = yearPillar[0];
+  const yearPillar = await getYearPillar(date);
 
   const map = {
     "갑":"병","기":"병",
@@ -212,15 +210,15 @@ export function getHourPillar(dayPillar, hour){
 // -------------------------------
 // 9) 통합
 // -------------------------------
-export function calculateSaju(ymd, hour=12, minute=0){
+export async function calculateSaju(ymd, hour=12, minute=0){
 
   const birth = parseBirthDate(ymd, hour, minute);
 
   if(!birth) return null;
 
-  const year = getYearPillar(birth);
+  const year = await getYearPillar(birth);
 
-  const month = getMonthPillar(birth);
+  const month = await getMonthPillar(birth);
 
   const day = getDayPillar(birth);
 
