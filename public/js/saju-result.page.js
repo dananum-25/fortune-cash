@@ -1,6 +1,5 @@
 import { calculateSajuResultV2 } from "/js/saju.result.v2.engine.js";
 import { loadMyeongriDB, buildDbInterpretation } from "/js/myeongri.db.engine.js";
-import { summarize12Sinsal } from "/js/sinsal12.engine.js";
 import { calculateFlowInterpretation } from "/js/flow.engine.js";
 import { hasVerifiedSolarTerm } from "/js/solarTerms.exact.db.js";
 
@@ -320,13 +319,16 @@ async function renderResult(result, dbInterp, flow, extraInput) {
     : "";
   setText("habchungInfo", habchungSummary || "해당 없음");
 
-  const sinsalSummary = summarize12Sinsal(result?.pillars);
-  setText(
-    "sinsalInfo",
-    Array.isArray(sinsalSummary) && sinsalSummary.length
-      ? sinsalSummary.join(" / ")
-      : "내용 없음"
-  );
+  const sinsalSummary = Array.isArray(result?.sinsal12?.summary)
+  ? result.sinsal12.summary
+  : [];
+
+setText(
+  "sinsalInfo",
+  sinsalSummary.length
+    ? sinsalSummary.join(" / ")
+    : "내용 없음"
+);
 
   setText(
     "extraSinsal",
