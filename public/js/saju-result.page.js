@@ -5,7 +5,7 @@ import { calculateFlowInterpretation } from "/js/flow.engine.js";
 import { hasVerifiedSolarTerm } from "/js/solarTerms.exact.db.js";
 
 const $ = (id) => document.getElementById(id);
-
+const SAJU_NEW_PAGE = "/pages/saju/saju-new.html";
 let myeongriDB = null;
 
 function setText(id, value) {
@@ -391,7 +391,7 @@ async function init() {
   const raw = sessionStorage.getItem("sajuInput");
   if (!raw) {
   alert("입력 정보가 없습니다.");
-  location.href = "/pages/saju/saju-new.html";
+  location.href = SAJU_NEW_PAGE;
   return;
   }
 
@@ -417,7 +417,7 @@ async function init() {
 } catch (err) {
   console.error(err);
   alert(err?.message || "결과 페이지를 불러오는 중 오류가 발생했습니다.");
-  location.href = "/pages/saju/saju-new.html";
+  location.href = SAJU_NEW_PAGE;
   }
 }
 
