@@ -116,16 +116,14 @@ function getMonthBranch(monthPillar){
 // -------------------------------
 // 통합 계산
 // -------------------------------
-export function calculateSajuResultV2({
-
+export async function calculateSajuResultV2({
   ymd,
   hour = 12,
   minute = 0,
   gender = ""
-
 }){
 
-  const saju = calculateSaju(ymd, hour, minute);
+  const saju = await calculateSaju(ymd, hour, minute);
 
   if(!saju) return null;
 
