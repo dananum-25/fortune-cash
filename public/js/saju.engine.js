@@ -109,33 +109,63 @@ async function getTermDateTime(year, termName){
 async function getMonthBranch(date){
   const y = date.getFullYear();
 
-  const sohan = await getTermDateTime(y, "소한");
-  const ipchun = await getTermDateTime(y, "입춘");
-  const gyeongchip = await getTermDateTime(y, "경칩");
-  const cheongmyeong = await getTermDateTime(y, "청명");
-  const ibha = await getTermDateTime(y, "입하");
-  const mangjong = await getTermDateTime(y, "망종");
-  const soseo = await getTermDateTime(y, "소서");
-  const ipchu = await getTermDateTime(y, "입추");
-  const baengno = await getTermDateTime(y, "백로");
-  const hanro = await getTermDateTime(y, "한로");
-  const ibdong = await getTermDateTime(y, "입동");
-  const daeseol = await getTermDateTime(y, "대설");
+  const boundaries = [
+    { name: "입춘", branch: "인", date: await getTermDateTime(y, "입춘") },
+    { name: "경칩", branch: "묘", date: await getTermDateTime(y, "경칩") },
+    { name: "청명", branch: "진", date: await getTermDateTime(y, "청명") },
+    { name: "입하", branch: "사", date: await getTermDateTime(y, "입하") },
+    { name: "망종", branch: "오", date: await getTermDateTime(y, "망종") },
+    { name: "소서", branch: "미", date: await getTermDateTime(y, "소서") },
+    { name: "입추", branch: "신", date: await getTermDateTime(y, "입추") },
+    { name: "백로", branch: "유", date: await getTermDateTime(y, "백로") },
+    { name: "한로", branch: "술", date: await getTermDateTime(y, "한로") },
+    { name: "입동", branch: "해", date: await getTermDateTime(y, "입동") },
+    { name: "대설", branch: "자", date: await getTermDateTime(y, "대설") }
+  ];
 
-  if (sohan && date < sohan) return "자";
-  if (ipchun && date < ipchun) return "축";
-  if (gyeongchip && date < gyeongchip) return "인";
-  if (cheongmyeong && date < cheongmyeong) return "묘";
-  if (ibha && date < ibha) return "진";
-  if (mangjong && date < mangjong) return "사";
-  if (soseo && date < soseo) return "오";
-  if (ipchu && date < ipchu) return "미";
-  if (baengno && date < baengno) return "신";
-  if (hanro && date < hanro) return "유";
-  if (ibdong && date < ibdong) return "술";
-  if (daeseol && date < daeseol) return "해";
+  const sohanThisYear = await getTermDateTime(y, "소한");
+  const ipchunThisYear = await getTermDateTime(y, "입춘");
+  const sohanNextYear = await getTermDateTime(y + 1, "소한");
 
-  return "자";
+  // 1) 올해 입춘 전
+  //    -> 올해 소한 이후면 축월
+  //    -> 올해 소한 전이면 전년도 자월/축월 경계이므로 전년도 기준으로 다시 판단
+  if (ipchunThisYear && date < ipchunThisYear) {
+    if (sohanThisYear && date >= sohanThisYear) {
+      return "축";
+    }
+
+    const prevDaeseol = await getTermDateTime(y - 1, "대설");
+    const prevSohan = await getTermDateTime(y, "소한");
+
+    if (prevDaeseol && prevSohan && date >= prevDaeseol && date < prevSohan) {
+      return "자";
+    }
+
+    return "축";
+  }
+
+  // 2) 입춘 이후~대설 이전
+  for (let i = boundaries.length - 1; i >= 0; i--) {
+    const item = boundaries[i];
+    if (item.date && date >= item.date) {
+      return item.branch;
+    }
+  }
+
+  // 3) 대설 이후~다음해 소한 전 = 자월
+  const daeseolThisYear = await getTermDateTime(y, "대설");
+  if (daeseolThisYear && sohanNextYear && date >= daeseolThisYear && date < sohanNextYear) {
+    return "자";
+  }
+
+  // 4) 다음해 소한 이후면 실제로는 이 해 범위를 넘어가므로 축으로 방어
+  if (sohanNextYear && date >= sohanNextYear) {
+    return "축";
+  }
+
+  // 최종 방어
+  return "축";
 }
 
 // -------------------------------
@@ -155,8 +185,8 @@ export async function getMonthPillar(date){
     "무":"갑","계":"갑"
   };
 
-  const startStem = map[yearStem];
-
+  const yearStem = yearPillar[0];
+const startStem = map[yearStem];
   const startIndex = heavenly.indexOf(startStem);
 
   const order = {
@@ -232,4 +262,18 @@ export async function calculateSaju(ymd, hour=12, minute=0){
       hour:hourP
     }
   };
+}
+
+function adjustDateForJasi(date){
+
+  const d = new Date(date);
+
+  const hour = d.getHours();
+
+  // 자시 (23:00 이후는 다음날로 계산)
+  if(hour >= 23){
+    d.setDate(d.getDate() + 1);
+  }
+
+  return d;
 }
