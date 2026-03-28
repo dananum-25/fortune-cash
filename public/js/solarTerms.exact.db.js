@@ -24,11 +24,38 @@ export async function loadVerifiedSolarTerms() {
 }
 
 export async function getExactSolarTermDate(year, termName) {
+function parseKstDateTime(datetime) {
+  if (!datetime) return null;
+
+  // "1982-02-04 18:12:00" 또는 "1982-02-04T18:12:00" 대응
+  const normalized = String(datetime).trim().replace("T", " ");
+  const match = normalized.match(
+    /^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})(?::(\d{2}))?$/
+  );
+
+  if (!match) {
+    throw new Error(`절기 datetime 형식 오류: ${datetime}`);
+  }
+
+  const [, y, m, d, hh, mm, ss = "00"] = match;
+
+  // 로컬 기준 Date 생성
+  return new Date(
+    Number(y),
+    Number(m) - 1,
+    Number(d),
+    Number(hh),
+    Number(mm),
+    Number(ss)
+  );
+}
+
+export async function getExactSolarTermDate(year, termName) {
   const data = await loadExactSolarTerms();
   const datetime = data?.[year]?.[termName];
 
   if (!datetime) return null;
-  return new Date(datetime);
+  return parseKstDateTime(datetime);
 }
 
 export async function getVerifiedSolarTermDate(year, termName) {
@@ -36,7 +63,7 @@ export async function getVerifiedSolarTermDate(year, termName) {
   const record = data?.[year]?.[termName];
 
   if (!record?.datetime) return null;
-  return new Date(record.datetime);
+  return parseKstDateTime(record.datetime);
 }
 
 export async function getBestSolarTermDate(year, termName) {
@@ -49,7 +76,7 @@ export async function getBestSolarTermDate(year, termName) {
   return null;
 }
 
-export async function hasVerifiedSolarTerm(year, termName) {
+export async function hasSolarTermData(year, termName) {
   const exact = await loadExactSolarTerms();
   if (exact?.[year]?.[termName]) return true;
 
