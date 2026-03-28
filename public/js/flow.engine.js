@@ -31,7 +31,6 @@ const controls = {
 };
 
 function loadRelationType(dayMasterStem, targetStem){
-
   const dm = stemElementMap[dayMasterStem];
   const tg = stemElementMap[targetStem];
 
@@ -47,62 +46,23 @@ function loadRelationType(dayMasterStem, targetStem){
 }
 
 async function loadFlowDB(){
-
   const res = await fetch("/data/myeongri/flow_interpretation.json");
-
   if(!res.ok){
     throw new Error("flow_interpretation.json 로드 실패");
   }
-
   return await res.json();
 }
 
 function findCurrentDaewoon(daewoon, currentAge){
-
   if(!daewoon?.list || !Array.isArray(daewoon.list)) return null;
 
   return daewoon.list.find(item =>
     currentAge >= item.fromAge &&
     currentAge <= item.toAge
   ) || null;
-
 }
 
 export async function calculateFlowInterpretation({
-  birthYear,
-  currentYear,
-  dayMasterStem,
-  daewoon
-}){
-
-  const db = await loadFlowDB();
-
-  const sewoon = getSeWoon(currentYear);
-  const currentAge = currentYear - birthYear + 1;
-
-  const currentDaewoon = findCurrentDaewoon(daewoon, currentAge);
-
-  const sewoonType = sewoon?.stem
-    ? loadRelationType(dayMasterStem, sewoon.stem)
-    : "";
-
-  const daewoonType = currentDaewoon?.ganji
-    ? loadRelationType(dayMasterStem, currentDaewoon.ganji[0])
-    : "";
-
-  const sewoonMsg = db?.[sewoonType] || null;
-  const daewoonMsg = db?.[daewoonType] || null;
-
-  return {
-    currentAge,
-    sewoon,
-    currentDaewoon,
-    sewoonType,
-    daewoonType,
-    sewoonMessage: sewoonMsg,
-    daewoonMessage: daewoonMsg
-  };
-}
   birthYear,
   currentYear,
   dayMasterStem,
@@ -135,10 +95,9 @@ export async function calculateFlowInterpretation({
     ? loadRelationType(safeDayMasterStem, sewoon.stem)
     : "";
 
-  const daewoonType =
-    currentDaewoon?.ganji?.[0]
-      ? loadRelationType(safeDayMasterStem, currentDaewoon.ganji[0])
-      : "";
+  const daewoonType = currentDaewoon?.ganji?.[0]
+    ? loadRelationType(safeDayMasterStem, currentDaewoon.ganji[0])
+    : "";
 
   const sewoonMsg = db?.[sewoonType] || null;
   const daewoonMsg = db?.[daewoonType] || null;
