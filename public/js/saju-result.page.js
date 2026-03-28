@@ -428,9 +428,17 @@ async function init() {
     }
 
     const dbInterp = buildDbInterpretation(db, result);
-    const flow = calculateFlowInterpretation(result);
+    const birthYear = Number(String(input.ymd || "").slice(0, 4));
+const currentYear = new Date().getFullYear();
 
-    await renderResult(result, dbInterp, flow, input);
+const flow = await calculateFlowInterpretation({
+  birthYear,
+  currentYear,
+  dayMasterStem: result?.dayMaster?.stem || "",
+  daewoon: result?.daewoon || null
+});
+
+await renderResult(result, dbInterp, flow, input);
   } catch (err) {
     console.error(err);
     alert(err?.message || "결과 페이지를 불러오는 중 오류가 발생했습니다.");
