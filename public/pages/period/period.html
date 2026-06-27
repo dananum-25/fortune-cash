@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>오늘·내일·연간 운세 | 운세 앱테크</title>
+  <meta name="description" content="오늘 운세, 내일 운세, 연간 운세를 목적별로 쉽게 찾아볼 수 있는 운세 안내 페이지입니다.">
+  <link rel="canonical" href="https://fortune-cash.vercel.app/pages/period/period.html">
+  <style>
+    :root{
+      --bg:#111;
+      --panel:#1b1b1b;
+      --text:#f8f5ee;
+      --muted:#c9c0b2;
+      --gold:#ffd56b;
+      --line:rgba(255,255,255,.12);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",Arial,sans-serif}
+    .wrap{max-width:880px;margin:0 auto;padding:22px 14px 48px}
+    .hero{padding:12px 0 24px;border-bottom:1px solid var(--line)}
+    .eyebrow{margin:0 0 8px;color:var(--gold);font-weight:900;font-size:15px}
+    h1{margin:0 0 12px;font-size:34px;line-height:1.18}
+    .lead{margin:0;color:var(--muted);font-size:17px;line-height:1.7;word-break:keep-all}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}
+    .card{display:block;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;text-decoration:none;color:inherit;min-height:190px}
+    .card:hover{border-color:rgba(255,213,107,.65)}
+    .card h2{margin:0 0 10px;color:var(--gold);font-size:22px}
+    .card p{margin:0;color:var(--muted);font-size:16px;line-height:1.65}
+    .tag{display:inline-block;margin-top:14px;padding:8px 10px;border-radius:999px;background:#2c2513;color:var(--gold);font-weight:900;font-size:14px}
+    .section{margin-top:24px;background:#171717;border:1px solid var(--line);border-radius:10px;padding:18px;line-height:1.7}
+    .section h2{margin:0 0 8px;color:var(--gold);font-size:22px}
+    .section p{margin:0;color:var(--muted)}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 15px;border-radius:8px;background:#222;border:1px solid var(--line);color:#fff;text-decoration:none;font-weight:900}
+    .btn.primary{background:var(--gold);color:#15110a;border-color:transparent}
+    footer{margin-top:30px;color:#aaa;font-size:14px;line-height:1.8}
+    footer a{color:#ccc;text-decoration:none}
+    @media (max-width:720px){
+      body{font-size:17px}
+      h1{font-size:30px}
+      .grid{grid-template-columns:1fr}
+      .card{min-height:auto}
+      .card h2,.section h2{font-size:24px}
+      .card p,.section p{font-size:17px}
+      .btn{width:100%;font-size:17px;min-height:52px}
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <p class="eyebrow">기간별 운세 안내</p>
+      <h1>오늘·내일·연간 운세</h1>
+      <p class="lead">
+        기간별 운세는 “언제 무엇을 조심하고, 어떤 흐름을 살릴지”를 가볍게 점검하는 용도입니다.
+        아래에서 지금 궁금한 기간을 선택하세요.
+      </p>
+    </section>
+
+    <div class="grid">
+      <a class="card" href="/pages/cookie/cookie.html">
+        <h2>오늘 운세</h2>
+        <p>오늘의 기분, 집중할 일, 조심할 말을 짧게 확인하고 싶을 때 좋습니다.</p>
+        <span class="tag">포춘쿠키로 보기</span>
+      </a>
+
+      <a class="card" href="/pages/tarot/tarot.html">
+        <h2>내일 운세</h2>
+        <p>내일의 고민이나 선택지를 미리 정리하고 싶다면 타로 상담 흐름이 잘 맞습니다.</p>
+        <span class="tag">타로로 보기</span>
+      </a>
+
+      <a class="card" href="/pages/tojung/tojung.html">
+        <h2>연간 운세</h2>
+        <p>한 해의 큰 방향, 재물·관계·일의 흐름을 넓게 보고 싶을 때 확인하세요.</p>
+        <span class="tag">토정비결로 보기</span>
+      </a>
+    </div>
+
+    <section class="section">
+      <h2>더 정밀하게 보고 싶다면</h2>
+      <p>
+        생년월일과 출생 시간을 기준으로 내 성향과 올해 흐름을 함께 보고 싶다면 사주 분석을 이용해 주세요.
+        결과는 쉬운 해석 도우미가 대화하듯 풀어줍니다.
+      </p>
+      <div class="actions">
+        <a class="btn primary" href="/pages/saju/saju.html">사주 분석 보기</a>
+        <a class="btn" href="/pages/zodiac/zodiac.html">띠별 운세</a>
+        <a class="btn" href="/pages/astro/index.html">별자리 운세</a>
+        <a class="btn" href="/">홈으로</a>
+      </div>
+    </section>
+
+    <footer>
+      <div>운세 앱테크</div>
+      <div>
+        <a href="/privacy.html">개인정보처리방침</a> |
+        <a href="/terms.html">이용약관</a> |
+        <a href="/fortune-disclaimer.html">운세 콘텐츠 안내</a> |
+        <a href="/contact.html">문의</a>
+      </div>
+    </footer>
+  </main>
+</body>
+</html>
