@@ -639,6 +639,104 @@ function formatCardName(key){
   return key;
 }
 
+function getTarotCategoryLabel(category){
+  const labels = {
+    love: "연애와 마음",
+    career: "일과 진로",
+    money: "돈과 현실 문제",
+    relationship: "사람 관계"
+  };
+  return labels[category] || "지금의 고민";
+}
+
+function getTarotTimeLabel(timeKey){
+  const labels = {
+    past: "지나온 흐름",
+    present: "현재의 핵심",
+    future: "앞으로의 가능성"
+  };
+  return labels[timeKey] || "현재 흐름";
+}
+
+function pickCardLine(card, fallbackField){
+  return (
+    card?.db?.[fallbackField] ||
+    card?.db?.present ||
+    card?.db?.core ||
+    ""
+  );
+}
+
+function buildStoryParagraph(cards){
+  const past = cards.find(c=>getSlotMeaning(c.slot)==="past");
+  const present = cards.find(c=>getSlotMeaning(c.slot)==="present");
+  const future = cards.find(c=>getSlotMeaning(c.slot)==="future");
+  const advice = cards.find(c=>getSlotMeaning(c.slot)==="advice");
+
+  const categoryLabel = getTarotCategoryLabel(selectedCategory);
+  const timeLabel = getTarotTimeLabel(selectedTime);
+  const presentName = formatCardName(present?.key || cards[0]?.key || "");
+  const futureName = formatCardName(future?.key || cards[cards.length - 1]?.key || "");
+  const adviceName = formatCardName(advice?.key || cards[cards.length - 1]?.key || "");
+
+  const opening = `${categoryLabel}에 대해 보면, 이번 리딩은 단순히 좋다/나쁘다보다 마음이 어디에서 멈춰 있고 어떤 선택을 하면 흐름이 풀리는지를 보여줍니다.`;
+  const pastLine = past ? `지나온 흐름에는 <b>${formatCardName(past.key)}</b>의 기운이 있어요. ${pickCardLine(past, "past")}` : "";
+  const presentLine = `지금 가장 중요한 장면은 <b>${presentName}</b>입니다. ${present ? pickCardLine(present, "present") : pickCardLine(cards[0], "present")}`;
+  const futureLine = future ? `앞으로의 가능성은 <b>${futureName}</b> 쪽으로 열려 있습니다. ${pickCardLine(future, "future")}` : "";
+  const adviceLine = advice
+    ? `그래서 오늘의 조언은 <b>${adviceName}</b>처럼, ${advice.db?.advice || "한 번에 결론 내기보다 상황을 차분히 살피는 것"}입니다.`
+    : `그래서 오늘의 조언은 결론을 서두르기보다 ${timeLabel}을 먼저 정리하는 것입니다.`;
+
+  return [opening, pastLine, presentLine, futureLine, adviceLine].filter(Boolean).join(" ");
+}
+
+function buildStorySteps(cards){
+  const steps = [
+    ["상황", cards.find(c=>getSlotMeaning(c.slot)==="past") || cards[0], "past"],
+    ["마음", cards.find(c=>getSlotMeaning(c.slot)==="present") || cards[0], "present"],
+    ["가능성", cards.find(c=>getSlotMeaning(c.slot)==="future") || cards[cards.length - 1], "future"],
+    ["조언", cards.find(c=>getSlotMeaning(c.slot)==="advice") || cards[cards.length - 1], "advice"]
+  ];
+
+  return steps
+    .filter(([, card])=>card)
+    .map(([title, card, field])=>`
+      <div class="story-step">
+        <strong>${title}</strong>
+        <span>${formatCardName(card.key)}</span>
+        <p>${pickCardLine(card, field)}</p>
+      </div>
+    `)
+    .join("");
+}
+
+function buildStoryAction(){
+  const categoryLabel = getTarotCategoryLabel(selectedCategory);
+  const actionByCategory = {
+    "연애와 마음": "상대의 반응을 추측하기보다, 내가 원하는 관계의 속도와 기준을 먼저 정리해보세요.",
+    "일과 진로": "오늘은 큰 결론보다 할 일의 우선순위를 세 가지로 줄이는 것이 좋습니다.",
+    "돈과 현실 문제": "지출, 약속, 계약처럼 숫자로 확인할 수 있는 부분을 먼저 점검해보세요.",
+    "사람 관계": "바로 설득하려 하기보다 상대가 불편해하는 지점을 한 번 더 들어보는 것이 좋습니다."
+  };
+
+  return actionByCategory[categoryLabel] || "오늘은 결론보다 상황 정리가 먼저입니다.";
+}
+
+function buildReadingStoryHTML(cards, category){
+  return `
+    <section class="reading-story" aria-label="타로 상담 이야기">
+      <div class="story-label">${getTarotCategoryLabel(category)} 리딩</div>
+      <h4>카드들이 말하는 장면</h4>
+      <p>${buildStoryParagraph(cards)}</p>
+      <div class="story-steps">${buildStorySteps(cards)}</div>
+      <div class="story-action">
+        <strong>오늘 해볼 일</strong>
+        <span>${buildStoryAction()}</span>
+      </div>
+    </section>
+  `;
+}
+
 async function buildReadingHTML(pickedCards){
   await loadTarotDB();
 
@@ -658,6 +756,7 @@ async function buildReadingHTML(pickedCards){
 
   let html = `<div class="reading">`;
   html += `<h3>🔮 AI 고양이 타로 리딩</h3>`;
+  html += buildReadingStoryHTML(cards, category);
 
   /* =====================
      V1 전용 리딩

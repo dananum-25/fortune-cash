@@ -361,6 +361,93 @@ body.lock-scroll{ overflow:hidden; }
   margin-bottom:18px;
 }
 
+.reading-story{
+  margin:0 0 20px;
+  padding:18px;
+  border-radius:16px;
+  background:linear-gradient(180deg,rgba(255,213,107,.12),rgba(255,255,255,.045));
+  border:1px solid rgba(255,213,107,.24);
+}
+
+.story-label{
+  display:inline-flex;
+  align-items:center;
+  min-height:30px;
+  padding:5px 10px;
+  border-radius:999px;
+  background:rgba(255,213,107,.16);
+  color:#ffe7a3;
+  font-size:14px;
+  font-weight:800;
+}
+
+.reading-story h4{
+  margin-top:12px;
+  color:#fff1b8;
+}
+
+.reading-story > p{
+  margin:8px 0 16px;
+  font-size:17px;
+  line-height:1.75;
+}
+
+.story-steps{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+
+.story-step{
+  min-height:138px;
+  padding:13px;
+  border-radius:12px;
+  background:rgba(10,12,24,.72);
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.story-step strong{
+  display:block;
+  color:#ffd56b;
+  font-size:14px;
+  margin-bottom:4px;
+}
+
+.story-step span{
+  display:block;
+  color:#fff;
+  font-weight:800;
+  margin-bottom:7px;
+}
+
+.story-step p{
+  margin:0;
+  color:#e8e8ee;
+  font-size:15px;
+  line-height:1.55;
+}
+
+.story-action{
+  margin-top:12px;
+  padding:14px;
+  border-radius:12px;
+  background:rgba(255,255,255,.08);
+}
+
+.story-action strong,
+.story-action span{
+  display:block;
+}
+
+.story-action strong{
+  color:#ffd56b;
+  margin-bottom:5px;
+}
+
+.story-action span{
+  line-height:1.6;
+}
+
 .reading h4{
   margin-top:18px;
   margin-bottom:8px;
@@ -475,4 +562,41 @@ body.lock-scroll{ overflow:hidden; }
   margin:6px 0;
   border-radius:8px;
   border:none;
+}
+
+@media (max-width: 720px){
+  .reading{
+    margin:28px 12px;
+    padding:18px;
+    border-radius:16px;
+    font-size:17px;
+  }
+
+  .reading h3{
+    font-size:21px;
+    line-height:1.35;
+  }
+
+  .reading-story{
+    padding:16px;
+  }
+
+  .reading-story > p,
+  .story-action span{
+    font-size:17px;
+    line-height:1.75;
+  }
+
+  .story-steps{
+    grid-template-columns:1fr;
+  }
+
+  .story-step{
+    min-height:auto;
+  }
+
+  .story-step p{
+    font-size:16px;
+    line-height:1.65;
+  }
 }
