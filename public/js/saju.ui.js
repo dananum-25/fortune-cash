@@ -983,6 +983,155 @@ function loadReport(index){
     generateFullReport(r.name, r.pillars, elementCounts, r.scores);
 }
 
+function getScoreBandText(score){
+  if(score >= 80) return "강하게 살아나는 흐름";
+  if(score >= 65) return "무난하게 밀어볼 만한 흐름";
+  if(score >= 50) return "평균적인 흐름";
+  return "천천히 관리가 필요한 흐름";
+}
+
+function getElementEasyName(element){
+  const map = {
+    "목": "성장, 시작, 배움",
+    "화": "표현, 인기, 활력",
+    "토": "안정, 신뢰, 정리",
+    "금": "판단, 기준, 결과",
+    "수": "생각, 정보, 유연함"
+  };
+  return map[element] || "균형";
+}
+
+function appendCoachMessage(role, html){
+  const chat = document.getElementById("sajuCoachChat");
+  if(!chat) return;
+
+  const msg = document.createElement("div");
+  msg.className = `coach-msg ${role}`;
+  msg.innerHTML = html;
+  chat.appendChild(msg);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function buildSajuCoachState({ name, pillars, elementResult, strongest, scores, profile }){
+  const safeName = name || "사용자";
+  const scoreEntries = [
+    ["재물", scores?.wealth || 0],
+    ["관계", scores?.love || 0],
+    ["일과 진로", scores?.career || 0],
+    ["건강 루틴", scores?.health || 0]
+  ].sort((a,b)=>b[1]-a[1]);
+
+  const strongestText = getElementEasyName(strongest);
+  const topArea = scoreEntries[0];
+  const careArea = scoreEntries[scoreEntries.length - 1];
+  const dayStem = profile?.strength?.dayStem || "";
+  const strength = profile?.strength?.verdict || "";
+  const yong = profile?.yongshin?.yong || "";
+  const hee = profile?.yongshin?.hee || "";
+
+  return {
+    name: safeName,
+    pillars,
+    strongest,
+    strongestText,
+    topArea,
+    careArea,
+    dayStem,
+    strength,
+    yong,
+    hee,
+    scores
+  };
+}
+
+function getCoachAnswer(type, state){
+  if(!state?.hasResult){
+    const beforeAnswers = {
+      summary: "생년월일과 출생 시간을 입력해 계산하면, 결과를 한 문장으로 먼저 요약해드릴게요.",
+      terms: `
+        <span class="term-chip">사주</span> 태어난 시간 정보를 네 칸으로 나눠 성향을 보는 방식입니다.<br>
+        <span class="term-chip">오행</span> 목·화·토·금·수라는 다섯 가지 성향의 균형입니다.<br>
+        <span class="term-chip">세운</span> 올해의 흐름을 참고용으로 보는 항목입니다.<br>
+        <span class="term-chip">대운</span> 긴 주기로 바뀌는 큰 흐름을 말합니다.
+      `,
+      money: "계산 후에는 재물운을 ‘돈이 생긴다/안 생긴다’가 아니라, 소비·저축·기회 판단을 어떻게 관리하면 좋은지로 풀어드릴게요.",
+      love: "관계운은 연애뿐 아니라 가족, 친구, 직장 관계까지 포함해서 쉽게 설명해드릴게요.",
+      career: "일과 진로는 특정 직업을 단정하기보다, 어떤 환경에서 힘이 나는지 중심으로 설명해드릴게요.",
+      next: "먼저 생년월일을 입력하고 출생 시간을 모르면 12시 기준으로 계산해보세요. 이후 시간을 바꿔 다시 비교할 수 있습니다."
+    };
+    return beforeAnswers[type] || beforeAnswers.summary;
+  }
+
+  const userName = state.name;
+  const topLabel = state.topArea?.[0] || "강점";
+  const topScore = state.topArea?.[1] || 0;
+  const careLabel = state.careArea?.[0] || "관리할 부분";
+  const careScore = state.careArea?.[1] || 0;
+
+  const answers = {
+    summary: `${userName}님은 <b>${state.strongestText}</b> 쪽 기운이 비교적 잘 보입니다. 지금은 <b>${topLabel}</b>을 살리되, <b>${careLabel}</b>은 무리하지 않고 루틴으로 관리하는 흐름이 좋습니다.`,
+    terms: `
+      <span class="term-chip">4기둥</span> 태어난 연·월·일·시간을 네 칸으로 나눈 표입니다.<br>
+      <span class="term-chip">오행</span> 목·화·토·금·수라는 다섯 가지 성향의 균형입니다.<br>
+      <span class="term-chip">일간</span> 사주에서 나 자신을 대표하는 글자입니다. ${state.dayStem ? `현재 계산값은 <b>${state.dayStem}</b>입니다.` : ""}<br>
+      <span class="term-chip">용신</span> 균형을 잡는 데 도움이 되는 방향입니다. 점수보다 “생활에서 무엇을 보완할지”로 보면 쉽습니다.
+    `,
+    money: `재물운은 돈이 갑자기 생긴다는 뜻보다 <b>돈을 다루는 태도</b>를 보는 쪽이 현실적입니다. 현재 점수는 <b>${state.scores?.wealth || 0}</b>으로, ${getScoreBandText(state.scores?.wealth || 0)}입니다. 지출 기록, 작은 저축, 충동구매 줄이기처럼 반복 가능한 행동이 가장 중요합니다.`,
+    love: `관계운은 연애만이 아니라 가족, 친구, 직장 관계까지 포함합니다. 현재 점수는 <b>${state.scores?.love || 0}</b>으로, ${getScoreBandText(state.scores?.love || 0)}입니다. 말의 속도를 늦추고 상대의 반응을 확인하는 방식이 관계 흐름을 부드럽게 만듭니다.`,
+    career: `일과 진로는 “무슨 직업이 정답인가”보다 <b>어떤 환경에서 힘이 나는가</b>로 보면 좋습니다. 현재 점수는 <b>${state.scores?.career || 0}</b>으로, ${getScoreBandText(state.scores?.career || 0)}입니다. ${state.strongestText}의 장점을 살릴 수 있는 역할을 먼저 찾아보세요.`,
+    next: `오늘부터는 세 가지만 해보세요. 1. 중요한 결정은 하루 더 두고 보기. 2. 돈과 시간을 쓴 기록을 남기기. 3. 지금 가장 막힌 관계나 일을 한 문장으로 적기. 운세는 답을 맞히는 도구보다 <b>생각을 정리하는 도구</b>로 쓸 때 가장 도움이 됩니다.`
+  };
+
+  return answers[type] || answers.summary;
+}
+
+function bindSajuCoachActions(){
+  const actions = document.getElementById("sajuCoachActions");
+  if(!actions || actions.dataset.bound === "1") return;
+
+  actions.addEventListener("click", (e)=>{
+    const btn = e.target.closest("[data-coach-question]");
+    if(!btn) return;
+
+    const type = btn.dataset.coachQuestion;
+    const current = window.__sajuCoachState || { hasResult:false };
+    appendCoachMessage("user", btn.textContent);
+    appendCoachMessage("bot", getCoachAnswer(type, current));
+  });
+  actions.dataset.bound = "1";
+}
+
+function initSajuCoachLanding(){
+  const chat = document.getElementById("sajuCoachChat");
+  if(!chat) return;
+
+  window.__sajuCoachState = { hasResult:false };
+  chat.innerHTML = "";
+  appendCoachMessage(
+    "bot",
+    "안녕하세요. 사주 결과가 어렵게 느껴지지 않도록 제가 쉬운 말로 풀어드릴게요. 먼저 생년월일을 입력해 계산하면, 결과를 대화하듯 설명해드릴 수 있습니다."
+  );
+  bindSajuCoachActions();
+}
+
+function renderSajuCoach(context){
+  const chat = document.getElementById("sajuCoachChat");
+  const actions = document.getElementById("sajuCoachActions");
+  if(!chat || !actions) return;
+
+  const state = buildSajuCoachState(context);
+  state.hasResult = true;
+  window.__sajuCoachState = state;
+
+  chat.innerHTML = "";
+  appendCoachMessage(
+    "bot",
+    `결과가 나왔어요. 먼저 쉽게 말하면, ${getCoachAnswer("summary", state)}`
+  );
+
+  bindSajuCoachActions();
+}
+
 // ===============================
 // 9) Daewoon (simple)
 // ===============================
@@ -1631,6 +1780,14 @@ try{
   analysis += analyzeDaewoonVsSewoon(currentDaewoon);
 
   const scores = calculateFortuneScores(elementResult, currentDaewoon);
+  renderSajuCoach({
+    name,
+    pillars,
+    elementResult,
+    strongest,
+    scores,
+    profile
+  });
   analysis += generateScoreGraph(scores);
   analysis += generateScoreInterpretation(scores);
   analysis += generateMonthlyGraph(scores, rand, profile);
@@ -1929,6 +2086,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   renderSajuEntryState();
   renderPointBoxSaju();
+  initSajuCoachLanding();
   bindSajuShare();
 
   const savedHour = localStorage.getItem("birthHour");

@@ -82,6 +82,79 @@
   background:#f3f3f3;
 }
 
+.saju-coach{
+  border-color:rgba(255,213,107,.28);
+  background:#161616;
+}
+
+.coach-head{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:flex-start;
+}
+
+.coach-chat{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:14px;
+}
+
+.coach-msg{
+  max-width:92%;
+  padding:12px 14px;
+  border-radius:14px;
+  line-height:1.7;
+  font-size:15px;
+  word-break:keep-all;
+}
+
+.coach-msg.bot{
+  align-self:flex-start;
+  background:#242424;
+  border:1px solid rgba(255,255,255,.1);
+}
+
+.coach-msg.user{
+  align-self:flex-end;
+  background:#fff4cf;
+  color:#191307;
+}
+
+.coach-actions{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-top:14px;
+}
+
+.coach-actions button{
+  border:1px solid rgba(255,255,255,.14);
+  background:#202020;
+  color:#fff;
+  border-radius:10px;
+  padding:11px 10px;
+  font-weight:700;
+  cursor:pointer;
+  line-height:1.35;
+}
+
+.coach-actions button:hover{
+  border-color:#ffd56b;
+  color:#ffd56b;
+}
+
+.term-chip{
+  display:inline-block;
+  margin:3px 4px 3px 0;
+  padding:3px 8px;
+  border-radius:999px;
+  background:rgba(255,213,107,.14);
+  color:#ffd56b;
+  font-weight:800;
+}
+
 .footer-links{
   margin-top:10px;
   display:grid;
@@ -165,6 +238,10 @@ svg{
   }
 
   .recommend-actions{
+    grid-template-columns:1fr;
+  }
+
+  .coach-actions{
     grid-template-columns:1fr;
   }
 

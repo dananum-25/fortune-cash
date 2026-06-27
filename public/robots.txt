@@ -1,5 +1,9 @@
 User-agent: *
 Allow: /
+Disallow: /test/
+Disallow: /pages/saju/saju-new.html
+Disallow: /pages/saju/career-new.html
+Disallow: /pages/saju/gunghap-new.html
 
 Host: https://fortune-cash.vercel.app
 Sitemap: https://fortune-cash.vercel.app/sitemap.xml
