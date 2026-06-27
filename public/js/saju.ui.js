@@ -984,10 +984,10 @@ function loadReport(index){
 }
 
 function getScoreBandText(score){
-  if(score >= 80) return "강하게 살아나는 흐름";
-  if(score >= 65) return "무난하게 밀어볼 만한 흐름";
-  if(score >= 50) return "평균적인 흐름";
-  return "천천히 관리가 필요한 흐름";
+  if(score >= 80) return "기회가 비교적 잘 살아나는 구간";
+  if(score >= 65) return "준비한 만큼 결과를 만들기 좋은 구간";
+  if(score >= 50) return "큰 무리 없이 균형을 잡아갈 수 있는 구간";
+  return "속도보다 점검과 관리가 필요한 구간";
 }
 
 function getElementEasyName(element){
@@ -1047,17 +1047,17 @@ function buildSajuCoachState({ name, pillars, elementResult, strongest, scores, 
 function getCoachAnswer(type, state){
   if(!state?.hasResult){
     const beforeAnswers = {
-      summary: "생년월일과 출생 시간을 입력해 계산하면, 결과를 한 문장으로 먼저 요약해드릴게요.",
+      summary: "생년월일과 출생 시간을 입력해 계산하면, 사주 구조를 먼저 보고 핵심 성향과 올해 흐름을 한 문장으로 요약해드릴게요.",
       terms: `
-        <span class="term-chip">사주</span> 태어난 시간 정보를 네 칸으로 나눠 성향을 보는 방식입니다.<br>
+        <span class="term-chip">사주</span> 태어난 연·월·일·시를 네 기둥으로 나눈 기본 구조입니다.<br>
         <span class="term-chip">오행</span> 목·화·토·금·수라는 다섯 가지 성향의 균형입니다.<br>
-        <span class="term-chip">세운</span> 올해의 흐름을 참고용으로 보는 항목입니다.<br>
-        <span class="term-chip">대운</span> 긴 주기로 바뀌는 큰 흐름을 말합니다.
+        <span class="term-chip">일간</span> 사주에서 나 자신을 대표하는 글자입니다.<br>
+        <span class="term-chip">세운</span> 올해 들어오는 흐름을 내 사주와 비교해 보는 항목입니다.
       `,
-      money: "계산 후에는 재물운을 ‘돈이 생긴다/안 생긴다’가 아니라, 소비·저축·기회 판단을 어떻게 관리하면 좋은지로 풀어드릴게요.",
-      love: "관계운은 연애뿐 아니라 가족, 친구, 직장 관계까지 포함해서 쉽게 설명해드릴게요.",
-      career: "일과 진로는 특정 직업을 단정하기보다, 어떤 환경에서 힘이 나는지 중심으로 설명해드릴게요.",
-      next: "먼저 생년월일을 입력하고 출생 시간을 모르면 12시 기준으로 계산해보세요. 이후 시간을 바꿔 다시 비교할 수 있습니다."
+      money: "계산 후에는 재물운을 단순한 횡재 예측이 아니라, 돈을 모으고 쓰고 판단하는 습관 관점으로 풀어드릴게요.",
+      love: "관계운은 연애만이 아니라 가족, 친구, 직장 관계까지 포함해 ‘소통 방식’ 중심으로 설명해드릴게요.",
+      career: "일과 진로는 특정 직업을 단정하기보다, 어떤 역할과 환경에서 힘이 나는지 중심으로 설명해드릴게요.",
+      next: "먼저 생년월일을 입력해 보세요. 출생 시간을 모르면 12시 기준으로 시작하고, 나중에 시간을 바꿔 결과 차이를 비교하면 됩니다."
     };
     return beforeAnswers[type] || beforeAnswers.summary;
   }
@@ -1069,17 +1069,17 @@ function getCoachAnswer(type, state){
   const careScore = state.careArea?.[1] || 0;
 
   const answers = {
-    summary: `${userName}님은 <b>${state.strongestText}</b> 쪽 기운이 비교적 잘 보입니다. 지금은 <b>${topLabel}</b>을 살리되, <b>${careLabel}</b>은 무리하지 않고 루틴으로 관리하는 흐름이 좋습니다.`,
+    summary: `${userName}님 사주는 <b>${state.strongestText}</b>의 성향이 비교적 선명합니다. 올해는 <b>${topLabel}</b>을 적극적으로 살리되, <b>${careLabel}</b>은 감정이나 속도에 휘둘리지 않도록 관리하는 흐름이 좋습니다.`,
     terms: `
       <span class="term-chip">4기둥</span> 태어난 연·월·일·시간을 네 칸으로 나눈 표입니다.<br>
       <span class="term-chip">오행</span> 목·화·토·금·수라는 다섯 가지 성향의 균형입니다.<br>
       <span class="term-chip">일간</span> 사주에서 나 자신을 대표하는 글자입니다. ${state.dayStem ? `현재 계산값은 <b>${state.dayStem}</b>입니다.` : ""}<br>
-      <span class="term-chip">용신</span> 균형을 잡는 데 도움이 되는 방향입니다. 점수보다 “생활에서 무엇을 보완할지”로 보면 쉽습니다.
+      <span class="term-chip">용신</span> 사주의 균형을 잡는 데 도움이 되는 방향입니다. “좋다/나쁘다”보다 생활에서 무엇을 보완할지로 보면 이해가 쉽습니다.
     `,
-    money: `재물운은 돈이 갑자기 생긴다는 뜻보다 <b>돈을 다루는 태도</b>를 보는 쪽이 현실적입니다. 현재 점수는 <b>${state.scores?.wealth || 0}</b>으로, ${getScoreBandText(state.scores?.wealth || 0)}입니다. 지출 기록, 작은 저축, 충동구매 줄이기처럼 반복 가능한 행동이 가장 중요합니다.`,
-    love: `관계운은 연애만이 아니라 가족, 친구, 직장 관계까지 포함합니다. 현재 점수는 <b>${state.scores?.love || 0}</b>으로, ${getScoreBandText(state.scores?.love || 0)}입니다. 말의 속도를 늦추고 상대의 반응을 확인하는 방식이 관계 흐름을 부드럽게 만듭니다.`,
-    career: `일과 진로는 “무슨 직업이 정답인가”보다 <b>어떤 환경에서 힘이 나는가</b>로 보면 좋습니다. 현재 점수는 <b>${state.scores?.career || 0}</b>으로, ${getScoreBandText(state.scores?.career || 0)}입니다. ${state.strongestText}의 장점을 살릴 수 있는 역할을 먼저 찾아보세요.`,
-    next: `오늘부터는 세 가지만 해보세요. 1. 중요한 결정은 하루 더 두고 보기. 2. 돈과 시간을 쓴 기록을 남기기. 3. 지금 가장 막힌 관계나 일을 한 문장으로 적기. 운세는 답을 맞히는 도구보다 <b>생각을 정리하는 도구</b>로 쓸 때 가장 도움이 됩니다.`
+    money: `재물운은 “돈이 들어온다”보다 <b>돈을 다루는 방식</b>을 보는 항목입니다. 현재 점수는 <b>${state.scores?.wealth || 0}</b>으로, ${getScoreBandText(state.scores?.wealth || 0)}입니다. 큰 결정보다 지출 기록, 고정비 점검, 작은 저축처럼 반복 가능한 행동이 재물 흐름을 안정시킵니다.`,
+    love: `관계운은 연애뿐 아니라 가족, 친구, 직장 관계까지 포함합니다. 현재 점수는 <b>${state.scores?.love || 0}</b>으로, ${getScoreBandText(state.scores?.love || 0)}입니다. 올해는 먼저 판단하기보다 상대의 말뜻을 확인하고, 감정이 커질 때 답변을 늦추는 방식이 좋습니다.`,
+    career: `일과 진로는 “정답 직업”을 찍는 항목이 아닙니다. <b>어떤 역할에서 집중력과 만족감이 살아나는지</b>를 보는 것이 더 정확합니다. 현재 점수는 <b>${state.scores?.career || 0}</b>으로, ${getScoreBandText(state.scores?.career || 0)}입니다. ${state.strongestText}의 장점이 드러나는 업무 환경을 우선적으로 살펴보세요.`,
+    next: `오늘부터는 세 가지만 해보세요. 1. 중요한 결정은 하루 더 두고 보기. 2. 돈과 시간을 쓴 기록을 남기기. 3. 지금 가장 막힌 관계나 일을 한 문장으로 적기. 사주는 미래를 맞히는 도구보다 <b>내 선택을 정리하는 지도</b>로 쓸 때 가장 실용적입니다.`
   };
 
   return answers[type] || answers.summary;
@@ -1109,7 +1109,7 @@ function initSajuCoachLanding(){
   chat.innerHTML = "";
   appendCoachMessage(
     "bot",
-    "안녕하세요. 사주 결과가 어렵게 느껴지지 않도록 제가 쉬운 말로 풀어드릴게요. 먼저 생년월일을 입력해 계산하면, 결과를 대화하듯 설명해드릴 수 있습니다."
+    "안녕하세요. 사주 용어가 어렵게 느껴지지 않도록, 계산 결과를 근거와 함께 쉬운 말로 풀어드릴게요. 먼저 생년월일을 입력해 계산하면 핵심 성향과 올해 흐름부터 차근차근 설명해드립니다."
   );
   bindSajuCoachActions();
 }

@@ -10,6 +10,54 @@
   margin-bottom:14px;
 }
 
+.saju-hero{
+  padding:12px 0 8px;
+}
+
+.saju-hero .eyebrow{
+  margin:0 0 8px;
+  color:#ffd56b;
+  font-weight:800;
+  font-size:14px;
+}
+
+.saju-hero h1{
+  margin:0 0 10px;
+  font-size:34px;
+  line-height:1.18;
+}
+
+.trust-card{
+  border:1px solid rgba(255,213,107,.18);
+}
+
+.trust-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin:16px 0;
+}
+
+.trust-grid div{
+  background:#151515;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:10px;
+  padding:13px;
+}
+
+.trust-grid strong{
+  display:block;
+  color:#ffd56b;
+  margin-bottom:6px;
+}
+
+.trust-grid span{
+  display:block;
+  font-size:13px;
+  line-height:1.55;
+  opacity:.86;
+}
+
 .fortune-title{
   margin:0 0 14px;
   font-size:28px;
@@ -252,5 +300,13 @@ svg{
 
   .fortune-title{
     font-size:22px;
+  }
+
+  .saju-hero h1{
+    font-size:28px;
+  }
+
+  .trust-grid{
+    grid-template-columns:1fr;
   }
 }

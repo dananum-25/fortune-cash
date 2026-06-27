@@ -1,139 +1,153 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>무료 사주 계산 | 4기둥(연·월·일·시) + 오행 + 올해 세운 분석</title>
-<meta name="description" content="출생 연월일시를 기준으로 4기둥(연주·월주·일주·시주), 오행 분석, 올해 세운 흐름을 무료로 확인하세요. 회원은 저장된 생년월일이 자동 적용되고, 게스트도 직접 입력 후 이용할 수 있습니다.">
+<title>정밀 사주 분석 | 사주팔자·오행·세운 해석</title>
+<meta name="description" content="출생 연월일시를 기준으로 사주팔자, 오행 균형, 일간 성향, 올해 세운 흐름을 이해하기 쉽게 확인하는 무료 사주 분석 페이지입니다.">
 <link rel="canonical" href="https://fortune-cash.vercel.app/pages/saju/saju.html">
-
 <link rel="stylesheet" href="/css/common.css">
 <link rel="stylesheet" href="/css/saju.css">
 </head>
 
 <body>
-<div class="wrap saju-wrap">
+<main class="wrap saju-wrap">
 
-  <h1 id="pageTitle">나의 사주 분석</h1>
-  <div class="small page-desc">
-    ※ 정확한 사주는 출생시간(시주)이 중요합니다. 출생시간을 모르면 “12시(정오)”로 먼저 확인한 뒤, 나중에 수정해도 됩니다.
-  </div>
+  <header class="saju-hero">
+    <p class="eyebrow">명리학의 구조를 쉬운 언어로 풀어보는 사주 분석</p>
+    <h1 id="pageTitle">정밀 사주 분석</h1>
+    <p class="page-desc">
+      생년월일과 출생 시간을 바탕으로 네 기둥, 오행 균형, 일간 성향, 올해의 흐름을 계산합니다.
+      결과는 운명을 단정하는 말이 아니라, 나의 성향과 선택 방향을 점검하는 참고 자료로 제공됩니다.
+    </p>
+  </header>
 
   <div id="loginCheck" class="card"></div>
   <div id="pointBox" class="card"></div>
 
   <section id="guestBirthCard" class="card helper-box" style="display:none;">
-    <h2>내 기준으로 다시 보기</h2>
-    <p>회원은 저장된 생년월일이 자동 적용됩니다.</p>
-    <p>게스트는 생년월일을 입력하면 본인 기준으로 다시 확인할 수 있습니다.</p>
+    <h2>내 생년월일로 다시 보기</h2>
+    <p>로그인하지 않아도 생년월일을 입력하면 내 기준으로 사주 흐름을 확인할 수 있습니다.</p>
 
     <div class="birth-form">
-      <input id="guestBirthInline" type="date">
+      <input id="guestBirthInline" type="date" aria-label="생년월일">
 
-      <select id="guestBirthTypeInline">
+      <select id="guestBirthTypeInline" aria-label="양력 또는 음력">
         <option value="solar">양력</option>
         <option value="lunar">음력</option>
       </select>
 
       <label class="inline-check">
         <input type="checkbox" id="guestIsLeapInline">
-        윤달(윤월) 입니다
+        윤달입니다
       </label>
 
-      <button class="btn" type="button" id="applyGuestBirthBtn">내 생년월일 적용</button>
+      <button class="btn" type="button" id="applyGuestBirthBtn">생년월일 적용</button>
     </div>
+  </section>
 
-    <p class="small" style="margin-top:10px;">
-      게스트는 포인트 적립 없이 콘텐츠만 이용할 수 있습니다.
+  <section class="card trust-card">
+    <h2>분석 기준</h2>
+    <p>
+      이 페이지는 전통 명리학의 기본 구조를 바탕으로 자동 계산합니다. 어려운 용어는 가능한 한 생활 언어로 풀어 설명하고,
+      해석의 근거와 한계를 함께 안내합니다.
+    </p>
+    <div class="trust-grid">
+      <div>
+        <strong>1. 출생 정보</strong>
+        <span>연·월·일·시 정보를 기준으로 네 기둥을 계산합니다.</span>
+      </div>
+      <div>
+        <strong>2. 오행 균형</strong>
+        <span>목·화·토·금·수의 분포를 보고 성향의 방향을 살펴봅니다.</span>
+      </div>
+      <div>
+        <strong>3. 일간과 십성</strong>
+        <span>나를 대표하는 글자와 주변 기운의 관계를 참고합니다.</span>
+      </div>
+      <div>
+        <strong>4. 세운 흐름</strong>
+        <span>올해의 흐름을 재물, 관계, 일, 건강 루틴 관점으로 해석합니다.</span>
+      </div>
+    </div>
+    <p class="small">
+      안내: 사주는 의료, 법률, 투자, 진로 결정을 대신하지 않습니다. 중요한 결정은 현실 자료와 전문가 상담을 함께 확인해 주세요.
     </p>
   </section>
 
-  <div class="card">
-    <h2>사주 서비스 안내</h2>
+  <section class="card" id="timeInputBox" style="display:none;">
+    <h2>출생 시간 입력</h2>
     <p>
-      사주는 출생 연월일시를 기준으로 연주, 월주, 일주, 시주의 흐름을 살펴보는 전통 해석 방식입니다.
-      본 서비스는 4기둥, 오행 분포, 올해 세운 흐름, 자동 해설을 참고용으로 제공합니다.
+      출생 시간을 알면 시주까지 반영되어 더 정교한 결과를 볼 수 있습니다.
+      시간을 모르면 12시 기준으로 먼저 확인한 뒤, 나중에 시간을 바꿔 비교해도 됩니다.
     </p>
-    <p>
-      결과는 참고용이며 절대적인 미래 예언이 아닙니다. 중요한 판단은 현실 상황과 함께 종합적으로 살펴보는 것이 좋습니다.
-    </p>
-  </div>
-
-  <div class="card" id="timeInputBox" style="display:none;">
-  <h2>⏰ 출생 시간 입력</h2>
-  <p>출생 시간(0~23시)을 입력하면 더 정확한 4기둥 분석이 가능합니다. 입력하지 않으면 정오(12시) 기준으로 먼저 결과를 보여드립니다.</p>
-  <input type="number" id="birthHour" min="0" max="23" placeholder="출생 시간 (미입력 시 12시 기준)">
-  <button id="calcBtn" type="button">사주 계산하기</button>
-  <div class="small" style="margin-top:10px;">
-    TIP) 출생시간을 모르면 비워두거나 12를 넣고 먼저 확인하세요. 나중에 시간을 바꿔 다시 계산할 수 있습니다.
-  </div>
-</div>
+    <input type="number" id="birthHour" min="0" max="23" placeholder="출생 시간 (0~23, 모르면 12)">
+    <button id="calcBtn" type="button">사주 계산하기</button>
+    <p class="small">출생 시간은 0시부터 23시까지 숫자로 입력해 주세요.</p>
+  </section>
 
   <section class="card saju-coach" id="sajuCoachBox">
-      <div class="coach-head">
-        <div>
-          <h2 class="fortune-title accent-main">쉬운 해석 도우미</h2>
-          <p class="small">어려운 사주 용어를 생활 언어로 바꿔서 하나씩 설명합니다.</p>
-        </div>
+    <div class="coach-head">
+      <div>
+        <h2 class="fortune-title accent-main">쉬운 해석 도우미</h2>
+        <p class="small">전문 용어를 바로 단정하지 않고, 생활에서 이해할 수 있는 말로 풀어드립니다.</p>
       </div>
-      <div class="coach-chat" id="sajuCoachChat" aria-live="polite"></div>
-      <div class="coach-actions" id="sajuCoachActions">
-        <button type="button" data-coach-question="summary">한 문장으로 요약해줘</button>
-        <button type="button" data-coach-question="terms">어려운 단어를 쉽게 설명해줘</button>
-        <button type="button" data-coach-question="money">재물운은 어떻게 보면 돼?</button>
-        <button type="button" data-coach-question="love">관계운은 어떻게 보면 돼?</button>
-        <button type="button" data-coach-question="career">일과 진로는 어떻게 보면 돼?</button>
-        <button type="button" data-coach-question="next">오늘부터 뭘 하면 좋아?</button>
-      </div>
-    </section>
+    </div>
+    <div class="coach-chat" id="sajuCoachChat" aria-live="polite"></div>
+    <div class="coach-actions" id="sajuCoachActions">
+      <button type="button" data-coach-question="summary">한 문장으로 요약해줘</button>
+      <button type="button" data-coach-question="terms">어려운 단어를 쉽게 설명해줘</button>
+      <button type="button" data-coach-question="money">재물운은 어떻게 보면 돼?</button>
+      <button type="button" data-coach-question="love">관계운은 어떻게 보면 돼?</button>
+      <button type="button" data-coach-question="career">일과 진로는 어떻게 보면 돼?</button>
+      <button type="button" data-coach-question="next">오늘부터 뭘 하면 좋아?</button>
+    </div>
+  </section>
 
   <div id="sajuResult" style="display:none;">
 
     <section class="card fortune-block">
-      <h2 class="fortune-title accent-main">📜 나의 기본 정보</h2>
+      <h2 class="fortune-title accent-main">기본 정보</h2>
       <div id="basicInfo"></div>
     </section>
 
     <section class="card fortune-block">
-      <h2 class="fortune-title accent-main">🔮 4기둥(연·월·일·시)</h2>
+      <h2 class="fortune-title accent-main">사주 네 기둥</h2>
       <div id="sajuBox"></div>
-      <div class="small">※ 월주는 절기 기준 간이 반영 버전입니다.</div>
+      <p class="small">연주·월주·일주·시주는 각각 태어난 해, 달, 날, 시간을 상징적으로 나눈 값입니다.</p>
     </section>
 
     <section class="card fortune-block">
-      <h2 class="fortune-title accent-main">🌿 오행 분석</h2>
+      <h2 class="fortune-title accent-main">오행 균형</h2>
       <div id="elementBox"></div>
       <div class="hr"></div>
       <div id="elementInterpretation"></div>
     </section>
 
     <section class="card fortune-block">
-      <h2 class="fortune-title accent-main" id="yearFortuneTitle">📈 올해 세운 분석</h2>
+      <h2 class="fortune-title accent-main" id="yearFortuneTitle">올해 세운 분석</h2>
       <div id="sewoonBox"></div>
     </section>
 
     <section class="card fortune-block">
-      <h2 class="fortune-title accent-main">✨ 종합 해석</h2>
+      <h2 class="fortune-title accent-main">종합 해석</h2>
       <div id="analysisBox"></div>
     </section>
 
-    <div class="card">
+    <section class="card">
       <h2>리포트</h2>
       <div class="recommend-actions">
         <button id="pdfFullBtn" type="button" class="white-action-btn">전체 리포트 PDF</button>
         <button id="pdfSummaryBtn" type="button" class="white-action-btn">요약 리포트 PDF</button>
-        <button id="reportBtn" type="button" class="white-action-btn">내 리포트 보기</button>
+        <button id="reportBtn" type="button" class="white-action-btn">저장 리포트 보기</button>
       </div>
-    </div>
+    </section>
 
     <section class="card">
-      <h2>사주 해석 안내</h2>
+      <h2>해석을 볼 때 기억할 점</h2>
       <p>
-        사주는 4기둥의 조합, 오행의 균형, 일간 강약, 세운 흐름 등을 종합해 참고하는 자료입니다.
-        한 문장 결과보다 전체 구조를 함께 보는 것이 더 도움이 됩니다.
-      </p>
-      <p>
-        오행 분포는 성향과 생활 습관을 점검하는 데 활용하고, 세운 분석은 올해 어떤 흐름을 조심하거나 활용하면 좋은지 참고하는 식으로 보는 것이 적절합니다.
+        좋은 흐름은 “아무것도 하지 않아도 된다”는 뜻이 아니라, 지금 가진 장점을 더 잘 쓰기 좋은 구간이라는 의미에 가깝습니다.
+        조심할 흐름은 불안해하라는 말이 아니라, 무리하지 않고 점검할 부분을 알려주는 신호로 보는 것이 좋습니다.
       </p>
     </section>
 
@@ -147,7 +161,6 @@
         <a href="/fortune-guide.html">운세 가이드</a>
       </div>
     </section>
-
   </div>
 
   <button class="secondaryBtn" id="shareBtn" type="button">공유하기</button>
@@ -159,13 +172,12 @@
     <div class="footer-links">
       <a href="/privacy.html">개인정보처리방침</a>
       <a href="/terms.html">이용약관</a>
+      <a href="/fortune-disclaimer.html">운세 콘텐츠 안내</a>
       <a href="/about.html">사이트 소개</a>
       <a href="/contact.html">문의</a>
-      <a href="/fortune-guide.html">운세 가이드</a>
     </div>
   </footer>
-
-</div>
+</main>
 
 <script src="/js/config.js"></script>
 <script src="/js/birth.js"></script>
