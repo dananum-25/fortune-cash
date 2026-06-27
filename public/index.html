@@ -4,20 +4,20 @@
   <meta charset="UTF-8">
   <meta name="google-adsense-account" content="ca-pub-7356591276029815">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>무료 운세 플랫폼 | 사주·타로·별자리·띠별 운세</title>
-  <meta name="description" content="사주, 타로, 별자리, 띠별 운세, 토정비결을 참고용으로 확인할 수 있는 무료 운세 플랫폼입니다.">
+  <title>운세 앱테크 | 포인트와 무료 운세를 함께 확인</title>
+  <meta name="description" content="포인트를 모으면서 사주, 타로, 별자리, 띠별 운세를 쉽게 확인하는 운세 앱테크 플랫폼입니다.">
   <link rel="canonical" href="https://fortune-cash.vercel.app/">
 
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="무료 운세 플랫폼">
-  <meta property="og:title" content="무료 운세 플랫폼 | 사주·타로·별자리·띠별 운세">
-  <meta property="og:description" content="오늘의 흐름을 사주, 타로, 별자리, 띠별 운세로 가볍게 점검해 보세요.">
+  <meta property="og:site_name" content="운세 앱테크">
+  <meta property="og:title" content="운세 앱테크 | 포인트와 무료 운세">
+  <meta property="og:description" content="오늘 할 일을 확인하고, 궁금한 운세를 대화하듯 찾아보세요.">
   <meta property="og:url" content="https://fortune-cash.vercel.app/">
   <meta property="og:image" content="https://fortune-cash.vercel.app/assets/star_fortune.png">
 
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="무료 운세 플랫폼">
-  <meta name="twitter:description" content="사주, 타로, 별자리, 띠별 운세를 무료로 확인하세요.">
+  <meta name="twitter:title" content="운세 앱테크">
+  <meta name="twitter:description" content="포인트를 모으면서 무료 운세를 확인하세요.">
   <meta name="twitter:image" content="https://fortune-cash.vercel.app/assets/star_fortune.png">
 
   <script src="/js/config.js"></script>
@@ -26,34 +26,52 @@
 
   <style>
     :root{
-      --bg:#111111;
+      --bg:#101010;
       --panel:#1b1b1b;
-      --text:#f7f4ed;
-      --muted:#c8beb0;
+      --panel2:#222;
+      --text:#f8f5ee;
+      --muted:#c9c0b2;
       --gold:#ffd56b;
-      --teal:#6ee7d8;
+      --green:#74e0b4;
       --line:rgba(255,255,255,.12);
+      --danger:#ffbf8a;
     }
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",Arial,sans-serif}
     a{color:inherit}
-    #userBar{position:sticky;top:0;z-index:10;background:rgba(17,17,17,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;font-size:14px}
+    #userBar{position:sticky;top:0;z-index:10;background:rgba(16,16,16,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;font-size:14px}
     #loginBtn,.small-btn{border:0;background:var(--gold);color:#17110a;padding:8px 12px;border-radius:8px;font-weight:800;cursor:pointer}
-    .wrap{max-width:1080px;margin:0 auto;padding:22px 16px 52px}
-    .hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(280px,.9fr);gap:24px;align-items:center;min-height:520px;border-bottom:1px solid var(--line)}
-    .eyebrow{color:var(--teal);font-weight:800;font-size:14px;margin-bottom:10px}
-    h1{font-size:44px;line-height:1.12;margin:0 0 16px;letter-spacing:0}
-    .lead{font-size:18px;line-height:1.75;color:var(--muted);margin:0 0 22px;word-break:keep-all}
-    .hero-actions{display:flex;gap:10px;flex-wrap:wrap}
-    .primary,.secondary{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border-radius:8px;text-decoration:none;font-weight:900;border:1px solid transparent}
+    .wrap{max-width:1080px;margin:0 auto;padding:18px 16px 52px}
+    .hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(300px,.95fr);gap:18px;align-items:stretch;padding:18px 0 30px;border-bottom:1px solid var(--line)}
+    .intro{display:flex;flex-direction:column;justify-content:center;min-height:420px}
+    .eyebrow{color:var(--green);font-weight:900;font-size:14px;margin:0 0 10px}
+    h1{font-size:42px;line-height:1.12;margin:0 0 14px;letter-spacing:0}
+    .lead{font-size:17px;line-height:1.75;color:var(--muted);margin:0 0 18px;word-break:keep-all}
+    .hero-actions,.quick-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .primary,.secondary,.chat-link{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border-radius:8px;text-decoration:none;font-weight:900;border:1px solid transparent}
     .primary{background:var(--gold);color:#17110a}
     .secondary{border-color:var(--line);color:var(--text);background:#191919}
-    .hero-media{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .hero-media img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:8px;border:1px solid var(--line);background:#222}
-    section{padding:34px 0;border-bottom:1px solid var(--line)}
-    .section-head{display:flex;justify-content:space-between;gap:18px;align-items:end;margin-bottom:18px}
+    .chatbot{background:#151515;border:1px solid rgba(255,213,107,.25);border-radius:8px;padding:14px;display:flex;flex-direction:column;min-height:420px}
+    .chatbot h2{font-size:22px;color:var(--gold);margin:0 0 6px}
+    .chatbot-sub{margin:0 0 12px;color:var(--muted);font-size:14px;line-height:1.55}
+    .chat-window{display:flex;flex-direction:column;gap:9px;overflow:auto;min-height:145px;max-height:230px;padding:4px 2px 10px}
+    .msg{max-width:92%;padding:11px 12px;border-radius:14px;line-height:1.6;font-size:14px;word-break:keep-all}
+    .msg.bot{align-self:flex-start;background:#242424;border:1px solid var(--line)}
+    .msg.user{align-self:flex-end;background:#fff2c2;color:#15110a}
+    .question-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:auto}
+    .question-grid button{border:1px solid var(--line);background:#202020;color:#fff;border-radius:8px;padding:11px 10px;font-weight:800;cursor:pointer;text-align:left;line-height:1.35}
+    .question-grid button:hover{border-color:var(--gold);color:var(--gold)}
+    .answer-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .chat-link{min-height:36px;padding:0 11px;background:#2c2513;border-color:rgba(255,213,107,.45);color:var(--gold);font-size:13px}
+    section{padding:30px 0;border-bottom:1px solid var(--line)}
+    .section-head{display:flex;justify-content:space-between;gap:18px;align-items:end;margin-bottom:16px}
     h2{font-size:24px;margin:0;color:var(--gold);letter-spacing:0}
     .section-copy{margin:0;color:var(--muted);max-width:680px;line-height:1.7}
+    .mission-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .mission,.info{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px;line-height:1.65}
+    .mission strong,.info strong{display:block;color:var(--text);font-size:16px;margin-bottom:6px}
+    .mission span,.info span{display:block;color:var(--muted);font-size:14px}
+    .mission a{margin-top:12px}
     .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
     .card{display:block;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden;text-decoration:none;transition:transform .15s ease,border-color .15s ease}
     .card:hover{transform:translateY(-2px);border-color:rgba(255,213,107,.65)}
@@ -61,8 +79,7 @@
     .cardTitle{padding:12px 12px 4px;font-weight:900}
     .cardDesc{padding:0 12px 14px;color:var(--muted);font-size:13px;line-height:1.55}
     .info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-    .info{background:#181818;border:1px solid var(--line);border-radius:8px;padding:16px;line-height:1.7;color:var(--muted)}
-    .info strong{display:block;color:var(--text);margin-bottom:6px}
+    .notice{color:var(--danger)}
     footer{padding-top:28px;color:#aaa;font-size:13px;line-height:1.9}
     footer a{color:#ccc;text-decoration:none}
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.78);display:flex;justify-content:center;align-items:center;z-index:9999;padding:16px}
@@ -76,16 +93,17 @@
     .button-row button{flex:1}
     .muted-small{font-size:12px;color:#aaa;line-height:1.5}
     @media (max-width:860px){
-      .hero{grid-template-columns:1fr;min-height:auto;padding:34px 0}
+      .hero{grid-template-columns:1fr;padding-top:8px}
+      .intro{min-height:auto}
       h1{font-size:34px}
       .grid{grid-template-columns:repeat(2,1fr)}
-      .info-grid{grid-template-columns:1fr}
+      .mission-grid,.info-grid{grid-template-columns:1fr}
     }
     @media (max-width:480px){
       .wrap{padding-inline:12px}
       h1{font-size:30px}
       .lead{font-size:16px}
-      .hero-media{grid-template-columns:1fr 1fr}
+      .question-grid{grid-template-columns:1fr}
       .section-head{display:block}
       .grid{gap:10px}
       .cardTitle{font-size:15px}
@@ -100,102 +118,124 @@
 
   <main class="wrap">
     <section class="hero">
-      <div>
-        <div class="eyebrow">오늘의 흐름을 차분하게 읽는 운세 도구</div>
-        <h1>무료 운세 플랫폼</h1>
-        <p class="lead">
-          사주, 타로, 별자리, 띠별 운세를 한 곳에서 확인하세요. 결과는 확정적인 예언이 아니라 현재를 돌아보고 선택을 정리하는 참고 자료로 제공합니다.
-        </p>
-        <div class="hero-actions">
-          <a class="primary" href="/pages/saju/saju.html">사주 보기</a>
-          <a class="secondary" href="/pages/tarot/tarot.html">타로 상담</a>
-          <a class="secondary" href="/fortune-guide.html">운세 가이드</a>
+      <div class="chatbot" aria-label="앱테크 질문 챗봇">
+        <h2>무엇이 궁금하세요?</h2>
+        <p class="chatbot-sub">포인트를 모으고 싶은지, 오늘 운세가 궁금한지, 고민을 정리하고 싶은지 먼저 골라보세요.</p>
+        <div class="chat-window" id="homeChat">
+          <div class="msg bot">안녕하세요. 여기는 운세를 보면서 포인트 활동도 함께 관리하는 앱테크형 서비스입니다. 궁금한 걸 누르면 바로 맞는 메뉴로 안내해드릴게요.</div>
+        </div>
+        <div class="question-grid" id="homeQuestions">
+          <button type="button" data-home-question="earn">포인트는 어떻게 모아?</button>
+          <button type="button" data-home-question="today">오늘 뭘 하면 좋아?</button>
+          <button type="button" data-home-question="saju">내 사주가 궁금해</button>
+          <button type="button" data-home-question="tarot">고민을 타로로 보고 싶어</button>
+          <button type="button" data-home-question="points">내 포인트를 확인하고 싶어</button>
+          <button type="button" data-home-question="guide">처음이라 뭐부터 볼지 모르겠어</button>
         </div>
       </div>
-      <div class="hero-media" aria-label="주요 운세 콘텐츠">
-        <img src="/assets/saju.png" alt="사주 운세">
-        <img src="/assets/tarot.png" alt="타로 카드">
-        <img src="/assets/star_fortune.png" alt="별자리 운세">
-        <img src="/assets/zodiac_fortune.png" alt="띠별 운세">
+
+      <div class="intro">
+        <p class="eyebrow">운세 기반 앱테크</p>
+        <h1>궁금한 걸 묻고, 오늘 할 일을 확인하세요</h1>
+        <p class="lead">
+          단순히 운세 메뉴를 나열하지 않습니다. 사용자가 알고 싶은 질문을 먼저 받고,
+          포인트 활동과 운세 콘텐츠를 연결해 오늘 무엇을 보면 좋을지 안내합니다.
+        </p>
+        <div class="hero-actions">
+          <a class="primary" href="/point.html">포인트 확인</a>
+          <a class="secondary" href="/pages/saju/saju.html">사주 분석</a>
+          <a class="secondary" href="/pages/tarot/tarot.html">타로 상담</a>
+        </div>
       </div>
     </section>
 
     <section>
       <div class="section-head">
-        <h2>운세 콘텐츠</h2>
-        <p class="section-copy">가볍게 보는 오늘의 흐름부터 생년월일 기반 분석까지, 목적에 맞는 콘텐츠를 선택할 수 있습니다.</p>
+        <h2>오늘의 앱테크 흐름</h2>
+        <p class="section-copy">사용자가 바로 이해할 수 있도록 “무엇을 하면 되는지” 중심으로 정리했습니다.</p>
+      </div>
+      <div class="mission-grid">
+        <div class="mission">
+          <strong>1. 내 상태 확인</strong>
+          <span>사주나 타로로 오늘의 감정, 돈, 관계, 일 흐름을 먼저 정리합니다.</span>
+          <a class="chat-link" href="/pages/saju/saju.html">사주로 시작</a>
+        </div>
+        <div class="mission">
+          <strong>2. 포인트 확인</strong>
+          <span>내 포인트와 이용 상태를 확인하고, 가능한 활동을 점검합니다.</span>
+          <a class="chat-link" href="/point.html">포인트 보기</a>
+        </div>
+        <div class="mission">
+          <strong>3. 짧은 활동 참여</strong>
+          <span>미니게임, 포춘쿠키, MBTI처럼 짧게 끝나는 콘텐츠로 체류 흐름을 만듭니다.</span>
+          <a class="chat-link" href="/pages/mini_game/index.html">미니게임</a>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>궁금증별 추천</h2>
+        <p class="section-copy">사용자가 실제로 묻는 질문을 기준으로 콘텐츠를 배치했습니다.</p>
       </div>
       <div class="grid">
         <a class="card" href="/pages/saju/saju.html">
           <img src="/assets/saju.png" alt="사주">
-          <div class="cardTitle">사주</div>
-          <div class="cardDesc">출생 정보를 바탕으로 오행과 세운 흐름을 살펴봅니다.</div>
+          <div class="cardTitle">나는 어떤 성향일까?</div>
+          <div class="cardDesc">사주 네 기둥과 오행으로 내 성향과 올해 흐름을 쉽게 봅니다.</div>
         </a>
         <a class="card" href="/pages/tarot/tarot.html">
           <img src="/assets/tarot.png" alt="타로">
-          <div class="cardTitle">타로</div>
-          <div class="cardDesc">현재 고민과 선택지를 카드 상징으로 정리합니다.</div>
-        </a>
-        <a class="card" href="/pages/astro/index.html">
-          <img src="/assets/star_fortune.png" alt="별자리 운세">
-          <div class="cardTitle">별자리</div>
-          <div class="cardDesc">별자리별 연간·월간 흐름을 확인합니다.</div>
-        </a>
-        <a class="card" href="/pages/zodiac/zodiac.html">
-          <img src="/assets/zodiac_fortune.png" alt="띠별 운세">
-          <div class="cardTitle">띠별 운세</div>
-          <div class="cardDesc">띠와 생년 기준으로 일상 흐름을 살펴봅니다.</div>
+          <div class="cardTitle">지금 고민은 어떻게 볼까?</div>
+          <div class="cardDesc">타로로 현재 상황, 선택지, 조심할 점을 대화하듯 정리합니다.</div>
         </a>
         <a class="card" href="/pages/tojung/tojung.html">
           <img src="/assets/tojung.png" alt="토정비결">
-          <div class="cardTitle">토정비결</div>
-          <div class="cardDesc">한 해의 큰 방향과 주의할 흐름을 확인합니다.</div>
+          <div class="cardTitle">올해 큰 흐름은?</div>
+          <div class="cardDesc">한 해의 방향과 관리할 부분을 넓게 확인합니다.</div>
+        </a>
+        <a class="card" href="/point.html">
+          <img src="/assets/point.png" alt="포인트">
+          <div class="cardTitle">내 포인트는?</div>
+          <div class="cardDesc">포인트 상태와 서비스 이용 흐름을 확인합니다.</div>
+        </a>
+        <a class="card" href="/pages/astro/index.html">
+          <img src="/assets/star_fortune.png" alt="별자리 운세">
+          <div class="cardTitle">이번 달 분위기는?</div>
+          <div class="cardDesc">별자리 기준으로 월간·연간 흐름을 가볍게 봅니다.</div>
+        </a>
+        <a class="card" href="/pages/zodiac/zodiac.html">
+          <img src="/assets/zodiac_fortune.png" alt="띠별 운세">
+          <div class="cardTitle">내 띠 운세는?</div>
+          <div class="cardDesc">띠와 생년 기준으로 일상 흐름을 확인합니다.</div>
         </a>
         <a class="card" href="/pages/cookie/cookie.html">
           <img src="/assets/fortune_cookie.png" alt="포춘쿠키">
-          <div class="cardTitle">포춘쿠키</div>
-          <div class="cardDesc">짧은 메시지로 오늘의 기분을 가볍게 점검합니다.</div>
+          <div class="cardTitle">짧은 메시지가 필요해</div>
+          <div class="cardDesc">오늘의 기분을 가볍게 정리하는 메시지를 확인합니다.</div>
         </a>
         <a class="card" href="/pages/mbti/mbti.html">
           <img src="/assets/mbti.png" alt="MBTI">
-          <div class="cardTitle">MBTI</div>
-          <div class="cardDesc">성향을 참고용으로 확인하고 관계 팁을 봅니다.</div>
-        </a>
-        <a class="card" href="/pages/mini_game/index.html">
-          <img src="/assets/mini_game.png" alt="미니게임">
-          <div class="cardTitle">미니게임</div>
-          <div class="cardDesc">짧게 즐기는 기억력·집중력 콘텐츠입니다.</div>
+          <div class="cardTitle">내 관계 스타일은?</div>
+          <div class="cardDesc">MBTI 성향을 참고용으로 확인하고 관계 팁을 봅니다.</div>
         </a>
       </div>
     </section>
 
     <section>
       <div class="section-head">
-        <h2>이용 안내</h2>
-        <p class="section-copy">운세 콘텐츠는 생활 조언과 자기 점검을 돕는 참고용 서비스입니다.</p>
+        <h2>신뢰 안내</h2>
+        <p class="section-copy">앱테크 서비스일수록 보상 구조와 광고 정책을 분명히 보여주는 것이 중요합니다.</p>
       </div>
       <div class="info-grid">
-        <div class="info"><strong>참고용 해석</strong>결과는 확정적인 예언이 아니며 중요한 의사결정의 단독 근거로 쓰지 않는 것이 좋습니다.</div>
-        <div class="info"><strong>개인정보 보호</strong>생년월일 등 입력 정보는 맞춤 결과 계산과 서비스 제공을 위해 사용됩니다.</div>
-        <div class="info"><strong>광고 정책</strong>광고 클릭을 조건으로 포인트를 지급하지 않으며, 콘텐츠 이용을 방해하지 않도록 배치합니다.</div>
-      </div>
-    </section>
-
-    <section>
-      <div class="section-head">
-        <h2>운세 가이드</h2>
-        <p class="section-copy">사주, 타로, 별자리, 띠별 운세의 차이를 알고 보면 결과를 더 현실적으로 활용할 수 있습니다.</p>
-      </div>
-      <div class="hero-actions">
-        <a class="secondary" href="/fortune-guide.html">운세 보는 방법</a>
-        <a class="secondary" href="/saju-guide.html">사주 가이드</a>
-        <a class="secondary" href="/star-guide.html">별자리 가이드</a>
-        <a class="secondary" href="/zodiac-guide.html">띠별 운세 가이드</a>
+        <div class="info"><strong>포인트 활동</strong><span>포인트는 출석, 콘텐츠 이용, 이벤트 등 운영 정책에 따라 제공될 수 있습니다.</span></div>
+        <div class="info"><strong>광고 정책</strong><span class="notice">광고 클릭이나 광고 상호작용을 조건으로 포인트를 지급하지 않습니다.</span></div>
+        <div class="info"><strong>운세 해석</strong><span>운세 결과는 참고용이며 중요한 결정은 현실 정보와 전문가 조언을 함께 확인해야 합니다.</span></div>
       </div>
     </section>
 
     <footer>
-      <div>무료 운세 플랫폼</div>
+      <div>운세 앱테크</div>
       <div>문의: daekoju@naver.com</div>
       <div>
         <a href="/privacy.html">개인정보처리방침</a> |
@@ -246,10 +286,58 @@
   {
     "@context":"https://schema.org",
     "@type":"WebSite",
-    "name":"무료 운세 플랫폼",
+    "name":"운세 앱테크",
     "url":"https://fortune-cash.vercel.app/",
     "inLanguage":"ko-KR"
   }
+  </script>
+  <script>
+    const homeChatAnswers = {
+      earn: {
+        text: "포인트는 출석, 콘텐츠 이용, 이벤트 참여처럼 서비스 안에서 자연스럽게 하는 활동을 중심으로 쌓는 구조가 좋습니다. 광고 클릭을 조건으로 보상하지 않는 것이 정책상 안전합니다.",
+        links: [["포인트 확인", "/point.html"], ["미니게임", "/pages/mini_game/index.html"]]
+      },
+      today: {
+        text: "오늘은 먼저 내 상태를 확인하고, 짧은 콘텐츠로 활동을 이어가는 흐름이 좋습니다. 사주로 큰 방향을 보고, 고민이 있으면 타로로 선택지를 정리해보세요.",
+        links: [["사주 보기", "/pages/saju/saju.html"], ["타로 보기", "/pages/tarot/tarot.html"]]
+      },
+      saju: {
+        text: "사주는 내가 어떤 성향으로 움직이는지, 올해 어떤 부분을 관리하면 좋은지 보는 데 적합합니다. 어려운 용어는 쉬운 해석 도우미가 풀어줍니다.",
+        links: [["사주 분석", "/pages/saju/saju.html"], ["사주 가이드", "/saju-guide.html"]]
+      },
+      tarot: {
+        text: "타로는 지금의 고민을 정리하는 데 좋습니다. 결과를 확정된 미래로 보기보다, 현재 선택지와 조심할 점을 확인하는 방식으로 쓰면 더 실용적입니다.",
+        links: [["타로 상담", "/pages/tarot/tarot.html"]]
+      },
+      points: {
+        text: "포인트는 내 활동 상태를 확인하는 핵심 화면입니다. 적립 조건과 사용 제한은 운영 정책에 따라 달라질 수 있어요.",
+        links: [["포인트 확인", "/point.html"], ["이용약관", "/terms.html"]]
+      },
+      guide: {
+        text: "처음이라면 포인트 확인보다 먼저 사주나 포춘쿠키처럼 쉬운 콘텐츠를 하나 체험해보세요. 그 다음 포인트 화면에서 활동 흐름을 확인하면 됩니다.",
+        links: [["포춘쿠키", "/pages/cookie/cookie.html"], ["운세 가이드", "/fortune-guide.html"]]
+      }
+    };
+
+    function appendHomeChat(role, html){
+      const chat = document.getElementById("homeChat");
+      if(!chat) return;
+      const msg = document.createElement("div");
+      msg.className = `msg ${role}`;
+      msg.innerHTML = html;
+      chat.appendChild(msg);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    document.getElementById("homeQuestions")?.addEventListener("click", (event)=>{
+      const btn = event.target.closest("[data-home-question]");
+      if(!btn) return;
+      const answer = homeChatAnswers[btn.dataset.homeQuestion];
+      if(!answer) return;
+      appendHomeChat("user", btn.textContent);
+      const links = answer.links.map(([label, href]) => `<a class="chat-link" href="${href}">${label}</a>`).join("");
+      appendHomeChat("bot", `${answer.text}<div class="answer-actions">${links}</div>`);
+    });
   </script>
   <script src="/js/birth.js"></script>
   <script src="/js/auth.js"></script>
