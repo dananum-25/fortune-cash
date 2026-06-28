@@ -386,7 +386,7 @@ body.lock-scroll{ overflow:hidden; }
   color:#fff1b8;
 }
 
-.reading-story > p{
+.story-narrative p{
   margin:8px 0 16px;
   font-size:17px;
   line-height:1.75;
@@ -418,6 +418,15 @@ body.lock-scroll{ overflow:hidden; }
   color:#fff;
   font-weight:800;
   margin-bottom:7px;
+}
+
+.story-step em{
+  display:block;
+  margin-bottom:8px;
+  color:#ffe7a3;
+  font-size:14px;
+  font-style:normal;
+  line-height:1.45;
 }
 
 .story-step p{
@@ -581,7 +590,7 @@ body.lock-scroll{ overflow:hidden; }
     padding:16px;
   }
 
-  .reading-story > p,
+  .story-narrative p,
   .story-action span{
     font-size:17px;
     line-height:1.75;

@@ -641,12 +641,22 @@ function formatCardName(key){
 
 function getTarotCategoryLabel(category){
   const labels = {
-    love: "연애와 마음",
-    career: "일과 진로",
-    money: "돈과 현실 문제",
-    relationship: "사람 관계"
+    love: "연애 상담",
+    career: "일과 진로 상담",
+    money: "돈과 현실 상담",
+    relationship: "인간관계 상담"
   };
-  return labels[category] || "지금의 고민";
+  return labels[category] || "지금 고민 상담";
+}
+
+function getTarotQuestionFrame(category){
+  const frames = {
+    love: "상대의 마음을 맞히는 것보다, 이 관계 안에서 내가 무엇을 기대하고 어디서 불안해지는지부터 보는 리딩입니다.",
+    career: "결과를 단정하기보다, 지금 일의 흐름에서 힘을 써야 할 지점과 내려놓아도 되는 부담을 구분해보는 리딩입니다.",
+    money: "운이 좋고 나쁨을 말하기보다, 돈이 새는 지점과 현실적으로 바로 정리할 수 있는 선택을 보는 리딩입니다.",
+    relationship: "누가 옳은지 판단하기보다, 관계 안에서 반복되는 감정과 대화의 실마리를 찾아보는 리딩입니다."
+  };
+  return frames[category] || "지금 고민을 한 걸음 떨어져 보고, 오늘 선택할 수 있는 방향을 정리해보는 리딩입니다.";
 }
 
 function getTarotTimeLabel(timeKey){
@@ -667,43 +677,47 @@ function pickCardLine(card, fallbackField){
   );
 }
 
+function getStoryCard(cards, meaning, fallbackIndex){
+  return cards.find(c=>getSlotMeaning(c.slot)===meaning) || cards[fallbackIndex] || cards[0];
+}
+
 function buildStoryParagraph(cards){
-  const past = cards.find(c=>getSlotMeaning(c.slot)==="past");
-  const present = cards.find(c=>getSlotMeaning(c.slot)==="present");
-  const future = cards.find(c=>getSlotMeaning(c.slot)==="future");
-  const advice = cards.find(c=>getSlotMeaning(c.slot)==="advice");
+  const past = getStoryCard(cards, "past", 0);
+  const present = getStoryCard(cards, "present", Math.min(1, cards.length - 1));
+  const future = getStoryCard(cards, "future", cards.length - 1);
+  const advice = getStoryCard(cards, "advice", cards.length - 1);
 
   const categoryLabel = getTarotCategoryLabel(selectedCategory);
   const timeLabel = getTarotTimeLabel(selectedTime);
-  const presentName = formatCardName(present?.key || cards[0]?.key || "");
-  const futureName = formatCardName(future?.key || cards[cards.length - 1]?.key || "");
-  const adviceName = formatCardName(advice?.key || cards[cards.length - 1]?.key || "");
+  const pastName = formatCardName(past?.key || "");
+  const presentName = formatCardName(present?.key || "");
+  const futureName = formatCardName(future?.key || "");
+  const adviceName = formatCardName(advice?.key || "");
 
-  const opening = `${categoryLabel}에 대해 보면, 이번 리딩은 단순히 좋다/나쁘다보다 마음이 어디에서 멈춰 있고 어떤 선택을 하면 흐름이 풀리는지를 보여줍니다.`;
-  const pastLine = past ? `지나온 흐름에는 <b>${formatCardName(past.key)}</b>의 기운이 있어요. ${pickCardLine(past, "past")}` : "";
-  const presentLine = `지금 가장 중요한 장면은 <b>${presentName}</b>입니다. ${present ? pickCardLine(present, "present") : pickCardLine(cards[0], "present")}`;
-  const futureLine = future ? `앞으로의 가능성은 <b>${futureName}</b> 쪽으로 열려 있습니다. ${pickCardLine(future, "future")}` : "";
-  const adviceLine = advice
-    ? `그래서 오늘의 조언은 <b>${adviceName}</b>처럼, ${advice.db?.advice || "한 번에 결론 내기보다 상황을 차분히 살피는 것"}입니다.`
-    : `그래서 오늘의 조언은 결론을 서두르기보다 ${timeLabel}을 먼저 정리하는 것입니다.`;
-
-  return [opening, pastLine, presentLine, futureLine, adviceLine].filter(Boolean).join(" ");
+  return `
+    <p>지금 뽑힌 카드는 <b>${categoryLabel}</b>을 “맞다/아니다”로 끊어 말하기보다, 마음이 어떤 순서로 움직이고 있는지 보여줍니다. ${getTarotQuestionFrame(selectedCategory)}</p>
+    <p>먼저 <b>${pastName}</b>은 이 고민이 갑자기 생긴 것이 아니라 이미 쌓여온 감정이나 상황에서 출발했음을 말합니다. ${pickCardLine(past, "past")}</p>
+    <p>현재의 중심에는 <b>${presentName}</b>이 놓여 있습니다. 이 카드는 지금 당장 결론을 내리기보다, ${timeLabel}에서 가장 예민하게 반응하는 부분을 먼저 알아차리라고 말합니다. ${pickCardLine(present, "present")}</p>
+    <p>앞으로의 흐름은 <b>${futureName}</b> 쪽으로 열립니다. 정해진 미래라기보다, 지금의 태도를 유지하거나 조금 바꾸었을 때 생길 수 있는 가능성에 가깝습니다. ${pickCardLine(future, "future")}</p>
+    <p>그래서 이 리딩의 조언은 <b>${adviceName}</b>입니다. ${advice?.db?.advice || "오늘은 큰 결론보다 작은 확인부터 해보는 편이 좋습니다."}</p>
+  `;
 }
 
 function buildStorySteps(cards){
   const steps = [
-    ["상황", cards.find(c=>getSlotMeaning(c.slot)==="past") || cards[0], "past"],
-    ["마음", cards.find(c=>getSlotMeaning(c.slot)==="present") || cards[0], "present"],
-    ["가능성", cards.find(c=>getSlotMeaning(c.slot)==="future") || cards[cards.length - 1], "future"],
-    ["조언", cards.find(c=>getSlotMeaning(c.slot)==="advice") || cards[cards.length - 1], "advice"]
+    ["시작점", getStoryCard(cards, "past", 0), "이 고민이 어디서 시작됐는지 봅니다.", "past"],
+    ["현재 감정", getStoryCard(cards, "present", Math.min(1, cards.length - 1)), "지금 가장 크게 흔들리는 마음을 봅니다.", "present"],
+    ["가능한 흐름", getStoryCard(cards, "future", cards.length - 1), "앞으로 열릴 수 있는 선택지를 봅니다.", "future"],
+    ["상담 조언", getStoryCard(cards, "advice", cards.length - 1), "오늘 바로 해볼 수 있는 행동을 정리합니다.", "advice"]
   ];
 
   return steps
     .filter(([, card])=>card)
-    .map(([title, card, field])=>`
+    .map(([title, card, guide, field])=>`
       <div class="story-step">
         <strong>${title}</strong>
         <span>${formatCardName(card.key)}</span>
+        <em>${guide}</em>
         <p>${pickCardLine(card, field)}</p>
       </div>
     `)
@@ -711,26 +725,25 @@ function buildStorySteps(cards){
 }
 
 function buildStoryAction(){
-  const categoryLabel = getTarotCategoryLabel(selectedCategory);
   const actionByCategory = {
-    "연애와 마음": "상대의 반응을 추측하기보다, 내가 원하는 관계의 속도와 기준을 먼저 정리해보세요.",
-    "일과 진로": "오늘은 큰 결론보다 할 일의 우선순위를 세 가지로 줄이는 것이 좋습니다.",
-    "돈과 현실 문제": "지출, 약속, 계약처럼 숫자로 확인할 수 있는 부분을 먼저 점검해보세요.",
-    "사람 관계": "바로 설득하려 하기보다 상대가 불편해하는 지점을 한 번 더 들어보는 것이 좋습니다."
+    love: "오늘은 상대의 마음을 단정하지 말고, 내가 원하는 관계의 속도와 불편했던 장면을 한 문장으로 적어보세요.",
+    career: "오늘은 큰 결정을 미루더라도 괜찮습니다. 대신 가장 신경 쓰이는 일 하나를 골라 다음 행동만 작게 정해보세요.",
+    money: "오늘은 지출, 약속, 결제일처럼 숫자로 확인되는 것부터 보세요. 막연한 불안이 줄어들면 선택이 더 선명해집니다.",
+    relationship: "오늘은 설득보다 확인이 먼저입니다. 상대가 실제로 말한 것과 내가 추측한 것을 나누어 적어보세요."
   };
 
-  return actionByCategory[categoryLabel] || "오늘은 결론보다 상황 정리가 먼저입니다.";
+  return actionByCategory[selectedCategory] || "오늘은 결론을 서두르지 말고, 지금 고민에서 확인 가능한 사실 한 가지를 먼저 적어보세요.";
 }
 
 function buildReadingStoryHTML(cards, category){
   return `
     <section class="reading-story" aria-label="타로 상담 이야기">
-      <div class="story-label">${getTarotCategoryLabel(category)} 리딩</div>
-      <h4>카드들이 말하는 장면</h4>
-      <p>${buildStoryParagraph(cards)}</p>
+      <div class="story-label">${getTarotCategoryLabel(category)}</div>
+      <h4>상담사가 읽어주는 흐름</h4>
+      <div class="story-narrative">${buildStoryParagraph(cards)}</div>
       <div class="story-steps">${buildStorySteps(cards)}</div>
       <div class="story-action">
-        <strong>오늘 해볼 일</strong>
+        <strong>오늘의 작은 선택</strong>
         <span>${buildStoryAction()}</span>
       </div>
     </section>
